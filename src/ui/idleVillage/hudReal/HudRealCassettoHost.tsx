@@ -22,7 +22,7 @@ import { MatericRosterComponentV2 } from '@/ui/idleVillage/rosterV2';
 import { SkinScope } from '@/ui/idleVillage/skins/primitives';
 import { selectResourceOutlook, useMinimalGameplayWithIdleVillageConfig } from '@/store/useMinimalGameplay';
 import { buildResourceReadoutItems } from '@/ui/idleVillage/components/gameFrame';
-import { HudRealCassetto, type CassettoQuest, type LoadoutRow } from './HudRealCassetto';
+import { HudRealCassetto, type CassettoQuest, type CassettoLoadout } from './HudRealCassetto';
 
 const POI_ID = 'poi-goblin';
 /** Stable empty bag — inline `?? []` inside the store selector mints a new array
@@ -97,30 +97,25 @@ export const HudRealCassettoHost: React.FC = () => {
     };
   }, [poi, scenario, session.poiView, session.estimate, t]);
 
-  /* Loadout rows: the REAL ledger bag — click packs (assign) / unpacks (release). */
-  const loadoutRows: LoadoutRow[] = useMemo(() => {
-    const bagItemIds = bag.filter((id): id is string => Boolean(id));
-    return villageStashViewModel(VILLAGE_STASH_CONFIG).rows.slice(0, 5).map((row) => {
-      const packed = bagItemIds.includes(row.itemId);
-      const full = !packed && bagItemIds.length >= QUEST_STASH.bagSlots;
-      return {
-        id: row.itemId,
-        icon: row.icon,
-        label: row.label ?? row.itemId,
-        qty: row.qty,
-        packed,
-        disabled: full,
-        onToggle: () => {
-          if (packed) {
-            const idx = bag.findIndex((id) => id === row.itemId);
-            if (idx >= 0) stashState.release(POI_ID, idx);
-          } else if (!full) {
-            stashState.assign(POI_ID, row.itemId);
-          }
-        },
-      };
-    });
-  }, [bag, stashState]);
+  /* Quest bag as SLOT FRAMES (R-337): the sparse ledger bag, not a catalogue
+   *  list — empty slots open the (bound) stash affordance, packed slots release. */
+  const loadout: CassettoLoadout = useMemo(() => {
+    const rows = villageStashViewModel(VILLAGE_STASH_CONFIG).rows;
+    return {
+      slots: Array.from({ length: QUEST_STASH.bagSlots }, (_, i) => {
+        const id = bag[i] ?? null;
+        if (!id) return null;
+        const row = rows.find((r) => r.itemId === id);
+        return row ? { id, icon: row.icon, label: t(row.nameKey.replace(/^idleVillage\./, '')), qty: row.qty } : null;
+      }),
+      onReleaseItem: (itemId: string) => {
+        const idx = bag.findIndex((id) => id === itemId);
+        if (idx >= 0) stashState.release(POI_ID, idx);
+      },
+      /* Lab has no magazzino panel — binding keeps the ledger contract real. */
+      onOpenStash: () => { stashState.bindStash(POI_ID); console.info('[cassetto-host] open stash'); },
+    };
+  }, [bag, stashState, t]);
 
   const slots = session.controller.slots as unknown as import('@/ui/idleVillage/slots/types').ResidentSlotViewModel[];
 
@@ -170,7 +165,7 @@ export const HudRealCassettoHost: React.FC = () => {
         resourceItems={resourceItems}
         onSlotClear={(slotId) => session.handleSlotClear(slotId)}
         suppressedResidentIds={session.suppressedResidentIds}
-        loadoutRows={loadoutRows}
+        loadout={loadout}
         canSend={session.canSend}
         onConfirm={() => session.send()}
       />

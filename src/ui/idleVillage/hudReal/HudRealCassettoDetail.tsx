@@ -13,9 +13,9 @@ import { buildResourceReadoutItems } from '@/ui/idleVillage/components/gameFrame
 import type { QuestExpeditionDetailProps } from '@/ui/idleVillage/quests/QuestExpeditionDetail';
 import { journeyFasiOf } from '@/ui/idleVillage/quests/questJourney';
 import { expeditionTotalDays } from '@/ui/idleVillage/quests/questExpedition';
-import { QUEST_STASH } from '@/balancing/config/idleVillage/quests/questStash';
 import { DEFAULT_IDLE_VILLAGE_CONFIG } from '@/balancing/config/idleVillage/defaultConfig';
-import { HudRealCassetto, type CassettoQuest, type LoadoutRow } from './HudRealCassetto';
+import { HudRealCassetto, type CassettoQuest, type CassettoLoadout } from './HudRealCassetto';
+import { emptyStashBag, useVillageStashStore } from '@/ui/idleVillage/store/useVillageStashStore';
 
 /** `labelKey`/`descKey` may carry the `idleVillage.` prefix — stripped before `t`. */
 const stripNs = (k: string) => k.replace(/^idleVillage\./, '');
@@ -59,24 +59,26 @@ export const HudRealCassettoDetail: React.FC<QuestExpeditionDetailProps> = (p) =
     };
   }, [p.poi, p.scenario, p.estimate, p.expeditionDuration, t]);
 
-  /* Loadout = the session's REAL expedition items (shared village pool):
-   * click packs/unpacks the planner's bag — same `onToggleItem` the stock
-   * detail fires. Full bag disables unpacked rows. */
-  const loadoutRows = useMemo<LoadoutRow[]>(() => {
-    const full = p.selectedItemIds.length >= QUEST_STASH.bagSlots;
-    return p.items.map((entry) => {
-      const packed = p.selectedItemIds.includes(entry.item.id);
-      return {
-        id: entry.item.id,
-        icon: entry.item.icon,
-        label: t(stripNs(entry.item.labelKey)),
-        qty: entry.qty,
-        packed,
-        disabled: !packed && full,
-        onToggle: () => p.onToggleItem(entry.item.id),
-      };
-    });
-  }, [p.items, p.selectedItemIds, p.onToggleItem, t]);
+  /* Quest bag as SLOT FRAMES (R-337): the ledger's sparse `bags[poi.id]`
+   * is the authoritative slot layout — the same slice the bound
+   * `VillageStashPanel` writes into via `assign`. Empty slot → `onOpenStash`
+   * (binds this POI + opens the magazzino); packed slot → `onToggleItem`
+   * releases the item (the session's toggle is in-bag ⇒ release). */
+  const stashBag = useVillageStashStore((s) => s.bags[p.poi.id]);
+  const loadout = useMemo<CassettoLoadout>(() => {
+    const bag = stashBag ?? emptyStashBag();
+    return {
+      slots: emptyStashBag().map((_, i) => {
+        const id = bag[i] ?? null;
+        if (!id) return null;
+        const entry = p.items.find((e) => e.item.id === id);
+        if (!entry) return null;
+        return { id, icon: entry.item.icon, label: t(stripNs(entry.item.labelKey)), qty: entry.qty };
+      }),
+      onReleaseItem: p.onToggleItem,
+      onOpenStash: p.onOpenStash,
+    };
+  }, [stashBag, p.items, p.onToggleItem, p.onOpenStash, t]);
 
   return (
     <HudRealCassetto
@@ -85,7 +87,7 @@ export const HudRealCassettoDetail: React.FC<QuestExpeditionDetailProps> = (p) =
       resourceItems={resourceItems}
       onSlotClear={p.onSlotClear}
       suppressedResidentIds={p.suppressedResidentIds}
-      loadoutRows={loadoutRows}
+      loadout={loadout}
       canSend={p.canSend}
       onConfirm={p.onSend}
     />

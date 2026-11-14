@@ -1,26 +1,26 @@
 /**
  * HudRealCassetto — PLAN-113/114 family B: the quest planner drawer (dossier on map).
  * Director rulings 2026-11-06 — form + internals signed against `cassetto-rich-0.png`.
- * F3 art pass (2026-11-09): `/assets/ui/hud-real/cassetto/frame.webp` (639×1613 RGBA)
- * is the cut-out, background-free, text-free frame asset extracted from the signed art
- * (`cassetto-rich-0.png` + clean navy wells from `internals-v2-0.png`).
+ * F3 art pass (2026-11-09) + PLAN-116 F1 column pass (2026-11-14): the frame is
+ * the widened column art from `scripts/hud-real/build-cassetto-column.py`
+ * (`column-1440.webp` / `column-1280.webp` — ruling R-323 "Dentro la cornice",
+ * 420px @1440×900 / 400px @1280×800; ornaments never stretched, seams only in
+ * neutral fields). Zone rects come from the generated `cassettoColumnGeometry`.
  * Zero opaque cover patches: live i18n text, the REAL certified ResidentSlotRack mount,
  * the REAL village stash bag, and the live CONFIRM button sit directly inside the
  * clean painted enamel/navy wells.
  */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useSyncExternalStore } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ResidentSlotRack } from '@/ui/idleVillage/components/ResidentSlotRack';
 import type { ResidentSlotViewModel } from '@/ui/idleVillage/slots/types';
 import { StashItemTile } from '@/ui/idleVillage/components/gameFrame/stashItemFace';
+import { EngravedIcon } from '@/ui/idleVillage/components/gameFrame/engravedIcons';
 import type { ResourceReadoutItem } from '@/ui/idleVillage/components/gameFrame/ResourceReadout';
-import { HudRealResources } from './HudRealResources';
-import { RESOURCES_BAR } from './resourcesBarGeometry';
-
-const FRAME_SRC = '/assets/ui/hud-real/cassetto/frame.webp';
-/** Cut-out RGBA asset dimensions (x=9..648, y=10..1623 of the 656×1632 signed source). */
-const ART_W = 639;
-const ART_H = 1613;
+import { HUD_TONE_COLOR } from '@/ui/idleVillage/components/gameFrame/hudTones';
+import { ZanaraTooltip } from '@/ui/idleVillage/zanara/ZanaraTooltip';
+import { CASSETTO_WIDE_BREAKPOINT, cassettoColumnSpec } from './layout/cassettoColumn';
+import type { CassettoZone } from './cassettoColumnGeometry';
 
 const C = {
   ink: '#f3e7c4',
@@ -40,14 +40,25 @@ export interface CassettoQuest {
   riskLabel: string;
   rewards: { icon: string; qty: string }[];
 }
-export interface LoadoutRow {
+export interface CassettoLoadoutSlot {
   id: string;
-  icon: string;
-  label?: string;
+  icon?: string;
+  label: string;
   qty?: number;
-  packed?: boolean;
-  disabled?: boolean;
-  onToggle?: () => void;
+}
+
+/**
+ * The quest bag as SLOT FRAMES (R-337): `bagSlots` wells in order, `null` =
+ * empty pouch. The cassetto never lists the stash catalogue — filling happens
+ * by clicking items inside the bound warehouse (`VillageStashPanel`, the
+ * magazzino), exactly like the stock planner's `QuestBagSlot` contract:
+ * empty slot → `onOpenStash` (opens the bound magazzino), packed slot →
+ * `onReleaseItem` returns the item to the shared pool.
+ */
+export interface CassettoLoadout {
+  slots: (CassettoLoadoutSlot | null)[];
+  onReleaseItem: (itemId: string) => void;
+  onOpenStash: (trigger: HTMLElement) => void;
 }
 
 export interface HudRealCassettoProps {
@@ -63,40 +74,43 @@ export interface HudRealCassettoProps {
   onSlotClick?: (slotId: string) => void;
   onSlotClear?: (slotId: string) => void;
   suppressedResidentIds?: readonly string[];
-  loadoutRows?: LoadoutRow[];
+  loadout?: CassettoLoadout;
   canSend?: boolean;
   onConfirm?: () => void;
 }
 
-/** A zone rect on the 639×1613 cut-out RGBA art (offset by -9, -10 from raw 656×1632). */
-interface Zone { x: number; y: number; w: number; h: number }
+type Zone = CassettoZone;
 
-const Z = {
-  resources: { x: 208, y: 22, w: 396, h: 126 },
-  title: { x: 227, y: 176, w: 318, h: 42 },
-  subtitle: { x: 216, y: 238, w: 340, h: 38 },
-  briefing: { x: 215, y: 300, w: 342, h: 256 },
-  partyLabel: { x: 225, y: 594, w: 322, h: 30 },
-  slots: { x: 214, y: 632, w: 344, h: 156 },
-  loadout: { x: 215, y: 800, w: 342, h: 64 },
-  journeyLabel: { x: 260, y: 906, w: 252, h: 38 },
-  journeyLegs: { x: 218, y: 980, w: 336, h: 38 },
-  journeySubs: { x: 215, y: 1034, w: 342, h: 52 },
-  riskLabel: { x: 250, y: 1144, w: 296, h: 38 },
-  riskValue: { x: 244, y: 1298, w: 116, h: 74 },
-  rewards: { x: 382, y: 1292, w: 172, h: 82 },
-  confirm: { x: 224, y: 1450, w: 336, h: 78 },
-} satisfies Record<string, Zone>;
-
-const pct = (z: Zone): React.CSSProperties => ({
+const pct = (z: Zone, artW: number, artH: number): React.CSSProperties => ({
   position: 'absolute',
-  left: `${(z.x / ART_W) * 100}%`,
-  top: `${(z.y / ART_H) * 100}%`,
-  width: `${(z.w / ART_W) * 100}%`,
-  height: `${(z.h / ART_H) * 100}%`,
+  left: `${(z.x / artW) * 100}%`,
+  top: `${(z.y / artH) * 100}%`,
+  width: `${(z.w / artW) * 100}%`,
+  height: `${(z.h / artH) * 100}%`,
 });
 
-const cqw = (px: number) => `${(px / ART_W) * 100}cqw`;
+const cqw = (px: number, artW: number) => `${(px / artW) * 100}cqw`;
+
+/** Viewport-wide variant switch: ≥1360px → the '1440' column art (R-323 ruling
+ *  420px @1440×900 / 400px @1280×800). matchMedia keeps it live on resize. */
+const WIDE_MQ = `(min-width: ${CASSETTO_WIDE_BREAKPOINT}px)`;
+const subscribeWide = (cb: () => void) => {
+  const mq = window.matchMedia(WIDE_MQ);
+  mq.addEventListener('change', cb);
+  return () => mq.removeEventListener('change', cb);
+};
+const readWide = () => window.matchMedia(WIDE_MQ).matches;
+const useColumnSpec = () => {
+  const wide = useSyncExternalStore(subscribeWide, readWide, () => true);
+  return cassettoColumnSpec(wide ? 1440 : 1280);
+};
+
+/** Compact display for very large integers (123456 -> 123K) so a targhetta never overflows. */
+function compactRes(v: string | number): string {
+  const n = typeof v === 'number' ? v : Number(String(v).replace(/[^0-9.-]/g, ''));
+  if (!Number.isFinite(n) || Math.abs(n) < 100000) return String(v);
+  return new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 }).format(n);
+}
 
 /* Force the 4 detail slots onto a single evenly-spaced 4-column row inside the Party Slots well */
 const RACK_SCOPED_CSS = `
@@ -111,23 +125,14 @@ const RACK_SCOPED_CSS = `
 `;
 
 export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
-  quest, slots, resourceItems, onSlotClick, onSlotClear, suppressedResidentIds, loadoutRows = [], canSend = true, onConfirm,
+  quest, slots, resourceItems, onSlotClick, onSlotClear, suppressedResidentIds, loadout, canSend = true, onConfirm,
 }) => {
   const { t } = useTranslation('idleVillage');
-
-  /* The resources bar is a fixed-design-px component (`RESOURCES_BAR`) while the
-   *  drawer scales with the column: measure its well and fit the bar inside. */
-  const resWellRef = useRef<HTMLDivElement | null>(null);
-  const [resFit, setResFit] = useState(0);
-  useEffect(() => {
-    const el = resWellRef.current;
-    if (!el || !resourceItems) return;
-    const fit = () => setResFit(Math.min(el.clientWidth / RESOURCES_BAR.w, el.clientHeight / RESOURCES_BAR.h) * 0.94);
-    fit();
-    const ro = new ResizeObserver(fit);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [resourceItems]);
+  const spec = useColumnSpec();
+  const Z = spec.geo.zones;
+  const { artW, artH } = spec.geo;
+  const zp = (z: Zone) => pct(z, artW, artH);
+  const fz = (px: number) => cqw(px, artW);
   return (
     <div
       data-hudreal-cassetto=""
@@ -144,37 +149,107 @@ export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
         style={{
           position: 'relative',
           height: '100%',
-          aspectRatio: `${ART_W} / ${ART_H}`,
+          aspectRatio: `${artW} / ${artH}`,
           containerType: 'size',
           pointerEvents: 'auto',
         }}
       >
         <img
-          src={FRAME_SRC}
+          src={spec.src}
           alt=""
           draggable={false}
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', display: 'block' }}
         />
 
-        {/* REAL resources bar inside the empty navy well the frame paints at
-            the top interior (where the signed mockup's control band sits). */}
+        {/* REAL resources targhette inside the cleaned header band — the
+            approved fork look (ruling "Dentro la cornice"): one dark-glass
+            plaque per resource, not the corner bar scaled down. */}
         {resourceItems && (
           <div
-            ref={resWellRef}
             data-cassetto-resources=""
-            style={{ ...pct(Z.resources), display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            style={{ ...zp(Z.resources), display: 'flex', alignItems: 'stretch', gap: fz(9), padding: `${fz(5)} ${fz(7)}` }}
           >
-            <div style={{ transform: `scale(${resFit})`, transformOrigin: 'center center', opacity: resFit > 0 ? 1 : 0 }}>
-              <HudRealResources items={resourceItems} />
-            </div>
+            {resourceItems.map((item) => {
+              const danger = item.tone === 'danger';
+              const toneColor = item.tone ? HUD_TONE_COLOR[item.tone] : C.muted;
+              const description = item.description ?? `${item.label}: ${item.value}`;
+              const hint = [description !== item.label ? description : null, item.detail ? `${item.detail}` : null]
+                .filter(Boolean)
+                .join(' — ');
+              return (
+                <ZanaraTooltip key={item.id} label={item.label} hint={hint || undefined}>
+                  <div
+                    role="group"
+                    aria-label={description}
+                    tabIndex={0}
+                    data-cassetto-res={item.id}
+                    data-tone={item.tone}
+                    style={{
+                      flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: fz(9),
+                      padding: `0 ${fz(9)}`, borderRadius: fz(9), cursor: 'default',
+                      background: 'rgba(6, 20, 18, 0.66)',
+                      boxShadow: danger
+                        ? `inset 0 0 0 1px ${HUD_TONE_COLOR.danger}b8, inset 0 0 10px ${HUD_TONE_COLOR.danger}33, inset 0 0 0 1px rgba(240,214,138,.22)`
+                        : 'inset 0 0 0 1px rgba(240, 214, 138, 0.30), inset 0 -6px 12px rgba(0,0,0,.35)',
+                    }}
+                  >
+                    {/* brass socket — same grammar as the nav round buttons */}
+                    <div
+                      aria-hidden="true"
+                      style={{
+                        width: fz(58), height: fz(58), flex: 'none', borderRadius: '50%',
+                        display: 'grid', placeItems: 'center',
+                        background: 'radial-gradient(circle at 34% 26%, #33514a 0%, #14302b 55%, #0a1f1c 100%)',
+                        boxShadow: [
+                          'inset 0 1px 1px rgba(255, 236, 180, 0.22)',
+                          'inset 0 -2px 3px rgba(0, 0, 0, 0.6)',
+                          '0 0 0 1.5px #7a6230',
+                          '0 0 0 3px rgba(20, 12, 4, 0.9)',
+                          '0 1px 3px rgba(0, 0, 0, 0.75)',
+                        ].join(', '),
+                      }}
+                    >
+                      <div style={{ width: fz(36), height: fz(36), display: 'grid', placeItems: 'center', filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.8))' }}>
+                        {item.icon}
+                      </div>
+                    </div>
+                    <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', position: 'relative' }}>
+                      <span
+                        style={{
+                          fontFamily: '"EB Garamond", serif', fontSize: fz(26), fontWeight: danger ? 700 : 600,
+                          lineHeight: 1.05, fontVariantNumeric: 'tabular-nums',
+                          color: danger ? HUD_TONE_COLOR.danger : '#f7efd8',
+                          textShadow: '0 1px 0 rgba(255,240,200,.16), 0 1px 2px rgba(3,26,30,.9)',
+                          whiteSpace: 'nowrap', display: 'flex', alignItems: 'baseline', gap: fz(4),
+                        }}
+                      >
+                        {compactRes(item.value)}
+                        {item.max !== undefined && String(item.value).length <= 3 && (
+                          <span style={{ fontSize: fz(17), fontWeight: 500, color: C.muted, opacity: 0.85 }}>/{item.max}</span>
+                        )}
+                      </span>
+                      <span
+                        style={{
+                          fontFamily: '"EB Garamond", serif', fontSize: fz(16), lineHeight: 1.15, color: toneColor,
+                          textShadow: '0 1px 2px rgba(3,26,30,.9)', whiteSpace: 'nowrap', overflow: 'hidden',
+                          textOverflow: 'ellipsis', letterSpacing: '0.06em',
+                        }}
+                      >
+                        {item.label}
+                      </span>
+                    </div>
+                  </div>
+                </ZanaraTooltip>
+              );
+            })}
           </div>
         )}
 
         {/* Title inside the clean emerald cartouche */}
-        <div style={{ ...pct(Z.title), display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 2%' }}>
+        <div style={{ ...zp(Z.title), display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 2%' }}>
           <span style={{
-            fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: cqw(17.5), fontWeight: 700,
-            letterSpacing: '0.12em', textTransform: 'uppercase', color: C.goldHi,
+            fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: fz(27), fontWeight: 700,
+            letterSpacing: '0.05em', textTransform: 'uppercase', color: C.goldHi,
             textShadow: '0 1px 3px rgba(0,0,0,.9)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
           }}>
             {quest.title}
@@ -182,22 +257,22 @@ export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
         </div>
 
         {/* Subtitle on the emerald band */}
-        <div style={{ ...pct(Z.subtitle), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ fontStyle: 'italic', fontSize: cqw(14), color: C.muted, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        <div style={{ ...zp(Z.subtitle), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ fontStyle: 'italic', fontSize: fz(21), color: C.muted, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {quest.subtitle}
           </span>
         </div>
 
         {/* Briefing well */}
-        <div style={{ ...pct(Z.briefing), padding: '3.5% 4.5%', overflow: 'hidden' }}>
-          <p style={{ margin: 0, fontSize: cqw(14.5), lineHeight: 1.42, color: C.ink }}>
+        <div style={{ ...zp(Z.briefing), padding: '3.5% 4.5%', overflow: 'hidden' }}>
+          <p style={{ margin: 0, fontSize: fz(23), lineHeight: 1.42, color: C.ink }}>
             {quest.briefing}
           </p>
         </div>
 
         {/* Party Slots well header */}
-        <div style={{ ...pct(Z.partyLabel), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: cqw(14.5), fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: C.goldHi }}>
+        <div style={{ ...zp(Z.partyLabel), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: fz(22), fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: C.goldHi }}>
             {t('gameFrame.cassetto.party', 'Party Slots')}
           </span>
         </div>
@@ -205,12 +280,11 @@ export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
         {/* REAL certified ResidentSlotRack — all 4 seats fit cleanly inside the upper Party Slots well */}
         <div
           data-cassetto-rack=""
-          style={{ ...pct(Z.slots), display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'visible' }}
+          style={{ ...zp(Z.slots), display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'visible' }}
         >
           {/* R-335: the draghi bezels paint wider than their 44 px token boxes —
-           *  at 0.56 their outer edges kiss the well's margins. 0.44 keeps the
-           *  painted band clear on every side. */}
-          <div style={{ transform: 'scale(0.44)', transformOrigin: 'center center' }}>
+           *  the painted band must stay clear of the well's margins on every side. */}
+          <div style={{ transform: 'scale(0.62)', transformOrigin: 'center center' }}>
             <ResidentSlotRack
               slots={slots}
               layout="detail"
@@ -225,50 +299,76 @@ export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
           </div>
         </div>
 
-        {/* Loadout row — REAL village stash bag inside the lower Party Slots well */}
-        <div style={{ ...pct(Z.loadout), display: 'flex', gap: 5, justifyContent: 'center', alignItems: 'center' }}>
-          {loadoutRows.map((row) => (
-            <button
-              key={row.id}
-              type="button"
-              title={row.label}
-              data-testid={`cassetto-loadout-${row.id}`}
-              data-packed={row.packed}
-              onClick={row.onToggle}
-              disabled={row.disabled}
-              style={{
-                padding: 0, border: 'none', background: 'transparent',
-                cursor: row.disabled ? 'default' : 'pointer',
-                borderRadius: 6,
-                outline: row.packed ? `1.5px solid ${C.emeraldGlow}` : 'none',
-                boxShadow: row.packed ? '0 0 8px rgba(31,184,119,.5)' : 'none',
-                opacity: row.disabled ? 0.3 : row.packed ? 1 : 0.72,
-              }}
-            >
-              <StashItemTile icon={row.icon} qty={row.packed ? row.qty : undefined} size={24} iconSize={15} />
-            </button>
-          ))}
-        </div>
+        {/* Quest bag — empty slot frames inside the lower Party Slots well
+            (R-337). Items arrive ONLY by clicking rows in the bound magazzino
+            (`VillageStashPanel` → `assign` on this POI's ledger bag): an empty
+            pouch opens it, a packed tile releases its item back to the pool —
+            same contract as the stock planner's `QuestBagSlot`/`PackedBagItem`,
+            including the `loadout-item-*` test id the shelf focuses after an
+            assign. */}
+        {loadout && (
+          <div data-cassetto-bag="" style={{ ...zp(Z.loadout), display: 'flex', gap: fz(14), justifyContent: 'center', alignItems: 'center' }}>
+            {loadout.slots.map((slot, i) => (
+              <span
+                key={i}
+                data-testid={`bag-slot-${i}`}
+                style={{
+                  width: fz(56), height: fz(56), flexShrink: 0, borderRadius: fz(14),
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  border: slot ? 'none' : '1px solid rgba(240, 214, 138, 0.35)',
+                  background: slot ? 'none' : 'rgba(4, 22, 28, 0.55)',
+                }}
+              >
+                {slot ? (
+                  <button
+                    type="button"
+                    data-testid={`loadout-item-${slot.id}`}
+                    data-bag-slot-index={i}
+                    aria-label={t('questExpedition.bag.removeSlot', { item: slot.label })}
+                    title={slot.label}
+                    onClick={() => loadout.onReleaseItem(slot.id)}
+                    style={{ padding: 0, border: 'none', background: 'transparent', cursor: 'pointer', display: 'inline-flex' }}
+                  >
+                    <StashItemTile icon={slot.icon} qty={slot.qty} size={46} iconSize={26} />
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    data-testid={`bag-slot-empty-${i}`}
+                    aria-label={t('questExpedition.bag.emptySlot', { index: i + 1 })}
+                    onClick={(e) => loadout.onOpenStash(e.currentTarget)}
+                    style={{
+                      width: '100%', height: '100%', padding: 0, border: 'none', background: 'transparent',
+                      cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                    }}
+                  >
+                    <EngravedIcon id="ico-pouch" size={26} style={{ opacity: 0.45, color: C.goldHi }} aria-hidden />
+                  </button>
+                )}
+              </span>
+            ))}
+          </div>
+        )}
 
         {/* Journey header + 3 chevron legs + localized sub-labels */}
-        <div style={{ ...pct(Z.journeyLabel), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: cqw(15), fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', color: C.goldHi }}>
+        <div style={{ ...zp(Z.journeyLabel), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: fz(22), fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', color: C.goldHi }}>
             {t('gameFrame.cassetto.journey', 'Journey')}
           </span>
         </div>
-        <div style={{ ...pct(Z.journeyLegs), display: 'flex' }}>
+        <div style={{ ...zp(Z.journeyLegs), display: 'flex' }}>
           {quest.legs.map((leg, i) => (
             <div key={i} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: cqw(15), fontWeight: 700, color: i === 1 ? '#eafff5' : C.goldHi, textShadow: '0 1px 3px rgba(0,0,0,.9)' }}>
+              <span style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: fz(25), fontWeight: 700, color: i === 1 ? '#eafff5' : C.goldHi, textShadow: '0 1px 3px rgba(0,0,0,.9)' }}>
                 {leg.days}{typeof leg.days === 'number' ? 'd' : ''}
               </span>
             </div>
           ))}
         </div>
-        <div style={{ ...pct(Z.journeySubs), display: 'flex' }}>
+        <div style={{ ...zp(Z.journeySubs), display: 'flex' }}>
           {quest.legs.map((leg, i) => (
             <div key={i} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 2px' }}>
-              <span style={{ fontSize: cqw(10.5), letterSpacing: '0.13em', textTransform: 'uppercase', color: C.muted, textAlign: 'center', lineHeight: 1.15 }}>
+              <span style={{ fontSize: fz(16), letterSpacing: '0.13em', textTransform: 'uppercase', color: C.muted, textAlign: 'center', lineHeight: 1.15 }}>
                 {leg.label}
               </span>
             </div>
@@ -276,23 +376,23 @@ export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
         </div>
 
         {/* Risk & Rewards header + live values */}
-        <div style={{ ...pct(Z.riskLabel), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: cqw(15), fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', color: C.goldHi }}>
+        <div style={{ ...zp(Z.riskLabel), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: fz(22), fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', color: C.goldHi }}>
             {t('gameFrame.cassetto.riskRewards', 'Risk & Rewards')}
           </span>
         </div>
-        <div style={{ ...pct(Z.riskValue), display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ fontSize: cqw(10.5), letterSpacing: '0.14em', textTransform: 'uppercase', color: C.muted }}>
+        <div style={{ ...zp(Z.riskValue), display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ fontSize: fz(15), letterSpacing: '0.14em', textTransform: 'uppercase', color: C.muted }}>
             {t('gameFrame.cassetto.risk', 'Risk')}
           </span>
-          <span style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: cqw(15), fontWeight: 800, color: C.danger, textTransform: 'uppercase' }}>
+          <span style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: fz(26), fontWeight: 800, color: C.danger, textTransform: 'uppercase' }}>
             {quest.riskLabel}
           </span>
         </div>
-        <div style={{ ...pct(Z.rewards), display: 'flex', gap: 6, alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }}>
+        <div style={{ ...zp(Z.rewards), display: 'flex', gap: fz(10), alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }}>
           {quest.rewards.map((r) => (
-            <span key={r.icon} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: cqw(14), fontWeight: 700, color: C.goldHi }}>
-              <img src={`/assets/ui/resources/res-${r.icon}-64.webp`} alt="" width={18} height={18} draggable={false} />
+            <span key={r.icon} style={{ display: 'inline-flex', alignItems: 'center', gap: fz(6), fontSize: fz(24), fontWeight: 700, color: C.goldHi }}>
+              <img src={`/assets/ui/resources/res-${r.icon}-64.webp`} alt="" style={{ width: fz(32), height: fz(32) }} draggable={false} />
               {r.qty}
             </span>
           ))}
@@ -306,7 +406,7 @@ export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
           disabled={!canSend}
           aria-label={t('gameFrame.cassetto.confirm', 'CONFIRM')}
           style={{
-            ...pct(Z.confirm),
+            ...zp(Z.confirm),
             padding: 0, border: 'none', background: 'transparent',
             cursor: canSend ? 'pointer' : 'default',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -314,7 +414,7 @@ export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
           }}
         >
           <span style={{
-            fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: cqw(17), fontWeight: 800,
+            fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: fz(30), fontWeight: 800,
             letterSpacing: '0.28em', textTransform: 'uppercase', color: '#eafff5',
             textShadow: '0 1px 4px rgba(0,0,0,.9)',
           }}>

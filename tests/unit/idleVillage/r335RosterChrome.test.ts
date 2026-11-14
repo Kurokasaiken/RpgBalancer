@@ -2,11 +2,18 @@
  * R-335 (2026-11-14) — two regressions the Director saw live on /game:
  *
  * 1. The roster's filter/sort pills painted the native <select> text
- *    («testo invece delle icone») because the page never sat inside
+ *    («testo invece delle icone») because the roster never sat inside
  *    `.skin-scope`, so `skinScope.css`'s select-hiding rule
  *    (INV:drag-test-container-v2.INV-1) could not match. /gameOld wraps the
- *    whole subtree in <SkinScope> via GameFrame; /game must carry the same
- *    `skin-scope` class on its root.
+ *    whole subtree in <SkinScope> via GameFrame; on /game the roster panel
+ *    carries the `skin-scope` class on its own mount.
+ *
+ *    R-336 (2026-11-14): the class must stay on the roster panel, NOT on the
+ *    page root — a root-wide scope makes the base button plate rule
+ *    (`.skin-scope :where(button…)`, specificity 0,3,0) win over the signed
+ *    HUD surfaces' own scoped CSS (0,1,1), bronze-plating every transparent
+ *    button of HudRealTime (pause/speeds) and HudRealNav (voices, recenter
+ *    medallion, lock badges).
  * 2. The C1 medallion mounted `ring-fused.webp` — a row-module piece whose
  *    left gem band is cut at the image edge («l'immagine mozzata»). The
  *    standalone signed asset is `ring.webp` (same ornament complete, its own
@@ -18,10 +25,16 @@ import { describe, expect, it } from 'vitest';
 
 const read = (p: string) => fs.readFileSync(path.resolve(__dirname, '../../../', p), 'utf8');
 
-describe('R-335 — /game HUD lives inside skin-scope (icon pills, not select text)', () => {
-  it('game-mappa2 root carries skin-scope like /gameOld\u2019s GameFrame', () => {
+describe('R-335/R-336 — /game roster lives inside skin-scope (icon pills, not select text)', () => {
+  it('the roster panel carries skin-scope…', () => {
     const src = read('src/pages/game-mappa2.tsx');
-    expect(src).toMatch(/className="game-frame skin-scope"/);
+    expect(src).toMatch(/data-panel="roster"[^>]*className="skin-scope"/);
+  });
+
+  it('…and the page root does NOT (R-336: root scope bronze-plates the signed HUD buttons)', () => {
+    const src = read('src/pages/game-mappa2.tsx');
+    expect(src).toMatch(/className="game-frame"/);
+    expect(src).not.toMatch(/className="game-frame skin-scope"/);
   });
 
   it('the select-hiding rule is still only reachable inside .skin-scope', () => {
