@@ -32,31 +32,17 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'pnpm'
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
+          node-version-file: '.nvmrc'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: npm ci
 
       - name: Install Playwright browsers
-        run: pnpm exec playwright install --with-deps
-
-      - name: Start dev server
-        run: pnpm dev &
-        timeout-minutes: 2
-
-      - name: Wait for server
-        run: |
-          echo "Waiting for dev server to be ready..."
-          npx wait-on http://127.0.0.1:5173 --timeout 30000
+        run: npx playwright install --with-deps
 
       - name: Run Playwright tests (Minimal Slice)
-        run: pnpm test:minimal
+        run: npm run test:minimal
         timeout-minutes: 25
 
       - name: Generate test summary
