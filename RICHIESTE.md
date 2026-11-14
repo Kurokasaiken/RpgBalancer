@@ -5722,3 +5722,13 @@ seed picker; save-on-approval → store condiviso. Dibattito multi-AI
 **Decisione:** `/` renderizza `GameMappa2Page` (la superficie `/game` di R-322) su ogni device, senza canonicalizzazione URL — comportamento pre-R-297. `/mappa2-lab` resta navigabile alla sua route diretta (kept nella whitelist PLAN-118). **Supera:** R-297 (landing mobile → mappa2-lab) e R-305 (estensione a tutti i device + canonicalizzazione `/`→`/mappa2-lab`).
 **Nota deploy:** un `vercel --prod` da worktree sporco pubblicherebbe i file WIP non committati (POI, ~117 path — T-13) → il rilascio passa dal canale git (commit scoped → push → build remoto), che richiede la fix del drift manifest su file set committato.
 **Esito deploy (2026-11-14):** canale git sbloccato — fix manifest `ls-tree -l` padding (bytes=0) + probe `git rev-parse` (stub `.git` Vercel). Deploy `rpg-balancer-a4awsqpvk` **● Ready** su `rpg-balancer.vercel.app`. Verifica post-deploy: bundle servito contiene `k = isGamePath || isRootPath` (no `replaceState`); probe WebGL su `/` raggiunge `bootPhase=assets` (boot game, non lab); crash headless oltre asset-load = limite ambiente SwiftShader, già presente su deploy precedenti.
+
+---
+
+## R-329 — HUD/UI non scala con la dimensione dello schermo (mobile "enorme")
+
+**Richiesta (verbatim, 2026-11-14):** *"la HUD e UI nn scala cn la grandezza dello schermo correttamente, devo pensarci dopo?"* → *"enorme"* (osservazione su telefono, app salvata su Home).
+**Data:** 2026-11-14
+**Stato:** `aperta`
+**Contesto rilevato:** su viewport phone la HUD blueprint B1 (PLAN-112, pensata ≥768px) non deve applicarsi — il reflow stacked <768px è specificato in `gameHudPlacement.ts` (PLAN-083 mobile-fit) ed è **in lavorazione attiva** (file hud-real modificati non committati nel worktree). Il deploy `a4awsqpvk` contiene la HUD pre-fit.
+**Verifica da fare:** dopo il merge/deploy del lavoro hud-real corrente, controllare su viewport 390×844 che resources/time/nav siano stacked e scalati alla larghezza; se ancora sproporzionata → bug da fixare, non scope nuovo.
