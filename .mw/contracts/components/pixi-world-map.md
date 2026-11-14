@@ -112,6 +112,18 @@ invariants:
       metà) valgono solo se passate: senza, il renderer carica le sorgenti piene.
     test_refs:
       - tests/unit/idleVillage/mappa2ApprovedLook.test.ts
+  - id: pixi-world-map.INV-10
+    source: director-bug
+    source_ref: R-331
+    statement: 'mappa2 cover-fit senza margini mare: floorZoom=cover=resting zoom, zoom-out utente matematicamente morto'
+    test_refs:
+      - tests/e2e/idleVillage/gameMappa2.spec.ts
+  - id: pixi-world-map.INV-11
+    source: director-bug
+    source_ref: R-331
+    statement: 'nav village su /game lascia la camera utente stantia: al ritorno su map zoom/pan non tornano al fit di default'
+    test_refs:
+      - tests/e2e/idleVillage/gameMappa2.spec.ts
 ---
 # pixi-world-map
 

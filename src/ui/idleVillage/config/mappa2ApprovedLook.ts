@@ -7,6 +7,7 @@
  * (the pin test `tests/unit/mappa2ApprovedLook.test.ts` makes the change explicit).
  */
 import type { PixiMapTune, PixiWorldMapEffects } from '@/ui/idleVillage/pixiSpike/PixiWorldMap';
+import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
 
 export const MAPPA2_MANIFEST_PATH = '/assets/world/mappa2/base/manifest.json';
 export const MAPPA2_REGIONS_BASE = '/assets/world/mappa2/base';
@@ -92,9 +93,15 @@ const hexToRgb01 = (hex: string): [number, number, number] => {
 const v = MAPPA2_APPROVED;
 
 /** The PixiWorldMap props that make the approved look (everything except camera, regions and callbacks). */
+const SEA_FIT = DEFAULT_GAME_FRAME_CONFIG.worldDressing.safeFit;
+
 export const MAPPA2_APPROVED_MAP_PROPS = {
   manifestPath: MAPPA2_MANIFEST_PATH,
   stageColor: MAPPA2_STAGE_COLOR,
+  /* R-331: camera reach past the painted canvas — the same open-sea margins the /gameOld
+   * worldDressing ships (R-148). mappa2 keeps its cover fit as the resting look and passes
+   * `seaMargin` instead of a safeFit, so wheel zoom-out can open below the cover scale. */
+  seaMargin: { xPx: SEA_FIT.seaMarginPx, yPx: SEA_FIT.seaMarginYPx ?? SEA_FIT.seaMarginPx },
   tune: {
     cloudParallax: 1,
     cloudMorph: 1,

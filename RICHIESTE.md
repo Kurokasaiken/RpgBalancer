@@ -5741,3 +5741,25 @@ seed picker; save-on-approval → store condiviso. Dibattito multi-AI
 **Data:** 2026-11-14
 **Stato:** `aperta` (rinviata dal Director — scelta artistica da fare insieme)
 **Difetti tecnici già accertati (indipendenti dall'arte):** `apple-touch-icon` punta a `/vite.svg` — iOS non supporta SVG come icona Home e usa uno screenshot della pagina (l'«icona strana» vista); il manifest dichiara `maskable-icon-512.png` che non esiste (404 su Android); manca `apple-touch-icon` PNG 180×180.
+
+---
+
+## R-331 — /game: zoom-out mouse morto, HUD deve restare fissa, pulsante village → zoom default
+
+**Richiesta (verbatim, 2026-11-14):** *"in /game ho difficoltà cn il zoom out da mouse. quando zoomo la HUD deve rimanere fissa nella poszione e nelle proporzioni. Quando clicco il pulsante village, oltre a riportarmi al centro del villaggio m deve portare anche allo zoom d default"*
+**Data:** 2026-11-14
+**Stato:** `in corso`
+**Diagnosi (2026-11-14, probe headless `scripts/_tmp-zoom-probe.mjs`):**
+- `/game` (mappa2, canvas 2752×1536) non passa alcun `safeFit` a `PixiWorldMap` → `margin=marginY=0` → `floorZoom() = max(W/2752, H/1536)` = cover-fit (0.586 @1440×900). Lo zoom-out utente è matematicamente morto: `userFloor = max(floor, minZoom)` = 0.586 = resting zoom; `ctl.set({zoom:0.4})` viene ri-clampato a 0.586 entro ~100 ms.
+- Wheel/ctrl+wheel sul chrome HUD non raggiunge il canvas (listener su `hostRef`): zona morta + possibile page-zoom browser (HUD che scala — viola «HUD fissa in posizione e proporzioni»).
+- Click nav `village` → `setView('village')` senza toccare la camera: al ritorno su mappa lo zoom utente stantio persiste.
+**Fix previsto:** prop `seaMargin` su `PixiWorldMap` (portata mare senza safe-fit, cover-fit preservato) alimentata da `mappa2ApprovedLook` (3600/1800, precedente R-148); guard wheel globale (ctrl/meta+wheel → preventDefault page-zoom; wheel su chrome non scrollabile → zoom mappa); nav village → `onRecenter()` (refit = zoom default + utente resettato).
+
+**Stato (2026-11-14):** `in corso` — **fix implementato e verificato, chiusura formale bloccata da stato condiviso del worktree (T-13).**
+**Delivered:** prop `seaMargin` su `PixiWorldMap` + guard wheel globale (no dead zone su chrome, no page-zoom ctrl+wheel, step proporzionale) + `seaMargin` R-148 in `mappa2ApprovedLook` + nav village → `onRecenter()` (zoom/centro default al ritorno su map).
+**Verificato:** red-first registrato (`.mw/red-first/tests-e2e-idleVillage-gameMappa2.spec.ts-2026-11-14T11-14-24-419Z.log`); spec camera 2/2 verdi (zoom-out < cover fit, wheel su HUD zooma, `visualViewport.scale`=1, bbox nav invariato, village→zoom default); `verify:bundle` OB-1/OB-2 **PASS**; lint 0 err; `build:check` OK; contratti INV-10/INV-11 aggiunti.
+**Blocco chiusura:** verdict `verify:bundle` BLOCKED — baseline capture impossibile (worktree sporco di lavoro parallelo PLAN-117/R-327), trusted-lock drift su file altrui, ~150 finding foreign; in-scope residui meccanici (`R-331 non risolvibile a BASE`, `blocco mutato` su file condiviso accumulati da entrambe le sessioni). Richiede `waived-director` o chiusura dopo che il lavoro parallelo atterra.
+**Evidence:** `test-results/r331-zoom/evidence.md` — bundle: .mw/runs/r331-game-zoom-out/bundle.json (verdict BLOCKED, obbligazioni PASS).
+
+---
+

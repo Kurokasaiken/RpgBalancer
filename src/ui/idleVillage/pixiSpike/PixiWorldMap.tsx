@@ -162,6 +162,13 @@ export interface PixiWorldMapProps {
   manifestPath: string;
   hiddenLayerIds?: string[];
   safeFit?: WorldSurfaceSafeFit;
+  /**
+   * Sea reach in world px for cover-fit pages that pass no `safeFit` (R-331): how far the camera may
+   * travel past the painted canvas. It only widens the coverage floor and the sea the camera can
+   * wander into — the resting fit stays the plain cover fit. An explicit margin wins over the
+   * safe-fit margins when both are present.
+   */
+  seaMargin?: { xPx: number; yPx: number };
   recenterSignal?: number;
   /** Glide the camera to a point (fractions of the world canvas, 0-1); `n` makes a repeat request on the same point count. */
   focusRequest?: { x: number; y: number; n: number } | null;
@@ -903,6 +910,7 @@ export function PixiWorldMap({
   manifestPath,
   hiddenLayerIds = [],
   safeFit,
+  seaMargin,
   recenterSignal = 0,
   focusRequest = null,
   effects,
@@ -1053,6 +1061,9 @@ export function PixiWorldMap({
   const hiddenKey = hiddenLayerIds.join('|');
   const safeFitKey = safeFit ? JSON.stringify(safeFit) : '';
   const safeFitMarginKey = safeFit ? JSON.stringify({ x: safeFit.seaMarginPx, y: safeFit.seaMarginYPx }) : '';
+  const seaMarginRef = useRef(seaMargin);
+  seaMarginRef.current = seaMargin;
+  const seaMarginKey = seaMargin ? JSON.stringify(seaMargin) : '';
 
   useEffect(() => {
     const host = hostRef.current;
@@ -1066,9 +1077,9 @@ export function PixiWorldMap({
     const fxOn = JSON.parse(fxKey) as PixiWorldMapEffects;
     const tn = tuneRef.current!;
     const canvas = manifest.coordinateSystem.canvas;
-    const margin = fit?.seaMarginPx ?? 0;
+    const margin = seaMarginRef.current?.xPx ?? fit?.seaMarginPx ?? 0;
     // Vertical sea is only ever the painted sea layer mirrored: land must never be reflected.
-    const marginY = fit?.seaMarginYPx ?? 0;
+    const marginY = seaMarginRef.current?.yPx ?? fit?.seaMarginYPx ?? 0;
     const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
     // PLAN-083: mobile-fit policy — a coarse pointer caps the renderer DPR at
     // `mobileFitConfig.dprCap` (iPhone DPR3 → 2 ≈ 3x fewer pixels; desktop stays 2).
@@ -3671,12 +3682,30 @@ export function PixiWorldMap({
         const sy = e.clientY - r.top;
         const wx = cam.panX + sx / cam.zoom;
         const wy = cam.panY + sy / cam.zoom;
-        cam.zoom *= e.deltaY < 0 ? 1.1 : 1 / 1.1;
+        // Proportional step (R-331): a wheel notch (~100 px) keeps the legacy ±10 %, a
+        // trackpad's small deltas zoom smoothly instead of jumping a full step each.
+        const px = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaMode === 2 ? e.deltaY * r.height : e.deltaY;
+        cam.zoom *= Math.pow(1.1, -px / 100);
         cam.zoom = Math.min(zoomBounds().max, Math.max(userFloor(), cam.zoom));
         cam.panX = wx - sx / cam.zoom;
         cam.panY = wy - sy / cam.zoom;
         userMoved = true;
         apply();
+      };
+      /* The map owns the zoom gesture on every page that mounts it (R-331): a wheel over the
+       * fixed chrome is a dead zone otherwise, and ctrl/meta+wheel must never become a browser
+       * page-zoom — that scales the HUD instead of the world. Scrollable ancestors (panels,
+       * lists) keep their native scroll; a map that is pointer-none (covered view) stays out. */
+      const onGlobalWheel = (e: WheelEvent) => {
+        if (e.ctrlKey || e.metaKey) e.preventDefault();
+        if (el.contains(e.target as Node)) return;
+        if (getComputedStyle(el).pointerEvents === 'none') return;
+        for (let node = e.target as HTMLElement | null; node; node = node.parentElement) {
+          if (node === document.body || node === document.documentElement) break;
+          const s = getComputedStyle(node);
+          if ((s.overflowY === 'auto' || s.overflowY === 'scroll') && node.scrollHeight > node.clientHeight + 1) return;
+        }
+        onWheel(e);
       };
       /* Resize with a user camera must never let the protected land slide under
        * the fixed chrome (CTR-game-005 INV-2). The user's zoom survives only
@@ -3819,6 +3848,7 @@ export function PixiWorldMap({
       window.addEventListener('mousemove', onMove);
       window.addEventListener('mouseup', onUp);
       el.addEventListener('wheel', onWheel, { passive: false });
+      window.addEventListener('wheel', onGlobalWheel, { passive: false });
       app.renderer.on('resize', onResize);
       cleanupInput = () => {
         cleanupRegions();
@@ -3830,6 +3860,7 @@ export function PixiWorldMap({
         window.removeEventListener('mousemove', onMove);
         window.removeEventListener('mouseup', onUp);
         el.removeEventListener('wheel', onWheel);
+        window.removeEventListener('wheel', onGlobalWheel);
         window.removeEventListener('mousemove', onTiltMove);
         window.removeEventListener('keydown', onKey);
         window.removeEventListener('keyup', onKey);
@@ -3887,7 +3918,7 @@ export function PixiWorldMap({
         /* init may not have finished */
       }
     };
-  }, [manifest, cameraConfig, hiddenKey, safeFitMarginKey, fxKey, cloudShadowOpacity, cloudShadowOffset.x, cloudShadowOffset.y, cloudSpeed, seabed?.opacity, seabed?.parallax, regionsOn, onStats, syncAnchors]);
+  }, [manifest, cameraConfig, hiddenKey, safeFitMarginKey, seaMarginKey, fxKey, cloudShadowOpacity, cloudShadowOffset.x, cloudShadowOffset.y, cloudSpeed, seabed?.opacity, seabed?.parallax, regionsOn, onStats, syncAnchors]);
 
   // New or moved anchors get placed before paint, not on the next camera move.
   useLayoutEffect(syncAnchors);
