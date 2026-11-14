@@ -1277,13 +1277,16 @@ export default function GameMappa2Page() {
     [t, legacyOpen, settlementLostActive, deadResidentCount, skinId, invasion, poiDemo, questShown, autoRevealedIds, questRun.run, activeQuestRun.run, expeditionGoblin, residentsById, panels],
   );
 
-  /* R-335: `game-frame` alone is not enough — the page must also sit inside
-   * `skin-scope` like /gameOld (GameFrame wraps its whole subtree in
-   * <SkinScope>). Without it `skinScope.css` never matches: the roster's
-   * native <select>s (INV:drag-test-container-v2.INV-1) stay visible and the
-   * filter/sort pills paint their value text next to the engraved icons. */
+  /* R-335/R-336: the ROSTER panel must sit inside `skin-scope` (see the
+   * `data-panel="roster"` mount below) so `skinScope.css` matches its native
+   * <select>s (INV:drag-test-container-v2.INV-1) and the filter/sort pills
+   * paint engraved icons, not value text. It must NOT go on this root: the
+   * base rule `.skin-scope :where(button…)` (0,3,0) out-specifies the signed
+   * HUD surfaces' own scoped CSS (0,1,1) and turns every transparent button
+   * of HudRealTime/HudRealNav into a bronze plate (R-336, Director 2026-11-14:
+   * barre "scazzate"). */
   return (
-    <div data-testid="game-mappa2" data-tier={tier} data-hudreal-lift="" data-view={view} data-map-ready={ready || undefined} className="game-frame skin-scope" style={{ position: 'fixed', inset: 0, background: '#04161c' }}>
+    <div data-testid="game-mappa2" data-tier={tier} data-hudreal-lift="" data-view={view} data-map-ready={ready || undefined} className="game-frame" style={{ position: 'fixed', inset: 0, background: '#04161c' }}>
       <style>{`[data-hudslot]{filter:drop-shadow(0 2px 5px rgba(1,14,18,.7)) drop-shadow(0 0 1px rgba(1,14,18,.9))}`}</style>
       {/* R-325: the shared drag context — roster cards fly into expedition
        *  planner slots / the activity session through the same ownership
@@ -1460,7 +1463,7 @@ export default function GameMappa2Page() {
        *  (intercepted to `stage.api`), the menu lists the same ids. */}
       {panels.visible.roster && (
         <StagePanelFrame panelId="roster">
-        <div data-panel="roster" ref={heroSheet.railRef} {...heroSheet.railProps}>
+        <div data-panel="roster" className="skin-scope" ref={heroSheet.railRef} {...heroSheet.railProps}>
           <MatericRosterComponentV2
             componentId="game-mappa2-roster"
             density="compact"

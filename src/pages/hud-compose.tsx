@@ -246,7 +246,7 @@ export default function HudComposePage() {
           drawer's top-interior navy well (R-335), mounted by the host itself —
           no separate overlay. The host manages its own drawer geometry. */}
       {params.get('comp') === 'cassetto' && (
-        <div data-hudslot="cassetto" style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 360, zIndex: 7 }}>
+        <div data-hudslot="cassetto" style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '50vh', zIndex: 7 }}>
           <HudRealCassettoHost />
         </div>
       )}
