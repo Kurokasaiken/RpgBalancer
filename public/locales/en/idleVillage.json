@@ -410,7 +410,8 @@
       "stat-requirement": "Doesn't meet a seat's requirement",
       "seat-busy": "Seat is busy",
       "generic": "Not eligible here"
-    }
+    },
+    "title": "Roster"
   },
   "slowMo": "Slow Mo",
   "spinDuration": "Spin Duration",
@@ -2177,5 +2178,8 @@
         "mill": "Windmill"
       }
     }
+  },
+  "poiMarker": {
+    "ariaLabel": "Point of interest"
   }
 }
