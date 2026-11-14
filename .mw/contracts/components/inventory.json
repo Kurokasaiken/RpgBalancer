@@ -1,6 +1,6 @@
 {
   "schema": "plan054-component-inventory/1",
-  "generated_at": "2026-11-02T11:34:10.483Z",
+  "generated_at": "2026-11-14T11:32:32.064Z",
   "strict_files": [
     "src/pages/game-frame-pixi.tsx",
     "src/pages/game-frame.tsx",
@@ -41,6 +41,7 @@
     "src/ui/idleVillage/archetypeDirectory.ts",
     "src/ui/idleVillage/audio/questTheatreAudio.ts",
     "src/ui/idleVillage/components/ActiveHUD.tsx",
+    "src/ui/idleVillage/components/C1Medallion.tsx",
     "src/ui/idleVillage/components/CrewSchedulerHUDCard.tsx",
     "src/ui/idleVillage/components/CustomDragOverlay.tsx",
     "src/ui/idleVillage/components/DragContext.tsx",
@@ -71,7 +72,6 @@
     "src/ui/idleVillage/components/SlotShake.module.css",
     "src/ui/idleVillage/components/SlotV12Renderer.tsx",
     "src/ui/idleVillage/components/VillageRosterSection.tsx",
-    "src/ui/idleVillage/components/WanderlustMedalOverlay.tsx",
     "src/ui/idleVillage/components/WanderlustRosterCard.tsx",
     "src/ui/idleVillage/components/WorkerCard.tsx",
     "src/ui/idleVillage/components/WorldSurfaceAtmosphere.tsx",
@@ -124,12 +124,16 @@
     "src/ui/idleVillage/components/gameFrame/HudTooltip.tsx",
     "src/ui/idleVillage/components/gameFrame/MapBuildingPoi.tsx",
     "src/ui/idleVillage/components/gameFrame/MapDemoPoi.tsx",
+    "src/ui/idleVillage/components/gameFrame/MapPlace.tsx",
     "src/ui/idleVillage/components/gameFrame/MapQuestPoi.tsx",
     "src/ui/idleVillage/components/gameFrame/MerchantPanel.tsx",
     "src/ui/idleVillage/components/gameFrame/MockBuyControl.tsx",
     "src/ui/idleVillage/components/gameFrame/MockUpgradeControl.tsx",
     "src/ui/idleVillage/components/gameFrame/NextEventTab.tsx",
     "src/ui/idleVillage/components/gameFrame/ObjectiveCartouche.tsx",
+    "src/ui/idleVillage/components/gameFrame/PlaceFan.tsx",
+    "src/ui/idleVillage/components/gameFrame/PlaceHoverCard.tsx",
+    "src/ui/idleVillage/components/gameFrame/PlaceRadial.tsx",
     "src/ui/idleVillage/components/gameFrame/QuestBeltPlaque.tsx",
     "src/ui/idleVillage/components/gameFrame/QuestCheckOptionsPanel.tsx",
     "src/ui/idleVillage/components/gameFrame/QuestEpilogue.tsx",
@@ -148,6 +152,7 @@
     "src/ui/idleVillage/components/gameFrame/RegionTooltip.tsx",
     "src/ui/idleVillage/components/gameFrame/ResourceReadout.tsx",
     "src/ui/idleVillage/components/gameFrame/TuningPanel.tsx",
+    "src/ui/idleVillage/components/gameFrame/VillageBuildingLayers.tsx",
     "src/ui/idleVillage/components/gameFrame/VillageDirectorView.tsx",
     "src/ui/idleVillage/components/gameFrame/VillageRegistry.tsx",
     "src/ui/idleVillage/components/gameFrame/VillageScreenView.tsx",
@@ -178,6 +183,9 @@
     "src/ui/idleVillage/components/gameFrame/merchantOfferIcons.tsx",
     "src/ui/idleVillage/components/gameFrame/nextEvent.ts",
     "src/ui/idleVillage/components/gameFrame/overlayStack.ts",
+    "src/ui/idleVillage/components/gameFrame/placeFanGeometry.ts",
+    "src/ui/idleVillage/components/gameFrame/placeOrdering.ts",
+    "src/ui/idleVillage/components/gameFrame/placeRadialGeometry.ts",
     "src/ui/idleVillage/components/gameFrame/poiSigillo.ts",
     "src/ui/idleVillage/components/gameFrame/questAvailability.ts",
     "src/ui/idleVillage/components/gameFrame/questBag.ts",
@@ -216,8 +224,10 @@
     "src/ui/idleVillage/components/minimal/QuestPOI.tsx",
     "src/ui/idleVillage/components/minimal/TimeEngineStrip.tsx",
     "src/ui/idleVillage/components/minimal/expiryStageEngine.ts",
+    "src/ui/idleVillage/components/poi/PoiMagicCircle.tsx",
     "src/ui/idleVillage/components/poi/PoiMarker.tsx",
     "src/ui/idleVillage/components/poi/PoiMatericV3_5.tsx",
+    "src/ui/idleVillage/components/poi/PoiZanara.tsx",
     "src/ui/idleVillage/components/poi/poiSigilloFamilies.ts",
     "src/ui/idleVillage/config/activityLogPanelConfig.ts",
     "src/ui/idleVillage/config/atmosphereAssets.ts",
@@ -241,7 +251,6 @@
     "src/ui/idleVillage/config/rosterSortConfig.ts",
     "src/ui/idleVillage/config/seaMarksConfig.ts",
     "src/ui/idleVillage/config/seaWonders.ts",
-    "src/ui/idleVillage/config/villageDirectorConfig.ts",
     "src/ui/idleVillage/config/wanderlustBaseManifest.json",
     "src/ui/idleVillage/config/worldSurfaceConfig.ts",
     "src/ui/idleVillage/controllers/CrewSchedulerController.ts",
@@ -294,6 +303,7 @@
     "src/ui/idleVillage/hooks/useSlottedMedalBehavior.ts",
     "src/ui/idleVillage/hooks/useThrottledValue.ts",
     "src/ui/idleVillage/hooks/useWorldSurface.ts",
+    "src/ui/idleVillage/hudReal/c1RowModGeometry.ts",
     "src/ui/idleVillage/icons/statIcons.tsx",
     "src/ui/idleVillage/intent/GameIntent.ts",
     "src/ui/idleVillage/interaction/DragOutcomeFlight.tsx",
@@ -315,6 +325,7 @@
     "src/ui/idleVillage/pixiSpike/ambient/ambientRig.ts",
     "src/ui/idleVillage/pixiSpike/ambient/ambientShoal.ts",
     "src/ui/idleVillage/pixiSpike/ambient/ambientStormo.ts",
+    "src/ui/idleVillage/pixiSpike/baseTiles.ts",
     "src/ui/idleVillage/pixiSpike/feederRiver.ts",
     "src/ui/idleVillage/pixiSpike/mapFitRuntime.ts",
     "src/ui/idleVillage/pixiSpike/mountainStorm.ts",
@@ -651,6 +662,17 @@
         "src/ui/idleVillage/interaction/bloomEffect.ts"
       ],
       "tier_source": "kernel"
+    },
+    {
+      "id": "c1-medallion",
+      "role": "ui-component",
+      "tier": 2,
+      "root_file": "src/ui/idleVillage/components/C1Medallion.tsx",
+      "scope_files": [
+        "src/ui/idleVillage/components/C1Medallion.tsx",
+        "src/ui/idleVillage/hudReal/c1RowModGeometry.ts"
+      ],
+      "tier_source": "default"
     },
     {
       "id": "canonical-roster-bundle",
@@ -1064,8 +1086,6 @@
         "src/ui/idleVillage/components/gameFrame/hudTones.ts",
         "src/ui/idleVillage/components/gameFrame/index.ts",
         "src/ui/idleVillage/components/gameFrame/nextEvent.ts",
-        "src/ui/idleVillage/components/gameFrame/poiSigillo.ts",
-        "src/ui/idleVillage/components/gameFrame/questAvailability.ts",
         "src/ui/idleVillage/components/gameFrame/questRevealSchedule.ts",
         "src/ui/idleVillage/components/gameFrame/questShellLayout.ts",
         "src/ui/idleVillage/components/gameFrame/questSkillCheckWarm.ts",
@@ -1075,7 +1095,6 @@
         "src/ui/idleVillage/components/gameFrame/useHudPanels.ts",
         "src/ui/idleVillage/components/gameFrame/useHudScale.ts",
         "src/ui/idleVillage/components/gameFrame/usePanelWhileOpen.ts",
-        "src/ui/idleVillage/components/gameFrame/usePoiTypeIcon.ts",
         "src/ui/idleVillage/components/gameFrame/villageStashViewModel.ts",
         "src/ui/idleVillage/config/gamePerfBudgets.ts",
         "src/ui/idleVillage/config/worldSurfaceConfig.ts",
@@ -1482,6 +1501,16 @@
       "root_file": "src/ui/idleVillage/components/gameFrame/MapDemoPoi.tsx",
       "scope_files": [
         "src/ui/idleVillage/components/gameFrame/MapDemoPoi.tsx"
+      ],
+      "tier_source": "default"
+    },
+    {
+      "id": "map-place",
+      "role": "ui-component",
+      "tier": 2,
+      "root_file": "src/ui/idleVillage/components/gameFrame/MapPlace.tsx",
+      "scope_files": [
+        "src/ui/idleVillage/components/gameFrame/MapPlace.tsx"
       ],
       "tier_source": "default"
     },
@@ -1974,6 +2003,7 @@
         "src/ui/idleVillage/pixiSpike/ambient/ambientRig.ts",
         "src/ui/idleVillage/pixiSpike/ambient/ambientShoal.ts",
         "src/ui/idleVillage/pixiSpike/ambient/ambientStormo.ts",
+        "src/ui/idleVillage/pixiSpike/baseTiles.ts",
         "src/ui/idleVillage/pixiSpike/feederRiver.ts",
         "src/ui/idleVillage/pixiSpike/mapFitRuntime.ts",
         "src/ui/idleVillage/pixiSpike/mountainStorm.ts",
@@ -1985,6 +2015,48 @@
       "tier_source": "ctr-reference"
     },
     {
+      "id": "place-fan",
+      "role": "ui-component",
+      "tier": 2,
+      "root_file": "src/ui/idleVillage/components/gameFrame/PlaceFan.tsx",
+      "scope_files": [
+        "src/ui/idleVillage/components/gameFrame/PlaceFan.tsx",
+        "src/ui/idleVillage/components/gameFrame/placeOrdering.ts"
+      ],
+      "tier_source": "default"
+    },
+    {
+      "id": "place-fan-geometry",
+      "role": "shared-kernel",
+      "tier": 1,
+      "root_file": "src/ui/idleVillage/components/gameFrame/placeFanGeometry.ts",
+      "scope_files": [
+        "src/ui/idleVillage/components/gameFrame/placeFanGeometry.ts"
+      ],
+      "tier_source": "kernel"
+    },
+    {
+      "id": "place-hover-card",
+      "role": "ui-component",
+      "tier": 2,
+      "root_file": "src/ui/idleVillage/components/gameFrame/PlaceHoverCard.tsx",
+      "scope_files": [
+        "src/ui/idleVillage/components/gameFrame/PlaceHoverCard.tsx"
+      ],
+      "tier_source": "default"
+    },
+    {
+      "id": "place-radial",
+      "role": "ui-component",
+      "tier": 2,
+      "root_file": "src/ui/idleVillage/components/gameFrame/PlaceRadial.tsx",
+      "scope_files": [
+        "src/ui/idleVillage/components/gameFrame/PlaceRadial.tsx",
+        "src/ui/idleVillage/components/gameFrame/placeRadialGeometry.ts"
+      ],
+      "tier_source": "default"
+    },
+    {
       "id": "plate-variants",
       "role": "ui-component",
       "tier": 2,
@@ -1992,6 +2064,16 @@
       "scope_files": [
         "src/ui/visualFidelityLab/matericPlate.css",
         "src/ui/visualFidelityLab/plateVariants.tsx"
+      ],
+      "tier_source": "default"
+    },
+    {
+      "id": "poi-magic-circle",
+      "role": "ui-component",
+      "tier": 2,
+      "root_file": "src/ui/idleVillage/components/poi/PoiMagicCircle.tsx",
+      "scope_files": [
+        "src/ui/idleVillage/components/poi/PoiMagicCircle.tsx"
       ],
       "tier_source": "default"
     },
@@ -2027,6 +2109,26 @@
       "tier_source": "default"
     },
     {
+      "id": "poi-sigillo",
+      "role": "shared-kernel",
+      "tier": 1,
+      "root_file": "src/ui/idleVillage/components/gameFrame/poiSigillo.ts",
+      "scope_files": [
+        "src/ui/idleVillage/components/gameFrame/poiSigillo.ts"
+      ],
+      "tier_source": "kernel"
+    },
+    {
+      "id": "poi-zanara",
+      "role": "ui-component",
+      "tier": 2,
+      "root_file": "src/ui/idleVillage/components/poi/PoiZanara.tsx",
+      "scope_files": [
+        "src/ui/idleVillage/components/poi/PoiZanara.tsx"
+      ],
+      "tier_source": "default"
+    },
+    {
       "id": "portrait-decode-cache",
       "role": "shared-kernel",
       "tier": 1,
@@ -2055,6 +2157,16 @@
         "src/ui/idleVillage/components/QuestAssignmentPreview.tsx"
       ],
       "tier_source": "default"
+    },
+    {
+      "id": "quest-availability",
+      "role": "shared-kernel",
+      "tier": 1,
+      "root_file": "src/ui/idleVillage/components/gameFrame/questAvailability.ts",
+      "scope_files": [
+        "src/ui/idleVillage/components/gameFrame/questAvailability.ts"
+      ],
+      "tier_source": "kernel"
     },
     {
       "id": "quest-belt-plaque",
@@ -2972,6 +3084,16 @@
       "tier_source": "kernel"
     },
     {
+      "id": "use-poi-type-icon",
+      "role": "shared-kernel",
+      "tier": 1,
+      "root_file": "src/ui/idleVillage/components/gameFrame/usePoiTypeIcon.ts",
+      "scope_files": [
+        "src/ui/idleVillage/components/gameFrame/usePoiTypeIcon.ts"
+      ],
+      "tier_source": "kernel"
+    },
+    {
       "id": "use-quest-expedition-session",
       "role": "ui-component",
       "tier": 2,
@@ -3115,13 +3237,22 @@
       "tier_source": "default"
     },
     {
+      "id": "village-building-layers",
+      "role": "ui-component",
+      "tier": 2,
+      "root_file": "src/ui/idleVillage/components/gameFrame/VillageBuildingLayers.tsx",
+      "scope_files": [
+        "src/ui/idleVillage/components/gameFrame/VillageBuildingLayers.tsx"
+      ],
+      "tier_source": "default"
+    },
+    {
       "id": "village-director-view",
       "role": "ui-component",
       "tier": 2,
       "root_file": "src/ui/idleVillage/components/gameFrame/VillageDirectorView.tsx",
       "scope_files": [
-        "src/ui/idleVillage/components/gameFrame/VillageDirectorView.tsx",
-        "src/ui/idleVillage/config/villageDirectorConfig.ts"
+        "src/ui/idleVillage/components/gameFrame/VillageDirectorView.tsx"
       ],
       "tier_source": "default"
     },
@@ -3234,16 +3365,6 @@
         "src/ui/wanderlust-surface/WanderlustMaterialContext.tsx"
       ],
       "tier_source": "kernel"
-    },
-    {
-      "id": "wanderlust-medal-overlay",
-      "role": "ui-component",
-      "tier": 2,
-      "root_file": "src/ui/idleVillage/components/WanderlustMedalOverlay.tsx",
-      "scope_files": [
-        "src/ui/idleVillage/components/WanderlustMedalOverlay.tsx"
-      ],
-      "tier_source": "default"
     },
     {
       "id": "wanderlust-portrait",
@@ -3521,10 +3642,10 @@
     }
   ],
   "stats": {
-    "files": 484,
-    "units": 283,
-    "ui_components": 216,
-    "shared_kernels": 67
+    "files": 495,
+    "units": 294,
+    "ui_components": 223,
+    "shared_kernels": 71
   },
-  "content_sha256": "a2182c7d5ca2ae1c1a972079ccf5b7cebb4c1625d3aaf308ec8f544e11174af6"
+  "content_sha256": "49a02ef61564335e615c04db737a1456532457beed69f7d416455f28516032cd"
 }

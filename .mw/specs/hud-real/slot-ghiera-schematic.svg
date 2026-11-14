@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1720" height="620" viewBox="0 0 1720 620" font-family="Georgia, serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#d8b96a"/>
+    </marker>
+    <marker id="arrRed" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c96a5a"/>
+    </marker>
+    <marker id="arrGreen" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#7fc9a0"/>
+    </marker>
+  </defs>
+  <rect width="1720" height="620" fill="#0d1420"/>
+  <text x="860" y="42" text-anchor="middle" fill="#e8ddc0" font-size="22" letter-spacing="6">SLOT — GHIERA + MEDAGLIONE = UN PEZZO UNICO</text>
+
+  <!-- ============ STATO 1: APERTO ============ -->
+  <g transform="translate(200,310)">
+    <circle r="125" fill="none" stroke="#b98a4f" stroke-width="15"/>
+    <circle r="125" fill="none" stroke="#0f5f4a" stroke-width="6" opacity="0.8"/>
+    <circle r="94" fill="none" stroke="#4a5a70" stroke-width="2" stroke-dasharray="5 5"/>
+    <text y="4" text-anchor="middle" fill="#4a5a70" font-size="13" font-style="italic">sede vuota</text>
+    <!-- denti ritratti: sagome arretrate SOPRA la banda -->
+    <g fill="#6a5230" stroke="#3a2a12" stroke-width="1.5" opacity="0.55">
+      <path d="M-92,-92 l10,10 -4,-22 z"/>
+      <path d="M92,-92 l-10,10 4,-22 z"/>
+      <path d="M-92,92 l10,-10 -4,22 z"/>
+      <path d="M92,92 l-10,-10 4,22 z"/>
+    </g>
+    <text y="150" text-anchor="middle" fill="#8a9ab0" font-size="12" font-style="italic">denti arretrati sopra la banda</text>
+    <text y="180" text-anchor="middle" fill="#d8b96a" font-size="15" letter-spacing="3">APERTO — ghiera LARGA</text>
+  </g>
+
+  <!-- freccia 1 -->
+  <g transform="translate(420,310)">
+    <text x="0" y="-46" text-anchor="middle" fill="#d8b96a" font-size="12">si insedia il</text>
+    <text x="0" y="-31" text-anchor="middle" fill="#d8b96a" font-size="12">medaglione</text>
+    <line x1="-55" y1="0" x2="55" y2="0" stroke="#d8b96a" stroke-width="2" marker-end="url(#arr)"/>
+    <text x="0" y="22" text-anchor="middle" fill="#c96a5a" font-size="11" font-style="italic">NON cala dall'alto:</text>
+    <text x="0" y="37" text-anchor="middle" fill="#c96a5a" font-size="11" font-style="italic">STRINGE radialmente</text>
+  </g>
+
+  <!-- ============ STATO 2: STRINGE + denti avanzano ============ -->
+  <g transform="translate(660,310)">
+    <circle r="125" fill="none" stroke="#b98a4f" stroke-width="15" stroke-dasharray="6 6" opacity="0.4"/>
+    <circle r="103" fill="none" stroke="#b98a4f" stroke-width="15"/>
+    <circle r="103" fill="none" stroke="#0f5f4a" stroke-width="6" opacity="0.8"/>
+    <circle r="86" fill="#1a2438" stroke="#d8b96a" stroke-width="5"/>
+    <g stroke="#c96a5a" stroke-width="3" marker-end="url(#arrRed)">
+      <line x1="0" y1="-158" x2="0" y2="-132"/>
+      <line x1="0" y1="158" x2="0" y2="132"/>
+      <line x1="-158" y1="0" x2="-132" y2="0"/>
+      <line x1="158" y1="0" x2="132" y2="0"/>
+    </g>
+    <!-- denti che AVANZANO sopra la banda verso il filo -->
+    <g stroke="#7fc9a0" stroke-width="3" marker-end="url(#arrGreen)">
+      <line x1="-80" y1="-80" x2="-66" y2="-66"/>
+      <line x1="80" y1="-80" x2="66" y2="-66"/>
+      <line x1="-80" y1="80" x2="-66" y2="66"/>
+      <line x1="80" y1="80" x2="66" y2="66"/>
+    </g>
+    <text y="180" text-anchor="middle" fill="#d8b96a" font-size="15" letter-spacing="3">CHIUSURA — stringe</text>
+    <text y="152" text-anchor="middle" fill="#7fc9a0" font-size="12" font-style="italic">i denti avanzano sopra la banda</text>
+  </g>
+
+  <!-- freccia 2 -->
+  <g transform="translate(880,310)">
+    <text x="0" y="-46" text-anchor="middle" fill="#d8b96a" font-size="12">scatto finale:</text>
+    <text x="0" y="-31" text-anchor="middle" fill="#d8b96a" font-size="12">denti sul filo</text>
+    <line x1="-55" y1="0" x2="55" y2="0" stroke="#d8b96a" stroke-width="2" marker-end="url(#arr)"/>
+  </g>
+
+  <!-- ============ STATO 3: CHIUSO — denti SOPRA, avanzati ============ -->
+  <g transform="translate(1080,310)">
+    <circle r="86" fill="#1a2438" stroke="#d8b96a" stroke-width="5"/>
+    <text y="30" text-anchor="middle" fill="#8a9ab0" font-size="12" font-style="italic">medaglione</text>
+    <circle r="97" fill="none" stroke="#b98a4f" stroke-width="18"/>
+    <circle r="97" fill="none" stroke="#0f5f4a" stroke-width="7" opacity="0.8"/>
+    <!-- denti SOPRA: chele che da sopra la banda avanzano sul filo del medaglione -->
+    <g fill="#d8b96a" stroke="#7a5c28" stroke-width="1.5">
+      <!-- dente: base larga sulla banda esterna, punta che copre il filo -->
+      <path d="M-84,-84 L-40,-40 -50,-30 -94,-74 z"/>
+      <path d="M84,-84 L40,-40 50,-30 94,-74 z"/>
+      <path d="M-84,84 L-40,40 -50,30 -94,74 z"/>
+      <path d="M84,84 L40,40 50,30 94,74 z"/>
+    </g>
+    <!-- perni alla base dei denti -->
+    <g fill="#8a6a3a" stroke="#4a3410" stroke-width="1.5">
+      <circle cx="-80" cy="-80" r="7"/><circle cx="80" cy="-80" r="7"/>
+      <circle cx="-80" cy="80" r="7"/><circle cx="80" cy="80" r="7"/>
+    </g>
+    <text y="152" text-anchor="middle" fill="#8a9ab0" font-size="12" font-style="italic">denti SOPRA — avanzati sul filo</text>
+    <text y="180" text-anchor="middle" fill="#d8b96a" font-size="15" letter-spacing="3">CHIUSO — incastonato</text>
+  </g>
+
+  <!-- freccia 3 -->
+  <g transform="translate(1280,310)">
+    <text x="0" y="-46" text-anchor="middle" fill="#d8b96a" font-size="12">estrazione:</text>
+    <text x="0" y="-31" text-anchor="middle" fill="#d8b96a" font-size="12">prima i denti</text>
+    <line x1="-55" y1="0" x2="55" y2="0" stroke="#d8b96a" stroke-width="2" marker-end="url(#arr)"/>
+    <text x="0" y="22" text-anchor="middle" fill="#c96a5a" font-size="11" font-style="italic">tornano indietro,</text>
+    <text x="0" y="37" text-anchor="middle" fill="#c96a5a" font-size="11" font-style="italic">POI la ghiera si allarga</text>
+  </g>
+
+  <!-- ============ STATO 4: RIAPERTURA ============ -->
+  <g transform="translate(1500,310)">
+    <circle r="103" fill="none" stroke="#b98a4f" stroke-width="15"/>
+    <circle r="125" fill="none" stroke="#b98a4f" stroke-width="15" stroke-dasharray="6 6" opacity="0.4"/>
+    <circle r="86" fill="#1a2438" stroke="#d8b96a" stroke-width="5" opacity="0.7"/>
+    <g stroke="#c96a5a" stroke-width="3" marker-end="url(#arrRed)">
+      <line x1="-58" y1="-58" x2="-76" y2="-76"/>
+      <line x1="58" y1="-58" x2="76" y2="-76"/>
+      <line x1="-58" y1="58" x2="-76" y2="76"/>
+      <line x1="58" y1="58" x2="76" y2="76"/>
+    </g>
+    <text y="180" text-anchor="middle" fill="#d8b96a" font-size="15" letter-spacing="3">RIAPERTURA — si allarga</text>
+  </g>
+
+  <!-- dettaglio stratificazione -->
+  <g transform="translate(200,570)">
+    <text x="0" y="-14" fill="#8a9ab0" font-size="12">sezione laterale — il dente sta SOPRA e copre il filo del medaglione:</text>
+    <g transform="translate(0,4)">
+      <rect x="0" y="6" width="34" height="7" fill="#b98a4f" rx="2"/>
+      <rect x="26" y="10" width="34" height="6" fill="#d8b96a" rx="2" opacity="0.85"/>
+      <path d="M20,0 L44,0 L52,10 L34,10 z" fill="#e8cd80" stroke="#7a5c28" stroke-width="1"/>
+      <text x="70" y="11" fill="#8a9ab0" font-size="11">dente sopra · banda · filo medaglione sotto</text>
+    </g>
+  </g>
+  <text x="860" y="590" text-anchor="middle" fill="#5a6a80" font-size="12" font-style="italic">stessi materiali del C1 — bronzo opaco, smalto smeraldo — castone + gemma, non anello appoggiato</text>
+</svg>

@@ -12,6 +12,7 @@
 import { useTranslation } from 'react-i18next';
 import type { GameFrameNavItemConfig } from '@/balancing/config/idleVillage/gameFrameConfig';
 import { HudGlyph } from '@/ui/idleVillage/components/gameFrame/hudIcons';
+import { EngravedIcon } from '@/ui/idleVillage/components/gameFrame/engravedIcons';
 import { HudTooltip } from '@/ui/idleVillage/components/gameFrame/HudTooltip';
 import { NAV_BAR as BAR } from './navBarGeometry';
 import { hudPx } from './hudType';
@@ -80,8 +81,16 @@ export function HudRealNav({ navItems, activeNavId, onNavSelect, onRecenter, lab
               }}
             >
               <span data-hr-glyph="" style={{ display: 'grid', placeItems: 'center', filter: 'drop-shadow(0 1px 2px rgba(3, 26, 30, 0.9))' }}>
-                <HudGlyph iconId={item.icon} label={label} size={36} style={{ color: item.locked ? '#9fb3a8' : active ? '#fff1bd' : C.gold, opacity: item.locked ? 0.85 : 1, filter: item.locked ? 'none' : 'drop-shadow(0 1px 0 rgba(255, 244, 200, 0.55)) drop-shadow(0 -1px 0 rgba(60, 38, 4, 0.8))' }} />
+                <HudGlyph iconId={item.icon} label={label} size={40} style={{ color: item.locked ? '#8fa89b' : active ? '#fff1bd' : C.gold, opacity: item.locked ? 0.55 : 1, filter: item.locked ? 'none' : 'drop-shadow(0 1px 0 rgba(255, 244, 200, 0.55)) drop-shadow(0 -1px 0 rgba(60, 38, 4, 0.8))' }} />
               </span>
+              {item.locked && (
+                <span aria-hidden="true" style={{
+                  position: 'absolute', right: slot.w * 0.08, bottom: slot.h * 0.08, width: 18, height: 18, borderRadius: '50%', display: 'grid', placeItems: 'center',
+                  background: 'radial-gradient(circle at 35% 30%, #4a3a22, #1c1410 70%)', boxShadow: `0 0 0 1px ${C.gold}, 0 1px 3px rgba(0,0,0,0.8)`,
+                }}>
+                  <EngravedIcon id="cmd-lock" size={11} style={{ color: C.gold }} />
+                </span>
+              )}
             </button>
           </HudTooltip>
         );

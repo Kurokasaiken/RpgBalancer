@@ -1,17 +1,15 @@
 import { chromium } from 'playwright';
-import { writeFileSync } from 'fs';
+import fs from 'fs';
 const b = await chromium.connectOverCDP('http://localhost:9222');
-const ctx = b.contexts()[0];
-const p = ctx.pages().filter(pg => pg.url().includes('gemini.google.com')).pop();
-// scroll to bottom, find generated imgs
-const data = await p.evaluate(async () => {
-  const imgs = [...document.querySelectorAll('img')].filter(i => i.src.startsWith('blob:'));
-  const last = imgs[imgs.length - 1];
-  if (!last) return null;
-  const r = await fetch(last.src); const buf = await r.arrayBuffer();
-  return { b64: btoa(String.fromCharCode(...new Uint8Array(buf))), w: last.naturalWidth, h: last.naturalHeight };
-});
-if (data) {
-  writeFileSync('/Users/faustoboni/progetti_personali/RPG/.mw/runs/20261110-chatgpt-ghiera/gen/gemini-ghiera-v2.png', Buffer.from(data.b64, 'base64'));
-  console.log('saved', data.w, 'x', data.h);
-} else console.log('no blob img');
+const p = b.contexts()[0].pages().find(pg => pg.url().includes('gemini.google.com'));
+const url = 'blob:https://gemini.google.com/4738ab21-481a-4014-9b35-5f7392ddd1cc';
+const b64 = await p.evaluate(async (u) => {
+  const r = await fetch(u);
+  const buf = await r.arrayBuffer();
+  let bin=''; const bytes=new Uint8Array(buf);
+  for (let i=0;i<bytes.length;i+=8192) bin += String.fromCharCode.apply(null, bytes.subarray(i,i+8192));
+  return btoa(bin);
+}, url);
+fs.writeFileSync('.mw/runs/20261110-chatgpt-ghiera/gen/gemini-dentini.png', Buffer.from(b64,'base64'));
+console.log('saved', fs.statSync('.mw/runs/20261110-chatgpt-ghiera/gen/gemini-dentini.png').size);
+process.exit(0);

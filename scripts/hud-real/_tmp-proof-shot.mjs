@@ -1,0 +1,11 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch({args:['--enable-unsafe-swiftshader']});
+const p = await b.newPage({viewport:{width:1400,height:1600}, deviceScaleFactor:2});
+await p.goto('http://localhost:5173/bezel-variants', {waitUntil:'networkidle'});
+await p.waitForTimeout(2500);
+const el = p.locator('section', {hasText: 'GHIERA DENTINI'}).first();
+await el.scrollIntoViewIfNeeded();
+await p.waitForTimeout(800);
+await el.screenshot({path:'/tmp/proof-dentini.png'});
+console.log('done');
+await b.close();

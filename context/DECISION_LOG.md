@@ -1857,3 +1857,107 @@ utenti WebGL; il Director ha imposto verifica-fino-a-verde e landing unica.
 - **Veto modali GX-0042 esteso al core:** scheda hover e ventaglio ancorati non bloccanti, dettaglio in sezione dedicata.
 **Supera/integra:** voci 2026-11-11 su POI (aggregazione emergente bocciata definitivamente; «vermiglio=urgenza» sostituito; famiglia evento ridefinita come evento-locale).
 **Fonte:** `plans/PLAN-117-poi-zanara-e-luogo.md` rev. 5; run `mind-weaver/.mw/runs/20261111-plan117-rev4/` (report.md, artifact-r002.md).
+
+## 2026-11-12 — POI: cornice verde scelta (baseline di lavoro)
+
+**Scelta del Director:** cornice `.mw/runs/20261111-poi-zanara/piece/poi-frame-green.png` = versione con anello interno, gemme delle quattro punte ingrandite 1,3× in proporzione (oro + gemma + castone insieme), **collare sottile quasi nero** (`#060c14`, ~1 px a 48 px) e **bagliore dorato intenso in controluce** come strato separato (`poi-glow-gold.png`, radiale, sommato alla mappa in modalità screen, non un secondo collare).
+**Scoperte di questo giro:** allungare solo l'oro delle punte le rende fili che spariscono a 32–48 px (Director: «le punte sembrano sparire»); a far spiccare la sagoma servono rombi di gemma grandi + contorno; un «alone» fatto come fascia colorata attorno alla sagoma è un secondo collare, non una luce — il bagliore deve essere radiale e additivo («come se ci fosse una fonte luminosa dietro»); collare spesso/scuro bocciato come troppo pesante.
+**Nel gioco:** il bagliore è uno strato a parte (CSS `mix-blend-mode: screen` o equivalente) così colore/intensità possono seguire lo stato.
+**Prossimi:** versione blu con zaffiri; eventuali punte in più (da decidere); punte laterali da rifinire; listelli del rombo in basso.
+
+## 2026-11-12 — Halo del POI: il tempo riempie la cornice, non un anello esterno
+
+**Decisione del Director:** il tempo si legge riempiendo di smalto la **fascia esterna** della cornice, quella con le gemme (opzione 2). Il riempimento è parte del materiale del POI, non un arco sovrapposto: niente anello colorato attorno. Il mockup di riferimento (`images/17.webp`, mockup sbagliato in tutto il resto) mostra il principio: la banda verde dietro l'oro si allarga man mano che il tempo avanza.
+**Senso:** lavoro = riempimento in senso orario da dodici; scadenza = svuotamento in senso antiorario. Stessa fascia, punto di partenza e verso diversi.
+**Estremi:** vuoto = solo oro, nessuno smalto; pieno = tutta la fascia esterna in smalto (stato «finito» leggibile senza pulsazione).
+**Ancora da decidere:** colore dello smalto per stato (il vermiglio resta solo per l'urgenza); se l'arco sta sopra o sotto il bagliore (proposta: sopra, sottile, ma ora non serve più come elemento separato).
+**Da aggiornare dopo conferma:** `poi_family_spec.md` (sezione Halo grammar), `design-intent-v2.md`, questo log.
+
+## 2026-11-12 — Riempimento dell'halo: colore della famiglia del POI
+
+**Decisione del Director:** lo smalto che riempie la fascia esterna ha il **colore della famiglia** del POI, lo stesso della cupola: lavoro (job) = verde smeraldo, spedizione (quest) = blu. Non sono previsti altri colori per ora. Supera la proposta dei colori di stato (avorio/argento/rosso del mockup `gen/director-halo-fill-example.webp`).
+**Aperto:** il Director non è convinto del blu per le quest; da provare un'alternativa sulla mappa. Da chiarire anche come si segnala l'urgenza ora che il colore non cambia con lo stato (badge «!» e/o altro).
+**Fonte:** Director in sessione 2026-11-12.
+
+## 2026-11-12 — POI: niente badge; urgenza solo sull'arco di scadenza
+
+**Decisione del Director:** **nessun badge di stato** sul POI (clessidra, «!», forziere, spunta: non previsti). L'urgenza riguarda solo l'arco **antiorario** (scadenza), e forse non serve nemmeno lì; al massimo l'**ultimo 10%** vira al rosso: blu → viola → rosso per le quest, verde → … → rosso per i lavori.
+**Nota tecnica (prova `evidence/urgency-ramps.png`):** la miscela diretta dei colori passa per toni spenti (verde→rosso = marrone fangoso, blu→rosso = malva grigio); la miscela percettiva passa per tinte vive (verde→rosso = oliva→ambra→arancio, blu→rosso = viola→magenta). Per il verde l'ambra intermedia rischia di confondersi con l'oro della cornice.
+**Supera:** stato «decision waiting» come badge separato e il vermiglio del Sigillo a 25% della finestra (ora 10%, e solo se serve).
+
+## 2026-11-12 — Viraggio all'urgenza: miscela percettiva per entrambe le famiglie
+
+**Decisione del Director:** l'ultimo tratto dell'arco di scadenza passa dal colore della famiglia al rosso con la **miscela percettiva** (colori vivi, niente marrone). Verde → oliva/ambra/arancio → rosso per i lavori; blu → viola/magenta → rosso per le quest. Niente tratto marrone dedicato.
+**Nota:** il passaggio verde→rosso attraversa ambra, vicina all'oro della cornice: resta da verificare sulla mappa che l'arco si legga ancora in quel tratto.
+
+## 2026-11-12 — Arco di tempo del POI: versione «C, acceso e largo»
+
+**Scelta del Director:** riempimento della fascia esterna con verde **più acceso** (`#16c46c`, più chiaro al centro, meno «bruciato» dalle incisioni) e fascia **più larga**, estesa verso l'interno (da 0,885 a 0,845 del raggio esterno; ~2,2 px a 48 px, ~3 px a 64 px).
+**Motivo:** a 48 px l'arco era 1,5 px e il verde scuro quasi invisibile sulla foresta (prova `evidence/arc-intensity-test.png`).
+**Aperto:** colore acceso equivalente per le quest (blu/alternativa); viraggio al rosso (soglia da riprovare, 25% proposto); animazione legata al progresso del tempo.
+
+## 2026-11-12 — Arco del POI verde: stesso verde dell'interno
+
+**Decisione del Director:** il verde dell'arco è lo stesso verde dell'**interno** del componente (la cupola), non un verde più acceso. Supera la scelta «C» (`#16c46c`), giudicata troppo chiara.
+**Misura:** la cupola ha molte sfumature; valore tipico `#073f25`, 75° percentile `#185d35`, 90° percentile `#2d784c` (tinta ~152°). Adottato il **90° percentile `#2d784c`**, cioè lo smeraldo luminoso della cupola. Il valore tipico e il 75° si confondono con il collare scuro e con la foresta.
+**Costo noto:** a 48 px è meno leggibile di `#12a35a`; a 32 px l'arco non si legge comunque (spessore ~1,3 px). Prova: `evidence/green-dome-test.png`.
+
+## 2026-11-12 — POI verde BATTEZZATO
+
+**Componente battezzato (famiglia lavoro, verde):** cornice `.mw/runs/20261111-poi-zanara/piece/battezzato/poi-green-frame-alpha.png` (trasparente, senza collare, bagliore e icona) + `poi-green-frame-for-gemini.png` (stessa cornice su sfondo piatto `#0a1622`). Caratteristiche: anello interno con filigrana, cupola ingrandita, 4 rombi di gemma ingranditi 1,3× in proporzione, punte, ritocchi puliti.
+**Strati che aggiunge il codice:** collare quasi nero sottile (`#060c14`, ~1 px a 48 px), bagliore dorato a raggi come strato additivo (`piece/poi-glow-gold.png`), arco di tempo nella fascia esterna (livelli in `piece/layers/`).
+**Arco:** canale 0,845–0,972 del raggio; verde **`#226a40`** (tra il 75° e il 90° percentile dei verdi della cupola, più scuro del 90° su richiesta del Director); scarica antioraria da pieno, riempimento orario per il lavoro; viraggio percettivo al rosso (soglia da fissare, 25% proposto).
+**Prossimo:** versione blu (quest) da ricolorare con Gemini a partire da `poi-green-frame-for-gemini.png`; poi aggiornare `poi_family_spec.md` e `design-intent-v2.md`.
+
+## 2026-11-12 — POI quest (zaffiro) BATTEZZATO; asset in public; handoff
+
+**Battezzato dal Director:** cornice blu ricolorata da Gemini a partire dal POI verde (sagoma coincide al 90,5 %, oro invariato, cupola un po' più scura: L 45 contro 52). Stessa sagoma e stessi materiali del verde; cambia solo lo smalto.
+**Asset tracciati:** `public/assets/ui/hud-real/poi/` — `poi-job-frame.webp` (verde), `poi-quest-frame.webp` (blu), `poi-glow-gold.webp`, `poi-icon-logs.webp`, `layers/*` + `arc-geometry.json`.
+**Handoff:** `context/handoff-poi-zanara-production.md` (cosa è deciso, come si compone, punti da risolvere rispetto a PLAN-117 rev. 5, cosa non è stato verificato).
+**Aperto:** colore dell'arco per le quest; terza cornice minaccia/evento; tutti i punti di §5 dell'handoff.
+
+## 2026-11-12 — Ruling sulle divergenze PLAN-117 rev. 5 ↔ POI battezzati
+
+**Da:** `context/handoff-poi-zanara-production.md` §5 — sette divergenze tra PLAN-117 rev. 5 (battezzato da un'altra sessione) e le decisioni/asset della sessione POI; punti 1–5 risolti con il Director in sessione, una domanda per volta.
+**A:**
+1. **Famiglia = segno di forma su sagoma condivisa (ibrido).** Le cornici battezzate restano la base e non si rifanno da zero, ma ogni famiglia riceve un segno di forma proprio (numero/stile delle punte o altro segno d'oro) leggibile a 32 px in grigio. Quale segno → fork visivo sulla mappa (desiderata v35). Risolve §5.1: lo spirito di P4/OB-3c (famiglia leggibile senza colore) resta, assolto dal segno di forma invece che dalla sagoma intera.
+2. **Famiglie = 2.** Solo lavoro e spedizione hanno un POI sulla mappa; l'evento-locale non ha marker: la forma «evento» di rev. 5 diventa solo glifo nella timeline Eventi (ripiego già previsto da D-9). `MapPOIType` restringe a `quest|job` (o `event` resta dichiarato ma senza marker); test e matrice sagome da 3 a 2. Risolve §5.2.
+3. **Arco di scadenza = colore famiglia che vira al rosso.** Confermata la scelta battezzata: l'arancione CCW di rev. 5 (C4) è superato. Risolve §5.3.
+4. **Urgenza = solo viraggio al rosso.** Niente pulsazione, niente badge, niente equivalente statico non-colore: l'ultimo tratto dell'arco antiorario vira al rosso percettivo (`#e8553a`). OB-3b (pulsazione+statico) da emendare. Risolve §5.5.
+5. **Il tempo riempie il ring del componente, liscio.** Verbatim Director: *«nn c'è un canale, c'è il normale ring del componente»* — niente tacche né gioiello terminale nel countdown (C4 superato del tutto). La differenza lavoro/scadenza è nello **stato iniziale e nel verso** (verbatim: *«scadenza cambia verso ma parte da pieno e si svuota, mentre lavoro è il contrario: parte da vuoto e si riempie»*): scadenza = tempo rimasto, pieno → vuoto antiorario; lavoro = tempo trascorso, vuoto → pieno orario; a parità di percentuale gli archi sono speculari (destra vs sinistra delle 12). Il capo tondo era comunque vietato da T-02. Risolve §5.4.
+**Resta aperto (§5.6–5.7):** colore dell'arco per le quest (blu su mare = caso peggiore) e soglia del viraggio al rosso (10 % invisibile a 48 px, 25 % leggibile solo da ~64 px; `urgentStartsAtRemaining: 0.25` in `arc-geometry.json` è **proposta**, non decisione). Entrambi da decidere su compositi a dimensione reale sulla mappa2 — ruling visivo, non astratto.
+**Fonte:** Director in sessione 2026-11-12 (ruling su `handoff-poi-zanara-production.md`).
+
+### 2026-11-13 — Veto: niente testo sotto i POI mappa
+
+Il Director ha posto un veto esplicito e permanente: **mai un'etichetta
+testuale sotto i marker POI sulla mappa** («niente testo sotto, mai»). La
+leggibilità del marker passa solo per il materiale: sagoma, smalto, collare,
+anello, icona — il nome/stato resta nell'interazione (click → scheda).
+
+### 2026-11-14 — Ghiera DRAGHI = slot corretto (R-333); cassetto su /game (R-334)
+
+Il Director battezza la ghiera draghi come **lo slot corretto** e ordina la
+sostituzione nel cassetto alla dimensione esistente. Decisioni incorporate:
+
+- **Composizione sandwich:** disco smaltato col drago *dietro* il medaglione
+  del residente, ring di bronzo + banda *davanti* («sotto l'outer ring del
+  componente»). Implementazione: layer DOM portal z-5 (integrale) + frame
+  forato dentro il bezel group z-20 — meccanica stock invariata (slam 440ms,
+  open pose -30°/1.18×, zero denti `toothAngles: []`).
+- **Proporzione chiusura** tuned dal Director sugli slider del lab:
+  ghiera ×1.15 / medaglione ×0.9 — il ring interno si chiude sul bordo del
+  medaglione (castone). Fattori relativi: riusabili a qualsiasi taglia slot.
+- **Medaglione:** `medaglione-battezzato-v3` firmato; in produzione è FRAME
+  (foro trasparente) + ritratto reale — niente faccia dipinta nei sedili.
+- **Palette:** gold ghiera ri-matchato in LAB sul gold del medaglione
+  (L50 37→49, C50 28→40) — il "brunito" era solo lightness/chroma, non hue.
+- **Montato in:** `HudRealCassetto` (`bezelPreset="draghi"`, `slotSize 42`,
+  `scale(0.56)` — stessa dimensione del preset `b` precedente). Il preset `b`
+  resta la ghiera di produzione di `/game` (R-214) fino a ruling diverso.
+- **R-334 — cassetto su `/game`:** il click su un quest POI apre
+  `HudRealCassetto` al posto di `QuestExpeditionDetail` tramite
+  `HudRealCassettoDetail` (adapter su `QuestExpeditionDetailProps` letto dal
+  nodo dentro `wrapDetail`, `game-mappa2.tsx`): la sessione
+  `useQuestExpeditionSession` resta l'unica fonte — slots, estimate, items,
+  canSend/send/clear reali, stage/Escape/dnd invariati.

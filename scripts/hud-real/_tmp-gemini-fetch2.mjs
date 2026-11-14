@@ -1,0 +1,17 @@
+import WebSocket from 'ws';
+import { writeFileSync } from 'fs';
+import http from 'http';
+const OUT = '/tmp/gemini-other-blob.png';
+const listJson = () => new Promise((res, rej) => { http.get('http://localhost:9222/json/list', r => { let d=''; r.on('data',c=>d+=c); r.on('end',()=>res(JSON.parse(d))); }).on('error', rej); });
+const targets = await listJson();
+const page = targets.find(t => t.type==='page' && /gemini\.google\.com\/app$/.test(t.url)) || targets.find(t=>t.type==='page'&&t.url.includes('gemini.google.com'));
+const ws = new WebSocket(page.webSocketDebuggerUrl, { maxPayload: 512*1024*1024 });
+await new Promise((res, rej) => { ws.on('open', res); ws.on('error', rej); });
+let idc=0; const pend=new Map();
+ws.on('message', m=>{const j=JSON.parse(m); if(j.id&&pend.has(j.id)){pend.get(j.id)(j);pend.delete(j.id);}});
+const send=(method,params={})=>new Promise(res=>{const id=++idc;pend.set(id,res);ws.send(JSON.stringify({id,method,params}));});
+const evaljs=async(e)=>{const r=await send('Runtime.evaluate',{expression:e,returnByValue:true,awaitPromise:true});if(r.result?.exceptionDetails)return{err:r.result.exceptionDetails.exception?.description||'ex'};return r.result?.result?.value;};
+const src='blob:https://gemini.google.com/9254eef5-56f1-43fb-b06a-0d57eaa33d6d';
+const b64 = await evaljs(`(async()=>{const img=[...document.querySelectorAll('img')].find(i=>i.src===${JSON.stringify(src)});if(!img)return 'no-img';const c=document.createElement('canvas');c.width=img.naturalWidth||img.width;c.height=img.naturalHeight||img.height;c.getContext('2d').drawImage(img,0,0);return c.toDataURL('image/png')})()`);
+if (typeof b64==='string' && b64.startsWith('data:image')) { writeFileSync(OUT, Buffer.from(b64.split(',')[1],'base64')); console.log('saved'); } else console.log('fail:', JSON.stringify(b64).slice(0,150));
+ws.close(); process.exit(0);

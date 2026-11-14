@@ -1,0 +1,12 @@
+import { chromium } from 'playwright';
+const browser = await chromium.launch();
+const page = await browser.newPage({ viewport: { width: 1500, height: 900 } });
+page.on('pageerror', e => console.log('PAGEERROR', e.message));
+await page.goto('http://127.0.0.1:4173/figma-sim.html', { waitUntil: 'domcontentloaded', timeout: 20000 });
+await page.waitForTimeout(4000);
+await page.screenshot({ path: '/tmp/i2s-01-loaded.png' });
+console.log('shot done, url:', page.url());
+const btns = await page.locator('button').evaluateAll(els => els.map(e => (e.textContent||'').trim()).filter(Boolean).slice(0, 80));
+console.log('BUTTONS:', JSON.stringify(btns));
+console.log('done');
+await browser.close();

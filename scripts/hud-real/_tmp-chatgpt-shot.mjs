@@ -1,0 +1,10 @@
+import { chromium } from 'playwright';
+const b = await chromium.connectOverCDP('http://localhost:9222');
+const p = b.contexts()[0].pages().find(pg => pg.url().includes('chatgpt.com'));
+await p.waitForTimeout(4000);
+await p.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+await p.waitForTimeout(2000);
+await p.screenshot({path:'/tmp/chatgpt-tail.png'});
+const srcs = await p.evaluate(() => [...document.querySelectorAll('img')].map(i=>({src:i.src.slice(0,120),w:i.naturalWidth})).filter(i=>i.w>200));
+console.log(JSON.stringify(srcs.slice(-6)));
+process.exit(0);

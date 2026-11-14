@@ -19,6 +19,7 @@ import type { PlaceDefinition } from '@/balancing/config/idleVillage/placesConfi
 import type { MapQuestPoiView } from './MapQuestPoi';
 import { PlaceHoverCard } from './PlaceHoverCard';
 import { PlaceFan, type PlaceFanActivity } from './PlaceFan';
+import { PlaceRadial } from './PlaceRadial';
 
 export interface MapPlaceProps {
   place: PlaceDefinition;
@@ -30,6 +31,11 @@ export interface MapPlaceProps {
   open?: boolean;
   /** Marker diameter in px — never below 32 (hit area). */
   sizePx?: number;
+  /** Menu model: 'fan' = legacy two-ring fan (provvisorio), 'radial' = new
+   * inclined radial menu (sotto-piano F2, ruling Director 2026-11-12). */
+  menuMode?: 'fan' | 'radial';
+  /** Inclinazione del disco radiale in gradi (solo menuMode='radial'). */
+  radialTiltDeg?: number;
   onSelectActivity?: (activityId: string) => void;
 }
 
@@ -39,6 +45,8 @@ export const MapPlace: React.FC<MapPlaceProps> = ({
   views = {},
   open = true,
   sizePx = 56,
+  menuMode = 'fan',
+  radialTiltDeg,
   onSelectActivity,
 }) => {
   const { t } = useTranslation('idleVillage');
@@ -87,7 +95,10 @@ export const MapPlace: React.FC<MapPlaceProps> = ({
       onMouseLeave={() => setHovered(false)}
       style={{ position: 'relative', width: size, height: size, cursor: open ? 'pointer' : 'default' }}
     >
-      {/* Sigillo-luogo: ottagono scuro + gemma — gerarchia distinta dai POI */}
+      {/* Sigillo-luogo: ottagono scuro + gemma — gerarchia distinta dai POI.
+          Solo menuMode 'fan' (legacy): nel modello radiale il click target è
+          l'elemento dipinto sulla mappa, nessun sigillo sopra. */}
+      {menuMode !== 'radial' ? (
       <svg
         data-testid="map-place-seal"
         width={size}
@@ -119,6 +130,7 @@ export const MapPlace: React.FC<MapPlaceProps> = ({
           strokeWidth={1.5}
         />
       </svg>
+      ) : null}
 
       {hovered && !fanOpen ? (
         <div style={{ position: 'absolute', left: '50%', bottom: size + 8, transform: 'translateX(-50%)', zIndex: 30 }}>
@@ -128,7 +140,17 @@ export const MapPlace: React.FC<MapPlaceProps> = ({
 
       {fanOpen && open ? (
         <div style={{ position: 'absolute', left: '50%', top: '50%', zIndex: 25 }}>
-          <PlaceFan activities={activities} views={views} onSelect={onSelectActivity} />
+          {menuMode === 'radial' ? (
+            <PlaceRadial
+              activities={activities}
+              views={views}
+              tiltDeg={radialTiltDeg}
+              onSelect={onSelectActivity}
+              onRequestClose={closeFan}
+            />
+          ) : (
+            <PlaceFan activities={activities} views={views} onSelect={onSelectActivity} />
+          )}
         </div>
       ) : null}
     </div>

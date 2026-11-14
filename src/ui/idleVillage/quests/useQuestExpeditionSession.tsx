@@ -110,6 +110,13 @@ export interface QuestExpeditionSessionOptions {
   onOpenRun?: (questId: QuestId) => void;
   /** Opens the village-owned stash from the planner bag control. */
   onOpenStash: (trigger: HTMLElement) => void;
+  /**
+   * R-325: journey route origin override. The default is the settlement
+   * anchor authored in the Wanderlust presentation manifest (old 4240×2828
+   * canvas); pages rendering a different world canvas (Mappa2) pass their
+   * own origin so frozen journey routes draw from the painted village.
+   */
+  journeyOrigin?: { x: number; y: number };
   /** Where the planning panel first appears (viewport px). */
   detailPosition?: { x: number; y: number };
   /**
@@ -152,6 +159,7 @@ export function useQuestExpeditionSession({
   currentTick,
   onOpenRun,
   onOpenStash,
+  journeyOrigin,
   detailPosition,
   wrapDetail,
 }: QuestExpeditionSessionOptions) {
@@ -884,7 +892,7 @@ export function useQuestExpeditionSession({
           poi,
           nodes: resolved.instance.nodes,
           startNode: resolved.instance.startNode,
-          origin: VILLAGE_ORIGIN,
+          origin: journeyOrigin ?? VILLAGE_ORIGIN,
           ticksPerDay: useMinimalGameplayStore.getState().config.globalRules.dayLengthInTimeUnits,
           nodeTicks: expeditionDuration.nodeTicks,
           runSeed: seed,
@@ -944,6 +952,7 @@ export function useQuestExpeditionSession({
     expeditionDuration,
     questRun,
     onOpenRun,
+    journeyOrigin,
     clearDraft,
   ]);
 

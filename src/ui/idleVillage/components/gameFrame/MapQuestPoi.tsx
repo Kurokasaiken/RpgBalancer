@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useDndContext, useDroppable } from '@dnd-kit/core';
 import { useTranslation } from 'react-i18next';
 import PoiMatericV3_5, { poiMatericV3_5Styles } from '@/ui/idleVillage/components/poi/PoiMatericV3_5';
+import { PoiZanara } from '@/ui/idleVillage/components/poi/PoiZanara';
+import { POI_ZANARA_CONFIG } from '@/balancing/config/idleVillage/poiZanaraConfig';
 import type { PoiState, PoiType } from '@/ui/idleVillage/components/poi/PoiMarker';
 import { EXPIRING_BELOW, type QuestAvailability } from './questAvailability';
 import { usePoiTypeIcon } from './usePoiTypeIcon';
@@ -42,6 +44,9 @@ export interface MapQuestPoiProps {
    *  it plays the reverse of the entrance (fade + shrink) and stops taking
    *  pointer input before unmounting. */
   exiting?: boolean;
+  /** Marker skin: `sigillo` (legacy medallion, default — /gameOld and labs) or
+   *  `zanara` (painted frame + channel ring, PLAN-117, /game). */
+  marker?: 'sigillo' | 'zanara';
 }
 
 /** Selector `useQuestPoiSession` flies a dropped resident to while the detail is closed. */
@@ -146,7 +151,7 @@ const QUEST_GLYPH_URLS: Readonly<Record<string, string>> = {
   'poi-rovine': '/assets/ui/poi/poi-ruins-128.webp',
 };
 
-export const MapQuestPoi: React.FC<MapQuestPoiProps> = ({ session, sizePx: baseSizePx, availability, poiType = 'quest', tier: tierProp, exiting = false }) => {
+export const MapQuestPoi: React.FC<MapQuestPoiProps> = ({ session, sizePx: baseSizePx, availability, poiType = 'quest', tier: tierProp, exiting = false, marker = 'sigillo' }) => {
   const { activity, questStatus, activityProgress, poiDropId, canAcceptPoiDrop, handlePoiClick, draggingResidentId } = session;
   const { t } = useTranslation('idleVillage');
   const tier = tierProp ?? questPoiById(activity.id)?.tier ?? 'normal';
@@ -191,6 +196,29 @@ export const MapQuestPoi: React.FC<MapQuestPoiProps> = ({ session, sizePx: baseS
   const view = mapQuestPoiView(questStatus, activityProgress, availability, tier);
   const { state, progress } = view;
   const expired = state === 'expired';
+  /* Zanara grammar (Director 2026-11-12): the quest ring always reads
+   *  "deadline share left" and drains CCW from 12 — the offer window while
+   *  `available`, the expedition's remaining time while running, empty once
+   *  the run is over (the pulse marks it, not the ring). The job ring reads
+   *  elapsed work and fills CW. `view.progress` is the sigillo's quantity,
+   *  not the remaining share — the residual is derived here. */
+  const zanaraFamily = poiType === 'job' ? 'job' : 'quest';
+  const zanaraRemaining = zanaraFamily === 'job'
+    ? progress
+    : questStatus === 'available'
+      ? (availability?.progress ?? 0)
+      : questStatus === 'in_progress'
+        ? 1 - progress
+        : 0;
+  /* Write-in beat: the job ring draws up from empty like the sigillo did; the
+   *  quest ring is born full (a fresh window is whole) and drains in to the
+   *  live remaining share. */
+  const zanaraFraction = zanaraFamily === 'job'
+    ? zanaraRemaining * sealWriteIn
+    : 1 - (1 - zanaraRemaining) * sealWriteIn;
+  /* Zanara renders one notch bigger than the sigillo at equal authored size:
+   *  the painted jewel carries less info-density per px (live-map ruling). */
+  const markerSizePx = marker === 'zanara' ? sizePx * POI_ZANARA_CONFIG.markerScale : sizePx;
   /* The label says what the marker is AND where the expedition stands (was: always «open the quest»). */
   const poiAriaLabel = questStatus === 'available'
     ? t('gameFrame.questPoi.open', { name: activity.label })
@@ -235,21 +263,32 @@ export const MapQuestPoi: React.FC<MapQuestPoiProps> = ({ session, sizePx: baseS
       <style>{`[data-map-quest-poi-target]:focus-visible { outline: none; }
 [data-map-quest-poi-target]:focus-visible .poiv3_5 { filter: drop-shadow(1.6px 0 0 var(--skin-hud-brass-crest)) drop-shadow(-1.6px 0 0 var(--skin-hud-brass-crest)) drop-shadow(0 1.6px 0 var(--skin-hud-brass-crest)) drop-shadow(0 -1.6px 0 var(--skin-hud-brass-crest)) drop-shadow(0 0 4px var(--skin-hud-brass-crest)); }
 @media (prefers-reduced-motion: reduce) { [data-map-quest-poi-target] { transform: none !important; } }`}</style>
-      <div style={{ position: 'relative', width: sizePx, height: sizePx }}>
+      <div style={{ position: 'relative', width: markerSizePx, height: markerSizePx }}>
         {/* The red «decision waiting» dot was removed (Director 2026-10-20: a small circle in the corner must not exist). */}
-        <PoiMatericV3_5
-          sigillo
-          type={poiType}
-          iconUrl={iconUrl}
-          state={state}
-          progress={progress * sealWriteIn}
-          timerDirection={view.direction}
-          pulse={view.done}
-          size={sizePx}
-          grounded
-          isDragging={isDragActive && canAcceptPoiDrop}
-          data-testid="map-quest-poi"
-        />
+        {marker === 'zanara' && (poiType === 'quest' || poiType === 'job') ? (
+          <PoiZanara
+            family={zanaraFamily}
+            fraction={zanaraFraction}
+            iconUrl={iconUrl}
+            pulse={view.done}
+            sizePx={markerSizePx}
+            data-testid="map-quest-poi"
+          />
+        ) : (
+          <PoiMatericV3_5
+            sigillo
+            type={poiType}
+            iconUrl={iconUrl}
+            state={state}
+            progress={progress * sealWriteIn}
+            timerDirection={view.direction}
+            pulse={view.done}
+            size={sizePx}
+            grounded
+            isDragging={isDragActive && canAcceptPoiDrop}
+            data-testid="map-quest-poi"
+          />
+        )}
       </div>
     </div>
   );

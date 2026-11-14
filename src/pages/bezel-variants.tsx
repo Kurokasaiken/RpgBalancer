@@ -6,6 +6,7 @@ import {
 } from '@/ui/idleVillage/frozen/kits/slotRackKit';
 import { useCanonicalRosterBundle } from '@/ui/idleVillage/roster';
 import { C1Medallion } from '@/ui/idleVillage/components/C1Medallion';
+import { BEZEL_PRESETS } from '@/ui/idleVillage/components/SlotV12Renderer';
 import type { ResidentSlotViewModel } from '@/ui/idleVillage/slots/types';
 
 /**
@@ -20,6 +21,10 @@ import type { ResidentSlotViewModel } from '@/ui/idleVillage/slots/types';
 type BezelPreset = NonNullable<ResidentSlotRackProps['bezelPreset']>;
 
 const PRESET_META: Record<BezelPreset, { name: string; desc: string }> = {
+  draghi: {
+    name: 'DRAGHI — GHIERA DIPINTA + MECCANICA REALE',
+    desc: 'BATTEZZATO R-333 — slot corretto. Ghiera firmata (banda treccia + X con kite + ring oro + disco drago) nella meccanica reale: sandwich disco-dietro / medaglione v3 FRAME + ritratto reale / ring+banda-davanti; chiusura tuned ×1.15·×0.9; montata nel cassetto.',
+  },
   zanara: {
     name: 'ZANARA — PLAN-116 F0 (scartata)',
     desc: 'Full-width band, short wide claws rooted in the band biting the medallion rim, no bezel gem (lab-only).',
@@ -50,13 +55,18 @@ const PRESET_META: Record<BezelPreset, { name: string; desc: string }> = {
   },
 };
 
-const PRESET_ORDER: BezelPreset[] = ['zanara2', 'zanara', 'stock', 'a', 'b', 'c', 'ab'];
+const PRESET_ORDER: BezelPreset[] = ['draghi', 'zanara2', 'zanara', 'stock', 'a', 'b', 'c', 'ab'];
 
 /** Row labels mirror the planner's marching order (head → tail). */
 const ROW_LABELS = ['TESTA', 'II', 'III', 'CODA'];
 
 function BezelVariantsContent() {
   const [showCenterlines, setShowCenterlines] = useState(true);
+  const [seatNonce, setSeatNonce] = useState(0);
+  /* DRAGHI tuning sliders (lab-only): mutate the live preset object so every
+   * rack instance re-reads the knob on re-render; the numbers are the values
+   * to report back once the closure point looks right. */
+  const [tune, setTune] = useState({ ghiera: BEZEL_PRESETS.draghi.bandImageScale ?? 1, medal: BEZEL_PRESETS.draghi.portraitScale ?? 1 });
   const { residents } = useCanonicalRosterBundle(0);
 
   /* 3 occupied slots + 1 empty (bodyguard role glyph) — enough to read both
@@ -78,9 +88,10 @@ function BezelVariantsContent() {
           status: resident ? 'assigned' : 'empty',
           telemetryTags: [],
           role: index === 3 ? 'bodyguard' : 'member',
+          seatNonce,
         };
       }),
-    [residents],
+    [residents, seatNonce],
   );
 
   return (
@@ -99,6 +110,14 @@ function BezelVariantsContent() {
               (3 occupied + 1 empty), then a 3× zoomed slot.
             </p>
           </div>
+          <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => setSeatNonce((n) => n + 1)}
+            className="rounded border border-amber-400/60 bg-amber-400/10 px-3 py-1.5 text-xs uppercase tracking-[0.2em] text-amber-200 transition-colors hover:bg-amber-400/20"
+          >
+            Replay slam
+          </button>
           <button
             type="button"
             onClick={() => setShowCenterlines((v) => !v)}
@@ -110,7 +129,105 @@ function BezelVariantsContent() {
           >
             Centerlines {showCenterlines ? 'on' : 'off'}
           </button>
+          </div>
         </header>
+
+
+        {PRESET_ORDER.map((preset) => (
+          <section
+            key={preset}
+            data-testid={`bezel-row-${preset}`}
+            className="rounded-lg border border-slate-800 bg-slate-900/40 p-5"
+          >
+            <div className="mb-4 flex items-baseline gap-4">
+              <h2 className="text-sm font-semibold tracking-[0.25em] text-amber-100/90">
+                {PRESET_META[preset].name}
+              </h2>
+              <p className="text-xs text-slate-500">{PRESET_META[preset].desc}</p>
+            </div>
+            <div className="flex items-center gap-10">
+              <div className="flex items-end gap-6">
+                {slots.map((slot) => (
+                  <div key={slot.id} className="relative">
+                    <ResidentSlotRack
+                      /* draghi tuning: DetailSlot is memo'd — remount on knob
+                       * change so the mutated preset is re-read. */
+                      key={preset === 'draghi' ? `${tune.ghiera}-${tune.medal}` : 's'}
+                      slots={[slot]}
+                      layout="detail"
+                      slotSize={64}
+                      slotMaterial="hud-gold"
+                      slotVariant="hud64"
+                      bezelPreset={preset}
+                    />
+                    {showCenterlines && (
+                      <div aria-hidden className="pointer-events-none absolute left-0 top-0 z-40 h-16 w-16">
+                        <div className="absolute left-1/2 top-0 h-full w-px bg-cyan-400/70" />
+                        <div className="absolute left-0 top-1/2 h-px w-full bg-cyan-400/70" />
+                        <div
+                          className="absolute rounded-full border border-dashed border-cyan-400/60"
+                          style={{ left: '50%', top: '50%', width: 50, height: 50, transform: 'translate(-50%,-50%)' }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                ))}
+
+              </div>
+              <div className="relative h-48 w-48 shrink-0 overflow-hidden rounded-md border border-slate-700/60 bg-black/40">
+                <div className="relative" style={{ transform: 'scale(3)', transformOrigin: '0 0' }}>
+                  <ResidentSlotRack
+                    key={preset === 'draghi' ? `z-${tune.ghiera}-${tune.medal}` : 'z'}
+                    slots={slots.slice(0, 1)}
+                    layout="detail"
+                    slotSize={64}
+                    slotMaterial="hud-gold"
+                    slotVariant="hud64"
+                    bezelPreset={preset}
+                  />
+                  {showCenterlines && (
+                    <div aria-hidden className="pointer-events-none absolute left-0 top-0 z-40 h-16 w-16">
+                      <div className="absolute left-1/2 top-0 h-full w-px bg-cyan-400/70" />
+                      <div className="absolute left-0 top-1/2 h-px w-full bg-cyan-400/70" />
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            {preset === 'draghi' && (
+              <div className="mt-4 flex items-center gap-8 rounded border border-cyan-800/50 bg-slate-950/60 px-4 py-3">
+                <span className="text-[10px] uppercase tracking-[0.3em] text-cyan-300/80">Tuning</span>
+                <label className="flex items-center gap-3 text-xs text-slate-300">
+                  <span className="w-32 uppercase tracking-[0.15em]">Chiusura ghiera</span>
+                  <input
+                    type="range" min={0.85} max={1.15} step={0.0025} value={tune.ghiera}
+                    className="w-56 accent-cyan-400"
+                    onChange={(e) => {
+                      const v = Number(e.target.value);
+                      BEZEL_PRESETS.draghi.bandImageScale = v;
+                      setTune((t) => ({ ...t, ghiera: v }));
+                    }}
+                  />
+                  <span className="w-14 font-mono text-cyan-200">{tune.ghiera.toFixed(4)}</span>
+                </label>
+                <label className="flex items-center gap-3 text-xs text-slate-300">
+                  <span className="w-32 uppercase tracking-[0.15em]">Medaglione</span>
+                  <input
+                    type="range" min={0.9} max={1.3} step={0.005} value={tune.medal}
+                    className="w-56 accent-cyan-400"
+                    onChange={(e) => {
+                      const v = Number(e.target.value);
+                      BEZEL_PRESETS.draghi.portraitScale = v;
+                      setTune((t) => ({ ...t, medal: v }));
+                    }}
+                  />
+                  <span className="w-14 font-mono text-cyan-200">{tune.medal.toFixed(3)}</span>
+                </label>
+                <span className="text-[10px] text-slate-500">riportami i due numeri quando il punto di chiusura è giusto</span>
+              </div>
+            )}
+          </section>
+        ))}
 
         {/* Reference: the baptized C1 medallion (signed ring + resident portrait)
             — the real thing the ghiera must enclose. */}
@@ -138,10 +255,10 @@ function BezelVariantsContent() {
         <section className="rounded-lg border border-amber-800/60 bg-slate-900/40 p-5">
           <div className="mb-4 flex items-baseline gap-4">
             <h2 className="text-sm font-semibold tracking-[0.25em] text-amber-100/90">
-              GHIERA DAL MOCKUP — PROOF
+              GHIERA DENTINI — PROOF
             </h2>
             <p className="text-xs text-slate-500">
-              L'arte del mockup firmato estratta come asset trasparente, montata sopra il C1 vero.
+              Render Gemini con denti sottili forgiati (no ganasce), estratto trasparente e montato sopra il C1 vero.
             </p>
           </div>
           <div className="flex items-center gap-10">
@@ -150,17 +267,17 @@ function BezelVariantsContent() {
                 <div
                   className="absolute"
                   style={{
-                    width: g * 0.49,
-                    height: g * 0.49,
+                    width: g * 0.62,
+                    height: g * 0.62,
                     left: '50%',
                     top: '50%',
                     transform: 'translate(-50%,-50%)',
                   }}
                 >
-                  <C1Medallion portraitUrl={residents[0]?.portraitUrl} sizePx={g * 0.49} />
+                  <C1Medallion portraitUrl={residents[0]?.portraitUrl} sizePx={g * 0.62} />
                 </div>
                 <img
-                  src="/assets/ui/hud-real/ghiera-doppiobraccio.webp"
+                  src="/assets/ui/hud-real/ghiera-dentini.webp"
                   alt=""
                   draggable={false}
                   className="absolute inset-0 h-full w-full"
@@ -169,11 +286,11 @@ function BezelVariantsContent() {
             ))}
             <p className="max-w-xs text-xs text-slate-500">
               Taglie libere 64/96/128/160. La ghiera è in posa chiusa (X); in
-              apertura ruota di -45° e le ganasce vanno sui cardinali (+).
+              apertura ruota di -45° e i dentini vanno sui cardinali (+).
             </p>
           </div>
           <div className="mt-6 flex items-start gap-12">
-            {/* OPZIONE C — real 64px slot, painted ghiera overflowing the box */}
+            {/* CHIUSO — painted ghiera on the real occupied slot (X pose) */}
             <div className="flex flex-col items-center gap-2">
               <div className="relative">
                 <ResidentSlotRack
@@ -185,98 +302,69 @@ function BezelVariantsContent() {
                   bezelPreset="stock"
                 />
                 <img
-                  src="/assets/ui/hud-real/ghiera-doppiobraccio.webp"
+                  src="/assets/ui/hud-real/ghiera-dentini.webp"
                   alt=""
                   draggable={false}
                   className="pointer-events-none absolute"
-                  style={{ width: 92, height: 92, left: '50%', top: 22, transform: 'translate(-50%,-50%)' }}
+                  style={{ width: 78, height: 78, left: '50%', top: 32, transform: 'translate(-50%,-50%)' }}
                 />
               </div>
               <span className="text-[10px] uppercase tracking-[0.2em] text-amber-200/80">
-                C — slot 64 + ghiera overflow
+                Chiuso — slot reale (X)
               </span>
             </div>
-            {/* OPZIONE A — bigger slot: same composite at rack-real size */}
+            {/* APERTO — same ghiera rotated -45° + enlarged on the empty slot (+ pose) */}
             <div className="flex flex-col items-center gap-2">
-              <div className="relative" style={{ width: 128, height: 128 }}>
-                <div
-                  className="absolute"
-                  style={{ width: 63, height: 63, left: '50%', top: '50%', transform: 'translate(-50%,-50%)' }}
-                >
-                  <C1Medallion portraitUrl={residents[0]?.portraitUrl} sizePx={63} />
-                </div>
+              <div className="relative">
+                <ResidentSlotRack
+                  slots={slots.slice(3, 4)}
+                  layout="detail"
+                  slotSize={64}
+                  slotMaterial="hud-gold"
+                  slotVariant="hud64"
+                  bezelPreset="stock"
+                />
                 <img
-                  src="/assets/ui/hud-real/ghiera-doppiobraccio.webp"
+                  src="/assets/ui/hud-real/ghiera-dentini.webp"
                   alt=""
                   draggable={false}
-                  className="absolute inset-0 h-full w-full"
+                  className="pointer-events-none absolute"
+                  style={{ width: 98, height: 98, left: '50%', top: 32, transform: 'translate(-50%,-50%) rotate(-45deg)' }}
                 />
               </div>
               <span className="text-[10px] uppercase tracking-[0.2em] text-amber-200/80">
-                A — slot ~96-128px
+                Aperto — ruotata + ingrandita (+)
               </span>
             </div>
-          </div>
-        </section>
-
-        {PRESET_ORDER.map((preset) => (
-          <section
-            key={preset}
-            data-testid={`bezel-row-${preset}`}
-            className="rounded-lg border border-slate-800 bg-slate-900/40 p-5"
-          >
-            <div className="mb-4 flex items-baseline gap-4">
-              <h2 className="text-sm font-semibold tracking-[0.25em] text-amber-100/90">
-                {PRESET_META[preset].name}
-              </h2>
-              <p className="text-xs text-slate-500">{PRESET_META[preset].desc}</p>
-            </div>
-            <div className="flex items-center gap-10">
-              <div className="flex items-end gap-6">
-                {slots.map((slot) => (
-                  <div key={slot.id} className="relative">
+            {/* zoom of the closed state on the real slot */}
+            <div className="flex flex-col items-center gap-2">
+              <div className="relative h-52 w-52 overflow-hidden rounded-md border border-slate-700/60 bg-black/40">
+                <div className="relative" style={{ transform: 'scale(2.4)', transformOrigin: '0 0' }}>
+                  <div className="relative">
                     <ResidentSlotRack
-                      slots={[slot]}
+                      slots={slots.slice(0, 1)}
                       layout="detail"
                       slotSize={64}
                       slotMaterial="hud-gold"
                       slotVariant="hud64"
-                      bezelPreset={preset}
+                      bezelPreset="stock"
                     />
-                    {showCenterlines && (
-                      <div aria-hidden className="pointer-events-none absolute left-0 top-0 z-40 h-16 w-16">
-                        <div className="absolute left-1/2 top-0 h-full w-px bg-cyan-400/70" />
-                        <div className="absolute left-0 top-1/2 h-px w-full bg-cyan-400/70" />
-                        <div
-                          className="absolute rounded-full border border-dashed border-cyan-400/60"
-                          style={{ left: '50%', top: '50%', width: 50, height: 50, transform: 'translate(-50%,-50%)' }}
-                        />
-                      </div>
-                    )}
+                    <img
+                      src="/assets/ui/hud-real/ghiera-dentini.webp"
+                      alt=""
+                      draggable={false}
+                      className="pointer-events-none absolute"
+                      style={{ width: 78, height: 78, left: '50%', top: 32, transform: 'translate(-50%,-50%)' }}
+                    />
                   </div>
-                ))}
-              </div>
-              <div className="relative h-48 w-48 shrink-0 overflow-hidden rounded-md border border-slate-700/60 bg-black/40">
-                <div className="relative" style={{ transform: 'scale(3)', transformOrigin: '0 0' }}>
-                  <ResidentSlotRack
-                    slots={slots.slice(0, 1)}
-                    layout="detail"
-                    slotSize={64}
-                    slotMaterial="hud-gold"
-                    slotVariant="hud64"
-                    bezelPreset={preset}
-                  />
-                  {showCenterlines && (
-                    <div aria-hidden className="pointer-events-none absolute left-0 top-0 z-40 h-16 w-16">
-                      <div className="absolute left-1/2 top-0 h-full w-px bg-cyan-400/70" />
-                      <div className="absolute left-0 top-1/2 h-px w-full bg-cyan-400/70" />
-                    </div>
-                  )}
                 </div>
               </div>
+              <span className="text-[10px] uppercase tracking-[0.2em] text-amber-200/80">
+                Zoom chiuso
+              </span>
             </div>
-          </section>
-        ))}
+          </div>
+        </section>
       </div>
     </div>
   );

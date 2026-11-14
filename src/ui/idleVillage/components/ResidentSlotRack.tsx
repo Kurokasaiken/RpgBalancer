@@ -19,7 +19,7 @@ import { resolveSlotState } from '@/ui/idleVillage/utils/slotStateMapping';
 import type { MedalStyleBridgeConfig } from '@/ui/idleVillage/skins/slotRackSkinConfig';
 import type { SlotActivityState } from '@/ui/idleVillage/slots/types';
 import { Slot } from '@/ui/idleVillage/components/Slot';
-import type { BezelPreset } from '@/ui/idleVillage/components/SlotV12Renderer';
+import { BEZEL_PRESETS, type BezelPreset } from '@/ui/idleVillage/components/SlotV12Renderer';
 import { WanderlustSurface, type WanderlustShape } from '@/ui/wanderlust-surface/WanderlustSurface';
 import { type MaterialPreset } from '@/ui/wanderlust-surface/materialPresets';
 import styles from './SlotShake.module.css';
@@ -724,16 +724,52 @@ const DetailSlot = memo(({
                   data-testid={`slot-medal-${slot.id}`}
                   className={`absolute inset-0 flex items-center justify-center z-10 transition-all duration-560 ease-out ${isExtracting ? 'opacity-0 scale-75' : 'opacity-100 scale-100'} ${isShaking ? styles.animateSlotShake : ''}`}
                 >
-                  <C1Medallion
-                    portraitUrl={assignedAvatarUrl}
-                    isDragging={false}
-                    sizePx={isHud64 ? 44 : 40}
-                    className={isHud64 ? 'h-11 w-11' : 'h-10 w-10'}
-                    /* hud64: the slot paints its own 6-o'clock gem pointer —
-                     * a second pendant dangles past the bezel and reads as an
-                     * off-centre medallion (R-214). */
-                    gemPendant={!isHud64}
-                  />
+                  {(() => {
+                    const knobs = BEZEL_PRESETS[bezelPreset ?? 'stock'];
+                    const circlePx = Math.round((isHud64 ? 44 : 40) * (knobs.portraitScale ?? 1));
+                    return knobs.medallionImageHref ? (
+                      /* Painted signed medallion (draghi): the img box is
+                       * sized so the ring rim lands on the ghiera's ring —
+                       * with `medallionImageHoleFrac` the asset is a FRAME and
+                       * the real resident portrait shows through the hole. */
+                      <span className="relative block" style={{ width: circlePx / (knobs.medallionImageRingFrac ?? 1) }}>
+                        {knobs.medallionImageHoleFrac != null && assignedAvatarUrl && (
+                          <img
+                            src={assignedAvatarUrl}
+                            alt=""
+                            draggable={false}
+                            className="absolute left-1/2 top-1/2 rounded-full object-cover"
+                            style={{
+                              width: `${(knobs.medallionImageHoleFrac * 100).toFixed(2)}%`,
+                              aspectRatio: '1',
+                              transform: 'translate(-50%,-50%)',
+                            }}
+                          />
+                        )}
+                        <img
+                          src={knobs.medallionImageHref}
+                          alt={assignedLabel}
+                          draggable={false}
+                          className="relative block"
+                          style={{ width: '100%', height: 'auto', maxWidth: 'none' }}
+                        />
+                      </span>
+                    ) : (
+                      <C1Medallion
+                        portraitUrl={assignedAvatarUrl}
+                        isDragging={false}
+                        /* draghi (lab): the painted band carries a face disc — the
+                         * medallion shrinks so the emblem ring stays visible around
+                         * it ("medaglione davanti al centro" ruling). */
+                        sizePx={circlePx}
+                        className={isHud64 ? 'h-11 w-11' : 'h-10 w-10'}
+                        /* hud64: the slot paints its own 6-o'clock gem pointer —
+                         * a second pendant dangles past the bezel and reads as an
+                         * off-centre medallion (R-214). */
+                        gemPendant={!isHud64}
+                      />
+                    );
+                  })()}
                 </div>
               ) : (
                 <span
