@@ -1,6 +1,6 @@
 {
   "schema": "plan054-component-inventory/1",
-  "generated_at": "2026-11-14T11:32:32.064Z",
+  "generated_at": "2026-11-15T09:15:41.836Z",
   "strict_files": [
     "src/pages/game-frame-pixi.tsx",
     "src/pages/game-frame.tsx",
@@ -111,6 +111,7 @@
     "src/ui/idleVillage/components/destinyAstrolabeV62/tentacles.ts",
     "src/ui/idleVillage/components/gameFrame/AmanuensePage.tsx",
     "src/ui/idleVillage/components/gameFrame/DirectorPanel.tsx",
+    "src/ui/idleVillage/components/gameFrame/ExpeditionEdgeTab.tsx",
     "src/ui/idleVillage/components/gameFrame/GameBootScreen.tsx",
     "src/ui/idleVillage/components/gameFrame/GameFrame.tsx",
     "src/ui/idleVillage/components/gameFrame/GameFrameDragCursor.tsx",
@@ -132,6 +133,7 @@
     "src/ui/idleVillage/components/gameFrame/NextEventTab.tsx",
     "src/ui/idleVillage/components/gameFrame/ObjectiveCartouche.tsx",
     "src/ui/idleVillage/components/gameFrame/PlaceFan.tsx",
+    "src/ui/idleVillage/components/gameFrame/PlaceFanCards.tsx",
     "src/ui/idleVillage/components/gameFrame/PlaceHoverCard.tsx",
     "src/ui/idleVillage/components/gameFrame/PlaceRadial.tsx",
     "src/ui/idleVillage/components/gameFrame/QuestBeltPlaque.tsx",
@@ -251,6 +253,7 @@
     "src/ui/idleVillage/config/rosterSortConfig.ts",
     "src/ui/idleVillage/config/seaMarksConfig.ts",
     "src/ui/idleVillage/config/seaWonders.ts",
+    "src/ui/idleVillage/config/timeOfDay.ts",
     "src/ui/idleVillage/config/wanderlustBaseManifest.json",
     "src/ui/idleVillage/config/worldSurfaceConfig.ts",
     "src/ui/idleVillage/controllers/CrewSchedulerController.ts",
@@ -303,7 +306,7 @@
     "src/ui/idleVillage/hooks/useSlottedMedalBehavior.ts",
     "src/ui/idleVillage/hooks/useThrottledValue.ts",
     "src/ui/idleVillage/hooks/useWorldSurface.ts",
-    "src/ui/idleVillage/hudReal/c1RowModGeometry.ts",
+    "src/ui/idleVillage/hudReal/c1Geometry.ts",
     "src/ui/idleVillage/icons/statIcons.tsx",
     "src/ui/idleVillage/intent/GameIntent.ts",
     "src/ui/idleVillage/interaction/DragOutcomeFlight.tsx",
@@ -670,7 +673,7 @@
       "root_file": "src/ui/idleVillage/components/C1Medallion.tsx",
       "scope_files": [
         "src/ui/idleVillage/components/C1Medallion.tsx",
-        "src/ui/idleVillage/hudReal/c1RowModGeometry.ts"
+        "src/ui/idleVillage/hudReal/c1Geometry.ts"
       ],
       "tier_source": "default"
     },
@@ -995,6 +998,16 @@
       "root_file": "src/ui/idleVillage/components/gameFrame/engravedIcons.tsx",
       "scope_files": [
         "src/ui/idleVillage/components/gameFrame/engravedIcons.tsx"
+      ],
+      "tier_source": "default"
+    },
+    {
+      "id": "expedition-edge-tab",
+      "role": "ui-component",
+      "tier": 2,
+      "root_file": "src/ui/idleVillage/components/gameFrame/ExpeditionEdgeTab.tsx",
+      "scope_files": [
+        "src/ui/idleVillage/components/gameFrame/ExpeditionEdgeTab.tsx"
       ],
       "tier_source": "default"
     },
@@ -1997,6 +2010,7 @@
         "src/ui/idleVillage/config/mappa2SecondaryWaterConfig.ts",
         "src/ui/idleVillage/config/seaMarksConfig.ts",
         "src/ui/idleVillage/config/seaWonders.ts",
+        "src/ui/idleVillage/config/timeOfDay.ts",
         "src/ui/idleVillage/hooks/useWorldSurface.ts",
         "src/ui/idleVillage/pixiSpike/PixiWorldMap.tsx",
         "src/ui/idleVillage/pixiSpike/ambient/ambientDirector.ts",
@@ -2026,14 +2040,15 @@
       "tier_source": "default"
     },
     {
-      "id": "place-fan-geometry",
-      "role": "shared-kernel",
-      "tier": 1,
-      "root_file": "src/ui/idleVillage/components/gameFrame/placeFanGeometry.ts",
+      "id": "place-fan-cards",
+      "role": "ui-component",
+      "tier": 2,
+      "root_file": "src/ui/idleVillage/components/gameFrame/PlaceFanCards.tsx",
       "scope_files": [
+        "src/ui/idleVillage/components/gameFrame/PlaceFanCards.tsx",
         "src/ui/idleVillage/components/gameFrame/placeFanGeometry.ts"
       ],
-      "tier_source": "kernel"
+      "tier_source": "default"
     },
     {
       "id": "place-hover-card",
@@ -3642,10 +3657,10 @@
     }
   ],
   "stats": {
-    "files": 495,
-    "units": 294,
-    "ui_components": 223,
-    "shared_kernels": 71
+    "files": 498,
+    "units": 295,
+    "ui_components": 225,
+    "shared_kernels": 70
   },
-  "content_sha256": "49a02ef61564335e615c04db737a1456532457beed69f7d416455f28516032cd"
+  "content_sha256": "88a841d48ed4f641823400f845dbc32df7825434cb6ef510b0c819012f1d478e"
 }
