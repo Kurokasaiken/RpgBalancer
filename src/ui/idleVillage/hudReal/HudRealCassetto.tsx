@@ -20,7 +20,8 @@ import { EngravedIcon } from '@/ui/idleVillage/components/gameFrame/engravedIcon
 import type { ResourceReadoutItem } from '@/ui/idleVillage/components/gameFrame/ResourceReadout';
 import { HUD_TONE_COLOR } from '@/ui/idleVillage/components/gameFrame/hudTones';
 import { ZanaraTooltip } from '@/ui/idleVillage/zanara/ZanaraTooltip';
-import { CASSETTO_WIDE_BREAKPOINT, cassettoColumnSpec } from './layout/cassettoColumn';
+import { CASSETTO_LAYOUT_CONFIG } from '@/balancing/config/idleVillage/cassettoLayoutConfig';
+import { CASSETTO_WIDE_BREAKPOINT, cassettoColumnSpec, cassettoColumnWidthFor } from './layout/cassettoColumn';
 import type { CassettoZone } from './cassettoColumnGeometry';
 
 const C = {
@@ -177,14 +178,14 @@ export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
    *  the deferred step documented in the store file. */
   React.useEffect(() => {
     const publish = useGameLayoutInsets.getState().publish;
-    const update = () => publish({ right: Math.round(spec.aspect * window.innerHeight) });
+    const update = () => publish({ right: Math.round(cassettoColumnWidthFor(spec, window.innerHeight)) });
     update();
     window.addEventListener('resize', update);
     return () => {
       window.removeEventListener('resize', update);
       publish({ right: 0 });
     };
-  }, [spec.aspect]);
+  }, [spec]);
   return (
     <div
       data-hudreal-cassetto=""
@@ -200,7 +201,9 @@ export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
       <div
         style={{
           position: 'relative',
-          height: '100%',
+          /* T1 clamp: `min(100%, widthMaxPx / aspect)` — above the cap the
+           * column stops short of full height instead of stretching the art. */
+          height: `min(100%, ${CASSETTO_LAYOUT_CONFIG.drawer.widthMaxPx / spec.aspect}px)`,
           aspectRatio: `${artW} / ${artH}`,
           containerType: 'size',
           pointerEvents: 'auto',

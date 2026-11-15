@@ -8,6 +8,7 @@
  * exactly at the two signed viewport sizes and interpolates sanely elsewhere.
  * Viewport ≥ CASSETTO_WIDE_BREAKPOINT picks the '1440' variant.
  */
+import { CASSETTO_LAYOUT_CONFIG } from '@/balancing/config/idleVillage/cassettoLayoutConfig';
 import { CASSETTO_COLUMN_GEO, type CassettoColumnGeo } from '../cassettoColumnGeometry';
 
 export const CASSETTO_WIDE_BREAKPOINT = 1360;
@@ -37,4 +38,20 @@ const SPECS: Record<'1440' | '1280', CassettoColumnSpec> = {
 
 export function cassettoColumnSpec(viewportWidth: number): CassettoColumnSpec {
   return SPECS[viewportWidth >= CASSETTO_WIDE_BREAKPOINT ? '1440' : '1280'];
+}
+
+/**
+ * R-339/PLAN-119 T1: rendered column width = `aspect × viewportHeight`, capped
+ * at `drawer.widthMaxPx` (the plan's clamp upper bound). Above
+ * `widthMaxPx / aspect` viewport height the column renders shorter than the
+ * viewport so the baked art never distorts (T1 ruling: clamp = height cap,
+ * not width stretch).
+ */
+export function cassettoColumnWidthFor(spec: CassettoColumnSpec, viewportHeight: number): number {
+  return Math.min(spec.aspect * viewportHeight, CASSETTO_LAYOUT_CONFIG.drawer.widthMaxPx);
+}
+
+/** The height the column may occupy (≤ viewport) once the width cap binds. */
+export function cassettoColumnHeightFor(spec: CassettoColumnSpec, viewportHeight: number): number {
+  return Math.min(viewportHeight, CASSETTO_LAYOUT_CONFIG.drawer.widthMaxPx / spec.aspect);
 }

@@ -43,8 +43,10 @@ invariants:
     source: plan
     source_ref: PLAN-119
     statement: >-
-      Il drawer pubblica la propria larghezza renderizzata (`aspect × viewportH`) in
-      `useGameLayoutInsets.insets.right` al mount e la azzera allo smontaggio — fondazione per safeFit/pan-clamp.
+      Il drawer pubblica la propria larghezza renderizzata in `useGameLayoutInsets.insets.right` al mount e
+      la azzera allo smontaggio — fondazione per safeFit/pan-clamp. La larghezza è `aspect × viewportH`
+      cappata a `CASSETTO_LAYOUT_CONFIG.drawer.widthMaxPx` (clamp T1: sopra la soglia la colonna si accorcia,
+      l'art non si distorce).
     test_refs:
       - tests/unit/idleVillage/r339ExpeditionStates.test.tsx
   - id: hud-real-cassetto.INV-5
