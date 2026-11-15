@@ -19,6 +19,8 @@ const INVENTORY_DIRS = [
 
 const ROOT_FILES = [
   'RICHIESTE.md',
+  'RICHIESTE-backlog.md',
+  'RICHIESTE-archive.md',
   'AGENTS.md',
   'DESIGN_PILLARS.md',
   'ROADMAP.md',

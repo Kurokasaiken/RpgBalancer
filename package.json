@@ -87,6 +87,7 @@
     "lint:docs": "markdownlint src/docs/**/*.md",
     "storage:test:balancer": "npm run test:unit -- tests/unit/storage/BalancerConfigStore.storage.test.ts",
     "closure:lint": "tsx scripts/closureLint.ts",
+    "richeste:check": "tsx scripts/richesteSplit.ts check --cap 150000",
     "agents:lint": "tsx scripts/agentsLint.ts",
     "contracts:check": "tsx scripts/contractsCheck.ts",
     "surface:coverage": "tsx scripts/verification/gameSurfaceCoverage.ts --write",

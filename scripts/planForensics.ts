@@ -39,6 +39,7 @@ import {
 import { execFileSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
+import { readRichiesteUnion } from './verification/richiesteUnion';
 
 const REPO_ROOT = process.cwd();
 const LEDGER_PATH = path.join(REPO_ROOT, 'context', 'workflow-timing.jsonl');
@@ -1065,9 +1066,11 @@ function main(): void {
   const entitySet = new Set<string>();
   for (const c of commits) for (const { entity } of attributeCommit(c)) entitySet.add(entity);
   for (const plan of planFiles().keys()) entitySet.add(plan);
-  const richiesteNow = existsSync(path.join(REPO_ROOT, 'RICHIESTE.md'))
-    ? readFileSync(path.join(REPO_ROOT, 'RICHIESTE.md'), 'utf8')
-    : '';
+  /* PLAN-121: entity scan sull'unione — le entry archiviate restano
+   * entità attribuibili. La history (-p) segue solo RICHIESTE.md: le
+   * modifiche dentro backlog/archive non producono eventi di sezione
+   * (file archivistici, mutazioni rare — limite accettato). */
+  const richiesteNow = readRichiesteUnion(REPO_ROOT) ?? '';
   for (const m of richiesteNow.matchAll(/^## (R-\d+)/gm)) entitySet.add(m[1]);
 
   // 3. RICHIESTE history → entry events

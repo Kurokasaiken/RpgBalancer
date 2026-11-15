@@ -65,7 +65,7 @@ Questa è una fotografia; per lo stato più aggiornato verificare `SESSION_HANDO
 
 ## In corso
 
-Vedi `RICHIESTE.md` per la lista completa. Richieste/plan attivi (stato preciso in `RICHIESTE.md` e `plans/INDEX.md`):
+Vedi `RICHIESTE.md` (file attivo; PLAN-121: open/chiuse antecedenti 2026-11-08 in `RICHIESTE-backlog.md`/`RICHIESTE-archive.md`) per la lista completa. Richieste/plan attivi (stato preciso in `RICHIESTE.md` e `plans/INDEX.md`):
 
 - **PLAN-078** — Quality Sentinel: harness in lavorazione (`scripts/sentinel/*`).
 - **PLAN-079** — follow-up performance + eye-check (include G-12 ritratti accodato da PLAN-068); budget `gamePerf` sotto osservazione (p95 `medal-drag-mount`/`map-pan`/`menu-open` sopra budget nel run del 23-10, da confermare su run pulita).

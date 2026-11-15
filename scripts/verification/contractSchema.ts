@@ -27,6 +27,7 @@ import {
 import { assertionRatchet, invTagPositions, scanInvBlocks, type InvBlock } from './invBlocks';
 import { surfaceImportGraph } from './discoverGameSurface';
 import { loadRedFirst, retireAuthorizesInv } from './redFirst';
+import { RICHIESTE_UNION_PARTS } from './richiesteUnion';
 
 export const CONTRACTS_DIR_REL = '.mw/contracts';
 const CTR_FILE_RE = /^CTR-game-\d+\.md$/;
@@ -444,7 +445,12 @@ export function sourceRefExists(repoRoot: string, ref: string, baseline?: string
     }
   };
   const rMatch = ref.match(/^R-(\d+)$/);
-  if (rMatch) return (read('RICHIESTE.md') ?? '').includes(`R-${rMatch[1]}`);
+  /* PLAN-121: il ledger è splittato in RICHIESTE.md (attivo) +
+   * RICHIESTE-backlog/-archive (pre-split: le parti mancanti tornano null e
+   * l'unione degenera al solo file attivo). */
+  if (rMatch) {
+    return RICHIESTE_UNION_PARTS.some((rel) => (read(rel) ?? '').includes(`R-${rMatch[1]}`));
+  }
   const pMatch = ref.match(/^PLAN-(\d+)$/);
   if (pMatch) {
     if (baseline) {

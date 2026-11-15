@@ -33,6 +33,8 @@ import {
   type IntentAnswer,
 } from './intentRegistry';
 import { loadSurfaceMap, surfaceFor } from './surfaceMap';
+import { parseRichieste } from '../richesteSplit';
+import { RICHIESTE_UNION_PARTS, readRichiesteUnion } from './richiesteUnion';
 
 // ---------------------------------------------------------------- types
 
@@ -293,6 +295,11 @@ export function checkIntentGate(
   // RICHIESTE.md append-only vs git rispetto al commit di battesimo
   // (P2). La baseline è legata in intent.json — HEAD non è usabile:
   // il worktree condivide sessioni e lo stato delle R si aggiorna.
+  // PLAN-121: post-split il ledger è RICHIESTE.md (attivo) + backlog +
+  // archive. Baseline post-split → prefix check sul file attivo (nuove
+  // entry si appendono in coda al file attivo). Baseline pre-split →
+  // ogni entry della baseline deve sopravvivere verbatim nell'unione
+  // dei tre file (equivalente append-only attraverso la migrazione).
   if (intent.richeste_baseline_commit) {
     try {
       const baseline = execSync(
@@ -300,10 +307,43 @@ export function checkIntentGate(
         { cwd: repoRoot, encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 },
       );
       const current = readFileSync(path.join(repoRoot, 'RICHIESTE.md'), 'utf8');
-      if (!current.startsWith(baseline)) {
-        errors.push(
-          'ROSSO: RICHIESTE.md non append-only rispetto al commit di battesimo',
-        );
+      const splitEra = RICHIESTE_UNION_PARTS.slice(1).every((rel) =>
+        existsSync(path.join(repoRoot, rel)),
+      );
+      if (!splitEra || current.startsWith(baseline)) {
+        if (!current.startsWith(baseline)) {
+          errors.push(
+            'ROSSO: RICHIESTE.md non append-only rispetto al commit di battesimo',
+          );
+        }
+      } else {
+        let baselineIsSplit = false;
+        try {
+          execSync(`git cat-file -e "${intent.richeste_baseline_commit}:RICHIESTE-backlog.md"`, {
+            cwd: repoRoot,
+            stdio: ['ignore', 'ignore', 'ignore'],
+          });
+          baselineIsSplit = true;
+        } catch {
+          /* baseline pre-split */
+        }
+        if (baselineIsSplit) {
+          errors.push(
+            'ROSSO: RICHIESTE.md non append-only rispetto al commit di battesimo',
+          );
+        } else {
+          const union = readRichiesteUnion(repoRoot) ?? '';
+          const baseDoc = parseRichieste(baseline);
+          const missing = baseDoc.entries
+            .map((e, i) => ({ id: e.id, text: baseDoc.entryTexts[i] }))
+            .filter(({ text }) => text.length > 0 && !union.includes(text));
+          if (missing.length > 0) {
+            errors.push(
+              `ROSSO: ledger non append-only — ${missing.length} entry della baseline ` +
+                `assenti/mutate nell'unione RICHIESTE* (es. ${missing[0].id})`,
+            );
+          }
+        }
       }
     } catch {
       errors.push(
