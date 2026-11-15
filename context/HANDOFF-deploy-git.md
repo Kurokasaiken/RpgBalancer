@@ -432,6 +432,6 @@ i 3 residui → `--full` verde → solo allora T-6 kernel slim / T-7 demozioni
 ## Ruling "si a tutto" (2026-11-15)
 - MW RICHIESTE finestra attiva: confermata regola contratto PLAN-121
   (Data>=2026-11-08 → attivo per TUTTE le famiglie, incl. fatta recenti).
-- SESSION_HANDOFF.md (MW, 100.8k): split approvato → in esecuzione.
+- SESSION_HANDOFF.md (MW): FATTO — 100.8k→41.4k attivo + archive 59.6k, union sha PASS, guard ledger_split.py check; proposal AGENTS.md in .mw/runs/mw-ledger-split/ (review Director pendente).
 - mind-weaver/AGENTS.md (23k): proposta snellimento approvata → in drafting.
 - Push eseguito su entrambi i repo (include commit thread parallelo).
