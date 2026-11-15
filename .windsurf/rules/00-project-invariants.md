@@ -142,3 +142,14 @@ A command that hangs is treated as a failure, not as "still running".
   telemetry contract, persistence pattern, theming, frozen kits, documentation governance),
   it MUST be registered here — not left implicit in a single prompt. Strategist and
   Coordinator share this duty.
+
+## Split ledgers (PLAN-121/123)
+- `*-backlog.md`, `*-archive.md`, `RICHIESTE-backlog/archive.md`,
+  `DECISION_LOG-archive.md` are ON-DEMAND lookup files — never read them in
+  bulk, never `cat`/grep them wholesale during normal work.
+- Look up a specific entry (`R-NNN`, `## vNN`, decision title) by targeted
+  grep + narrow read; if the active file answers the question, stop there.
+- Agents write ONLY to the active file (`RICHIESTE.md`, `DECISION_LOG.md`,
+  `.mw/desiderata.md` is canonical — write to it, not to the digest).
+- Guards: `npm run richeste:check`, `npm run ledger:check` — the active files
+  must stay under their caps; append naturally, the next split rebalances.
