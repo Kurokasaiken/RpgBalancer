@@ -1587,6 +1587,9 @@
       "tablist": "Roster and stash",
       "tabStash": "Stash",
       "memberStats": "Member condition"
+    },
+    "topChrome": {
+      "ariaLabel": "Day and resources"
     }
   },
   "missionPlanner": {

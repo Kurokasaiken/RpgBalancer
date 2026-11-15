@@ -27,19 +27,27 @@ const SCOPED_CSS = `
 export interface HudRealTimeLabels {
   pause: string; resume: string; speedGroup: string; speed: (s: number) => string; spaceKey: string; paused: string;
 }
-export interface HudRealTimeProps extends TimeContract { labels: HudRealTimeLabels; dial?: DialConfig }
+export interface HudRealTimeProps extends TimeContract {
+  labels: HudRealTimeLabels;
+  dial?: DialConfig;
+  /** Bar geometry the live content maps onto — full (`timeGeometry.TIME_BAR`) or
+   *  slim (`timeSlimGeometry.TIME_SLIM_BAR`, R-339/T6); same generated shape. */
+  bar?: typeof BAR;
+  /** Bar art URL — `time/bar.webp` or the generated `time/bar-slim.webp`. */
+  asset?: string;
+}
 
-export function HudRealTime({ dayLabel, isDayPhase, cycleProgress, isPaused, locked, speed, labels, dial: DIAL = DEFAULT_GAME_FRAME_CONFIG.timeOfDay.dial }: HudRealTimeProps) {
+export function HudRealTime({ dayLabel, isDayPhase, cycleProgress, isPaused, locked, speed, labels, dial: DIAL = DEFAULT_GAME_FRAME_CONFIG.timeOfDay.dial, bar: BAR_LOCAL = BAR, asset: ASSET_LOCAL = ASSET }: HudRealTimeProps) {
   const DC = DIAL.colors;
-  const f = BAR.field;
+  const f = BAR_LOCAL.field;
   const ring = (on: boolean) => (on ? { boxShadow: `0 0 0 2px ${C.gold}, 0 0 10px ${C.glow}` } : undefined);
-  const pos = (i: number) => ({ position: 'absolute' as const, left: BAR.slots[i].x, top: BAR.slots[i].y, width: BAR.slots[i].w, height: BAR.slots[i].h, display: 'grid', placeItems: 'center' });
-  const shown = speed.available.slice(0, BAR.slots.length - 1);
+  const pos = (i: number) => ({ position: 'absolute' as const, left: BAR_LOCAL.slots[i].x, top: BAR_LOCAL.slots[i].y, width: BAR_LOCAL.slots[i].w, height: BAR_LOCAL.slots[i].h, display: 'grid', placeItems: 'center' });
+  const shown = speed.available.slice(0, BAR_LOCAL.slots.length - 1);
   const progress = Math.max(0, Math.min(1, cycleProgress));
   return (
-    <section data-hudreal-time="" data-paused={isPaused ? 'true' : 'false'} aria-label={dayLabel} style={{ position: 'relative', userSelect: 'none', width: BAR.w, height: BAR.h }}>
+    <section data-hudreal-time="" data-paused={isPaused ? 'true' : 'false'} aria-label={dayLabel} style={{ position: 'relative', userSelect: 'none', width: BAR_LOCAL.w, height: BAR_LOCAL.h }}>
       <style>{SCOPED_CSS}</style>
-      <img src={ASSET} alt="" draggable={false} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', display: 'block' }} />
+      <img src={ASSET_LOCAL} alt="" draggable={false} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', display: 'block' }} />
       {/* phase dial (Director 2026-11-11): sun or moon seated small in the emerald, framed by a crown of engraved ticks
        *  that light one by one as the phase runs — warm gold by day, silver-blue by night; unlit ticks stay dull bronze. */}
       <svg aria-hidden="true" width={DIAL.r * 2} height={DIAL.r * 2} viewBox={`${-DIAL.r} ${-DIAL.r} ${DIAL.r * 2} ${DIAL.r * 2}`}

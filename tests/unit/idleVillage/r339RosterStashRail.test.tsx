@@ -15,6 +15,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { act, render, screen, fireEvent } from '@testing-library/react';
 import { Provider as TooltipProvider } from '@radix-ui/react-tooltip';
+import { DndContext } from '@dnd-kit/core';
+import { DragProvider } from '@/ui/idleVillage/components/DragContext';
 import '@testing-library/jest-dom';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 import { RosterStashRail } from '@/ui/idleVillage/components/gameFrame/RosterStashRail';
@@ -54,9 +56,13 @@ const RESIDENTS = [
 
 const renderRail = (props: Partial<Parameters<typeof RosterStashRail>[0]> = {}) =>
   render(
-    <TooltipProvider>
-      <RosterStashRail residents={RESIDENTS} stashConfig={VILLAGE_STASH_CONFIG} {...props} />
-    </TooltipProvider>,
+    <DndContext>
+      <DragProvider>
+        <TooltipProvider>
+          <RosterStashRail residents={RESIDENTS} stashConfig={VILLAGE_STASH_CONFIG} {...props} />
+        </TooltipProvider>
+      </DragProvider>
+    </DndContext>,
   );
 
 /** Force the narrow-viewport band for the mutex tests. */

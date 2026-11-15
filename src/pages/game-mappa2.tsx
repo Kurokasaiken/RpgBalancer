@@ -108,6 +108,7 @@ import { MapDemoPoi } from '@/ui/idleVillage/components/gameFrame/MapDemoPoi';
 import { VillageStashPanel } from '@/ui/idleVillage/components/gameFrame/VillageStashPanel';
 import { ExpeditionEdgeTab } from '@/ui/idleVillage/components/gameFrame/ExpeditionEdgeTab';
 import { RosterStashRail } from '@/ui/idleVillage/components/gameFrame/RosterStashRail';
+import { GameTopChrome } from '@/ui/idleVillage/components/gameFrame/GameTopChrome';
 import { useExpeditionRail } from '@/ui/idleVillage/store/useExpeditionRail';
 import { CASSETTO_LAYOUT_CONFIG } from '@/balancing/config/idleVillage/cassettoLayoutConfig';
 import { useVillageStashStore } from '@/ui/idleVillage/store/useVillageStashStore';
@@ -1441,12 +1442,22 @@ export default function GameMappa2Page() {
        *  full-frame layer must let every drag/wheel/click reach the map underneath. */}
       <div style={{ position: 'absolute', left: 0, top: 0, width: hud.frame.W, height: hud.frame.H, transform: `scale(${hud.frame.scale})`, transformOrigin: 'top left', pointerEvents: 'none', ...barsFade }} data-hud-mode={hud.mode} data-hud-hidden={hudHidden || undefined}>
         {/* each signed bar is scaled whole (PLAN-112 §28); --hud-text-k keeps its text at the designed px (hudPx) */}
-        <div data-hudslot="time" style={barStyle(hud.time, hudHidden)}>
-          <HudRealTimeConnected locked={timeFrozen} />
-        </div>
-        <div data-hudslot="resources" style={barStyle(hud.resources, hudHidden)}>
-          <HudRealResources items={resources} />
-        </div>
+        {/* R-339/PLAN-119 T6 (D3 + Director ruling D10): in blueprint mode the
+         *  slim day banner + resource bar dock left/center — GameTopChrome owns
+         *  its placement, keeps the top-right Chronicle zone free and publishes
+         *  `insets.top`. The signed full bars stay the phone/landscape chrome. */}
+        {hud.mode === 'blueprint' ? (
+          <GameTopChrome frame={hud.frame} items={resources} locked={timeFrozen} visible={!hudHidden} />
+        ) : (
+          <>
+            <div data-hudslot="time" style={barStyle(hud.time, hudHidden)}>
+              <HudRealTimeConnected locked={timeFrozen} />
+            </div>
+            <div data-hudslot="resources" style={barStyle(hud.resources, hudHidden)}>
+              <HudRealResources items={resources} />
+            </div>
+          </>
+        )}
         <div data-hudslot="nav" style={{ ...barStyle(hud.nav, hudHidden), width: 513, height: 131.25 }}>
           <HudRealNav
             navItems={DEFAULT_GAME_FRAME_CONFIG.navItems}
