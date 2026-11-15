@@ -1534,6 +1534,30 @@
         "back": "Indietro",
         "effectLadder": "Effetti per livello"
       }
+    },
+    "cassetto": {
+      "party": "Slot del gruppo",
+      "journey": "Viaggio",
+      "riskRewards": "Rischio e ricompense",
+      "risk": "Rischio",
+      "confirm": "CONFERMA",
+      "legDays": "{count, plural, one {# giorno} other {# giorni}}",
+      "journeyTotal": "Totale: {count, plural, one {# giorno} other {# giorni}}",
+      "confirmReason": {
+        "partyIncomplete": "Gruppo incompleto — riempi gli slot richiesti",
+        "unavailable": "Spedizione non ancora pronta"
+      },
+      "edgeTab": {
+        "hint": "Seleziona un segnalino quest"
+      },
+      "demo": {
+        "subtitle": "Pianifica la spedizione"
+      },
+      "leg": {
+        "outbound": "Andata",
+        "site": "Sul posto",
+        "return": "Ritorno"
+      }
     }
   },
   "missionPlanner": {

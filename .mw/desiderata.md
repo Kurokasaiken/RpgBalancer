@@ -1916,3 +1916,65 @@ profonda e punta tonda, nessuna mescolanza di famiglie sullo stesso
 board;<!-- REQ:v37-tip-lengths --> le lunghezze delle punte restano per-asse e seguono le
 stat reali;<!-- REQ:v37-coverage-glyph --> la silhouette e' un glifo qualitativo — la
 copertura dipinta e' approssimata dalla famiglia, nessun solver esatto.
+
+## v38 — Expedition planning UI: assorbimento strutturale del mockup approvato
+
+**Status:** `FROZEN`
+**Date:** 2026-11-15
+**Authorized by:** Fausto — *"approvato"* (avallo sulla candidata presentata in sessione,
+dopo il dibattito multi-AI `20261115-wanderlust-ui-plan` e i ruling D6 edge-tab /
+D10 Chronicle top-right)
+
+### User-stated (parole del Director)
+
+1. «xò come prima parte in assoluto voglio che sia l'assorbimento d questo mockup di
+   di gpt, o come fase iniziale o come subplan 1. approvo» — il mockup ChatGPT è la
+   baseline di direzione (registrato in `.mw/specs/expedition-ui/refs/`).
+2. «mi piaceva l'idea di aver qualcosa che occupasse "meglio" la parte morta a destra» —
+   il componente expedition è un cassetto/console ancorato al bordo destro, non una
+   finestra flottante.
+3. «da qui possiamo prendere un village stash migliorato» — stash come superficie a
+   griglia + filtri + card dettaglio (contenuto del mockup stash-grid).
+4. «per adesso voglio che sia in alto a destra e il resto si sposti a sinistra, poi si
+   vede, niente tab pendente» — la superficie eventi futuri (Chronicle) è docked
+   top-right; il top chrome si sposta a sinistra.
+5. La mappa resta protagonista: niente superfici che la coprono senza motivo.
+
+### AI inference (derivata, marcata come tale)
+
+6. Lo stash vive come tab segmentato Roster|Stash nella colonna sinistra docked — il
+   reliquiario centrale flottante del mockup è veto-adjacent (no-popup); il contenuto
+   (griglia, filtri, dettaglio) si porta dentro il tab.
+7. Stati minimi inclusi nella stessa fase perché economici ora: CTA disabilitata +
+   motivo inline, slot party vuoto/pieno, empty-state edge-tab (D6 mode b), journey
+   "N days" + totale.
+8. Bag slot render-only in questa fase (assegnazione → S2).
+9. Tutto via skinConfigRegistry, config Zod, i18n EN/IT, primitivi esistenti —
+   implementazione conforme a artifact-r004 (`20261115-wanderlust-ui-plan`).
+
+### Cosa questo NON autorizza
+
+- popup/modal/overlay che coprono la mappa;
+- modifiche a regole gameplay o meccaniche quest;
+- alterare `QuestRunWindow` o superfici run;
+- tipografia sentence-case, food-cost preview, bag-assign interattivo, accenti
+  blu/verde, port della Chronicle (slice successive).
+
+### Still unresolved
+
+- forma finale della superficie Chronicle («poi si vede» — S1 riserva solo la zona
+  top-right via token);
+- estetica del dettaglio stash dentro il tab (griglia piena vs righe — si battezza
+  in esecuzione sulla larghezza reale della rail).
+
+**Formulazione approvata (FROZEN):**
+<!-- REQ:v38-mockup-absorption -->Subplan 1 = assorbimento strutturale del mockup
+ChatGPT su `/game`:<!-- REQ:v38-drawer-docked --> drawer expedition docked
+flush-right (token clamp 360/23vw/460), canvas full-bleed con insets via Zustand e
+pan/zoom clamp al rettangolo libero;<!-- REQ:v38-left-column --> colonna sinistra
+Roster|Stash a tab segmentati, persistente di default, mutua esclusione ≤1100px;
+<!-- REQ:v38-top-chrome --> top chrome snellito a sinistra, zona top-right riservata
+alla futura Chronicle docked (niente tab pendente);<!-- REQ:v38-states --> stati
+minimi: CTA disabilitata+motivo, slot party vuoto/pieno, empty-state edge-tab,
+journey "N days"+totale;<!-- REQ:v38-invariants --> tutto via skinConfigRegistry,
+config-first, i18n EN/IT, primitivi esistenti; niente overlay sulla mappa.
