@@ -835,8 +835,10 @@ function parseRichieste(content: string): Map<string, RichiestaSection> {
 }
 
 /**
- * Nuove transizioni a `fatta`/`completata` in RICHIESTE.md devono avere una
- * riga **Chiusura:** con bundle: / waived-director: / nessuna-verifica-tecnica:.
+ * Nuove transizioni a `fatta`/`completata` nell'unione RICHIESTE (PLAN-121:
+ * RICHIESTE.md attivo + -backlog + -archive concatenati dal chiamante)
+ * devono avere una riga **Chiusura:** con bundle: / waived-director: /
+ * nessuna-verifica-tecnica:.
  */
 export function checkRichiesteGate(
   baselineContent: string,

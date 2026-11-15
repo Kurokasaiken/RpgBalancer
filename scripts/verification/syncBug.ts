@@ -7,7 +7,7 @@
  *
  * Fa tre cose:
  *  1. valida `--component` contro `.mw/contracts/components/<id>.md` e
- *     `--source-ref` contro `RICHIESTE.md`/`plans/` (worktree);
+ *     `--source-ref` contro l'unione `RICHIESTE.md`/`-backlog`/`-archive`/`plans/` (worktree);
  *  2. aggiunge (o aggiorna con `--invariant`) un invariant
  *     `source: director-bug` nel frontmatter del contratto;
  *  3. appende un record `sync-bug` in `.mw/red-first.jsonl` — la
@@ -70,7 +70,7 @@ export function applySyncBug(repoRoot: string, args: Args): SyncBugResult {
     throw new Error('uso: --component <id> --source-ref <R-NNN> --desc "..." [--invariant <id>] [--test <file>]');
   }
   if (!sourceRefExists(repoRoot, args.sourceRef)) {
-    throw new Error(`source_ref ${args.sourceRef} non risolvibile — serve un R-NNN in RICHIESTE.md (o PLAN-NNN in plans/)`);
+    throw new Error(`source_ref ${args.sourceRef} non risolvibile — serve un R-NNN in RICHIESTE.md/backlog/archive (o PLAN-NNN in plans/)`);
   }
   const rel = `components/${args.component}.md`;
   const abs = path.join(repoRoot, CONTRACTS_DIR_REL, rel);

@@ -8,6 +8,7 @@ import { checkManifestBaseSha, readSyncSeal } from './verification/livingSyncGat
 import { checkVisualForkGate } from './verification/visualForkGate';
 import { checkIntentGate } from './verification/intentGate';
 import { checkResourceLifecycleGate } from './verification/resourceLifecycleGate';
+import { RICHIESTE_UNION_PARTS } from './verification/richiesteUnion';
 
 /**
  * closure:lint — gate di chiusura (R-189), ridotto all'essenziale (R-208).
@@ -17,8 +18,9 @@ import { checkResourceLifecycleGate } from './verification/resourceLifecycleGate
  * Director 2026-10-16 (R-208): nessuna nuova riga sulla board, nessun
  * dispatch, nessun prompt spec. Questo script NON valida più il formato
  * della tabella kanban: applica solo il gate di chiusura — una nuova
- * transizione a `Completato` sulla board o a `fatta`/`completata` in
- * RICHIESTE.md senza `bundle.json` valido fallisce il lint.
+ * transizione a `Completato` sulla board o a `fatta`/`completata`
+ * nell'unione RICHIESTE.md/backlog/archive (PLAN-121) senza
+ * `bundle.json` valido fallisce il lint.
  *
  * Baseline = HEAD: le righe già committate sono grandfathered.
  * Il controllo sul diff della board resta attivo di proposito: se qualcuno
@@ -26,6 +28,9 @@ import { checkResourceLifecycleGate } from './verification/resourceLifecycleGate
  */
 
 const KANBAN_REL_PATH = path.join('src', 'docs', 'docs', 'coordinator', 'agent_assignments.md');
+/* PLAN-121: il ledger è splittato in RICHIESTE.md (attivo) + backlog +
+ * archive. Il gate di chiusura legge l'UNIONE: una transizione a `fatta`
+ * fatta a mano dentro backlog/archive senza Chiusura fallisce comunque qui. */
 const RICHIESTE_REL_PATH = 'RICHIESTE.md';
 
 const DEFAULT_TIMEOUT_MS = 30000;
@@ -68,8 +73,22 @@ async function main() {
     const currentKanban = await readFile(path.resolve(KANBAN_REL_PATH), 'utf8');
     errors.push(...checkKanbanGate(baselineKanban, currentKanban, repoRoot));
 
-    const baselineRichieste = await readBaseline(RICHIESTE_REL_PATH);
-    const currentRichieste = await readFile(path.resolve(RICHIESTE_REL_PATH), 'utf8');
+    // Union-read (PLAN-121): baseline o worktree senza una parte → stringa
+    // vuota per quella parte; il diff per-set di righe resta corretto perché
+    // ogni riga esistente a baseline (in qualunque parte) non è "aggiunta".
+    const readBaselineOrEmpty = async (rel: string) => {
+      try {
+        return await readBaseline(rel);
+      } catch {
+        return '';
+      }
+    };
+    const readCurrentOrEmpty = (rel: string) =>
+      readFile(path.resolve(rel), 'utf8').catch(() => '');
+    const [baselineRichieste, currentRichieste] = await Promise.all([
+      Promise.all(RICHIESTE_UNION_PARTS.map(readBaselineOrEmpty)).then((p) => p.join('')),
+      Promise.all(RICHIESTE_UNION_PARTS.map(readCurrentOrEmpty)).then((p) => p.join('')),
+    ]);
     errors.push(...checkRichiesteGate(baselineRichieste, currentRichieste, repoRoot));
 
     // Gate regime intent (PLAN-045 T-005b): i bundle citati da righe di
