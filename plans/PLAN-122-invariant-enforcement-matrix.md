@@ -1,4 +1,4 @@
-# PLAN-121 — Invariant→enforcement matrix + `governance:check` + kernel slim
+# PLAN-122 — Invariant→enforcement matrix + `governance:check` + kernel slim
 
 **Stato:** `draft` — in attesa di battesimo Director (2026-11-15). NON eseguire
 prima del ruling.
@@ -214,7 +214,7 @@ con la proposta salvo veto.
 - Batteria sulle superficie richieste dall'artifact: write via edit-tool, shell
   redirect (`echo > x.md`), file rename, `.md` nested, `.md` appena creato —
   verificare se la regola con trigger `glob` scelto si attiva nel loader.
-- Report `.mw/runs/plan121-glob-activation/report.md` con esito per superficie.
+- Report `.mw/runs/plan122-glob-activation/report.md` con esito per superficie.
 - Demozione a glob SOLO se firing provato su tutte le superficie; altrimenti
   resta `always_on` — entrambi gli esiti chiudono il task.
 - **Deliverable:** report + (se verde) nuovo frontmatter, altrimenti nota.
@@ -249,8 +249,8 @@ con la proposta salvo veto.
 - `governance:check --full` verde, `--selftest` verde, `invariantMatrixCheck`
   verde; `closure:lint` sui file del plan.
 - Update: R-342 (Phase-3 → fatta; residuo Phase-0/4), `plans/INDEX.md` riga
-  PLAN-121, evidence log `test-results/` (regola 40), run dir
-  `.mw/runs/plan121-*/`.
+  PLAN-122, evidence log `test-results/` (regola 40), run dir
+  `.mw/runs/plan122-*/`.
 - Commit scoped (plan + ledger + matrice + script + fixtures + hook + kernel
   rewrites) — niente sweep (T-13).
 - **Deliverable:** report + docs + bundle.
@@ -267,7 +267,7 @@ con la proposta salvo veto.
 | OB-6 | state | `50-shutdown-governance` e `55-delegation-context-budget` frontmatter `trigger: always_on` invariati (check meccanico sul frontmatter); binding lines di 50 presenti nella forma compressa (citazioni nel ledger) | sì |
 | OB-7 | state | Kernel parity: `invariantMatrixCheck.ts --kernel` exit 0 — ogni ID `kernel:` ha la sua citazione vincolante nel kernel riscritto; diff frontmatter confinato: trigger modificati SOLO sui file/licenze elencati in matrice | sì |
 | OB-8 | human-eye | Sign-off Director sulla matrice (gap approvals + demozioni licenziate) registrato nella matrice stessa | sì |
-| OB-9 | state | Docs: R-342 aggiornata (Phase-3 fatta), `plans/INDEX.md` riga PLAN-121, evidence log `test-results/` + run dir `.mw/runs/plan121-*/`, `HUSKY_SETUP_INSTRUCTIONS.md` risolta (D-7) | sì |
+| OB-9 | state | Docs: R-342 aggiornata (Phase-3 fatta), `plans/INDEX.md` riga PLAN-122, evidence log `test-results/` + run dir `.mw/runs/plan122-*/`, `HUSKY_SETUP_INSTRUCTIONS.md` risolta (D-7) | sì |
 
 **Nota R-247/equivalente:** il task non muta codice di gioco — il "test di
 regressione permanente" è la coppia fixture per check + `--selftest`

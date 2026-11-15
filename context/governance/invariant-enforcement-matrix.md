@@ -1,4 +1,4 @@
-# Invariant → Enforcement Matrix (PLAN-121, T-1)
+# Invariant → Enforcement Matrix (PLAN-122, T-1)
 
 **Stato:** `draft — PENDING Director sign-off` (§0b gate: nessuna demozione
 prima dell'approvazione di questa matrice, gap inclusi).

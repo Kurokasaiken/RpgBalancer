@@ -1,6 +1,6 @@
 {
   "$schema": "invariant-ledger/v1",
-  "plan": "PLAN-121",
+  "plan": "PLAN-122",
   "generated": "2026-11-15",
   "idScheme": "INV-<file>-<slug> (D-5): immutable even if the text moves",
   "extraction": "double-pass: per-file read + grep sweep on MUST/FORBIDDEN/mai/never/only/vietato/VIOLATION/blocking/SEMPRE markers (anti T-06)",
@@ -633,7 +633,7 @@
       "source_trigger": "prose (root agent instructions)",
       "line": 1,
       "section": "Session bootstrap",
-      "verbatim": "All'inizio di ogni sessione: leggi `CANON.md`, `CURRENT_STATE.md`, `DESIGN_PILLARS.md`, `context/DECISION_LOG.md`, `RICHIESTE.md` (file attivo; le voci antecedenti 2026-11-08 sono in `RICHIESTE-backlog.md`/`RICHIESTE-archive.md` — consultabili on-demand, PLAN-121), `.mw/desiderata.md`, `context/INDEX.md` (se esiste) e `context/auto/` (advisory lane NON canonica: preferenze/veto durevoli — su conflitto vince il canonico).",
+      "verbatim": "All'inizio di ogni sessione: leggi `CANON.md`, `CURRENT_STATE.md`, `DESIGN_PILLARS.md`, `context/DECISION_LOG.md`, `RICHIESTE.md` (file attivo; le voci antecedenti 2026-11-08 sono in `RICHIESTE-backlog.md`/`RICHIESTE-archive.md` — consultabili on-demand, PLAN-122), `.mw/desiderata.md`, `context/INDEX.md` (se esiste) e `context/auto/` (advisory lane NON canonica: preferenze/veto durevoli — su conflitto vince il canonico).",
       "enforcement_candidate": "kernel"
     },
     {
