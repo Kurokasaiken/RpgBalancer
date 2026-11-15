@@ -1961,3 +1961,35 @@ sostituzione nel cassetto alla dimensione esistente. Decisioni incorporate:
   nodo dentro `wrapDetail`, `game-mappa2.tsx`): la sessione
   `useQuestExpeditionSession` resta l'unica fonte — slots, estimate, items,
   canSend/send/clear reali, stage/Escape/dnd invariati.
+- **R-334bis (2026-11-15) — contratto completato:** l'adapter espone bag
+  pouch + stash binding (`onOpenStash`), `resourceItems`, `disabledReason`,
+  `totalDays`/site-leg da `expeditionTotalDays`, banda danger i18n e
+  `onOpenRoster`: il cassetto su `/game` copre il contratto R-337/R-339, non
+  più solo la parte visuale.
+- **R-334ter (2026-11-15) — reliquary su `/game`:** `legacyOpen` monta
+  `HudRealReliquary` al posto di `LegacyReliquaryPanel` (stesso contratto:
+  `legacySlotsFor(villageBuildingLevel)` + onClose). Fix asset: le label
+  cotte ITEMS/BLUEPRINTS cancellate dalle capsule (smalto via clone-fill) —
+  le live label restano le uniche intestazioni; sottotitolo live "LEGACY"
+  rimosso (si camuffava da label sulla colonna HEROES). Il magazzino resta
+  `VillageStashPanel` — è già la superficie canonica anche nella triade.
+
+## 2026-11-15 — R-340: quattro superfici `/game` su visual firmato, dati reali invariati
+
+- **Regola applicata:** stesso pattern di R-334 — swap del solo strato
+  presentazionale dentro i mount esistenti; feed, sessioni, stage
+  ownership ed Escape arbitration non toccati.
+- **Portati:** `HudRealLedgerPanel` (events), `HudRealMerchantPanel`
+  (merchant, BUY disabilitato per contratto), `HudRealExpeditionLost`
+  (lost report su copia staged, reward path ancora stock),
+  `HudRealLevelUp` (drop-in di `HeroLevelCeremony`, stessa sorgente
+  `subscribeHeroLevelUp`), `HudRealMemorial` (menu MEMORIAL, dress zanara —
+  `GameMenuDialog.chromeless` nuovo flag: veil/Escape/focus invariati,
+  placca tolta; dress `skin` conserva il panel stock).
+- **Non portati (con motivo):** skill-check — `QuestSkillCheckColumn`
+  monta già il motore reale V62; roster — `HudRealRosterColumn` è
+  click-only e non copre il drag-to-assign (rinviato a design rail
+  compatibile DnD).
+- **Verifiche:** 5 witness Playwright (merchant, ledger+invasion row,
+  lost report con tomba reale, level-up con stat-gain reali, memorial
+  gallery su /game), `errors:0`, tsc/build:check/lint/closure:lint verdi.

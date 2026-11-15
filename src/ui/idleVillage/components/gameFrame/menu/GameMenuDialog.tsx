@@ -21,6 +21,10 @@ export interface GameMenuDialogProps {
   width?: number;
   /** Hide the Close pill (confirmations close through their own actions). */
   hideClose?: boolean;
+  /** Signed full-surface content: veil + portal + Escape + focus contract stay,
+   *  the plaque chrome (frame, title row, divider) is skipped — the children
+   *  own the whole dialog surface (e.g. the signed memorial gallery). */
+  chromeless?: boolean;
   children: ReactNode;
   'data-testid'?: string;
 }
@@ -81,7 +85,7 @@ const VEIL_STYLE: CSSProperties = {
   background: 'color-mix(in srgb, var(--skin-hud-lacquer-deep) 72%, transparent)',
 };
 
-export function GameMenuDialog({ title, onClose, width = 700, hideClose = false, children, 'data-testid': testId }: GameMenuDialogProps) {
+export function GameMenuDialog({ title, onClose, width = 700, hideClose = false, chromeless = false, children, 'data-testid': testId }: GameMenuDialogProps) {
   const { t } = useTranslation('idleVillage');
   const id = useId();
   const focusRef = useRef<HTMLDivElement>(null);
@@ -105,6 +109,23 @@ export function GameMenuDialog({ title, onClose, width = 700, hideClose = false,
       </button>
     </span>
   );
+  if (chromeless) {
+    const veilBg = dress === 'zanara'
+      ? `color-mix(in srgb, ${Z.fieldDark} ${Math.round(DEFAULT_GAME_FRAME_CONFIG.gamePage.dialog.veilAlpha * 100)}%, transparent)`
+      : undefined;
+    return createPortal(
+      <SkinScope>
+        {dress === 'zanara' && <style>{zanaraCss(DEFAULT_GAME_FRAME_CONFIG.gamePage.dialog)}</style>}
+        <div style={{ ...VEIL_STYLE, zIndex: layer, ...(veilBg ? { background: veilBg } : {}) }} data-testid="game-menu-veil">
+          <div ref={focusRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label={title} data-testid={testId}
+            style={{ outline: 'none', display: 'flex', width, maxWidth: 'calc(100vw - 48px)', maxHeight: 'calc(100vh - 48px)' }}>
+            {children}
+          </div>
+        </div>
+      </SkinScope>,
+      root,
+    );
+  }
   if (dress === 'zanara') {
     const d = DEFAULT_GAME_FRAME_CONFIG.gamePage.dialog;
     return createPortal(

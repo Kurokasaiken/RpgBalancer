@@ -41,7 +41,6 @@ import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 import { installGamePerfProbe } from '@/ui/idleVillage/utils/gamePerfProbe';
 import { GAME_PERF_BUDGETS } from '@/ui/idleVillage/config/gamePerfBudgets';
 import { isSkillCheckWarmEnabled, prewarmQuestSkillCheck } from '@/ui/idleVillage/components/gameFrame/questSkillCheckWarm';
-import { HeroLevelCeremony } from '@/ui/idleVillage/rosterV2/HeroLevelCeremony';
 import { runHeroLevelUpStaging } from '@/ui/idleVillage/rosterV2/runHeroLevelUpStaging';
 import { runStagingOpeningRoster } from '@/ui/idleVillage/rosterV2/runStagingOpeningRoster';
 import { playLevelUpCue } from '@/ui/idleVillage/rosterV2/heroLevelCue';
@@ -85,7 +84,11 @@ import { saveNowToManualSlot } from '@/ui/idleVillage/state/gameSaveService';
 import { useGameAutosave } from '@/ui/idleVillage/state/useGameAutosave';
 import { ambientForPhase, DAYLIGHT, nightShownAt, offeredSpeeds, type Ambient } from '@/ui/idleVillage/config/timeOfDay';
 import { DirectorPanel, type DirectorAction } from '@/ui/idleVillage/components/gameFrame/DirectorPanel';
-import { LegacyReliquaryPanel } from '@/ui/idleVillage/legacy/LegacyReliquaryPanel';
+import { HudRealReliquary } from '@/ui/idleVillage/hudReal/HudRealReliquary';
+import { HudRealMerchantPanel } from '@/ui/idleVillage/hudReal/HudRealMerchantPanel';
+import { HudRealLedgerPanel } from '@/ui/idleVillage/hudReal/HudRealLedgerPanel';
+import { HudRealExpeditionLost } from '@/ui/idleVillage/hudReal/HudRealExpeditionLost';
+import { HudRealLevelUp } from '@/ui/idleVillage/hudReal/HudRealLevelUp';
 import { SettlementLostOverlay } from '@/ui/idleVillage/components/SettlementLostOverlay';
 import { OxidizedGradeFilter } from '@/ui/idleVillage/components/OxidizedGradeFilter';
 import { useSettlementLostGrade, SETTLEMENT_LOST_WORLD_FILTER_ID } from '@/ui/idleVillage/hooks/useSettlementLostGrade';
@@ -100,7 +103,7 @@ import { COMPARABLE_SKIN_IDS, resolveInitialSkinPresetId } from '@/ui/idleVillag
 import { warmGameCursors } from '@/ui/idleVillage/utils/gameAssetWarmup';
 import { MatericRosterComponentV2 } from '@/ui/idleVillage/rosterV2';
 import { RosterKitShell, useRosterKitData, type RosterDropVerdict } from '@/ui/idleVillage/frozen/kits/rosterKit';
-import { HudEventLedger, QuestJourneyRoute, QuestOverlays, QuestRewardPopup, QuestRunWindow, RegionTooltip, useHeroSheet, usePanelWhileOpen, type HeroSheetApi, type HudEvent, type HudPanelsApi, type VillageScreenViewHandle } from '@/ui/idleVillage/components/gameFrame';
+import { QuestJourneyRoute, QuestOverlays, QuestRewardPopup, QuestRunWindow, RegionTooltip, useHeroSheet, usePanelWhileOpen, type HeroSheetApi, type HudEvent, type HudPanelsApi, type VillageScreenViewHandle } from '@/ui/idleVillage/components/gameFrame';
 import { MapDemoPoi } from '@/ui/idleVillage/components/gameFrame/MapDemoPoi';
 import { VillageStashPanel } from '@/ui/idleVillage/components/gameFrame/VillageStashPanel';
 import { ExpeditionEdgeTab } from '@/ui/idleVillage/components/gameFrame/ExpeditionEdgeTab';
@@ -108,7 +111,6 @@ import { RosterStashRail } from '@/ui/idleVillage/components/gameFrame/RosterSta
 import { useExpeditionRail } from '@/ui/idleVillage/store/useExpeditionRail';
 import { CASSETTO_LAYOUT_CONFIG } from '@/balancing/config/idleVillage/cassettoLayoutConfig';
 import { useVillageStashStore } from '@/ui/idleVillage/store/useVillageStashStore';
-import { MerchantPanel } from '@/ui/idleVillage/components/gameFrame/MerchantPanel';
 import { VILLAGE_STASH_CONFIG } from '@/balancing/config/idleVillage/villageStashConfig';
 import { MERCHANT_CONFIG } from '@/balancing/config/idleVillage/merchantConfig';
 import type { PixiRegionHover } from '@/ui/idleVillage/pixiSpike/PixiWorldMap';
@@ -537,6 +539,7 @@ export default function GameMappa2Page() {
                *  picks a member (tap member → fills the slot, existing
                *  assign flow). */
               onOpenRoster={() => useExpeditionRail.getState().open('roster')}
+              resourceItems={resources}
             />
           ) : (
             node
@@ -544,7 +547,7 @@ export default function GameMappa2Page() {
         </div>
       </StagePanelFrame>
     ),
-    [],
+    [resources, panels],
   );
   const session = useQuestPoiSession({
     poiFlightTargetSelector: MAP_QUEST_POI_TARGET,
@@ -1574,13 +1577,12 @@ export default function GameMappa2Page() {
       {panels.visible.events && (
         <StagePanelFrame panelId="events" positioned={false}>
           {(res) => (
-            <HudEventLedger
-              events={gameEvents}
-              context="game_mappa2"
-              onSelect={focusEvent}
-              onClose={() => panels.set('events', false)}
-              style={{ position: 'absolute', left: res.rect?.x ?? 0, top: res.rect?.y ?? 0, width: res.rect?.w ?? 360, zIndex: panelsZ }}
-            />
+            /* R-334ter: the signed ledger replaces the stock panel — same real
+             *  `gameEvents`/`focusEvent` feed, native 340×513 panel art at the
+             *  stage rect (close stays stage-owned: Escape). */
+            <div style={{ position: 'absolute', left: res.rect?.x ?? 0, top: res.rect?.y ?? 0, zIndex: panelsZ }}>
+              <HudRealLedgerPanel events={gameEvents} onSelect={focusEvent} />
+            </div>
           )}
         </StagePanelFrame>
       )}
@@ -1602,14 +1604,12 @@ export default function GameMappa2Page() {
       {panels.visible.merchant && (
         <StagePanelFrame panelId="merchant" positioned={false}>
           {(res) => (
-            <MerchantPanel
-              config={MERCHANT_CONFIG}
-              left={res.rect?.x ?? 0}
-              top={res.rect?.y ?? 0}
-              widthPx={res.rect?.w ?? MERCHANT_CONFIG.panel.widthPx}
-              zIndex={panelsZ}
-              onClose={closeMerchant}
-            />
+            /* R-334ter: the signed merchant replaces the stock panel — same
+             *  `MERCHANT_CONFIG` feed at the stage rect (close stays
+             *  stage-owned: Escape → closeMerchant). */
+            <div style={{ position: 'absolute', left: res.rect?.x ?? 0, top: res.rect?.y ?? 0, zIndex: panelsZ }}>
+              <HudRealMerchantPanel config={MERCHANT_CONFIG} />
+            </div>
           )}
         </StagePanelFrame>
       )}
@@ -1638,6 +1638,28 @@ export default function GameMappa2Page() {
           if (expeditionGoblin.handleResidentSelect(residentId)) return;
           if (expeditionRovine.handleResidentSelect(residentId)) return;
           session.handleResidentSelect(residentId);
+        }}
+        /* R-340: rail rows carry the production drag contract — same verdict
+         *  routing and flight-commit chain as the floating roster. While that
+         *  panel is mounted it stays the single drag source (kill-switch). */
+        dragEnabled={!panels.visible.roster}
+        onDragEnd={(event: DragEndEvent) => {
+          let verdict: RosterDropVerdict;
+          session.setDraggingResidentId(null);
+          expeditionGoblin.setDraggingResidentId(null);
+          expeditionRovine.setDraggingResidentId(null);
+          startTransition(() => {
+            verdict =
+              expeditionGoblin.handleDragEnd(event) ??
+              expeditionRovine.handleDragEnd(event) ??
+              session.handleDragEnd(event);
+          });
+          return verdict!;
+        }}
+        onFlightComplete={(residentId: string, slotId: string) => {
+          const owner = expeditions.find((exp) => exp.ownsSlotId(slotId));
+          if (owner) owner.handleFlightComplete(residentId, slotId);
+          else session.handleFlightComplete(residentId, slotId);
         }}
       />
 
@@ -1726,23 +1748,40 @@ export default function GameMappa2Page() {
       <QuestOverlays questId={activeQuestId} onDismissOutcome={activeQuestRun.dismissOutcome} checkInColumn={!!clusterGeometry && !questMinimised} />
       {/* R-199 pt.14: the end-of-run report floats OUTSIDE the window's DOM —
        *  staged reveal, skippable, non-modal. */}
-      {(expeditionLostRun || (rewardVisible && activeQuestRun.run)) && (
+      {/* R-334ter: the signed expedition-lost takeover replaces the stock
+       *  popup for the lost path (`lostReportModel` real data); the reward
+       *  report keeps the stock staged popup until its signed surface lands. */}
+      {expeditionLostRun && (
+        <HudRealExpeditionLost
+          run={expeditionLostRun}
+          questName={scenarioForQuest(activeQuestId)?.title ?? expeditionLostRun.questId}
+          onClose={() => setExpeditionLostRun(null)}
+        />
+      )}
+      {!expeditionLostRun && rewardVisible && activeQuestRun.run && (
         <QuestRewardPopup
-          run={(expeditionLostRun ?? activeQuestRun.run)!}
+          run={activeQuestRun.run}
           scenario={scenarioForQuest(activeQuestId)}
           widthPx={questWindow.rewardPopup.widthPx}
           stageMs={questWindow.rewardPopup.stageMs}
           edgeInsetPx={questWindow.rewardPopup.edgeInsetPx}
-          onClose={() => {
-            if (expeditionLostRun) setExpeditionLostRun(null);
-            else closeReward();
-          }}
+          onClose={closeReward}
         />
       )}
       {heroSheet.panelNode}
-      {/* T-C1 (R-234): the level-up ceremony plates (one per hero). */}
-      <HeroLevelCeremony residentsById={residentsById} />
-      {legacyOpen && <LegacyReliquaryPanel onClose={() => setLegacyOpen(false)} />}
+      {/* T-C1 (R-234) + R-334ter: the signed level-up plates — same
+       *  `subscribeHeroLevelUp` source and residentsById feed as the stock
+       *  ceremony, Escape per plate included. */}
+      <HudRealLevelUp residentsById={residentsById} />
+      {/* R-334bis: the signed reliquary replaces the stock panel — same data
+       *  source (`legacySlotsFor`/`villageBuildingLevel`), same onClose contract. */}
+      {legacyOpen && (
+        <div style={{ position: 'fixed', inset: 0, display: 'grid', placeItems: 'center', zIndex: DEFAULT_GAME_FRAME_CONFIG.zLayers.reward }}>
+          <div style={{ width: 'min(880px, 64vw)', aspectRatio: '1216 / 762' }}>
+            <HudRealReliquary onClose={() => setLegacyOpen(false)} />
+          </div>
+        </div>
+      )}
       {directorEnabled && panels.visible.director && (
         <DirectorPanel
           actions={directorActions}

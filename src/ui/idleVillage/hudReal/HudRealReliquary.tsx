@@ -66,12 +66,9 @@ export const HudRealReliquary: React.FC<{ onClose?: () => void }> = ({ onClose }
         </span>
       </div>
 
-      {/* Subtitle on the dark bronze band */}
-      <div style={{ ...pct(Z.inherit), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <span style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: '2.5cqh', fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', color: C.goldHi }}>
-          {t('gameFrame.director.legacy', 'Inheritance')}
-        </span>
-      </div>
+      {/* Subtitle dropped: the bronze band already carries the baked
+       *  "INHERITANCE" ribbon, and a live "LEGACY" here rendered on the centre
+       *  column's cap — reading as a wrong column header next to ITEMS/HEROES. */}
 
       {/* Three live columns */}
       {LEGACY_RELIQUARY_CATEGORIES.map((category, ci) => (
