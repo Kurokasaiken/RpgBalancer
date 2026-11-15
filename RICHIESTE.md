@@ -5917,9 +5917,9 @@ seed picker; save-on-approval → store condiviso. Dibattito multi-AI
 
 **Richiesta (verbatim, 2026-11-15):** *"il deploy su vercel e penso anche git è fallito, xè? voglio che fai un commit, push e deploy pulito"*
 **Data:** 2026-11-15
-**Stato:** `in corso`
-**Diagnosi accertata (2026-11-15, thread 2):** git pulito (auto-commit `5f11256d` pushato); il deploy Vercel di `5f11256d` è **fallito in build** su `assertDeployShape` — `deploy-manifest.json` in drift (~99 file nuovi in `public/` dall'auto-commit senza regen manifest). Alias prod rimasto su `35b9f7e`. **Fix:** manifest rigenerato (`deployManifest.mjs`, `--check` verde) + push in questo thread. Check GitHub rossi separati: `closure:lint` (drift contratti, parte noto Director-gated) e `Release` (Playwright vs runner ubuntu26.04, ambientale).
-**Resume:** `context/HANDOFF-deploy-git.md` § "Aggiornamento sessione 2026-11-15 (thread 2)" — verifica deploy success + WebGL probe R-304 su `/` e `/game`, poi chiusura.
+**Stato:** `fatta` — evidenza sotto. `bundle:` n/a (ops fix; `closure:lint` pre-rosso su drift contratti noto/Director-gated — un bundle PASS non è producibile finché quel drift resta).
+**Diagnosi accertata (2026-11-15, thread 2):** git pulito (auto-commit `5f11256d` pushato); il deploy Vercel di `5f11256d` è **fallito in build** su `assertDeployShape` — `deploy-manifest.json` in drift (~99 file nuovi in `public/` dall'auto-commit senza regen manifest). Alias prod rimasto su `35b9f7e`. **Fix:** manifest rigenerato (`deployManifest.mjs`, `--check` verde), commit `e5b8170d` pushato → deploy **● Ready** (`rpg-balancer-g6r856eo4`, poi `4gk1t9h02` per il commit `ad157925` di sessione parallela). **Verifica R-304:** `webglBootProbe.mjs` PASS su `https://rpg-balancer.vercel.app/` e `/game` sull'alias produzione (WebGL swiftshader, exit 0 entrambi).
+**Residui (non di questa voce):** check GitHub `Validate i18n…` rosso su `closure:lint` (drift contratti: 2-owner game-menu-screens Director-gated + 0-owner nuovi da auto-commit + scope_files divergenti); check `Release` rosso ambientale (Playwright 1.58.2 vs runner ubuntu26.04). Serve task dedicato di resync contratti + ruling Director.
 
 ## R-342 — ops: audit contesto fisso Devin + ottimizzazione sistema
 
@@ -5929,3 +5929,20 @@ seed picker; save-on-approval → store condiviso. Dibattito multi-AI
 **Audit eseguito (fase 1-3, vedi handoff):** regole sempre-on reali ≈23KB (solo 3 rule `always_on` + AGENTS.md; le altre 14 già lazy via trigger frontmatter — 8 senza frontmatter, attivazione ambigua); MCP github/vercel falliscono `list_tools` (dead weight), puppeteer ok + risorse stale; skill dirs = symlink, dedup attivo; gap: componenti visibili non spiegano 262k a sessione "fresca" (probabile carried-over o overhead harness).
 **Dibattito:** run `20261115-context-budget-audit` (mind-weaver `.mw/runs/`), provider chatgpt+claude+gemini+grok+deepseek, T-001 clarification POSTED — prosegue orchestrazione dal handoff.
 **Regola:** applicazione modifiche SOLO dopo ruling Director (governance).
+
+## R-340bis — Roster rail: righe drag-to-assign (punto di ripresa, budget)
+
+**Scelta Director (2026-11-15):** opzione 1 — estendere `RosterStashRail` (superficie canonica PLAN-119) col drag di produzione.
+**Data:** 2026-11-15
+**Stato:** `in corso` — **implementato, NON verificato dal vivo.**
+
+**Implementato:**
+- `RosterStashRail.tsx`: `RosterRow` ora `useDraggable` (id=`resident.id`, payload identico a `WanderlustRosterCardV2` + tag `source:'roster-rail'`, disabled se `!view.interactive || dragDisabled`); `useDndMonitor` gated su `source==='roster-rail'`; `useDragOutcome` + `CustomDragOverlay` + `DragOutcomeFlight` montati nel rail (DndContext/DragProvider già a livello pagina via `RosterKitShell`); nuove props `onDragEnd`/`onFlightComplete` (stesse firme del roster flottante) + `dragEnabled` kill-switch.
+- `game-mappa2.tsx`: wiring identico al pannello flottante (`expeditionGoblin/Rovine/session` chain per verdict, `ownsSlotId`→`handleFlightComplete` per il commit); `dragEnabled={!panels.visible.roster}` → una sola sorgente drag alla volta, zero doppio monitor.
+- Bug trovato+fixato: l'`onPointerDown` custom sovrascriveva `listeners.onPointerDown` di dnd-kit (drag mai attivato) → ora concatenato.
+
+**NON verificato (resume point):**
+- Probe Playwright `scripts/hud-real/_tmp-probe-rail-drag2.mjs` (strumentata: `__dragCursorOffset`, `aria-pressed`, medaglie slot) e `_tmp-probe-rail-drag.mjs` — ripetutamente disturbate da (a) dev server che cade/riparte, (b) reload Vite da file scritti da sessione parallela (`HANDOFF-deploy-git.md`, PLAN-119) — T-13. Ultimo run pulito: drag non committato, il tap sullo slot apre il picker roster mini-panel.
+- **Ipotesi aperte da verificare alla ripresa:** (1) drag parte ma `event.over` non risolve lo slot (SLOT_MAGNET/droppable rect) — guardare `aria-pressed` durante il drag; (2) `onResidentSelect` al click apre il picker `QuestPartyRosterPanel` — se il pointerup arriva prima del threshold il select scatta: valutare se il picker aperto è quello; (3) served-file va ri-verificato dopo il restart del server.
+- `tsc` pulito; lint 0 errori (file in ignore-pattern); `build:check`/`closure:lint` da rigirare dopo la verifica live.
+- Riferimenti: file toccati `src/ui/idleVillage/components/gameFrame/RosterStashRail.tsx`, `src/pages/game-mappa2.tsx` (~line 1640); contratto copiato da `RosterDraggableV2.handleDragEnd` (verdict `flightToSlot`/`springBack`/`settle`).
