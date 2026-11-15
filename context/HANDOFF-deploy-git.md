@@ -388,3 +388,21 @@ Prossime leve identificate: `DECISION_LOG.md` (149k char) e
 `.mw/desiderata.md` (148k) — stesso pattern split applicabile (plan
 dedicato, ruling Director). Hazard noto: backlog+archivio (~978k) sono
 on-demand ma nulla impedisce a un agente di leggerli in bulk.
+
+## PLAN-123 ledger-docs split — FATTO (2026-11-15, subagent)
+
+Split byte-preserving di `context/DECISION_LOG.md` (cutoff datate
+≥2026-10-24, ruling D-1=a): attivo **46.473B / 38 sezioni** (unico file in
+scrittura) + `context/DECISION_LOG-archive.md` **103.143B / 70 sezioni**
+(14 legacy non-datate + datate <cutoff) — union-check sha256 byte-perfect
+(108→108, multiset identico). `.mw/desiderata.md` **NON toccato** (D-2=c:
+sha256 `eae71073…` prima==dopo); generato `.mw/desiderata-digest.md`
+**47.824B** = indice v1–v38 + corpo verbatim v27–v38, deterministico.
+Guard `npm run ledger:check` (cap 50k, 4/4 PASS). Read-list AGENTS.md ora
+punta all'attivo DECISION_LOG + digest (~297k→~94k char sui due ledger).
+Consumer union-read: `scripts/verification/ledgerUnion.ts` +
+`planForensics` BOOKKEEPING da union parts. Commits `6adc859a` + `554960a5`
++ `7fde4d3d`. closure:lint red per drift parallelo R-345 (documentato nel
+report — unico finding mio dispositionato via coverage_exception).
+Report: `.mw/runs/plan123-ledger-split/report.md` · inventory/manifest
+nella stessa dir (gitignored). OB-5 Director spot-check pending.
