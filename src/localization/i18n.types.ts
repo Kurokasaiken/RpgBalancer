@@ -982,6 +982,9 @@ export default interface Resources {
       },
       "subtitle": "",
       "title": "Wanderlust",
+      "topChrome": {
+        "ariaLabel": "Day and resources"
+      },
       "tuning": {
         "bakeFailed": "Saved for this browser — the new defaults could not be written to the config (dev server only).",
         "reset": "Reset values",

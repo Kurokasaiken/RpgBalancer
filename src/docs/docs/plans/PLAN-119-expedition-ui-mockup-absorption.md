@@ -114,7 +114,7 @@ riservata da D10). Nessuna modifica a regole gameplay/quest.
 - ESLint scopato: i file `src/ui/idleVillage/**` e `tests/unit/**` risultano ignored dalla config — copertura lint non significativa.
 - `tests/i18n/icuInterpolation.test.ts`: 2 failure preesistenti su placeholder `{{...}}` legacy in `questGenLab` — NON causati da questa slice.
 
-**Non fatto (prossime sessioni):** T1 token skin (clamp 360/23vw/460, detents), T2 struttura completa oltre l'esistente, T3 bag assign (S2), T6 top chrome + sole + zona Chronicle (D-227), T8 mobile bottom-sheet, cablaggio insets→safeFit. File sporchi della sessione parallela (voce R-338, poi-radial, reliquary/cassettoDetail) non toccati né committati.
+**Non fatto (prossime sessioni):** T1 token skin (clamp 360/23vw/460, detents), T2 struttura completa oltre l'esistente, T3 bag assign (S2), ~~T6 top chrome + sole + zona Chronicle~~ (fatto, vedi ledger T6), T8 mobile bottom-sheet, cablaggio insets→safeFit. File sporchi della sessione parallela (voce R-338, poi-radial, reliquary/cassettoDetail) non toccati né committati.
 
 ### Seal + contratti (2026-11-15, ruling Director)
 - `trusted:seal` eseguito (×2): BASE = HEAD. Errori miei risolti: unità `expedition-edge-tab` creata (INV-1, ex INV-5), inventory rigenerato via `componentInventory.ts --write`, scaffold `place-fan-cards` auto-creato. Push su main.
@@ -136,6 +136,23 @@ riservata da D10). Nessuna modifica a regole gameplay/quest.
 
 **Pendenze Director:** statement `hud-real-cassetto.INV-3` mutato (ratchet richiede approvazione, non solo journal); sync-gate 25 amend/retire > cap 3 (cumulato BASE..WT, serve sync-amend-override); file esteri UNMAPPED (reliquary/probe sessione parallela).
 
+## Ledger — T6 top chrome slim (2026-11-15, stessa sessione)
+
+**Fatto:**
+- `GameTopChrome` (`components/gameFrame/`): cluster docked fascia superiore, day banner + resource bar come due `data-hudslot` separati (`time`/`resources`), arte slim firmata `bar-slim.webp` (PLAN-112 F4) via `timeSlimGeometry`/`resourcesSlimGeometry`. Solo blueprint mode — phone/landscape mantengono il chrome full-size esistente.
+- Posizionamento: bordo sinistro = `insets.left/scale + topChrome.marginPx` (segue il fold della rail), bordo destro ≤ `W - chronicleReserve.widthPx` — **zona top-right riservata** alla futura Chronicle docked (D3+D10, niente tab pendente). Fit = min(1, banda/naturale); sotto `topChrome.minFitScale` la riserva cede e il bound duro resta `W - marginPx` (mai fuori schermo).
+- Sole ornamentale (D3): dial di fase riusato — disco `sun.webp`/`moon.webp` + corona tick seduto nell'emerald della slim bar, geometria misurata `timeOfDay.dialSlim` in `gameFrameConfig` (Zod), colori/URL da config.
+- `useGameLayoutInsets.insets.top` pubblicato = `marginPx` + riga scalata (× fit × frame.scale); 0 quando nascosto/smontato; rail continua a possedere `left`, cassetto `right`.
+- `HudRealTime`/`HudRealTimeConnected`/`HudRealResources` parametrizzati (variante `slim`/`compact`, bar URL e geometria da config/prop) — nessuna superficie duplicata; chip compatti per gli slot risorse più stretti.
+- Config: `topChrome{marginPx, chronicleReserve.widthPx, minFitScale}` in `cassettoLayoutConfig` (Zod). i18n `gameFrame.topChrome.*` EN/IT; tipi rigenerati.
+- Contratto `.mw/contracts/components/game-top-chrome.md` INV-1..5; riga in `COMPONENT_MASTER_INDEX` via `contracts:index-sync`.
+
+**Verifiche:** `r339TopChrome.test.tsx` 11/11 (insets.top+cleanup, hidden, zoom, left=rail+margin, riserva, chip fold, naturale@1920, fallback stretto, slot separati, chip compatti, sole/luna); `r339ExpeditionStates` 10/10 + `gameHudPlacement` 19/19 + `r339DawnDuskWash` 8/8 verdi; `i18n:types` OK; `build:check` OK (`test-results/build-check-2026-11-15.log`); lint scope 0 errori (file idleVillage/tests ignored, già noto). Witness headless `/game?poiDemo=1` (`test-results/r339-topchrome-{1440,railfold,1024,full}.png`): left=332=rail(320)+12, right=1081=riserva(1440-360), phase=day sun.webp, 3 chip; fold rail → left=52; 1024 → right=1013 in-window. Reload HMR della sessione parallela (T-13) gestito nel probe (click DOM + strip veil).
+
+**Blocchi esteri (non miei):** `r339RosterStashRail.test.tsx` 10/10 rosso — il rail ora monta `useDndMonitor`/`DragProvider` (drag roster, sessione parallela R-340bis) e il test lo renderizza senza provider; da sistemare nel suo scope.
+
+**Chronicle: NON implementata** — solo la zona top-right è riservata (D10); port dedicato in slice futura.
+
 ### safeFit wiring — scoperta: NON è una prop, è un cambio di framing
 `/game` monta `PixiWorldMap` **senza** `safeFit` → cover-fit, "the framing the Director approved" (commento in pagina). Attivare safeFit con `insets.right` dal ledger richiede: `landBounds` dal manifest + `seaMarginPx/YPx` + verifica che a riposo il framing non cambi (T-01) + witness T-04 su apertura/chiusura drawer. Task dedicato, stimato non banale — NON fatto.
-### Prossimi: T6 chrome+sole (hudLayoutB ruling ok) · T8 sheet · T1/T2/T3 restanti · gate chiusura R-339.
+### Prossimi: ~~T6 chrome+sole~~ (fatto) · T8 sheet · T1/T2/T3 restanti · gate chiusura R-339.

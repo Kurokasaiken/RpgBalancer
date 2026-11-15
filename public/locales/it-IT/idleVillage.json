@@ -1582,6 +1582,9 @@
       "tablist": "Roster e magazzino",
       "tabStash": "Scorte",
       "memberStats": "Condizione dei membri"
+    },
+    "topChrome": {
+      "ariaLabel": "Giorno e risorse"
     }
   },
   "missionPlanner": {

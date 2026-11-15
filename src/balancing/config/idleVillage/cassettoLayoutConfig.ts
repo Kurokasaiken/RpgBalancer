@@ -11,7 +11,9 @@
  *
  * `rail` and `bottomSheet` are the T5/T8 sizing contract (persistent left
  * Roster|Stash column; non-modal mobile sheet detents) declared here so the
- * surfaces read one source of truth.
+ * surfaces read one source of truth. `topChrome` is the T6 contract (D3/D10):
+ * the slim day banner + resource bar docked left/center, and the top-right
+ * zone reserved for the future docked Chronicle surface.
  */
 import { z } from 'zod';
 
@@ -59,6 +61,20 @@ export const cassettoLayoutSchema = z
       halfFraction: z.number().positive().max(1),
       fullFraction: z.number().positive().max(1),
     }),
+    topChrome: z.object({
+      /** Design-px margin: distance from the top edge and from the boundary the
+       *  left inset (`insets.left`) leaves — the cluster hugs the free-map band. */
+      marginPx: z.number().nonnegative(),
+      /** Design-px gap between the day banner and the resource bar. */
+      gapPx: z.number().nonnegative(),
+      /** D10 (Director ruling 2026-11-15): width in REAL px of the top-right zone
+       *  reserved for the future docked Chronicle surface. The chrome cluster
+       *  never enters it while it can stay at or above `minFitScale`. */
+      chronicleReservePx: z.number().nonnegative(),
+      /** Below this fit scale the Chronicle reserve yields to the screen edge —
+       *  the cluster may shrink past the reserve but never leaves the window. */
+      minFitScale: z.number().positive().max(1),
+    }),
   })
   .strict();
 
@@ -88,6 +104,7 @@ const RAW_CASSETTO_LAYOUT_CONFIG: CassettoLayoutConfig = {
     ],
   },
   bottomSheet: { peekPx: 56, halfFraction: 0.5, fullFraction: 0.92 },
+  topChrome: { marginPx: 12, gapPx: 10, chronicleReservePx: 360, minFitScale: 0.55 },
 };
 
 export const CASSETTO_LAYOUT_CONFIG = cassettoLayoutSchema.parse(RAW_CASSETTO_LAYOUT_CONFIG);

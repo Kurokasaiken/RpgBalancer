@@ -27,6 +27,9 @@ const C = {
   focus: '#e8c766',
 } as const;
 const G = { pad: 7, socket: 36, glyph: 22, gap: 7, valueSize: 19, labelSize: 12 } as const;
+/** R-339/T6: the slim bar's first slot is 65 design px — the compact chip keeps the
+ *  same socket→value/label grammar at a size that seats inside every slim slot. */
+const G_COMPACT = { pad: 4, socket: 26, glyph: 17, gap: 4, valueSize: 15, labelSize: 10 } as const;
 
 const SCOPED_CSS = `
 [data-hudreal-resources] [data-hr-res]:focus { outline: none; }
@@ -46,13 +49,13 @@ function Hourglass({ color }: { color: string }) {
 
 /** Engraved brass socket — the icon's seat, same grammar as the nav round
  *  buttons: bronze rim, dark well, top sheen, inner shadow behind the glyph. */
-function IconSocket({ children }: { children: ReactNode }) {
+function IconSocket({ children, socket = G.socket, glyph = G.glyph }: { children: ReactNode; socket?: number; glyph?: number }) {
   return (
     <div
       aria-hidden="true"
       style={{
-        width: G.socket,
-        height: G.socket,
+        width: socket,
+        height: socket,
         flex: 'none',
         borderRadius: '50%',
         display: 'grid',
@@ -67,13 +70,13 @@ function IconSocket({ children }: { children: ReactNode }) {
         ].join(', '),
       }}
     >
-      <div style={{ width: G.glyph, height: G.glyph, filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.8))' }}>{children}</div>
+      <div style={{ width: glyph, height: glyph, filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.8))' }}>{children}</div>
     </div>
   );
 }
 
 /** Compact display for very large integers (99999 stays, 123456 -> 123K) so a chip never overflows its slot. */
-function compact(v: string | number): string {
+function compactValue(v: string | number): string {
   const n = typeof v === 'number' ? v : Number(String(v).replace(/[^0-9.-]/g, ''));
   if (!Number.isFinite(n) || Math.abs(n) < 100000) return String(v);
   return new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 }).format(n);
@@ -81,15 +84,23 @@ function compact(v: string | number): string {
 
 export interface HudRealResourcesProps {
   items: ResourceReadoutItem[];
+  /** Bar geometry — full (`resourcesBarGeometry.RESOURCES_BAR`) or slim
+   *  (`resourcesSlimGeometry.RESOURCES_SLIM_BAR`, R-339/T6); same generated shape. */
+  bar?: typeof BAR;
+  /** Bar art URL — `resources/bar.webp` or the generated `resources/bar-slim.webp`. */
+  asset?: string;
+  /** Compact chip sizes for the slim bar's narrower slots. */
+  compact?: boolean;
 }
 
-/** Top-right resource bar: one generated image, one chip per slot. */
-export function HudRealResources({ items }: HudRealResourcesProps) {
+/** Resource bar: one generated image, one chip per slot. */
+export function HudRealResources({ items, bar: BAR_LOCAL = BAR, asset: ASSET_LOCAL = ASSET, compact = false }: HudRealResourcesProps) {
+  const S = compact ? G_COMPACT : G;
   return (
-    <section data-hudreal-resources="" style={{ position: 'relative', userSelect: 'none', width: BAR.w, height: BAR.h }}>
+    <section data-hudreal-resources="" style={{ position: 'relative', userSelect: 'none', width: BAR_LOCAL.w, height: BAR_LOCAL.h }}>
       <style>{SCOPED_CSS}</style>
-      <img src={ASSET} alt="" draggable={false} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', display: 'block' }} />
-      {BAR.slots.map((slot, i) => {
+      <img src={ASSET_LOCAL} alt="" draggable={false} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', display: 'block' }} />
+      {BAR_LOCAL.slots.map((slot, i) => {
         const item = items[i];
         if (!item) return null;
         const danger = item.tone === 'danger';
@@ -101,7 +112,7 @@ export function HudRealResources({ items }: HudRealResourcesProps) {
             <div role="group" aria-label={description} tabIndex={0} data-hr-res={item.id} data-tone={item.tone}
               style={{
                 position: 'absolute', left: slot.x, top: slot.y, width: slot.w, height: slot.h, boxSizing: 'border-box',
-                padding: `0 ${G.pad}px`, display: 'flex', alignItems: 'center', gap: G.gap, cursor: 'default',
+                padding: `0 ${S.pad}px`, display: 'flex', alignItems: 'center', gap: S.gap, cursor: 'default',
                 borderRadius: 10,
                 /* Danger: vermilion enamel rim on the slice itself — the slot glows,
                  *  the hourglass sits at the right edge as an emblem. No hairline. */
@@ -109,20 +120,20 @@ export function HudRealResources({ items }: HudRealResourcesProps) {
                   ? { boxShadow: `inset 0 0 0 1.5px ${HUD_TONE_COLOR.danger}d9, inset 0 0 9px ${HUD_TONE_COLOR.danger}40` }
                   : {}),
               }}>
-              <IconSocket>{item.icon}</IconSocket>
+              <IconSocket socket={S.socket} glyph={S.glyph}>{item.icon}</IconSocket>
               <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', position: 'relative' }}>
                 <span style={{
-                  fontFamily: '"EB Garamond", serif', fontSize: hudPx(G.valueSize), fontWeight: danger ? 700 : 600, lineHeight: hudPx(18),
+                  fontFamily: '"EB Garamond", serif', fontSize: hudPx(S.valueSize), fontWeight: danger ? 700 : 600, lineHeight: hudPx(18),
                   fontVariantNumeric: 'tabular-nums', color: danger ? HUD_TONE_COLOR.danger : C.value, textShadow: C.emboss,
                   whiteSpace: 'nowrap', display: 'flex', alignItems: 'baseline', gap: 3,
                 }}>
-                  {compact(item.value)}
+                  {compactValue(item.value)}
                   {item.max !== undefined && String(item.value).length <= 3 && (
-                    <span style={{ fontSize: hudPx(G.labelSize), fontWeight: 500, color: C.label, opacity: 0.85 }}>/{item.max}</span>
+                    <span style={{ fontSize: hudPx(S.labelSize), fontWeight: 500, color: C.label, opacity: 0.85 }}>/{item.max}</span>
                   )}
                 </span>
                 <span style={{
-                  fontFamily: '"EB Garamond", serif', fontSize: hudPx(G.labelSize), lineHeight: hudPx(13), color: C.label, textShadow: C.shadow,
+                  fontFamily: '"EB Garamond", serif', fontSize: hudPx(S.labelSize), lineHeight: hudPx(13), color: C.label, textShadow: C.shadow,
                   whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', letterSpacing: 0.6,
                   display: 'flex', alignItems: 'center', gap: 5,
                 }}>

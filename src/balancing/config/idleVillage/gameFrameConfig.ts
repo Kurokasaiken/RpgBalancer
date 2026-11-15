@@ -779,6 +779,24 @@ const gameFrameGamePageSchema = z.object({
 });
 
 const lightSchema = z.object({ light: z.number().min(0).max(1), warm: z.number().min(0).max(1) });
+/** Time bar dial: sun/moon disc seated over the bar's emerald, framed by a crown of ticks lit as the phase runs. */
+const gameFrameTimeDialSchema = z.object({
+  /** Emerald centre and radius on the bar art, design px (measured on its alpha). */
+  cx: z.number(),
+  cy: z.number(),
+  r: z.number().positive(),
+  disc: z.number().positive(),
+  ticks: z.number().int().positive(),
+  majorEvery: z.number().int().positive(),
+  fadeMs: z.number().nonnegative(),
+  sunUrl: z.string(),
+  moonUrl: z.string(),
+  /** Tick geometry (design px): gap from the disc, inset from the emerald rim (major/minor), stroke widths, glow blur. */
+  tick: z.object({ gap: z.number(), insetMajor: z.number(), insetMinor: z.number(), widthMajor: z.number().positive(), widthMinor: z.number().positive(), glowPx: z.number().nonnegative() }),
+  /** CSS box-shadow framing the sun/moon disc (thin gold wire + dark seat). */
+  discFrame: z.string(),
+  colors: z.object({ dayLit: z.string(), nightLit: z.string(), unlit: z.string(), dayGlow: z.string(), nightGlow: z.string(), well: z.string() }),
+});
 /**
  * Time of day on the /game map and on the time bar's dial (Director 2026-11-11: «Luna e torce», sole/luna, notte fino a ×2).
  * Curve: `p` = progress through the current phase (0..1). Day: light falls from 1 to `nightLight` over [dayFallStart, 1];
@@ -819,24 +837,12 @@ const gameFrameTimeOfDaySchema = z.object({
     }),
   }),
   /** Time bar dial: sun/moon disc seated over the bar's emerald, framed by a crown of ticks lit as the phase runs. */
-  dial: z.object({
-    /** Emerald centre and radius on `time/bar.webp`, design px (measured on its alpha). */
-    cx: z.number(),
-    cy: z.number(),
-    r: z.number().positive(),
-    disc: z.number().positive(),
-    ticks: z.number().int().positive(),
-    majorEvery: z.number().int().positive(),
-    fadeMs: z.number().nonnegative(),
-    sunUrl: z.string(),
-    moonUrl: z.string(),
-    /** Tick geometry (design px): gap from the disc, inset from the emerald rim (major/minor), stroke widths, glow blur. */
-    tick: z.object({ gap: z.number(), insetMajor: z.number(), insetMinor: z.number(), widthMajor: z.number().positive(), widthMinor: z.number().positive(), glowPx: z.number().nonnegative() }),
-    /** CSS box-shadow framing the sun/moon disc (thin gold wire + dark seat). */
-    discFrame: z.string(),
-    colors: z.object({ dayLit: z.string(), nightLit: z.string(), unlit: z.string(), dayGlow: z.string(), nightGlow: z.string(), well: z.string() }),
-  }),
+  dial: gameFrameTimeDialSchema,
+  /** R-339/PLAN-119 T6: the same dial seated on the SLIM day banner (`time/bar-slim.webp`) —
+   *  emerald centre/radius re-measured on the squashed art, tick crown scaled down with it. */
+  dialSlim: gameFrameTimeDialSchema,
 });
+
 
 const gameFrameConfigSchema = z.object({
   insets: gameFrameInsetsSchema,
@@ -1215,6 +1221,20 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
       moonUrl: '/assets/ui/hud-real/time/moon.webp',
       tick: { gap: 2.6, insetMajor: 1.6, insetMinor: 3.2, widthMajor: 1.6, widthMinor: 1.1, glowPx: 1.6 },
       discFrame: '0 0 0 1px rgba(60, 40, 10, 0.9), 0 0 0 2px rgba(241, 216, 138, 0.55), 0 0 6px 2px rgba(2, 14, 18, 0.9)',
+      colors: {
+        dayLit: '#ffe7a3', nightLit: '#cfe2ff', unlit: 'rgba(150, 118, 58, 0.55)',
+        dayGlow: 'rgba(255, 200, 90, 0.95)', nightGlow: 'rgba(150, 195, 255, 0.95)', well: 'rgba(2, 16, 20, 0.62)',
+      },
+    },
+    /* R-339/T6: the slim banner's emerald — centre measured on `time/bar-slim.webp`
+     *  (green-glass blob ≈ x40..115 y17..89 @2x → cx 41, cy 26.5, r ≈ 17.5 design px),
+     *  disc and tick crown scaled ×0.63 from the full bar. */
+    dialSlim: {
+      cx: 41, cy: 26.5, r: 17.5, disc: 12, ticks: 24, majorEvery: 3, fadeMs: 600,
+      sunUrl: '/assets/ui/hud-real/time/sun.webp',
+      moonUrl: '/assets/ui/hud-real/time/moon.webp',
+      tick: { gap: 1.7, insetMajor: 1.1, insetMinor: 2.1, widthMajor: 1.1, widthMinor: 0.8, glowPx: 1.1 },
+      discFrame: '0 0 0 1px rgba(60, 40, 10, 0.9), 0 0 0 1.5px rgba(241, 216, 138, 0.55), 0 0 4px 1.5px rgba(2, 14, 18, 0.9)',
       colors: {
         dayLit: '#ffe7a3', nightLit: '#cfe2ff', unlit: 'rgba(150, 118, 58, 0.55)',
         dayGlow: 'rgba(255, 200, 90, 0.95)', nightGlow: 'rgba(150, 195, 255, 0.95)', well: 'rgba(2, 16, 20, 0.62)',
