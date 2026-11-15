@@ -32,6 +32,7 @@ Un caso singolo resta un pattern-candidate: non viene promosso.
 | `<select>`/`<button>` nativi dentro pill `data-hud-controls`, hit-area, click "che non fa nulla" | T-21 |
 | misura di latenza/percezione, verde E2E con sintomo ancora presente, preview vs dev server | T-22 |
 | prompt per generatori immagini esterni (Gemini/SD), batch su web-UI, style-reference attach, scorecard scene | T-16, T-25, T-26, T-27, T-28 |
+| `build:deploy`, deploy Vercel, `deploy-manifest.json`, asset in `public/` referenziati da codice | T-29 |
 
 ---
 
@@ -268,7 +269,11 @@ sullo stesso worktree.
   dev server killato (`ERR_CONNECTION_REFUSED`) o HMR full-reload da edit
   altrui → `Execution context destroyed` e hook
   `__idleVillageTestHooks` transientemente `undefined` nella probe;
-  `build:check` timeout a 180s sotto carico condiviso.
+  `build:check` timeout a 180s sotto carico condiviso;
+  `closure:lint` killato silenzioso a 30s: `checkContractsGate` rilancia se
+  stesso in un figlio tsx (`runCommittedGate`, timeout interno 150s) per
+  rivalutare i gate-file a HEAD — doppia scansione BASE..WT sotto carico
+  >30s. Diagnosi: timing per-gate, non guess (R-339 sessione 2026-11-15).
 - **Istanze:** R-196 (verifier estraneo, safeguards.log FORGED) · R-198/PLAN-035/R-202
   (kanban su bundle a metà) · R-199 (2 probe failure HMR + dev server down +
   build timeout). `.mw/runs/learn-r199-20261016-092815/pattern-candidate.md`
@@ -674,3 +679,28 @@ da altra chiave) e MOOD_PROOF (senza nome-chiave, quale relazione visibile
 identifica il mood?). Kill estetici → positivi nel campo nativo; HYGIENE
 cap ~5. Template convergente: `.mw/runs/2026-10-25-mood-keys-learn/pattern-candidate.md`
 + `context/research/2026-10-25-mood-keys/critiques/`.
+
+## T-29 — `deploy-manifest.json` va in drift quando il codice referenzia asset di `public/`
+
+**Surface:** `build:deploy`, `assertDeployShape`, deploy Vercel
+(`npx vercel --prod` / git push auto-deploy), `deploy-manifest.json`,
+asset in `public/` (incluse texture HUD referenziate da skin config).
+
+- **Cosa succede:** il manifest committato cataloga refs e orfani di
+  `public/` a HEAD. Quando il codice inizia a referenziare un asset prima
+  orfano (o asset vengono aggiunti/tolti), il manifest va in drift →
+  `assertDeployShape` FAIL → il build remoto Vercel muore dopo ~4min
+  **senza log leggibile in CLI** (Error generico, build log solo da
+  dashboard). Sintomo ingannevole: `vite build` locale verde, push ok,
+  poi deploy Error.
+- **Istanze:** `e5b8170d` (drift asset public/, resync manifest) ·
+  `c02efdf7` (PLAN-119 T6: `bar-slim.webp` da orfane a referenziate da
+  `GameTopChrome`, 2026-11-15) · scia di deploy ERROR stessa data.
+- **Regola:**
+  1. Ogni change che aggiunge/rimuove asset in `public/` **o crea nuovi
+     ref verso asset esistenti** → `node scripts/deploy/deployManifest.mjs`
+     e commit del manifest **nello stesso commit/push** del codice.
+  2. Prima del push di un task con asset: `npm run build:deploy` locale —
+     è l'unico gate che becca il drift prima del round-trip Vercel (~5min).
+  3. Deploy Vercel in Error senza causa apparente → prima cosa controlla
+     `build:deploy` locale: il manifest drift è il colpevole abituale.
