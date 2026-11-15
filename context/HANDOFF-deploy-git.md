@@ -406,3 +406,25 @@ Consumer union-read: `scripts/verification/ledgerUnion.ts` +
 report — unico finding mio dispositionato via coverage_exception).
 Report: `.mw/runs/plan123-ledger-split/report.md` · inventory/manifest
 nella stessa dir (gitignored). OB-5 Director spot-check pending.
+
+## PLAN-122 T-2..T-5 — FATTO (2026-11-15)
+
+`governance:check` orchestrator (--full/--staged/--selftest) + v1 checks
+`persistence:no-forbidden-apis` (AST) e `skin:no-adhoc-css` (allowlist,
+fixture mutation-validated) + `.husky/pre-commit` su `--staged`. Matrice
+firmata dal Director (4 GAP → approved). Rule 40 resta always_on (glob
+activation non osservabile — report `.mw/runs/plan122-glob-activation/`).
+
+**Ripristini post-fix `d06ca631`:** `foreground:lint` tornato in staged
+scope (2 `bringToFront` rimossi — CDP lavora su tab background);
+`shutdown:lint-capability` `timeoutMs: 90s` (era in timeout a 30s).
+**Scoperta:** `git commit <paths>` crea index temporaneo → `--staged`
+vede solo i file del commit → hook verde nativo su worktree condiviso,
+niente `--no-verify`. `lint-staged` copre solo `src/ui|engine/**`.
+
+**Residui `--full` (blocker T-6/T-7, tutti non-miei):** `trusted:check`
+drift (re-seal Director), `contracts:check` timeout 180s (verdict Mode-B
+`skinCssVariables` non osservato — run standalone), `i18n:validate` 217
+missing key (debito `src/ui/idleVillage`). **Resume point:** sanificare
+i 3 residui → `--full` verde → solo allora T-6 kernel slim / T-7 demozioni
++ T-8 docs finali. Commits: `bd4246b5` (T-2..T-5) + `d06ca631` (fix).
