@@ -12,6 +12,7 @@
  */
 import React, { useSyncExternalStore } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useGameLayoutInsets } from '@/ui/idleVillage/store/useGameLayoutInsets';
 import { ResidentSlotRack } from '@/ui/idleVillage/components/ResidentSlotRack';
 import type { ResidentSlotViewModel } from '@/ui/idleVillage/slots/types';
 import { StashItemTile } from '@/ui/idleVillage/components/gameFrame/stashItemFace';
@@ -37,6 +38,9 @@ export interface CassettoQuest {
   subtitle?: string;
   briefing: string;
   legs: CassettoLeg[];
+  /** R-339/PLAN-119 AC6: explicit total under the legs ("Total: N days"), from
+   *  the same quest config — the "2D" glyph alone read as a label, not a count. */
+  totalDays?: number;
   riskLabel: string;
   rewards: { icon: string; qty: string }[];
 }
@@ -76,6 +80,10 @@ export interface HudRealCassettoProps {
   suppressedResidentIds?: readonly string[];
   loadout?: CassettoLoadout;
   canSend?: boolean;
+  /** R-339/PLAN-119 AC4: why CONFIRM is muted, shown inline just above the
+   *  plaque (stock detail parity — `quest-planner-reason-line`). Null/undefined
+   *  renders nothing. */
+  disabledReason?: string | null;
   onConfirm?: () => void;
 }
 
@@ -154,7 +162,7 @@ const RACK_SCOPED_CSS = `
 `;
 
 export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
-  quest, slots, resourceItems, onSlotClick, onSlotClear, suppressedResidentIds, loadout, canSend = true, onConfirm,
+  quest, slots, resourceItems, onSlotClick, onSlotClear, suppressedResidentIds, loadout, canSend = true, disabledReason, onConfirm,
 }) => {
   const { t } = useTranslation('idleVillage');
   const spec = useColumnSpec();
@@ -162,6 +170,21 @@ export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
   const { artW, artH } = spec.geo;
   const zp = (z: Zone) => pct(z, artW, artH);
   const fz = (px: number) => cqw(px, artW);
+
+  /* R-339/PLAN-119 D4: the docked drawer publishes the screen width it occupies
+   *  (`aspect × viewportHeight`) into the shared insets ledger; unmount restores
+   *  0 so the free-map rect is always live. Wiring safeFit/pan-clamp on /game is
+   *  the deferred step documented in the store file. */
+  React.useEffect(() => {
+    const publish = useGameLayoutInsets.getState().publish;
+    const update = () => publish({ right: Math.round(spec.aspect * window.innerHeight) });
+    update();
+    window.addEventListener('resize', update);
+    return () => {
+      window.removeEventListener('resize', update);
+      publish({ right: 0 });
+    };
+  }, [spec.aspect]);
   return (
     <div
       data-hudreal-cassetto=""
@@ -389,7 +412,7 @@ export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
           {quest.legs.map((leg, i) => (
             <div key={i} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <span style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: fz(25), fontWeight: 700, color: i === 1 ? '#eafff5' : C.goldHi, textShadow: '0 1px 3px rgba(0,0,0,.9)' }}>
-                {leg.days}{typeof leg.days === 'number' ? 'd' : ''}
+                {typeof leg.days === 'number' ? t('gameFrame.cassetto.legDays', { count: leg.days }) : leg.days}
               </span>
             </div>
           ))}
@@ -403,6 +426,22 @@ export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
             </div>
           ))}
         </div>
+
+        {/* R-339/PLAN-119 AC6: explicit journey total — derived zone in the gap
+         *  between journeySubs and riskLabel (no generated-geometry edit). */}
+        {quest.totalDays != null && (
+          <div
+            data-testid="cassetto-journey-total"
+            style={{
+              ...zp({ x: Z.journeySubs.x, y: Z.journeySubs.y + Z.journeySubs.h + 4, w: Z.journeySubs.w, h: 30 }),
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}
+          >
+            <span style={{ fontSize: fz(15), letterSpacing: '0.12em', textTransform: 'uppercase', color: C.muted }}>
+              {t('gameFrame.cassetto.journeyTotal', { count: quest.totalDays })}
+            </span>
+          </div>
+        )}
 
         {/* Risk & Rewards header + live values */}
         <div style={{ ...zp(Z.riskLabel), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -427,6 +466,24 @@ export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
           ))}
         </div>
 
+        {/* R-339/PLAN-119 AC4: inline reason above the muted plaque — the stock
+         *  detail carries `quest-planner-reason-line`; the drawer renders it in
+         *  the free band right above CONFIRM (derived zone, no geometry edit). */}
+        {!canSend && disabledReason && (
+          <div
+            id="cassetto-confirm-reason"
+            data-testid="cassetto-confirm-reason"
+            style={{
+              ...zp({ x: Z.confirm.x, y: Z.confirm.y - 46, w: Z.confirm.w, h: 40 }),
+              display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4%',
+            }}
+          >
+            <span style={{ fontSize: fz(17), fontStyle: 'italic', color: C.muted, textShadow: '0 1px 2px rgba(0,0,0,.85)', textAlign: 'center', lineHeight: 1.2 }}>
+              {disabledReason}
+            </span>
+          </div>
+        )}
+
         {/* CONFIRM — transparent hit button directly over the clean painted emerald plaque */}
         <button
           type="button"
@@ -434,6 +491,7 @@ export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
           onClick={onConfirm}
           disabled={!canSend}
           aria-label={t('gameFrame.cassetto.confirm', 'CONFIRM')}
+          aria-describedby={!canSend && disabledReason ? 'cassetto-confirm-reason' : undefined}
           style={{
             ...zp(Z.confirm),
             padding: 0, border: 'none', background: 'transparent',

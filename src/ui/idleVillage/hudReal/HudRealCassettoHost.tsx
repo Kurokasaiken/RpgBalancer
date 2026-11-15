@@ -81,15 +81,17 @@ export const HudRealCassettoHost: React.FC = () => {
       estimate && estimate !== 'incomplete' && 'bands' in estimate
         ? estimate.bands.danger
         : undefined;
+    const legs = [
+      { label: t('gameFrame.cassetto.leg.outbound', 'Outbound'), days: fasi?.travelDays ?? 0 },
+      { label: t('gameFrame.cassetto.leg.site', 'At site'), days: '—' as const },
+      { label: t('gameFrame.cassetto.leg.return', 'Return'), days: fasi?.travelDays ?? 0 },
+    ];
     return {
       title: label,
       subtitle: t('gameFrame.cassetto.demo.subtitle', 'Pianifica la spedizione'),
       briefing: scenario?.offer.dispatch ?? scenario?.offer.objective ?? '',
-      legs: [
-        { label: t('gameFrame.cassetto.leg.outbound', 'Outbound'), days: fasi?.travelDays ?? 0 },
-        { label: t('gameFrame.cassetto.leg.site', 'At site'), days: '—' },
-        { label: t('gameFrame.cassetto.leg.return', 'Return'), days: fasi?.travelDays ?? 0 },
-      ],
+      legs,
+      totalDays: legs.reduce((sum, leg) => sum + (typeof leg.days === 'number' ? leg.days : 0), 0),
       riskLabel: danger ?? '—',
       rewards: [
         { icon: 'gold', qty: String(scenario?.rewardBase ?? 60) },
@@ -167,6 +169,13 @@ export const HudRealCassettoHost: React.FC = () => {
         suppressedResidentIds={session.suppressedResidentIds}
         loadout={loadout}
         canSend={session.canSend}
+        /* R-339/PLAN-119: same reason rule as the /game adapter — the lab
+         *  shows the muted plaque's inline reason too. */
+        disabledReason={
+          session.canSend
+            ? null
+            : t(session.requiredFilled ? 'gameFrame.cassetto.confirmReason.unavailable' : 'gameFrame.cassetto.confirmReason.partyIncomplete')
+        }
         onConfirm={() => session.send()}
       />
       {/* The session's flight/extraction overlays — without them the medal

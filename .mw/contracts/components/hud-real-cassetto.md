@@ -1,0 +1,58 @@
+---
+id: hud-real-cassetto
+kind: component
+role: ui-component
+tier: 2
+root_file: src/ui/idleVillage/hudReal/HudRealCassetto.tsx
+scope_files:
+  - src/ui/idleVillage/hudReal/HudRealCassetto.tsx
+  - src/ui/idleVillage/hudReal/HudRealCassettoDetail.tsx
+  - src/ui/idleVillage/components/gameFrame/ExpeditionEdgeTab.tsx
+  - src/ui/idleVillage/store/useGameLayoutInsets.ts
+fast_checks:
+  - tests/unit/idleVillage/r337CassettoBagSlots.test.tsx
+  - tests/unit/idleVillage/r339ExpeditionStates.test.tsx
+e2e_checks: []
+e2e_trigger_globs: []
+invariants:
+  - id: hud-real-cassetto.INV-1
+    source: plan
+    source_ref: PLAN-119
+    statement: >-
+      Ogni leg del journey mostra "N days" localizzato (ICU plural, mai la forma ambigua "Nd") e, quando
+      `quest.totalDays` è fornito, la riga `cassetto-journey-total` mostra "Total: N days" dalla stessa config.
+    test_refs:
+      - tests/unit/idleVillage/r339ExpeditionStates.test.tsx
+  - id: hud-real-cassetto.INV-2
+    source: plan
+    source_ref: PLAN-119
+    statement: >-
+      CONFIRM disabilitato mostra il motivo inline (`cassetto-confirm-reason`) nel band sopra la placca e
+      `aria-describedby` lo collega al bottone; abilitato o senza motivo → nessun elemento reason.
+    test_refs:
+      - tests/unit/idleVillage/r339ExpeditionStates.test.tsx
+  - id: hud-real-cassetto.INV-3
+    source: plan
+    source_ref: PLAN-119
+    statement: >-
+      Il tap su uno slot party VUOTO (unico evento che il rack emette su seat vuoto) è cablato a
+      `onOpenRoster` → `panels.set('roster', true)` nella pagina; il Detail converte la prop.
+    test_refs:
+      - tests/unit/idleVillage/r339ExpeditionStates.test.tsx
+  - id: hud-real-cassetto.INV-4
+    source: plan
+    source_ref: PLAN-119
+    statement: >-
+      Il drawer pubblica la propria larghezza renderizzata (`aspect × viewportH`) in
+      `useGameLayoutInsets.insets.right` al mount e la azzera allo smontaggio — fondazione per safeFit/pan-clamp.
+    test_refs:
+      - tests/unit/idleVillage/r339ExpeditionStates.test.tsx
+  - id: hud-real-cassetto.INV-5
+    source: plan
+    source_ref: PLAN-119
+    statement: >-
+      Senza quest selezionata la superficie expedition si riduce a `ExpeditionEdgeTab` docked sul bordo destro
+      con il meccanismo esplicitato (seleziona un quest marker); nessun pannello/modal; il tab non ruba input alla mappa.
+    test_refs:
+      - tests/unit/idleVillage/r339ExpeditionStates.test.tsx
+---

@@ -438,6 +438,30 @@ export default interface Resources {
           "name": "Village warehouse"
         }
       },
+      "cassetto": {
+        "confirm": "CONFIRM",
+        "confirmReason": {
+          "partyIncomplete": "Party incomplete — fill the required slots",
+          "unavailable": "Expedition not ready yet"
+        },
+        "demo": {
+          "subtitle": "Plan the expedition"
+        },
+        "edgeTab": {
+          "hint": "Select a quest marker"
+        },
+        "journey": "Journey",
+        "journeyTotal": "Total: {count, plural, one {# day} other {# days}}",
+        "leg": {
+          "outbound": "Outbound",
+          "return": "Return",
+          "site": "At site"
+        },
+        "legDays": "{count, plural, one {# day} other {# days}}",
+        "party": "Party Slots",
+        "risk": "Risk",
+        "riskRewards": "Risk & Rewards"
+      },
       "compass": {
         "recenter": "Re-centre the map"
       },

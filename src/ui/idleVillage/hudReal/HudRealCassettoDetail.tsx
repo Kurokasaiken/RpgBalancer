@@ -20,7 +20,13 @@ import { emptyStashBag, useVillageStashStore } from '@/ui/idleVillage/store/useV
 /** `labelKey`/`descKey` may carry the `idleVillage.` prefix — stripped before `t`. */
 const stripNs = (k: string) => k.replace(/^idleVillage\./, '');
 
-export const HudRealCassettoDetail: React.FC<QuestExpeditionDetailProps> = (p) => {
+export interface HudRealCassettoDetailExtra {
+  /** R-339/PLAN-119 AC4: tap on an EMPTY party slot opens the roster surface so
+   *  the player can pick a member (the rack only emits clicks on empty seats). */
+  onOpenRoster?: () => void;
+}
+
+export const HudRealCassettoDetail: React.FC<QuestExpeditionDetailProps & HudRealCassettoDetailExtra> = (p) => {
   const { t } = useTranslation('idleVillage');
   /* The drawer's own resources band — same selector + builder the page's
    *  top-right slot uses, so the cassetto shows the REAL readout while its
@@ -45,19 +51,31 @@ export const HudRealCassettoDetail: React.FC<QuestExpeditionDetailProps> = (p) =
       fasi?.travelDays ?? 0,
       DEFAULT_IDLE_VILLAGE_CONFIG.globalRules.dayLengthInTimeUnits,
     );
+    const legs = [
+      { label: t('gameFrame.cassetto.leg.outbound', 'Outbound'), days: fasi?.travelDays ?? 0 },
+      { label: t('gameFrame.cassetto.leg.site', 'At site'), days: siteDays },
+      { label: t('gameFrame.cassetto.leg.return', 'Return'), days: fasi?.travelDays ?? 0 },
+    ];
     return {
       title: p.scenario?.title ?? '',
       subtitle: t('gameFrame.cassetto.demo.subtitle', 'Pianifica la spedizione'),
       briefing: p.scenario?.offer.dispatch ?? p.scenario?.offer.objective ?? '',
-      legs: [
-        { label: t('gameFrame.cassetto.leg.outbound', 'Outbound'), days: fasi?.travelDays ?? 0 },
-        { label: t('gameFrame.cassetto.leg.site', 'At site'), days: siteDays },
-        { label: t('gameFrame.cassetto.leg.return', 'Return'), days: fasi?.travelDays ?? 0 },
-      ],
+      legs,
+      totalDays: legs.reduce((sum, leg) => sum + (typeof leg.days === 'number' ? leg.days : 0), 0),
       riskLabel: danger ?? '—',
       rewards: [{ icon: 'gold', qty: String(p.scenario?.rewardBase ?? 60) }],
     };
   }, [p.poi, p.scenario, p.estimate, p.expeditionDuration, t]);
+
+  /* R-339/PLAN-119 AC4: the muted plaque says WHY — the same distinction the
+   *  stock detail implies (`questExpedition.forecast.incomplete`): an unfilled
+   *  required seat reads "party incomplete", every other gate a generic wait. */
+  const disabledReason = useMemo(() => {
+    if (p.canSend) return null;
+    return p.requiredFilled
+      ? t('gameFrame.cassetto.confirmReason.unavailable')
+      : t('gameFrame.cassetto.confirmReason.partyIncomplete');
+  }, [p.canSend, p.requiredFilled, t]);
 
   /* Quest bag as SLOT FRAMES (R-337): the ledger's sparse `bags[poi.id]`
    * is the authoritative slot layout — the same slice the bound
@@ -85,10 +103,12 @@ export const HudRealCassettoDetail: React.FC<QuestExpeditionDetailProps> = (p) =
       quest={quest}
       slots={p.slots}
       resourceItems={resourceItems}
+      onSlotClick={p.onOpenRoster}
       onSlotClear={p.onSlotClear}
       suppressedResidentIds={p.suppressedResidentIds}
       loadout={loadout}
       canSend={p.canSend}
+      disabledReason={disabledReason}
       onConfirm={p.onSend}
     />
   );

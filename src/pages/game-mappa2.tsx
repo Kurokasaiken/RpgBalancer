@@ -99,6 +99,7 @@ import { RosterKitShell, useRosterKitData, type RosterDropVerdict } from '@/ui/i
 import { HudEventLedger, QuestJourneyRoute, QuestOverlays, QuestRewardPopup, QuestRunWindow, RegionTooltip, useHeroSheet, usePanelWhileOpen, type HeroSheetApi, type HudEvent, type HudPanelsApi, type VillageScreenViewHandle } from '@/ui/idleVillage/components/gameFrame';
 import { MapDemoPoi } from '@/ui/idleVillage/components/gameFrame/MapDemoPoi';
 import { VillageStashPanel } from '@/ui/idleVillage/components/gameFrame/VillageStashPanel';
+import { ExpeditionEdgeTab } from '@/ui/idleVillage/components/gameFrame/ExpeditionEdgeTab';
 import { useVillageStashStore } from '@/ui/idleVillage/store/useVillageStashStore';
 import { MerchantPanel } from '@/ui/idleVillage/components/gameFrame/MerchantPanel';
 import { VILLAGE_STASH_CONFIG } from '@/balancing/config/idleVillage/villageStashConfig';
@@ -518,7 +519,13 @@ export default function GameMappa2Page() {
          *  estimate, items, canSend/send/clear are the real session's). */}
         <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none' }}>
           {isValidElement(node) ? (
-            <HudRealCassettoDetail {...(node.props as QuestExpeditionDetailProps)} />
+            <HudRealCassettoDetail
+              {...(node.props as QuestExpeditionDetailProps)}
+              /* R-339/PLAN-119 AC4: tap an empty party seat → open the roster
+               *  rail so the player picks a member (Claude note: tap member →
+               *  fills the slot, existing assign flow). */
+              onOpenRoster={() => panels.set('roster', true)}
+            />
           ) : (
             node
           )}
@@ -1550,6 +1557,11 @@ export default function GameMappa2Page() {
           )}
         </StagePanelFrame>
       )}
+      {/* R-339/PLAN-119 D6(b): the expedition surface's resting state — a slim
+       *  right-edge tab with the mechanism hint while no quest is selected.
+       *  The signed cassetto replaces it the moment a marker opens a detail. */}
+      <ExpeditionEdgeTab visible={view === 'map' && !anyExpeditionDetailOpen && !hudHidden} />
+
       {view === 'map' && regionHover && (
         <RegionTooltip name={t(`gameFrame.regions.${regionHover.region.id}`)} x={regionHover.x} y={regionHover.y} />
       )}

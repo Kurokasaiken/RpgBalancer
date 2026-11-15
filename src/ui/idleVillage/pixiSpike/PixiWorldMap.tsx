@@ -33,6 +33,7 @@ import {
 } from '@/balancing/config/idleVillage/mobileFitConfig';
 import { Mappa2SecondaryWaterSchema, type Mappa2SecondaryWater } from '../config/mappa2SecondaryWaterConfig';
 import { parseMappa2AmbientDirector } from '../config/mappa2AmbientDirectorConfig';
+import { washGradeFor } from '../config/timeOfDay';
 import { parseMappa2Fauna, type Mappa2StormoConfig } from '../config/mappa2FaunaConfig';
 import { AmbientDirector, DEFAULT_AMBIENT_DIRECTOR_CONFIG, type AmbientDirectorConfig, type ShoalZone, type TakeoffZone } from './ambient/ambientDirector';
 import { StormoAdapter } from './ambient/ambientStormo';
@@ -2411,19 +2412,14 @@ export function PixiWorldMap({
       const lit = { light: 1, warm: 0 };
       ticks.push(() => {
         const target = ambientRef.current ?? { light: 1, warm: 0 };
-        if (nightLightRef.current) { wash.visible = false; return; } // the night plates own the night
         lit.light += (target.light - lit.light) * 0.015;
         lit.warm += (target.warm - lit.warm) * 0.015;
-        if (lit.light > 0.995 && lit.warm < 0.005) {
+        const grade = washGradeFor(lit, !!nightLightRef.current);
+        if (!grade.visible) {
           wash.visible = false;
           return;
         }
-        const night = 1 - lit.light;
-        // Gentle: the night keeps most of the brightness so the eyes do not strain; the cool tint carries the mood.
-        const r = (1 - 0.16 * night) * (1 - 0.02 * lit.warm);
-        const g = (1 - 0.14 * night) * (1 - 0.08 * lit.warm);
-        const b = (1 - 0.06 * night) * (1 - 0.22 * lit.warm);
-        wash.tint = (Math.round(r * 255) << 16) | (Math.round(g * 255) << 8) | Math.round(b * 255);
+        wash.tint = grade.tint;
         wash.zIndex = NIGHT_WASH_Z;
         if (wash.parent !== world) world.addChild(wash);
         wash.position.set(-margin - 2000, -marginY - 2000);

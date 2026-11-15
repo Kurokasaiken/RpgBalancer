@@ -1538,6 +1538,30 @@
         "back": "Back",
         "effectLadder": "Effects by level"
       }
+    },
+    "cassetto": {
+      "party": "Party Slots",
+      "journey": "Journey",
+      "riskRewards": "Risk & Rewards",
+      "risk": "Risk",
+      "confirm": "CONFIRM",
+      "legDays": "{count, plural, one {# day} other {# days}}",
+      "journeyTotal": "Total: {count, plural, one {# day} other {# days}}",
+      "confirmReason": {
+        "partyIncomplete": "Party incomplete — fill the required slots",
+        "unavailable": "Expedition not ready yet"
+      },
+      "edgeTab": {
+        "hint": "Select a quest marker"
+      },
+      "demo": {
+        "subtitle": "Plan the expedition"
+      },
+      "leg": {
+        "outbound": "Outbound",
+        "site": "At site",
+        "return": "Return"
+      }
     }
   },
   "missionPlanner": {
