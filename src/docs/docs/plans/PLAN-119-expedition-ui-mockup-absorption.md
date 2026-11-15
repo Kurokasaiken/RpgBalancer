@@ -115,3 +115,11 @@ riservata da D10). Nessuna modifica a regole gameplay/quest.
 - `tests/i18n/icuInterpolation.test.ts`: 2 failure preesistenti su placeholder `{{...}}` legacy in `questGenLab` — NON causati da questa slice.
 
 **Non fatto (prossime sessioni):** T1 token skin (clamp 360/23vw/460, detents), T2 struttura completa oltre l'esistente, T3 bag assign (S2), T5 rail Roster|Stash tab, T6 top chrome + sole + zona Chronicle (D-227), T8 mobile bottom-sheet, cablaggio insets→safeFit. File sporchi della sessione parallela (voce R-338, poi-radial) non toccati né committati.
+
+### Seal + contratti (2026-11-15, ruling Director)
+- `trusted:seal` eseguito (×2): BASE = HEAD. Errori miei risolti: unità `expedition-edge-tab` creata (INV-1, ex INV-5), inventory rigenerato via `componentInventory.ts --write`, scaffold `place-fan-cards` auto-creato. Push su main.
+- `contracts:check` resta FAIL solo per **drift estero/preesistente** (amanuense, game-save, game-menu-screens, ~strict 0-owner, tier-1 zero-invariants, `research-prompt-protocol.md` frontmatter): serve passata governance dedicata o eccezioni.
+
+### safeFit wiring — scoperta: NON è una prop, è un cambio di framing
+`/game` monta `PixiWorldMap` **senza** `safeFit` → cover-fit, "the framing the Director approved" (commento in pagina). Attivare safeFit con `insets.right` dal ledger richiede: `landBounds` dal manifest + `seaMarginPx/YPx` + verifica che a riposo il framing non cambi (T-01) + witness T-04 su apertura/chiusura drawer. Task dedicato, stimato non banale — NON fatto.
+### Prossimi: T5 rail (blueprint ruling ok) · T6 chrome+sole (hudLayoutB ruling ok) · T8 sheet · gate chiusura R-339.
