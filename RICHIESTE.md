@@ -5912,3 +5912,20 @@ seed picker; save-on-approval → store condiviso. Dibattito multi-AI
 **Non verificato:** screenshot cassetto aperto su `/game` in headless (blocco map-ready preesistente documentato in R-335).
 **Nota parità:** il BUY del merchant era disabilitato anche nello stock (badge Preview) — la firma mantiene il comportamento di produzione, l'acquisto interattivo è una feature nuova, non un gap di porting.
 **Resta sulla lista:** roster→superficie firmata compatibile drag (rail PLAN-119 vs pannello flottante — decisione di superficie canonica); merchant BUY interattivo (feature nuova); reward path (vittoria) quando esiste superficie firmata (richiede arte + visual fork); Voce/C10 (R-338, delivered — chiusura formale bloccata da worktree condiviso); mockup Chronicle drawer (R-339/PLAN-119).
+
+## R-341 — ops: commit + push + deploy Vercel pulito
+
+**Richiesta (verbatim, 2026-11-15):** *"il deploy su vercel e penso anche git è fallito, xè? voglio che fai un commit, push e deploy pulito"*
+**Data:** 2026-11-15
+**Stato:** `in corso`
+**Diagnosi accertata (2026-11-15, thread 2):** git pulito (auto-commit `5f11256d` pushato); il deploy Vercel di `5f11256d` è **fallito in build** su `assertDeployShape` — `deploy-manifest.json` in drift (~99 file nuovi in `public/` dall'auto-commit senza regen manifest). Alias prod rimasto su `35b9f7e`. **Fix:** manifest rigenerato (`deployManifest.mjs`, `--check` verde) + push in questo thread. Check GitHub rossi separati: `closure:lint` (drift contratti, parte noto Director-gated) e `Release` (Playwright vs runner ubuntu26.04, ambientale).
+**Resume:** `context/HANDOFF-deploy-git.md` § "Aggiornamento sessione 2026-11-15 (thread 2)" — verifica deploy success + WebGL probe R-304 su `/` e `/game`, poi chiusura.
+
+## R-342 — ops: audit contesto fisso Devin + ottimizzazione sistema
+
+**Richiesta (verbatim, 2026-11-15):** *"c'è un modo x alleggerire qualsiasi cosa sia alleggeribile, senza perdere funzionalità?"* — poi *"c serve un plan x esaminare al meglio tutta la dinamica, xè c sn cose pesanti e come ottimizzare il mio sistema"* — poi *"19 file sn tanti, magari anche cercare di caricare le cose 'nel caso servano' e solo 'indici e descrizioni quando nn servono. Devi fare un audit,e cc?"* — poi *"plan multi ai web"*
+**Data:** 2026-11-15
+**Stato:** `in corso`
+**Audit eseguito (fase 1-3, vedi handoff):** regole sempre-on reali ≈23KB (solo 3 rule `always_on` + AGENTS.md; le altre 14 già lazy via trigger frontmatter — 8 senza frontmatter, attivazione ambigua); MCP github/vercel falliscono `list_tools` (dead weight), puppeteer ok + risorse stale; skill dirs = symlink, dedup attivo; gap: componenti visibili non spiegano 262k a sessione "fresca" (probabile carried-over o overhead harness).
+**Dibattito:** run `20261115-context-budget-audit` (mind-weaver `.mw/runs/`), provider chatgpt+claude+gemini+grok+deepseek, T-001 clarification POSTED — prosegue orchestrazione dal handoff.
+**Regola:** applicazione modifiche SOLO dopo ruling Director (governance).

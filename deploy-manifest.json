@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-14T07:38:32.910Z",
+  "generated": "2026-11-15T12:27:44.651Z",
   "generator": "scripts/deploy/deployManifest.mjs",
   "profile": "slim",
   "keptRoutes": [
@@ -213,8 +213,8 @@
     "/world-surface-demo": "registry"
   },
   "public": {
-    "totalFiles": 3059,
-    "referencedCount": 305,
+    "totalFiles": 3158,
+    "referencedCount": 319,
     "dynamicPrefixes": [
       "/assets/atmosphere/",
       "/assets/atmosphere/fog/mask-",
@@ -370,8 +370,20 @@
         "bytes": 6136920
       },
       {
+        "path": "/tmp-fan/fancards-vs-mockup.png",
+        "bytes": 4666508
+      },
+      {
         "path": "/assets/alt-visuals/v8/background/noise/Data/1024_1024/LDR_RGBA_0.png",
         "bytes": 4202841
+      },
+      {
+        "path": "/tmp-fan/diorama-overlay.png",
+        "bytes": 3101716
+      },
+      {
+        "path": "/tmp-fan/fan-v8-vs-mockup.png",
+        "bytes": 2749594
       },
       {
         "path": "/assets/creatures/reference/regina-ibrida-concept.png",
@@ -380,6 +392,18 @@
       {
         "path": "/assets/creatures/reference/regina-pathfinder-concept.png",
         "bytes": 2474206
+      },
+      {
+        "path": "/tmp-fan/fancards-live.png",
+        "bytes": 2360630
+      },
+      {
+        "path": "/tmp-fan/fanring-vs.png",
+        "bytes": 1970293
+      },
+      {
+        "path": "/tmp-fan/fan-v65-overlay.png",
+        "bytes": 1944034
       },
       {
         "path": "/assets/maps/base/mare.png",
@@ -398,6 +422,10 @@
         "bytes": 1412962
       },
       {
+        "path": "/tmp-fan/diorama-c2.png",
+        "bytes": 1270705
+      },
+      {
         "path": "/assets/alt-visuals/v8/columns/Marble01/marble01_diff_2k.jpg",
         "bytes": 1269188
       },
@@ -412,6 +440,10 @@
       {
         "path": "/assets/alt-visuals/v8/columns/Marble023/Marble023_1K-JPG.blend",
         "bytes": 1099620
+      },
+      {
+        "path": "/assets/ui/hud-real/ghiera-draghi.png",
+        "bytes": 1078820
       },
       {
         "path": "/assets/maps/base/terreno.png",
@@ -450,6 +482,10 @@
         "bytes": 834238
       },
       {
+        "path": "/assets/ui/hud-real/cassetto/frame.webp",
+        "bytes": 824962
+      },
+      {
         "path": "/assets/ui/hud-real/C1/column-r1.png",
         "bytes": 824733
       },
@@ -478,12 +514,24 @@
         "bytes": 781426
       },
       {
+        "path": "/tmp-fan/mockup-hub-fan-village.jpg",
+        "bytes": 778915
+      },
+      {
         "path": "/assets/creatures/reference/guardia-reale.jpeg",
         "bytes": 753353
       },
       {
         "path": "/assets/alt-visuals/v8/columns/Marble023/Marble023_1K-JPG_Displacement.jpg",
         "bytes": 737999
+      },
+      {
+        "path": "/assets/ui/hud-real/medaglione-battezzato-v3.png",
+        "bytes": 735140
+      },
+      {
+        "path": "/assets/ui/hud-real/reliquary/frame-v2.png",
+        "bytes": 732124
       },
       {
         "path": "/assets/creatures/reference/gohul-combattente.jpeg",
@@ -496,6 +544,10 @@
       {
         "path": "/ui/fantasy/icon-combat.png",
         "bytes": 720276
+      },
+      {
+        "path": "/tmp-fan/diorama-side.png",
+        "bytes": 718588
       },
       {
         "path": "/assets/fantasy_ui/icon_quest.png",
@@ -518,12 +570,24 @@
         "bytes": 626262
       },
       {
+        "path": "/assets/village/layers/house-thatch-big.webp",
+        "bytes": 564174
+      },
+      {
         "path": "/assets/fantasy_ui/card_glow.png",
         "bytes": 564060
       },
       {
         "path": "/ui/fantasy/card-glow.png",
         "bytes": 564060
+      },
+      {
+        "path": "/tmp-fan/fancards-element.png",
+        "bytes": 552222
+      },
+      {
+        "path": "/tmp-fan/fanring-element.png",
+        "bytes": 533221
       },
       {
         "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/HDR_RGBA_0.png",
@@ -566,8 +630,12 @@
         "bytes": 496631
       },
       {
-        "path": "/assets/village/layers/house-thatch-big.webp",
-        "bytes": 441348
+        "path": "/assets/ui/hud-real/ghiera-doppiobraccio.webp",
+        "bytes": 488728
+      },
+      {
+        "path": "/assets/ui/hud-real/medaglione-battezzato-v3.webp",
+        "bytes": 475812
       },
       {
         "path": "/assets/creatures/reference/regina-ibrida.jpg",
@@ -636,10 +704,6 @@
       {
         "path": "/assets/quest-goblin/bottino.jpg",
         "bytes": 337568
-      },
-      {
-        "path": "/assets/village/layers/house-east-edge.webp",
-        "bytes": 311970
       },
       {
         "path": "/assets/alt-visuals/v8/columns/Marble01/marble01_rough_2k.jpg",
@@ -766,6 +830,14 @@
         "bytes": 214100
       },
       {
+        "path": "/tmp-fan/fan-v65.png",
+        "bytes": 211136
+      },
+      {
+        "path": "/assets/village/layers/house-stone-mid.webp",
+        "bytes": 195184
+      },
+      {
         "path": "/assets/quest-goblin/combattimento.jpg",
         "bytes": 184708
       },
@@ -806,12 +878,48 @@
         "bytes": 171810
       },
       {
-        "path": "/assets/village/layers/house-stone-mid.webp",
-        "bytes": 159994
+        "path": "/assets/ui/poi-radial/hub.webp",
+        "bytes": 162444
+      },
+      {
+        "path": "/assets/ui/poi-radial/slices/ring-emerald.webp",
+        "bytes": 154336
+      },
+      {
+        "path": "/assets/village/layers/house-east-edge.webp",
+        "bytes": 153000
       },
       {
         "path": "/assets/ui/hud-real/C1/emblem.webp",
         "bytes": 152792
+      },
+      {
+        "path": "/assets/ui/poi-radial/slices/ring-sapphire.webp",
+        "bytes": 144984
+      },
+      {
+        "path": "/assets/ui/poi-radial/slices/ring-amethyst.webp",
+        "bytes": 141372
+      },
+      {
+        "path": "/assets/ui/poi-radial/slices/ring-empty.webp",
+        "bytes": 141184
+      },
+      {
+        "path": "/assets/ui/hud-real/poi/layers/poi-job-base.webp",
+        "bytes": 138726
+      },
+      {
+        "path": "/assets/ui/hud-real/poi/layers/poi-green-base.webp",
+        "bytes": 136594
+      },
+      {
+        "path": "/assets/ui/hud-real/poi/poi-job-frame.webp",
+        "bytes": 135464
+      },
+      {
+        "path": "/assets/ui/hud-real/poi/layers/poi-quest-base.webp",
+        "bytes": 133292
       },
       {
         "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/HDR_L_0.png",
@@ -926,6 +1034,10 @@
         "bytes": 110451
       },
       {
+        "path": "/assets/ui/hud-real/poi/poi-glow-gold.webp",
+        "bytes": 108968
+      },
+      {
         "path": "/assets/ui/hud-real/kit-divider.png",
         "bytes": 100155
       },
@@ -960,6 +1072,10 @@
       {
         "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/LDR_LLL1_2.png",
         "bytes": 99123
+      },
+      {
+        "path": "/assets/village/layers/hut-far-2.webp",
+        "bytes": 96794
       },
       {
         "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_RGB_10.png",
@@ -1026,12 +1142,16 @@
         "bytes": 93696
       },
       {
-        "path": "/assets/village/layers/hut-far-2.webp",
-        "bytes": 85344
-      },
-      {
         "path": "/assets/alt-visuals/v8/goo/surface_imperfections_leaks_001_1k_NormalGL.png",
         "bytes": 83934
+      },
+      {
+        "path": "/assets/ui/hud-real/poi/poi-quest-frame.webp",
+        "bytes": 78634
+      },
+      {
+        "path": "/assets/ui/hud-real/poi/layers/poi-arc-top.webp",
+        "bytes": 73372
       },
       {
         "path": "/assets/ui/poi/offer-forage.webp",
@@ -1182,6 +1302,10 @@
         "bytes": 58506
       },
       {
+        "path": "/assets/ui/hud-real/poi/layers/poi-quest-top.webp",
+        "bytes": 56958
+      },
+      {
         "path": "/assets/ui/hud-real/C1/rail-cap.webp",
         "bytes": 56646
       },
@@ -1278,6 +1402,10 @@
         "bytes": 51662
       },
       {
+        "path": "/assets/ui/poi-radial/slices/ring-structure.png",
+        "bytes": 51583
+      },
+      {
         "path": "/assets/ui/poi/poi-ruins.webp",
         "bytes": 50772
       },
@@ -1288,10 +1416,6 @@
       {
         "path": "/assets/ui/poi/offer-people.webp",
         "bytes": 48876
-      },
-      {
-        "path": "/assets/village/layers/hut-far-1.webp",
-        "bytes": 47134
       },
       {
         "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RG01_15.png",
@@ -1374,6 +1498,14 @@
         "bytes": 42870
       },
       {
+        "path": "/assets/ui/poi-radial/disc-job.webp",
+        "bytes": 42780
+      },
+      {
+        "path": "/assets/ui/poi-radial/disc-quest.webp",
+        "bytes": 41350
+      },
+      {
         "path": "/assets/ui/hud-real/time/bar-slim.webp",
         "bytes": 39550
       },
@@ -1386,12 +1518,24 @@
         "bytes": 36497
       },
       {
+        "path": "/assets/ui/poi-radial/disc-event.webp",
+        "bytes": 36330
+      },
+      {
         "path": "/assets/characters/prototypes/fantasy_vector/knight_blade/character_run_2.png",
         "bytes": 36274
       },
       {
+        "path": "/assets/village/layers/hut-far-1.webp",
+        "bytes": 36006
+      },
+      {
         "path": "/assets/characters/prototypes/fantasy_vector/knight_blade/character_jump_0.png",
         "bytes": 35772
+      },
+      {
+        "path": "/assets/ui/poi-radial/cards/plate-emerald.webp",
+        "bytes": 35018
       },
       {
         "path": "/assets/characters/prototypes/fantasy_vector/knight_blade/character_death_1.png",
@@ -1488,6 +1632,18 @@
       {
         "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_L_1.png",
         "bytes": 31346
+      },
+      {
+        "path": "/assets/ui/poi-radial/cards/plate-empty.webp",
+        "bytes": 30422
+      },
+      {
+        "path": "/assets/ui/poi-radial/cards/plate-sapphire.webp",
+        "bytes": 30062
+      },
+      {
+        "path": "/assets/ui/poi-radial/cards/plate-amethyst.webp",
+        "bytes": 29812
       },
       {
         "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_56.png",
@@ -1758,6 +1914,10 @@
         "bytes": 26942
       },
       {
+        "path": "/assets/ui/hud-real/C1/ring-fused.webp",
+        "bytes": 26754
+      },
+      {
         "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_LLL1_2.png",
         "bytes": 25795
       },
@@ -1828,6 +1988,10 @@
       {
         "path": "/assets/ui/zanara/roster/plaque-mid.png",
         "bytes": 22378
+      },
+      {
+        "path": "/assets/ui/hud-real/poi/layers/poi-arc-inc.webp",
+        "bytes": 21948
       },
       {
         "path": "/assets/ui/zanara/roster/ring.png",
@@ -2094,6 +2258,10 @@
         "bytes": 19979
       },
       {
+        "path": "/assets/ui/hud-real/poi/layers/poi-arc-tube.webp",
+        "bytes": 17430
+      },
+      {
         "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_0.png",
         "bytes": 16521
       },
@@ -2180,176 +2348,8 @@
       {
         "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_28.png",
         "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_29.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_3.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_30.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_31.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_32.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_33.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_34.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_35.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_36.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_37.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_38.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_39.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_4.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_40.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_41.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_42.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_43.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_44.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_45.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_46.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_47.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_48.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_49.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_5.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_50.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_51.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_52.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_53.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_54.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_55.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_56.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_57.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_58.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_59.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_6.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_60.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_61.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_62.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_63.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_7.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_8.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_9.png",
-        "bytes": 16521
       }
     ],
-    "orphanBytes": 154423145
+    "orphanBytes": 182207674
   }
 }
