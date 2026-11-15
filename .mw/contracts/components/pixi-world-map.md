@@ -9,16 +9,26 @@ scope_files:
   - src/ui/idleVillage/config/generatedClouds.ts
   - src/ui/idleVillage/config/mappa2AmbientDirectorConfig.ts
   - src/ui/idleVillage/config/mappa2FaunaConfig.ts
+  - src/ui/idleVillage/config/mappa2RegionalWeatherConfig.ts
+  - src/ui/idleVillage/config/mappa2SeaLifeConfig.ts
+  - src/ui/idleVillage/config/mappa2SecondaryWaterConfig.ts
   - src/ui/idleVillage/config/seaMarksConfig.ts
   - src/ui/idleVillage/config/seaWonders.ts
+  - src/ui/idleVillage/config/timeOfDay.ts
   - src/ui/idleVillage/hooks/useWorldSurface.ts
   - src/ui/idleVillage/pixiSpike/PixiWorldMap.tsx
   - src/ui/idleVillage/pixiSpike/ambient/ambientDirector.ts
-  - src/ui/idleVillage/pixiSpike/ambient/ambientStormo.ts
+  - src/ui/idleVillage/pixiSpike/ambient/ambientRig.ts
   - src/ui/idleVillage/pixiSpike/ambient/ambientShoal.ts
+  - src/ui/idleVillage/pixiSpike/ambient/ambientStormo.ts
+  - src/ui/idleVillage/pixiSpike/baseTiles.ts
+  - src/ui/idleVillage/pixiSpike/feederRiver.ts
   - src/ui/idleVillage/pixiSpike/mapFitRuntime.ts
+  - src/ui/idleVillage/pixiSpike/mountainStorm.ts
   - src/ui/idleVillage/pixiSpike/regionOutline.ts
+  - src/ui/idleVillage/pixiSpike/regionalWeatherOverlay.ts
   - src/ui/idleVillage/pixiSpike/seabedTexture.ts
+  - src/ui/idleVillage/pixiSpike/villageZoneOverlay.ts
 fast_checks:
   - tests/unit/idleVillage/mappa2Stormo.test.ts
   - tests/unit/idleVillage/baseTiles.test.ts
@@ -144,14 +154,28 @@ Root: `src/ui/idleVillage/pixiSpike/PixiWorldMap.tsx`.
 
 - `src/ui/idleVillage/config/atmosphereAssets.ts`
 - `src/ui/idleVillage/config/generatedClouds.ts`
+- `src/ui/idleVillage/config/mappa2AmbientDirectorConfig.ts`
+- `src/ui/idleVillage/config/mappa2FaunaConfig.ts`
+- `src/ui/idleVillage/config/mappa2RegionalWeatherConfig.ts`
+- `src/ui/idleVillage/config/mappa2SeaLifeConfig.ts`
+- `src/ui/idleVillage/config/mappa2SecondaryWaterConfig.ts`
 - `src/ui/idleVillage/config/seaMarksConfig.ts`
 - `src/ui/idleVillage/config/seaWonders.ts`
-- `src/ui/idleVillage/config/worldSurfaceConfig.ts`
+- `src/ui/idleVillage/config/timeOfDay.ts`
 - `src/ui/idleVillage/hooks/useWorldSurface.ts`
 - `src/ui/idleVillage/pixiSpike/PixiWorldMap.tsx`
+- `src/ui/idleVillage/pixiSpike/ambient/ambientDirector.ts`
+- `src/ui/idleVillage/pixiSpike/ambient/ambientRig.ts`
+- `src/ui/idleVillage/pixiSpike/ambient/ambientShoal.ts`
+- `src/ui/idleVillage/pixiSpike/ambient/ambientStormo.ts`
+- `src/ui/idleVillage/pixiSpike/baseTiles.ts`
+- `src/ui/idleVillage/pixiSpike/feederRiver.ts`
 - `src/ui/idleVillage/pixiSpike/mapFitRuntime.ts`
+- `src/ui/idleVillage/pixiSpike/mountainStorm.ts`
 - `src/ui/idleVillage/pixiSpike/regionOutline.ts`
+- `src/ui/idleVillage/pixiSpike/regionalWeatherOverlay.ts`
 - `src/ui/idleVillage/pixiSpike/seabedTexture.ts`
+- `src/ui/idleVillage/pixiSpike/villageZoneOverlay.ts`
 
 ## Decision history
 

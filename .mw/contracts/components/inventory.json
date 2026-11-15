@@ -1,6 +1,6 @@
 {
   "schema": "plan054-component-inventory/1",
-  "generated_at": "2026-11-15T09:49:45.640Z",
+  "generated_at": "2026-11-15T13:13:08.098Z",
   "strict_files": [
     "src/pages/game-frame-pixi.tsx",
     "src/pages/game-frame.tsx",
@@ -115,6 +115,7 @@
     "src/ui/idleVillage/components/gameFrame/GameBootScreen.tsx",
     "src/ui/idleVillage/components/gameFrame/GameFrame.tsx",
     "src/ui/idleVillage/components/gameFrame/GameFrameDragCursor.tsx",
+    "src/ui/idleVillage/components/gameFrame/GameTopChrome.tsx",
     "src/ui/idleVillage/components/gameFrame/HeroSheetPanel.tsx",
     "src/ui/idleVillage/components/gameFrame/HudEventLedger.tsx",
     "src/ui/idleVillage/components/gameFrame/HudGameMenu.tsx",
@@ -679,6 +680,16 @@
       "tier_source": "default"
     },
     {
+      "id": "canonical-data-bridge",
+      "role": "shared-kernel",
+      "tier": 1,
+      "root_file": "src/ui/idleVillage/frozen/_infra/CanonicalDataBridge.ts",
+      "scope_files": [
+        "src/ui/idleVillage/frozen/_infra/CanonicalDataBridge.ts"
+      ],
+      "tier_source": "kernel"
+    },
+    {
       "id": "canonical-roster-bundle",
       "role": "shared-kernel",
       "tier": 1,
@@ -937,6 +948,16 @@
       "tier_source": "kernel"
     },
     {
+      "id": "drag-sensors",
+      "role": "shared-kernel",
+      "tier": 1,
+      "root_file": "src/ui/idleVillage/interaction/dragSensors.ts",
+      "scope_files": [
+        "src/ui/idleVillage/interaction/dragSensors.ts"
+      ],
+      "tier_source": "kernel"
+    },
+    {
       "id": "drag-test-container",
       "role": "ui-component",
       "tier": 2,
@@ -1097,7 +1118,6 @@
         "src/ui/idleVillage/components/gameFrame/heroSheetMachine.ts",
         "src/ui/idleVillage/components/gameFrame/heroSheetViewModel.ts",
         "src/ui/idleVillage/components/gameFrame/hudPanelRegistry.ts",
-        "src/ui/idleVillage/components/gameFrame/hudTones.ts",
         "src/ui/idleVillage/components/gameFrame/index.ts",
         "src/ui/idleVillage/components/gameFrame/nextEvent.ts",
         "src/ui/idleVillage/components/gameFrame/questRevealSchedule.ts",
@@ -1111,15 +1131,12 @@
         "src/ui/idleVillage/components/gameFrame/usePanelWhileOpen.ts",
         "src/ui/idleVillage/config/gamePerfBudgets.ts",
         "src/ui/idleVillage/config/worldSurfaceConfig.ts",
-        "src/ui/idleVillage/frozen/_infra/CanonicalDataBridge.ts",
         "src/ui/idleVillage/hooks/useFrameMetrics.ts",
         "src/ui/idleVillage/hooks/useQuestLoreDrop.ts",
         "src/ui/idleVillage/hooks/useReducedMotion.ts",
         "src/ui/idleVillage/hooks/useSettlementLostGrade.ts",
         "src/ui/idleVillage/hooks/useThrottledValue.ts",
-        "src/ui/idleVillage/interaction/dragSensors.ts",
         "src/ui/idleVillage/interaction/magneticCollision.ts",
-        "src/ui/idleVillage/interaction/useDragOutcome.ts",
         "src/ui/idleVillage/pixiSpike/pixiDestroy.ts",
         "src/ui/idleVillage/questS1Lab/questArt.ts",
         "src/ui/idleVillage/questS1Lab/questForecast.worker.ts",
@@ -1182,6 +1199,16 @@
       "root_file": "src/ui/idleVillage/components/gameFrame/menu/GameMenuDialog.tsx",
       "scope_files": [
         "src/ui/idleVillage/components/gameFrame/menu/GameMenuDialog.tsx"
+      ],
+      "tier_source": "default"
+    },
+    {
+      "id": "game-top-chrome",
+      "role": "ui-component",
+      "tier": 2,
+      "root_file": "src/ui/idleVillage/components/gameFrame/GameTopChrome.tsx",
+      "scope_files": [
+        "src/ui/idleVillage/components/gameFrame/GameTopChrome.tsx"
       ],
       "tier_source": "default"
     },
@@ -1408,6 +1435,16 @@
       "root_file": "src/ui/idleVillage/components/gameFrame/hudScale.ts",
       "scope_files": [
         "src/ui/idleVillage/components/gameFrame/hudScale.ts"
+      ],
+      "tier_source": "kernel"
+    },
+    {
+      "id": "hud-tones",
+      "role": "shared-kernel",
+      "tier": 1,
+      "root_file": "src/ui/idleVillage/components/gameFrame/hudTones.ts",
+      "scope_files": [
+        "src/ui/idleVillage/components/gameFrame/hudTones.ts"
       ],
       "tier_source": "kernel"
     },
@@ -3074,6 +3111,16 @@
       "tier_source": "kernel"
     },
     {
+      "id": "use-drag-outcome",
+      "role": "shared-kernel",
+      "tier": 1,
+      "root_file": "src/ui/idleVillage/interaction/useDragOutcome.ts",
+      "scope_files": [
+        "src/ui/idleVillage/interaction/useDragOutcome.ts"
+      ],
+      "tier_source": "kernel"
+    },
+    {
       "id": "use-drag-preview-instrumentation",
       "role": "shared-kernel",
       "tier": 1,
@@ -3704,10 +3751,10 @@
     }
   ],
   "stats": {
-    "files": 499,
-    "units": 300,
-    "ui_components": 226,
-    "shared_kernels": 74
+    "files": 500,
+    "units": 305,
+    "ui_components": 227,
+    "shared_kernels": 78
   },
-  "content_sha256": "006dcb2f567072ddfd9e3ef1c6ff985ba224a62536d1d069a608680b1e73c2a8"
+  "content_sha256": "1d5b6a5f47c8d2a9508736075193f392e4140bcd615238f0407ffad294b3b266"
 }

@@ -11,6 +11,7 @@ scope_files:
   - src/ui/idleVillage/questS1Lab/questEligibility.ts
   - src/ui/idleVillage/questS1Lab/residentToQuestMember.ts
   - src/ui/idleVillage/quests/questExpedition.ts
+  - src/ui/idleVillage/quests/questExpeditionRosterSwap.ts
   - src/ui/idleVillage/quests/questJourneyAuthoring.ts
   - src/ui/idleVillage/quests/useQuestExpeditionSession.tsx
 fast_checks:
@@ -111,10 +112,14 @@ Root: `src/ui/idleVillage/quests/useQuestExpeditionSession.tsx`.
 
 ## Scope
 
+- `src/ui/idleVillage/config/presentationConfig.ts`
+- `src/ui/idleVillage/config/wanderlustBaseManifest.json`
 - `src/ui/idleVillage/questS1Lab/questCertainty.ts`
 - `src/ui/idleVillage/questS1Lab/questEligibility.ts`
 - `src/ui/idleVillage/questS1Lab/residentToQuestMember.ts`
 - `src/ui/idleVillage/quests/questExpedition.ts`
+- `src/ui/idleVillage/quests/questExpeditionRosterSwap.ts`
+- `src/ui/idleVillage/quests/questJourneyAuthoring.ts`
 - `src/ui/idleVillage/quests/useQuestExpeditionSession.tsx`
 
 ## Decision history
