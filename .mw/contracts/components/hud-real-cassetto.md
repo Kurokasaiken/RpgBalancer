@@ -35,7 +35,8 @@ invariants:
     source_ref: PLAN-119
     statement: >-
       Il tap su uno slot party VUOTO (unico evento che il rack emette su seat vuoto) è cablato a
-      `onOpenRoster` → `panels.set('roster', true)` nella pagina; il Detail converte la prop.
+      `onOpenRoster` → `useExpeditionRail.getState().open('roster')` nella pagina — la rail Roster|Stash
+      docked (T5) è la superficie di pick; il Detail converte la prop.
     test_refs:
       - tests/unit/idleVillage/r339ExpeditionStates.test.tsx
   - id: hud-real-cassetto.INV-4

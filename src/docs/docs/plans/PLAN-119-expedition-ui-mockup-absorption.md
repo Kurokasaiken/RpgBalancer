@@ -114,12 +114,28 @@ riservata da D10). Nessuna modifica a regole gameplay/quest.
 - ESLint scopato: i file `src/ui/idleVillage/**` e `tests/unit/**` risultano ignored dalla config — copertura lint non significativa.
 - `tests/i18n/icuInterpolation.test.ts`: 2 failure preesistenti su placeholder `{{...}}` legacy in `questGenLab` — NON causati da questa slice.
 
-**Non fatto (prossime sessioni):** T1 token skin (clamp 360/23vw/460, detents), T2 struttura completa oltre l'esistente, T3 bag assign (S2), T5 rail Roster|Stash tab, T6 top chrome + sole + zona Chronicle (D-227), T8 mobile bottom-sheet, cablaggio insets→safeFit. File sporchi della sessione parallela (voce R-338, poi-radial) non toccati né committati.
+**Non fatto (prossime sessioni):** T1 token skin (clamp 360/23vw/460, detents), T2 struttura completa oltre l'esistente, T3 bag assign (S2), T6 top chrome + sole + zona Chronicle (D-227), T8 mobile bottom-sheet, cablaggio insets→safeFit. File sporchi della sessione parallela (voce R-338, poi-radial, reliquary/cassettoDetail) non toccati né committati.
 
 ### Seal + contratti (2026-11-15, ruling Director)
 - `trusted:seal` eseguito (×2): BASE = HEAD. Errori miei risolti: unità `expedition-edge-tab` creata (INV-1, ex INV-5), inventory rigenerato via `componentInventory.ts --write`, scaffold `place-fan-cards` auto-creato. Push su main.
 - `contracts:check` resta FAIL solo per **drift estero/preesistente** (amanuense, game-save, game-menu-screens, ~strict 0-owner, tier-1 zero-invariants, `research-prompt-protocol.md` frontmatter): serve passata governance dedicata o eccezioni.
 
+## Ledger — T5 colonna Roster|Stash (2026-11-15, stessa sessione)
+
+**Fatto:**
+- `RosterStashRail` (`components/gameFrame/`): docked `left:0`, `HudPlaque` panel 320px, top `rail.marginPx`, bottom `rail.bottomInsetPx` (D8 — sopra il medaglione voce). Tab segmentati Roster|Stash; collapse chip come unica forma ripiegata; expanded di default (D2).
+- Roster tab: riga per membro — medaglione ritratto (`getResidentPortraitUrl`), nome, badge `Lv N` (`heroLevelView`), stato (`zanaraRosterState` + `roster.status.locked`/zanara.state.*), barre da `rail.bars` in config (hp/stamina, labelKey + token skin `--skin-statbar-*` — config-driven, zero hardcode).
+- Stash tab: stat-chip compatti per membro (ritratto+nome+micro-barre config) poi righe ledger `villageStashViewModel` (tile+nome+una riga effetto ellissata, tooltip completo Radix); click→`assign(owner,itemId)` identico al magazzino quando `activeStashOwner` bound (la pagina ora binda anche con tab Stash aperto, non solo `villageStash` panel).
+- Store `useExpeditionRail` (Zustand): `expanded` default true, `tab`, `mutexCollapsed`, `open(tab)`, `applyDrawerMutex`. Pubblica `insets.left` = 320 espansa / 40 chip / 0 nascosta-smontata.
+- Mutual exclusion ≤1100 (D2): drawer aperto → rail ripiega mutex-owned e ripristina alla cessione; espansione esplicita della rail → la pagina chiude il detail (transizione false→true, niente veto su rail già espansa).
+- Empty party seat (AC4): `onOpenRoster` → `useExpeditionRail.getState().open('roster')` — INV-3 cassetto emendata (retire registrato; statement ratchet pendente approvazione Director).
+- Config: `rail.marginPx=24`, `bottomInsetPx=240`, `chipWidthPx=40`, `bars[hp,stamina]` in `cassettoLayoutConfig` (Zod). i18n `gameFrame.rail.*` + `roster.status.locked` EN/IT; tipi rigenerati.
+- `r339ExpeditionStates.test.tsx` ripristinato da `be53077e^` (era stato svuotato in 4a3b4b15 mentre i contratti lo citavano): tag INV-5→`expedition-edge-tab.INV-1`, wiring regex→rail.
+
+**Verifiche:** `r339RosterStashRail.test.tsx` 10/10 + `r339ExpeditionStates` 10/10 + scoped stash/cassetto verdi (2 failure in `r335CassettoResources`/`r337CassettoBagSlots` = diff estero su `HudRealCassettoDetail.tsx`, T-13 non mio); `build:check` green; `contracts:index-sync`+inventory rigenerati (scaffold hero-level-*/village-stash-* auto-creati); witness headless `/game` 1440×900 (`test-results/r339-rail-*.png`): rail left:0 top:24 bottomGap:240, 6 righe, stash 6 chip+6 items "6 of 24 goods", collapse→chip 40px→restore con tab ricordato; narrow 1024 mount ok.
+
+**Pendenze Director:** statement `hud-real-cassetto.INV-3` mutato (ratchet richiede approvazione, non solo journal); sync-gate 25 amend/retire > cap 3 (cumulato BASE..WT, serve sync-amend-override); file esteri UNMAPPED (reliquary/probe sessione parallela).
+
 ### safeFit wiring — scoperta: NON è una prop, è un cambio di framing
 `/game` monta `PixiWorldMap` **senza** `safeFit` → cover-fit, "the framing the Director approved" (commento in pagina). Attivare safeFit con `insets.right` dal ledger richiede: `landBounds` dal manifest + `seaMarginPx/YPx` + verifica che a riposo il framing non cambi (T-01) + witness T-04 su apertura/chiusura drawer. Task dedicato, stimato non banale — NON fatto.
-### Prossimi: T5 rail (blueprint ruling ok) · T6 chrome+sole (hudLayoutB ruling ok) · T8 sheet · gate chiusura R-339.
+### Prossimi: T6 chrome+sole (hudLayoutB ruling ok) · T8 sheet · T1/T2/T3 restanti · gate chiusura R-339.

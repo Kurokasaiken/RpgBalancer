@@ -1,6 +1,6 @@
 {
   "schema": "plan054-component-inventory/1",
-  "generated_at": "2026-11-15T09:15:41.836Z",
+  "generated_at": "2026-11-15T09:49:45.640Z",
   "strict_files": [
     "src/pages/game-frame-pixi.tsx",
     "src/pages/game-frame.tsx",
@@ -153,6 +153,7 @@
     "src/ui/idleVillage/components/gameFrame/QuestVerdictCard.tsx",
     "src/ui/idleVillage/components/gameFrame/RegionTooltip.tsx",
     "src/ui/idleVillage/components/gameFrame/ResourceReadout.tsx",
+    "src/ui/idleVillage/components/gameFrame/RosterStashRail.tsx",
     "src/ui/idleVillage/components/gameFrame/TuningPanel.tsx",
     "src/ui/idleVillage/components/gameFrame/VillageBuildingLayers.tsx",
     "src/ui/idleVillage/components/gameFrame/VillageDirectorView.tsx",
@@ -1108,7 +1109,6 @@
         "src/ui/idleVillage/components/gameFrame/useHudPanels.ts",
         "src/ui/idleVillage/components/gameFrame/useHudScale.ts",
         "src/ui/idleVillage/components/gameFrame/usePanelWhileOpen.ts",
-        "src/ui/idleVillage/components/gameFrame/villageStashViewModel.ts",
         "src/ui/idleVillage/config/gamePerfBudgets.ts",
         "src/ui/idleVillage/config/worldSurfaceConfig.ts",
         "src/ui/idleVillage/frozen/_infra/CanonicalDataBridge.ts",
@@ -1131,9 +1131,7 @@
         "src/ui/idleVillage/questS1Lab/useQuestRun.ts",
         "src/ui/idleVillage/quests/rosterCompatibility.ts",
         "src/ui/idleVillage/rosterV2/heroLevelCue.ts",
-        "src/ui/idleVillage/rosterV2/heroLevelMock.ts",
         "src/ui/idleVillage/rosterV2/heroLevelUpEvents.ts",
-        "src/ui/idleVillage/rosterV2/heroLevelViewModel.ts",
         "src/ui/idleVillage/rosterV2/index.ts",
         "src/ui/idleVillage/rosterV2/mountedCardRegistry.ts",
         "src/ui/idleVillage/rosterV2/runHeroLevelUpStaging.ts",
@@ -1142,7 +1140,6 @@
         "src/ui/idleVillage/skins/dayNightPoiSkinConfig.ts",
         "src/ui/idleVillage/skins/resolveInitialSkin.ts",
         "src/ui/idleVillage/slots/useResidentSlotController.ts",
-        "src/ui/idleVillage/store/useVillageStashStore.ts",
         "src/ui/idleVillage/utils/gameAssetWarmup.ts",
         "src/ui/idleVillage/utils/gamePerfProbe.ts"
       ],
@@ -1272,6 +1269,26 @@
         "src/ui/idleVillage/rosterV2/HeroLevelDecor.tsx"
       ],
       "tier_source": "default"
+    },
+    {
+      "id": "hero-level-mock",
+      "role": "shared-kernel",
+      "tier": 1,
+      "root_file": "src/ui/idleVillage/rosterV2/heroLevelMock.ts",
+      "scope_files": [
+        "src/ui/idleVillage/rosterV2/heroLevelMock.ts"
+      ],
+      "tier_source": "kernel"
+    },
+    {
+      "id": "hero-level-view-model",
+      "role": "shared-kernel",
+      "tier": 1,
+      "root_file": "src/ui/idleVillage/rosterV2/heroLevelViewModel.ts",
+      "scope_files": [
+        "src/ui/idleVillage/rosterV2/heroLevelViewModel.ts"
+      ],
+      "tier_source": "kernel"
     },
     {
       "id": "hero-sheet-panel",
@@ -2685,6 +2702,16 @@
       "tier_source": "default"
     },
     {
+      "id": "roster-stash-rail",
+      "role": "ui-component",
+      "tier": 2,
+      "root_file": "src/ui/idleVillage/components/gameFrame/RosterStashRail.tsx",
+      "scope_files": [
+        "src/ui/idleVillage/components/gameFrame/RosterStashRail.tsx"
+      ],
+      "tier_source": "default"
+    },
+    {
       "id": "sandbox-diagnostics",
       "role": "shared-kernel",
       "tier": 1,
@@ -3211,6 +3238,16 @@
       "tier_source": "kernel"
     },
     {
+      "id": "use-village-stash-store",
+      "role": "shared-kernel",
+      "tier": 1,
+      "root_file": "src/ui/idleVillage/store/useVillageStashStore.ts",
+      "scope_files": [
+        "src/ui/idleVillage/store/useVillageStashStore.ts"
+      ],
+      "tier_source": "kernel"
+    },
+    {
       "id": "v9-glass-layers-only",
       "role": "ui-component",
       "tier": 2,
@@ -3340,6 +3377,16 @@
         "src/ui/idleVillage/components/gameFrame/VillageStashPanel.tsx"
       ],
       "tier_source": "default"
+    },
+    {
+      "id": "village-stash-view-model",
+      "role": "shared-kernel",
+      "tier": 1,
+      "root_file": "src/ui/idleVillage/components/gameFrame/villageStashViewModel.ts",
+      "scope_files": [
+        "src/ui/idleVillage/components/gameFrame/villageStashViewModel.ts"
+      ],
+      "tier_source": "kernel"
     },
     {
       "id": "wanderlust-ambient-field",
@@ -3657,10 +3704,10 @@
     }
   ],
   "stats": {
-    "files": 498,
-    "units": 295,
-    "ui_components": 225,
-    "shared_kernels": 70
+    "files": 499,
+    "units": 300,
+    "ui_components": 226,
+    "shared_kernels": 74
   },
-  "content_sha256": "88a841d48ed4f641823400f845dbc32df7825434cb6ef510b0c819012f1d478e"
+  "content_sha256": "006dcb2f567072ddfd9e3ef1c6ff985ba224a62536d1d069a608680b1e73c2a8"
 }

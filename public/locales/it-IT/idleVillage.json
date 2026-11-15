@@ -1574,6 +1574,14 @@
         "site": "Sul posto",
         "return": "Ritorno"
       }
+    },
+    "rail": {
+      "ariaLabel": "Roster e magazzino del villaggio",
+      "expand": "Apri la colonna roster",
+      "collapse": "Comprimi la colonna roster",
+      "tablist": "Roster e magazzino",
+      "tabStash": "Scorte",
+      "memberStats": "Condizione dei membri"
     }
   },
   "missionPlanner": {
@@ -1701,7 +1709,8 @@
       "dead": "Morto",
       "exhausted": "Esausto",
       "away": "Fuori",
-      "assigned": "Assegnato"
+      "assigned": "Assegnato",
+      "locked": "Bloccato"
     },
     "stats": {
       "hp": "Salute",
