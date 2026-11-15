@@ -72,33 +72,66 @@ export const PlacesConfigSchema = z
      * enamelled card rotated around a shared pivot under the diorama.
      * Fixed arc — cards never resize for low activity counts (Director ruling).
      */
-    fanCards: z
+    /**
+     * Elliptical enamel ring around the diorama (modello battezzato
+     * `refs/approved-fan-v65.png`, ruling Director 2026-11-14): N settori
+     * anulari ellittici contigui — smalto per famiglia, separatori oro,
+     * gemme sul rim, gonna sotto il bordo frontale. Le posizioni non sono
+     * misurate carta-per-carta: la geometria è parametrica (ellissi).
+     */
+    fanRing: z
       .object({
-        /** Reference space of the measured slot map (mockup-hub-fan-village.jpg px). */
+        /** Reference space (mockup-hub-fan-village.jpg px). */
         refW: z.number().positive(),
         refH: z.number().positive(),
-        /**
-         * All card positions in draw order (back → front), measured on the
-         * approved mockup. Coordinates/sizes are fractions of refW/refH;
-         * rotateDeg is the CSS rotation so the plate tip points along the
-         * measured wedge axis.
-         */
-        slots: z.array(
-          z
-            .object({
-              x: z.number(),
-              y: z.number(),
-              rotateDeg: z.number(),
-              wFrac: z.number().positive(),
-              hFrac: z.number().positive(),
-            })
-            .strict(),
-        ),
-        /** Slot indices (into `slots`) that can host activities, in fill order. */
-        fillOrder: z.array(z.number().int().nonnegative()),
-        /** Central diorama: normalized centre, height fraction, z above cards. */
+        /** Centro dell'anello (frazioni di refW/refH). */
+        cx: z.number(),
+        cy: z.number(),
+        /** Semiassi del bordo esterno (frazioni di refW/refH). */
+        outerRx: z.number().positive(),
+        outerRy: z.number().positive(),
+        /** Semiassi del foro interno (impronta del saucer del diorama). */
+        innerRx: z.number().positive(),
+        innerRy: z.number().positive(),
+        /** Offset verticale del foro interno rispetto al centro (frac refH). */
+        innerDy: z.number(),
+        /** Numero di settori dell'anello (slot fissi). */
+        slotsTotal: z.number().int().min(3),
+        /** Angolo del primo separatore (gradi, 0=dx, + orario, -90=alto). */
+        startAngleDeg: z.number(),
+        /** Ampiezza angolare del separatore oro fra settori (gradi). */
+        gapDeg: z.number().positive(),
+        /** Quanto ogni lastra dipinta copre la precedente (gradi, lato CCW). */
+        overlapDeg: z.number().positive(),
+        /** Spessore del rim oro esterno (frazione di refH). */
+        rimFrac: z.number().positive(),
+        /** Altezza della gonna sotto il bordo frontale (frazione di refH). */
+        skirtFrac: z.number().positive(),
+        /** Dimensione icona = frazione dello spessore radiale del settore. */
+        iconFrac: z.number().positive(),
+        /** Oro del rim/separatori: [luce, base, ombra]. */
+        gold: z.tuple([z.string(), z.string(), z.string()]),
+        /** Smalto chiaro per famiglia (PoiType) + settore vuoto `empty`. */
+        enamel: z.record(z.string(), z.string()),
+        /** Smalto "scritto" (progress/done) per famiglia + `empty`. */
+        familyDark: z.record(z.string(), z.string()),
+        /** Base URL degli spicchi dipinti (slice-{slot}-{mat}.webp). */
+        sliceBase: z.string(),
+        /** PoiType → materiale spicchio dipinto (suffisso file). */
+        familySlice: z.record(z.string(), z.string()),
+        /** Base URL dei glifi dipinti (icon-{glyph}.webp). */
+        iconGlyphBase: z.string(),
+        /** Keyword (lowercase, match id/iconUrl) → nome glifo. */
+        iconGlyphMap: z.record(z.string(), z.string()),
+        /** Diorama centrale sopra l'anello. */
         diorama: z
-          .object({ x: z.number(), y: z.number(), hFrac: z.number().positive() })
+          .object({
+            x: z.number(),
+            y: z.number(),
+            hFrac: z.number().positive(),
+            href: z.string(),
+            aspect: z.number().positive(),
+          })
           .strict(),
       })
       .strict(),
@@ -141,32 +174,66 @@ const RAW_PLACES_CONFIG = {
     outerRingCapacity: 8,
   },
   /**
+   * Elliptical plate fan — geometric values fitted/measured with the Director
+   * (layout-tool + stroke export 2026-11-14, baseline mockup-hub-fan-village):
+   * - radial centre = point below the tower window, NOT the diorama base.
+   * - axes = screen directions from the centre through the 5 visible saucer
+   *   gems + 3 mirrored on the back rim (CYI=293.3).
+   * - first 3 slots (NW/N/NE back) are permanent navy sockets;
+   *   fill order is CW from the right side (MERCATO → FORGIA → AGRIC → MINA → TAGLIA).
+   */
+  /**
    * Slot map measured on `mockup-hub-fan-village.jpg` (1946×544): 14 wedge
    * cards, irregular rotations/sizes, shingled, around the central diorama.
    * NOT a regular fan — values come from the image, not a formula.
    * Draw order below is back → front (z = array index).
    */
-  fanCards: {
+  fanRing: {
     refW: 1946,
     refH: 544,
-    slots: [
-      /* 0  sockLT   — empty blue card behind TAGLIALEGNA            */ { x: 0.339, y: 0.266, rotateDeg: 10,   wFrac: 0.080, hFrac: 0.300 },
-      /* 1  sockM    — empty blue card behind MERCATO/scroll        */ { x: 0.617, y: 0.350, rotateDeg: 23.5, wFrac: 0.108, hFrac: 0.340 },
-      /* 2  sockR    — empty blue card behind MERCATO-2/scroll      */ { x: 0.766, y: 0.440, rotateDeg: -9.6,  wFrac: 0.080, hFrac: 0.220 },
-      /* 3  sockL    — small green socket under TAGLIALEGNA         */ { x: 0.306, y: 0.930, rotateDeg: 0,    wFrac: 0.039, hFrac: 0.140 },
-      /* 4  swords   — blue card, crossed swords                   */ { x: 0.838, y: 0.340, rotateDeg: 13,   wFrac: 0.105, hFrac: 0.330 },
-      /* 5  MAPPA    — compass card, tip pointing left              */ { x: 0.244, y: 0.460, rotateDeg: 93.1, wFrac: 0.154, hFrac: 0.580 },
-      /* 6  scroll   — green quest scroll card, top-right           */ { x: 0.763, y: 0.267, rotateDeg: 37,   wFrac: 0.130, hFrac: 0.340 },
-      /* 7  MINA     — pickaxe card                                 */ { x: 0.380, y: 0.735, rotateDeg: 15,   wFrac: 0.100, hFrac: 0.370 },
-      /* 8  MER2     — blue scales card                             */ { x: 0.768, y: 0.735, rotateDeg: 50,   wFrac: 0.108, hFrac: 0.370 },
-      /* 9  TAGLIA   — axe card                                     */ { x: 0.383, y: 0.553, rotateDeg: 11.1, wFrac: 0.103, hFrac: 0.630 },
-      /* 10 MERG     — gold moneybag card                           */ { x: 0.650, y: 0.500, rotateDeg: 37,   wFrac: 0.128, hFrac: 0.550 },
-      /* 11 TAVERNA  — blue mug card, far right                     */ { x: 0.879, y: 0.717, rotateDeg: 100,  wFrac: 0.121, hFrac: 0.450 },
-      /* 12 AGRIC    — wheat card, bottom centre-left               */ { x: 0.503, y: 0.900, rotateDeg: -154.1, wFrac: 0.159, hFrac: 0.420 },
-      /* 13 FORGIA   — anvil card, bottom centre-right              */ { x: 0.620, y: 0.827, rotateDeg: 159.2, wFrac: 0.154, hFrac: 0.430 },
-    ],
-    fillOrder: [5, 9, 7, 12, 10, 13, 8, 6, 4, 11],
-    diorama: { x: 0.493, y: 0.423, hFrac: 0.625 },
+    cx: 0.512,
+    cy: 0.50,
+    outerRx: 0.185,
+    outerRy: 0.50,
+    innerRx: 0.045,
+    innerRy: 0.065,
+    innerDy: 0.035,
+    /* Ruling Director: petali larghi 60° (6 slot — ogni petalo = 2 da
+     * 30°), riempimento da NE (`startAngleDeg`, convenzione 0=est,
+     * +=orario in y-down) in senso orario; gli slot vuoti non
+     * renderizzano alcun petalo. */
+    slotsTotal: 6,
+    startAngleDeg: -45,
+    gapDeg: 2.5,
+    overlapDeg: 6.5,
+    rimFrac: 0.014,
+    skirtFrac: 0.050,
+    iconFrac: 0.62,
+    /* oro = brass HUD (skin-hud-brass-crest/mid/base): il ruling R-290
+     * vieta l'oro lucido — niente highlight più chiari del crest HUD. */
+    gold: ['#d8bd78', '#c2a355', '#5f3f16'],
+    enamel: { job: '#1d7a4e', quest: '#1d4e89', event: '#5b2d7a', empty: '#16293f' },
+    familyDark: { job: '#081e14', quest: '#081226', event: '#180a22', empty: '#060d18' },
+    sliceBase: '/assets/ui/poi-radial/slices',
+    familySlice: { job: 'emerald', quest: 'sapphire', event: 'amethyst', empty: 'empty' },
+    iconGlyphBase: '/assets/ui/poi-radial/icons',
+    iconGlyphMap: {
+      taglia: 'axe', wood: 'axe', forest: 'axe', forage: 'axe', lumber: 'axe', log: 'axe',
+      mina: 'pickaxe', mine: 'pickaxe', crystal: 'pickaxe', ore: 'pickaxe', quarry: 'pickaxe',
+      agric: 'wheat', wheat: 'wheat', harvest: 'wheat', farm: 'wheat', apple: 'wheat',
+      mercato: 'moneybag', market: 'moneybag', carav: 'moneybag', caravan: 'moneybag', trade: 'moneybag', coin: 'moneybag',
+      swords: 'swords', arena: 'swords', militia: 'swords', sword: 'swords', goblin: 'swords', fight: 'swords', bandit: 'swords',
+    },
+    diorama: {
+      x: 0.512,
+      /* +0.014 vs precedente: il saucer scende nel socket — il labbro
+         frontale del foro gli passa sopra il piede (ruling Director:
+         incassato nelle slice, non appoggiato sopra) */
+      y: 0.454,
+      hFrac: 0.42,
+      href: '/assets/ui/poi-radial/village-diorama.webp',
+      aspect: 1.3078, // village-diorama.webp 1024×783
+    },
   },
 } as const;
 

@@ -16,6 +16,7 @@ import { villageZoneLive } from '@/ui/idleVillage/pixiSpike/villageZoneOverlay';
 import { HudRealPanel } from '@/ui/idleVillage/hudReal/HudRealPanel';
 import { PlaceRadial } from '@/ui/idleVillage/components/gameFrame/PlaceRadial';
 import { PlaceFan, type PlaceFanActivity } from '@/ui/idleVillage/components/gameFrame/PlaceFan';
+import { PlaceFanCards } from '@/ui/idleVillage/components/gameFrame/PlaceFanCards';
 import { PLACES_CONFIG, placeById } from '@/balancing/config/idleVillage/placesConfig';
 import type { MapQuestPoiView } from '@/ui/idleVillage/components/gameFrame/MapQuestPoi';
 
@@ -73,7 +74,7 @@ export default function PoiLuogoLabPage() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scenario, setScenario] = useState<FixtureScenario>('mixed');
   const [hoverCardOnly, setHoverCardOnly] = useState(false);
-  const [menuMode, setMenuMode] = useState<'fan' | 'radial'>('radial');
+  const [menuMode, setMenuMode] = useState<'fan' | 'radial' | 'fancards'>('fancards');
   const [tiltDeg, setTiltDeg] = useState(49);
   const [activityCount, setActivityCount] = useState(6);
   const [emptyMode, setEmptyMode] = useState<'glass' | 'open' | 'arc'>('glass');
@@ -123,6 +124,13 @@ export default function PoiLuogoLabPage() {
                   views={views}
                   tiltDeg={tiltDeg}
                   emptySlots={emptyMode}
+                  onSelect={(id) => console.info('[poi-luogo-lab] select', id)}
+                  onRequestClose={() => setMenuOpen(false)}
+                />
+              ) : menuMode === 'fancards' ? (
+                <PlaceFanCards
+                  activities={labActivities}
+                  views={views}
                   onSelect={(id) => console.info('[poi-luogo-lab] select', id)}
                   onRequestClose={() => setMenuOpen(false)}
                 />
@@ -235,7 +243,7 @@ export default function PoiLuogoLabPage() {
           anteprima scheda del Luogo
         </label>
         <div style={{ display: 'flex', gap: 6 }}>
-          {(['fan', 'radial'] as const).map((m) => (
+          {(['fan', 'radial', 'fancards'] as const).map((m) => (
             <button
               key={m}
               type="button"

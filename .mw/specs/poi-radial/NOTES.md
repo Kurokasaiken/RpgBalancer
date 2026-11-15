@@ -144,3 +144,13 @@
   le carte sono CORTE (~18% della profondità) e si fermano contro il piedistallo.
 - Ellisse bordo esterno (992,330) rx 680 ry 320, senza roll.
 - v18 regge la struttura: ferro di cavallo attorno alla base, tessellazione, fill model.
+
+## 2026-11-14 (d) — Reference preservation (ruling Director)
+
+- Nuova regola `.windsurf/rules/46-approved-references.md`: gli artefatti battezzati dal
+  Director e gli screenshot passati come reference vanno copiati in `refs/` e registrati.
+- **`refs/approved-fan-v65.png`** = render battezzato ("procedi"): **modello target del
+  componente Luogo** — anello ellittico continuo di spicchi-smalto attorno al piedistallo,
+  NON le 14 carte sparse del modello v8. Il componente live va riportato su questo modello.
+- Le 14 slot-map v8 restano in config ma il fitting a carte è da considerarsi bocciato:
+  v65 (settori anulari) è la forma approvata.

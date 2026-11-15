@@ -20,7 +20,14 @@ export const GAME_HUD_BARS = {
   time: { w: 485.34, h: 84.96, rowY: 44.5 },
   resources: { w: 395.79, h: 118.86, rowY: 44.3 },
   nav: { w: 513, h: 131.25 },
+  /* R-338: the narrator piece (voce/piece.webp) is 440×230.56 design px; its slot (360 wide,
+   *  blueprint B1 'voce') only reserves its lower band — the art overflows upward, bottom edge
+   *  VOCE_BOTTOM px above the screen's, same as the nav (Director ruling, /hud-compose). */
+  voce: { w: 440, h: 230.56 },
 } as const;
+
+/** The narrator's lowest point sits this far above the bottom edge (like NAV_BOTTOM). */
+const VOCE_BOTTOM = 6;
 
 /** Phone margins: side gutter and gap between stacked bars. */
 const PHONE_SIDE = 8;
@@ -45,6 +52,8 @@ export interface GameHudPlacement {
   time: BarPlacement;
   resources: BarPlacement;
   nav: BarPlacement;
+  /** The narrator's slot rect where the blueprint applies; phones have no signed layout for it (R-338). */
+  voce?: BarPlacement;
 }
 
 const bar = (left: number, top: number, scale: number): BarPlacement => ({ left, top, scale, textK: 1 / scale });
@@ -99,6 +108,9 @@ export function placeHudBlueprint(winW: number, winH: number, zoom: number): Gam
   const timeTop = drop
     ? resources.top + GAME_HUD_BARS.resources.h * sR + PHONE_GAP
     : M + TOP_ROW_H / 2 - GAME_HUD_BARS.time.rowY * sT;
+  /* The narrator hugs the slot's left edge and lets the tall art rise above the reserved band
+   *  (same maths as /hud-compose: bottom of the 440-wide piece VOCE_BOTTOM px from the edge). */
+  const sV = r.voce.w / GAME_HUD_BARS.voce.w;
   return {
     mode: 'blueprint',
     cornerScale: 1,
@@ -107,6 +119,7 @@ export function placeHudBlueprint(winW: number, winH: number, zoom: number): Gam
     time: bar(timeLeft, timeTop, sT),
     resources,
     nav: bar(r.nav.x + (r.nav.w - 460) / 2, frame.H - NAV_BOTTOM - GAME_HUD_BARS.nav.h * sN, sN),
+    voce: bar(r.voce.x, frame.H - VOCE_BOTTOM - GAME_HUD_BARS.voce.h * sV, sV),
   };
 }
 
@@ -134,6 +147,7 @@ function placeLandscape(winW: number, winH: number, zoom: number): GameHudPlacem
   const resources = mini(ref.resources, bp.resources.textK);
   const time = mini(ref.time, bp.time.textK);
   const sN = ref.nav.scale * kx;
+  const sV = (ref.voce?.scale ?? 0) * kx;
   return {
     mode: 'landscape',
     cornerScale: sN,
@@ -142,5 +156,6 @@ function placeLandscape(winW: number, winH: number, zoom: number): GameHudPlacem
     resources,
     time,
     nav: { left: ref.nav.left * kx, top: winH - NAV_BOTTOM - GAME_HUD_BARS.nav.h * sN, scale: sN, textK: bp.nav.textK },
+    voce: ref.voce ? { left: ref.voce.left * kx, top: winH - VOCE_BOTTOM - GAME_HUD_BARS.voce.h * sV, scale: sV, textK: bp.voce!.textK } : undefined,
   };
 }

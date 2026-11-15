@@ -66,6 +66,14 @@ export default interface Resources {
   },
   "common": {
     "appName": "RPG Balancer",
+    "deploy": {
+      "routeUnavailable": {
+        "backHome": "Back to home",
+        "body": "This page is a development lab and is not part of the mobile deploy.",
+        "kicker": "Deploy slim",
+        "title": "Not available"
+      }
+    },
     "designVsFidelity": {
       "backToHub": "Back to Test Hub",
       "designSystemColumn": "Design System /design-system",
@@ -91,6 +99,11 @@ export default interface Resources {
       "ja": "日本語",
       "pseudo": "Pseudo",
       "zh-CN": "简体中文"
+    },
+    "questS1Lab": {
+      "verdict": {
+        "win": "Success"
+      }
     },
     "welcome": "Welcome"
   },
@@ -611,6 +624,14 @@ export default interface Resources {
           "effects": "Effects",
           "general": "General",
           "interface": "Interface",
+          "mapQuality": "Graphics quality",
+          "mapQualityHint": "Map detail and memory use. Auto picks what this device can hold.",
+          "mapQualityOptions": {
+            "auto": "Auto",
+            "high": "High",
+            "low": "Low",
+            "medium": "Medium"
+          },
           "master": "Master",
           "music": "Music",
           "reducedMotion": "Reduced motion",
@@ -948,7 +969,8 @@ export default interface Resources {
         "unavailable": "No copies left in the store"
       },
       "status": {
-        "dayLabel": "Day"
+        "dayLabel": "Day",
+        "nightLabel": "Night"
       },
       "subtitle": "",
       "title": "Wanderlust",
@@ -1100,6 +1122,22 @@ export default interface Resources {
           "previewLabel": "preview only",
           "previewTooltip": "Construction arrives with the economy update — this screen is a preview",
           "upgrade": "Upgrade"
+        }
+      },
+      "voce": {
+        "labels": {
+          "bust": "The village's voice",
+          "collapse": "Collapse",
+          "dismiss": "Dismiss",
+          "expand": "Read more"
+        },
+        "line": {
+          "alarm": "Warning: {title} — {when}.",
+          "quiet": "{title} — {when}."
+        },
+        "when": {
+          "days": "in {days, plural, one {# day} other {# days}}",
+          "today": "today"
         }
       }
     },
@@ -1309,6 +1347,21 @@ export default interface Resources {
         "stamina": "STA"
       }
     },
+    "places": {
+      "villageStart": {
+        "act": {
+          "cassa": "Lost chest",
+          "fair": "Half-moon fair",
+          "farm": "River harvest",
+          "mill": "Windmill",
+          "ruins": "Old bridge ruins",
+          "smith": "Crossing smithy"
+        },
+        "body": "The village at the river crossing — hub for expeditions, jobs and the fair.",
+        "poiFixture": "Expedition: the lost chest",
+        "title": "The Three Bridges Crossing"
+      }
+    },
     "poiDetail": {
       "risk": {
         "danger": {
@@ -1321,6 +1374,9 @@ export default interface Resources {
           "title": "Chance a resident is injured"
         }
       }
+    },
+    "poiMarker": {
+      "ariaLabel": "Point of interest"
     },
     "poiMarkerLab": {
       "counterClockwise": "Counter-clockwise (deadline)",
@@ -2087,7 +2143,8 @@ export default interface Resources {
         "dead": "Fallen",
         "exhausted": "Exhausted",
         "injured": "Injured"
-      }
+      },
+      "title": "Roster"
     },
     "slowMo": "Slow Mo",
     "spinDuration": "Spin Duration",

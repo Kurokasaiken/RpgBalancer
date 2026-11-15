@@ -56,6 +56,10 @@ import { mountainClarityLive, mountainShadeLive, seaGradeLive } from './mappa2-g
 import { HudRealTimeConnected } from '@/ui/idleVillage/hudReal/HudRealTimeConnected';
 import { HudRealResources } from '@/ui/idleVillage/hudReal/HudRealResources';
 import { HudRealNav } from '@/ui/idleVillage/hudReal/HudRealNav';
+import { HudRealVoce } from '@/ui/idleVillage/hudReal/HudRealVoce';
+import { voceMessageFor } from '@/ui/idleVillage/hudReal/voceFeed';
+import { VOCE_CONFIG } from '@/ui/idleVillage/config/voceConfig';
+import { nextEventModel } from '@/ui/idleVillage/components/gameFrame/nextEvent';
 import { zoomFor } from '@/ui/idleVillage/hudReal/layout/hudLayoutB';
 import { placeGameHud, type BarPlacement } from '@/ui/idleVillage/hudReal/layout/gameHudPlacement';
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
@@ -369,6 +373,9 @@ export default function GameMappa2Page() {
   useEffect(() => {
     const hooks = ((window as unknown as { __idleVillageTestHooks?: Record<string, unknown> }).__idleVillageTestHooks ??= {});
     hooks.startInvasion = () => setShroudCovered(true);
+    /* Registers the threat directly in the ledger (no theatre) — E2E probes
+     * that need an eligible event without the card/shroud timing. */
+    hooks.confirmInvasion = () => setInvasion({ dueDay: currentDay + INVASION_WARNING_DAYS, startDay: currentDay });
     hooks.getInvasion = () =>
       invasion
         ? { startDay: invasion.startDay, dueDay: invasion.dueDay, currentDay: state.currentDay, progress: Math.min(1, Math.max(0, (state.currentDay - invasion.startDay) / INVASION_MARCH_DAYS)) }
@@ -377,6 +384,7 @@ export default function GameMappa2Page() {
     hooks.togglePoiDemo = () => setPoiDemo((on) => !on);
     return () => {
       delete hooks.startInvasion;
+      delete hooks.confirmInvasion;
       delete hooks.getInvasion;
       delete hooks.togglePoiDemo;
     };
@@ -944,6 +952,13 @@ export default function GameMappa2Page() {
     }
     return list;
   }, [invasion, invasionDaysLeft, rowArriving, questRevealed, autoRevealedIds, expeditionGoblin.poiView, expeditionGoblin.run, questPoiAvailability, poiGoblin, t]);
+  /* R-338: the narrator's plaque reads the same nearest-event model as the ledger —
+   *  nothing within its window means the feed is silent and only the bust stands. */
+  const voceMessage = useMemo(() => voceMessageFor(nextEventModel(gameEvents), t), [gameEvents, t]);
+  const voceMessageId = voceMessage?.id;
+  useEffect(() => {
+    if (voceMessageId) trackTelemetryEvent('voce_message', { messageId: voceMessageId });
+  }, [voceMessageId]);
   /* The goblin walks from where it lands to the village over INVASION_MARCH_DAYS
    * game days (PLAN-033 T-004); progress is clamped, so after the march it waits. */
   const anchors = useMemo<PixiMapAnchor[]>(() => {
@@ -1424,6 +1439,23 @@ export default function GameMappa2Page() {
             showLabels={PAGE.navShowLabels}
           />
         </div>
+        {hud.voce && (
+          <div data-hudslot="voce" style={barStyle(hud.voce, hudHidden)}>
+            <HudRealVoce
+              title={voceMessage?.title}
+              messageKey={voceMessage?.id}
+              autoCloseMs={VOCE_CONFIG.autoCloseMs}
+              onDismiss={() => voceMessageId && trackTelemetryEvent('voce_dismiss', { messageId: voceMessageId })}
+              onReopen={() => voceMessageId && trackTelemetryEvent('voce_reopen', { messageId: voceMessageId })}
+              labels={{
+                expand: t('gameFrame.voce.labels.expand'),
+                collapse: t('gameFrame.voce.labels.collapse'),
+                dismiss: t('gameFrame.voce.labels.dismiss'),
+                bust: t('gameFrame.voce.labels.bust'),
+              }}
+            >{voceMessage?.text}</HudRealVoce>
+          </div>
+        )}
       </div>
 
       <div data-hud-corner="" style={{ position: 'absolute', right: `calc(${CORNER.offsetPx}px + env(safe-area-inset-right, 0px))`, bottom: `calc(${CORNER.offsetPx}px + env(safe-area-inset-bottom, 0px))`, zIndex: 6, display: 'flex', alignItems: 'flex-end', gap: CORNER.gapPx, transform: hud.cornerScale !== 1 ? `scale(${hud.cornerScale})` : undefined, transformOrigin: 'bottom right' }}>
