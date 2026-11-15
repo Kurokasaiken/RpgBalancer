@@ -20,6 +20,7 @@ import type { MapQuestPoiView } from './MapQuestPoi';
 import { PlaceHoverCard } from './PlaceHoverCard';
 import { PlaceFan, type PlaceFanActivity } from './PlaceFan';
 import { PlaceRadial } from './PlaceRadial';
+import { PlaceFanCards } from './PlaceFanCards';
 
 export interface MapPlaceProps {
   place: PlaceDefinition;
@@ -32,8 +33,9 @@ export interface MapPlaceProps {
   /** Marker diameter in px — never below 32 (hit area). */
   sizePx?: number;
   /** Menu model: 'fan' = legacy two-ring fan (provvisorio), 'radial' = new
-   * inclined radial menu (sotto-piano F2, ruling Director 2026-11-12). */
-  menuMode?: 'fan' | 'radial';
+   * inclined radial menu, 'fancards' = fan a piastre ellittiche
+   * (sotto-piano F2, baseline approvata Director 2026-11-14). */
+  menuMode?: 'fan' | 'radial' | 'fancards';
   /** Inclinazione del disco radiale in gradi (solo menuMode='radial'). */
   radialTiltDeg?: number;
   onSelectActivity?: (activityId: string) => void;
@@ -145,6 +147,13 @@ export const MapPlace: React.FC<MapPlaceProps> = ({
               activities={activities}
               views={views}
               tiltDeg={radialTiltDeg}
+              onSelect={onSelectActivity}
+              onRequestClose={closeFan}
+            />
+          ) : menuMode === 'fancards' ? (
+            <PlaceFanCards
+              activities={activities}
+              views={views}
               onSelect={onSelectActivity}
               onRequestClose={closeFan}
             />

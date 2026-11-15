@@ -12,6 +12,7 @@ canvas{display:block;margin-top:44px;cursor:crosshair}
 <button id="btnMove">Sposta diorama (drag)</button>
 <button id="btnCenter">Centro radiale (cyan)</button>
 <button id="btnDraw">Disegna bordo (red)</button>
+<button id="btnCards">Carte (14 slot)</button>
 <button id="btnUndo">Undo</button><button id="btnClear">Clear disegno</button>
 <button id="btnExport">ESPORTA -> textarea</button>
 <span>scala: rotellina = zoom diorama &nbsp;|&nbsp; scala <b id="sc"></b> base (<span id="bp"></span>)</span>
@@ -30,6 +31,17 @@ let cX=997, cY=258;
 const BB={x:77,y:40,w:886,h:731};
 const AXC=443, AYC=525;
 let strokes=[], cur=null, mode='move', dragging=false;
+// 14 card slots: {x,y px; rot deg; w,h px} — init = current placesConfig fanCards
+let slots=[
+ {n:'sockLT',x:620,y:158,rot:190,w:113,h:118},{n:'sockM',x:1290,y:200,rot:203.5,w:152,h:133},
+ {n:'sockR',x:1490,y:235,rot:170.4,w:113,h:86},{n:'sockL',x:570,y:320,rot:180,w:54,h:55},
+ {n:'swords',x:1650,y:188,rot:193,w:148,h:129},{n:'MAPPA',x:475,y:324,rot:273.1,w:216,h:227},
+ {n:'scroll',x:1465,y:78,rot:217,w:183,h:117},{n:'MINA',x:755,y:392,rot:195,w:140,h:145},
+ {n:'MER2',x:1400,y:362,rot:230,w:152,h:145},{n:'TAGLIA',x:765,y:215,rot:191.1,w:144,h:196},
+ {n:'MERG',x:1226,y:272,rot:217,w:179,h:164},{n:'TAVERNA',x:1720,y:381,rot:280,w:169,h:176},
+ {n:'AGRIC',x:864,y:465,rot:25.9,w:222,h:157},{n:'FORGIA',x:1138,y:390,rot:339.2,w:216,h:157}];
+let sel=-1, dragS=false, ox=0, oy=0;
+function slotPoly(s){const r=s.rot*Math.PI/180,P=[];for(const[px,py]of[[-s.w/2,-s.h/2],[s.w/2,-s.h/2],[s.w/2,s.h/2],[-s.w/2,s.h/2]])P.push([s.x+px*Math.cos(r)-py*Math.sin(r),s.y+px*Math.sin(r)+py*Math.cos(r)]);return P;}
 function redraw(){
  ctx.clearRect(0,0,cv.width,cv.height);
  ctx.fillStyle="#0d1622"; ctx.fillRect(0,0,cv.width,cv.height);
@@ -43,6 +55,16 @@ function redraw(){
  ctx.strokeStyle="#f00"; ctx.lineWidth=4; ctx.lineJoin=ctx.lineCap="round";
  for(const s of strokes){ctx.beginPath();s.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.stroke();}
  if(cur){ctx.beginPath();cur.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.stroke();}
+ if(mode==='cards'){
+  slots.forEach((s,i)=>{const P=slotPoly(s);
+   ctx.strokeStyle=i===sel?'#ff0':'#f0f';ctx.lineWidth=i===sel?3:1.5;
+   ctx.beginPath();P.forEach((p,j)=>j?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();ctx.stroke();
+   ctx.fillStyle=i===sel?'#ff0':'#f0f';ctx.beginPath();ctx.arc(s.x,s.y,4,0,7);ctx.fill();
+   ctx.fillStyle='#fff';ctx.font='13px system-ui';ctx.fillText(i+' '+s.n,s.x-16,s.y-8);
+   // marker on the plate's narrow tip (bottom of image): shows tip direction
+   const r=s.rot*Math.PI/180,tx=s.x+(s.h/2)*Math.sin(r),ty=s.y-(s.h/2)*Math.cos(r);
+   ctx.fillStyle='#0f8';ctx.beginPath();ctx.arc(tx,ty,5,0,7);ctx.fill();});
+ }
  document.getElementById('sc').textContent=dS.toFixed(3);
  document.getElementById('bp').textContent=dX.toFixed(0)+","+dY.toFixed(0);
 }
@@ -51,6 +73,13 @@ cv.addEventListener('pointerdown',e=>{
  const [x,y]=pt(e);
  if(mode==='draw'){cur=[[x,y]];}
  else if(mode==='center'){cX=x; cY=y; redraw();}
+ else if(mode==='cards'){
+  let best=-1,bd=80;
+  slots.forEach((s,i)=>{const d=Math.hypot(s.x-x,s.y-y);if(d<bd){bd=d;best=i;}});
+  sel=best;
+  if(best>=0){dragS=true;ox=x-slots[best].x;oy=y-slots[best].y;}
+  redraw();
+ }
  else {dragging=true; dX=x; dY=y; redraw();}
 });
 cv.addEventListener('pointermove',e=>{
@@ -58,12 +87,20 @@ cv.addEventListener('pointermove',e=>{
  if(cur){cur.push([x,y]);redraw();}
  else if(dragging){dX=x; dY=y; redraw();}
  else if(mode==='center'&&e.buttons){cX=x; cY=y; redraw();}
+ else if(dragS&&sel>=0){slots[sel].x=x-ox;slots[sel].y=y-oy;redraw();}
 });
-addEventListener('pointerup',()=>{if(cur){strokes.push(cur);cur=null;redraw();}dragging=false;});
+addEventListener('pointerup',()=>{if(cur){strokes.push(cur);cur=null;redraw();}dragging=false;dragS=false;});
 cv.addEventListener('wheel',e=>{
- e.preventDefault(); dS*=e.deltaY<0?1.02:0.98; redraw();
+ e.preventDefault();
+ if(mode==='cards'&&sel>=0){
+  const s=slots[sel],dir=e.deltaY<0?1:-1;
+  if(e.shiftKey){s.w=Math.max(20,s.w*(dir>0?1.02:0.98));s.h=Math.max(20,s.h*(dir>0?1.02:0.98));}
+  else s.rot=(s.rot+dir*2+360)%360;
+  redraw();return;
+ }
+ dS*=e.deltaY<0?1.02:0.98; redraw();
 },{passive:false});
-const M={move:'btnMove',draw:'btnDraw',center:'btnCenter'};
+const M={move:'btnMove',draw:'btnDraw',center:'btnCenter',cards:'btnCards'};
 function set(m){mode=m;for(const k in M)document.getElementById(M[k]).classList.toggle('on',k===m);}
 for(const k in M)document.getElementById(M[k]).onclick=()=>set(k);
 document.getElementById('btnUndo').onclick=()=>{strokes.pop();redraw();};
@@ -72,6 +109,7 @@ document.getElementById('btnExport').onclick=()=>{
  document.getElementById('out').value=JSON.stringify({
   diorama:{baseX:+dX.toFixed(1),baseY:+dY.toFixed(1),scale:+dS.toFixed(4)},
   center:{x:+cX.toFixed(1),y:+cY.toFixed(1)},
+  slots:slots.map(s=>({x:+(s.x/1946).toFixed(4),y:+(s.y/544).toFixed(4),rotateDeg:+s.rot.toFixed(1),wFrac:+(s.w/1946).toFixed(4),hFrac:+(s.h/544).toFixed(4)})),
   strokes:strokes.map(s=>s.map(p=>[+p[0].toFixed(0),+p[1].toFixed(0)]))
  });
 };

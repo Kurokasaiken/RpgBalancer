@@ -1081,6 +1081,22 @@
       "hintAlarm": "In {days} d — click to bring the camera there.",
       "hintQuiet": "Nothing urgent. In {days} d."
     },
+    "voce": {
+      "when": {
+        "today": "today",
+        "days": "in {days, plural, one {# day} other {# days}}"
+      },
+      "line": {
+        "quiet": "{title} — {when}.",
+        "alarm": "Warning: {title} — {when}."
+      },
+      "labels": {
+        "expand": "Read more",
+        "collapse": "Collapse",
+        "dismiss": "Dismiss",
+        "bust": "The village's voice"
+      }
+    },
     "objective": {
       "label": "Objective",
       "available": "Send a party on “{name}”",

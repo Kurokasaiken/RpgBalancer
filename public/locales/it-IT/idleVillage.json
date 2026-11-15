@@ -1077,6 +1077,22 @@
       "hintAlarm": "Tra {days} g — clic per portare lì la camera.",
       "hintQuiet": "Niente di urgente. Tra {days} g."
     },
+    "voce": {
+      "when": {
+        "today": "oggi",
+        "days": "tra {days, plural, one {# giorno} other {# giorni}}"
+      },
+      "line": {
+        "quiet": "{title} — {when}.",
+        "alarm": "Attenzione: {title} — {when}."
+      },
+      "labels": {
+        "expand": "Leggi tutto",
+        "collapse": "Riduci",
+        "dismiss": "Chiudi",
+        "bust": "La voce del villaggio"
+      }
+    },
     "objective": {
       "label": "Obiettivo",
       "available": "Manda una squadra in “{name}”",
