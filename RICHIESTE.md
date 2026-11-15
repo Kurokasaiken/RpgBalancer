@@ -5917,7 +5917,8 @@ seed picker; save-on-approval → store condiviso. Dibattito multi-AI
 
 **Richiesta (verbatim, 2026-11-15):** *"il deploy su vercel e penso anche git è fallito, xè? voglio che fai un commit, push e deploy pulito"*
 **Data:** 2026-11-15
-**Stato:** `fatta` — evidenza sotto. `bundle:` n/a (ops fix; `closure:lint` pre-rosso su drift contratti noto/Director-gated — un bundle PASS non è producibile finché quel drift resta).
+**Stato:** `fatta` — evidenza sotto.
+**Chiusura:** nessuna-verifica-tecnica: "ops fix — verifica = deploy Ready + webglBootProbe PASS su / e /game sull'alias prod; nessun bundle producibile (closure:lint pre-rosso su drift contratti noto/Director-gated)".
 **Diagnosi accertata (2026-11-15, thread 2):** git pulito (auto-commit `5f11256d` pushato); il deploy Vercel di `5f11256d` è **fallito in build** su `assertDeployShape` — `deploy-manifest.json` in drift (~99 file nuovi in `public/` dall'auto-commit senza regen manifest). Alias prod rimasto su `35b9f7e`. **Fix:** manifest rigenerato (`deployManifest.mjs`, `--check` verde), commit `e5b8170d` pushato → deploy **● Ready** (`rpg-balancer-g6r856eo4`, poi `4gk1t9h02` per il commit `ad157925` di sessione parallela). **Verifica R-304:** `webglBootProbe.mjs` PASS su `https://rpg-balancer.vercel.app/` e `/game` sull'alias produzione (WebGL swiftshader, exit 0 entrambi).
 **Residui (non di questa voce):** check GitHub `Validate i18n…` rosso su `closure:lint` (drift contratti: 2-owner game-menu-screens Director-gated + 0-owner nuovi da auto-commit + scope_files divergenti); check `Release` rosso ambientale (Playwright 1.58.2 vs runner ubuntu26.04). Serve task dedicato di resync contratti + ruling Director.
 
@@ -5927,8 +5928,10 @@ seed picker; save-on-approval → store condiviso. Dibattito multi-AI
 **Data:** 2026-11-15
 **Stato:** `in corso`
 **Audit eseguito (fase 1-3, vedi handoff):** regole sempre-on reali ≈23KB (solo 3 rule `always_on` + AGENTS.md; le altre 14 già lazy via trigger frontmatter — 8 senza frontmatter, attivazione ambigua); MCP github/vercel falliscono `list_tools` (dead weight), puppeteer ok + risorse stale; skill dirs = symlink, dedup attivo; gap: componenti visibili non spiegano 262k a sessione "fresca" (probabile carried-over o overhead harness).
-**Dibattito:** run `20261115-context-budget-audit` (mind-weaver `.mw/runs/`), provider chatgpt+claude+gemini+grok+deepseek, T-001 clarification POSTED — prosegue orchestrazione dal handoff.
-**Regola:** applicazione modifiche SOLO dopo ruling Director (governance).
+**Dibattito (2026-11-15, thread 3 — CONVERGED):** run `mind-weaver/.mw/runs/20261115-context-budget-audit/` — 5 provider (chatgpt/claude/gemini/grok/deepseek), R1 proposte → R2 critiche incrociate blindate (7 WITNESS disposizionati) → artifact-r002 sha `e8f1f03f` ACCEPT 4/4 eleggibili (grok rimosso `provider_dead`: 3 risposte incoerenti consecutive su acceptance). `report.md` scritto (Converge/Diverge/Only-one). Raccomandazione finale = `artifact-r002.md`: Phase-0 misura a delta (3 condizioni ×2 rep, nessuno stop-gate) → Phase-1 igiene zero-risk (MCP morti, stale resources, 4 skill obsolete, frontmatter alle 8 regole orfane) → Phase-2 slim catalogo pixijs (≤200 char, verifica primaria = telemetry `skill-usage.jsonl`, canary stratificato secondario) → Phase-3 **matrice invariante→enforcement** come artifact di approvazione Director (governance:check + pre-commit, mutation fixtures per check, demozione solo per-invariante con check validato; shutdown-governance resta always_on; doc-governance a glob solo dopo test empirici di attivazione) → Phase-4 re-misura, solo delta misurati.
+**Regola:** applicazione modifiche SOLO dopo ruling Director (governance) — la lista ottimizzazioni attende approvazione.
+**Phase-1 applicata; Phase-2 fatta via PLAN-120 (catalogo 21.763→7.274 char, -67%, pixijs -75%, guard `mw-skill-desc.py audit --fail-over 240`, telemetry soak advisory +7gg) — restano Phase 0/3/4 (2026-11-15, ruling Director "procedi"):** (a) MCP `github-mcp-server` (token vuoto) e `vercel` (config vuota) rimossi da `~/.config/devin/mcp_config.json` e `~/.codeium/windsurf/mcp_config.json` (backup `.bak-20261115`; `git` disabilitato e `puppeteer` conservati — puppeteer verificato sano: 7 tool, risorse stale già assenti); (b) 4 skill obsolete archiviate fuori dai path scansionati: `demo` → `~/.cursor/skills-archive/`, `coordinator` → `mind-weaver/.agents/skills-archive/` (+3 symlink rimossi da ~/.agents|~/.claude|~/.cursor/skills), `strategist-mandate`+`coordinator-mandate` → `RPG/coordinator/skills-archive/`; (c) frontmatter `trigger: model_decision` + description aggiunto alle 8 regole orfane (10-canonical-dev-port, 15-browser-preview-guard, 16-no-foreground-windows, 17-resource-lifecycle, 45-director-intent-to-spec, 46-approved-references, 85-documentation-impact, mw-rpg-bridge) — binding cores restano in 00-invariants always_on; queste erano non-iniettate, ora scopribili on-demand.
+**Residuo R-342:** Phase-0 (misura a delta), Phase-2 (slim catalogo pixijs + telemetry), Phase-3 (matrice invariante→enforcement + governance:check), Phase-4 (re-misura) — da pianificare come task dedicati.
 
 ## R-340bis — Roster rail: righe drag-to-assign (punto di ripresa, budget)
 
@@ -5946,3 +5949,40 @@ seed picker; save-on-approval → store condiviso. Dibattito multi-AI
 - **Ipotesi aperte da verificare alla ripresa:** (1) drag parte ma `event.over` non risolve lo slot (SLOT_MAGNET/droppable rect) — guardare `aria-pressed` durante il drag; (2) `onResidentSelect` al click apre il picker `QuestPartyRosterPanel` — se il pointerup arriva prima del threshold il select scatta: valutare se il picker aperto è quello; (3) served-file va ri-verificato dopo il restart del server.
 - `tsc` pulito; lint 0 errori (file in ignore-pattern); `build:check`/`closure:lint` da rigirare dopo la verifica live.
 - Riferimenti: file toccati `src/ui/idleVillage/components/gameFrame/RosterStashRail.tsx`, `src/pages/game-mappa2.tsx` (~line 1640); contratto copiato da `RosterDraggableV2.handleDragEnd` (verdict `flightToSlot`/`springBack`/`settle`).
+
+## R-343 — ops: delega automatica a subagent + context budget (Devin)
+
+**Richiesta (verbatim, 2026-11-15):** *"le finestre d contesto si riempiono facilmente. Come faccio a fare in modo da cambiare sessioni automaticamente? nn voglio farlo a mano, voglio che sia il mio agente a farlo. E ancora meglio: c sn operazioni che sn diverse da implementazione e cose del genere, durante la conversazione nn so qunato m piaccia cambiare contesto. al massimo i miei agenti dovrebbero chiedere d fare operazioni in altre sessioni e poi da quella d partenza recuperare le info trovate? come possiamo fare?"* — poi *"procedi"* al pacchetto proposto.
+**Data:** 2026-11-15
+**Stato:** `fatta` — evidenza sotto.
+**Chiusura:** nessuna-verifica-tecnica: "ops tooling — verificato via devin doctor + dry-run hook; closure:lint non verificabile in sessione (timeout >90s, worktree condiviso T-13, pre-rosso documentato)".
+
+**Direzione approvata:** non rotazione di sessioni ma **delega a subagent** (context window propria, risultato distillato al parent) + auto-compaction già built-in. Integrato col protocollo esistente `mw-context-budget.py` (WARN 70% / CRIT 85%).
+
+**Implementato:**
+- `.devin/agents/researcher.md` — read-only, autorità CANON>CURRENT_STATE>DECISION_LOG>RICHIESTE>context/auto, obbligo citazioni `file:line` + recurring-traps check.
+- `.devin/agents/verifier.md` — esegue safeguard suite e riporta exit code/errori; timeout per regola 00, no fix, no foreground.
+- `.devin/agents/implementer.md` — write-capable su spec esatta, pinned fast model; invarianti config-first/i18n/persistence/primitives nel system prompt.
+- `.windsurf/rules/55-delegation-context-budget.md` (`trigger: always_on`) — matrice di delega, contratto subagent, lifecycle compaction/WARN/CRIT.
+- `scripts/devin-context-hooks.py` + `.devin/hooks.v1.json` — `PostCompaction` emette `additionalContext` + flag per-sessione; `UserPromptSubmit` di progetto re-inietta il reminder una volta se il flag esiste (fallback se `additionalContext` su PostCompaction non fosse onorato — non documentato per quell'evento).
+- `~/.config/devin/config.json`: `agent.subagent_model = "swe-1-6-fast"` (riguarda explore + custom senza pin; `subagent_general` segue sempre il parent).
+
+**Verificato:** `devin doctor` → 3 profili caricati (implementer, researcher, verifier), 0 failure; dry-run hook → emissione + flag-clearing corretto; JSON validi; file non gitignored.
+**Non verificato:** attivazione effettiva dei profili/hook dentro una sessione Devin live (visibile al prossimo uso — `/hooks` e pannello subagent); comportamento `additionalContext` su evento PostCompaction (fallback via flag implementato per coprirlo).
+
+## R-344 — ops: globalizzare delega subagent + context hooks (MW e tutti i progetti)
+
+**Richiesta (verbatim, 2026-11-15):** *"deve esser ein MW e tutti gli altri"*
+**Data:** 2026-11-15
+**Stato:** `fatta` — evidenza sotto.
+**Chiusura:** nessuna-verifica-tecnica: "ops tooling cross-project — verificato via devin doctor su RPG/MW/tmp + dry-run hook; closure:lint non verificabile in sessione (timeout >90s, come R-343)".
+
+**Implementato:**
+- Profili generici globali `~/.config/devin/agents/`: `researcher` (read-only, legge docs canonici del progetto ospite), `verifier` (check suite + timeout), `implementer` (write su spec esatta, legge AGENTS.md/CLAUDE.md) — tutti pinned `swe-1-6-fast`.
+- Profili RPG rinominati `rpg-researcher`/`rpg-verifier`/`rpg-implementer` in `.devin/agents/` per evitare collisione di nomi coi globali (doctor: 6 profili caricati, scelta deterministica); regola 55 aggiornata.
+- Regola globale `~/.devin/rules/delegation-context-budget.md` (`always_on`, tutti i progetti).
+- Hook context-restore spostato a livello globale: `mind-weaver/tools/devin-context-hooks.py` (generico — elenca i docs canonici presenti in `$DEVIN_PROJECT_DIR`) wired in `~/.config/devin/config.json` (`PostCompaction` + secondo `UserPromptSubmit` accanto a `mw-context-budget.py`). Rimossi `.devin/hooks.v1.json` e `scripts/devin-context-hooks.py` di progetto (doppio firing evitato).
+- `agent.subagent_model = swe-1-6-fast` già in config utente (R-343).
+
+**Verificato:** `devin doctor` in RPG (6 profili), mind-weaver (3), /tmp (3) — 0 failure; dry-run hook con `DEVIN_PROJECT_DIR` RPG e MW → elenca i docs canonici corretti di ciascun progetto; config.json valido.
+**Non verificato:** attivazione live in sessione (vale da nuove sessioni/`/fork`); precedenza runtime tra profili omonimi evitata a monte via rename.
