@@ -222,6 +222,24 @@ visibile. Verificare il contatore all'avvio della PROSSIMA sessione fresca.
 5. Fixare/rimuovere github-mcp-server e vercel MCP (morti); pulizia
    risorse puppeteer stale.
 
+### Stato dibattito (aggiornato 2026-11-15, fine sessione)
+
+Run: `mind-weaver/.mw/runs/20261115-context-budget-audit/`
+- Fase clarification CHIUSA: tutti e 5 READY, zero domande →
+  `grounding-ledger.md` scritto, `electorate_init` + `phase_transition`
+  registrati. DeepSeek recuperato via reconcile EXTRACT.
+- **T-002 (R1 proposals) POSTED a tutti e 5 — collect PENDENTE.**
+  Attenzione: role-hat NON assegnati (bash 3.2, `{ROLE}` vuoto — vedi
+  `ORCHESTRATOR-NOTE.md` nel run dir). Prompt identico per tutti.
+- **Resume:** `cd ~/progetti_personali/mind-weaver &&
+  browser-runtime/.venv/bin/python scripts/mw-web-turn.py collect --run
+  20261115-context-budget-audit --provider <p> --turn_id T-002` per i 5.
+  Poi mediare: leggere proposte → R2 con iniezioni cross-provider
+  (blinding `mw_blind.py` se ≥2 risposte) + ruoli critica diversificati
+  (prompt-enhancers: objective_critic / critique_and_counterplan).
+  Convergenza: acceptance su artifact-rNNN.md → `converged` o
+  `decision_memo` → report.md col Direttore.
+
 ### Contratto (obbligazioni verificabili)
 
 - [x] Meccanismo di metering documentato (fonte: docs devin-cli)
@@ -232,9 +250,48 @@ visibile. Verificare il contatore all'avvio della PROSSIMA sessione fresca.
        PRIMA di applicare (regole = governance, non si toccano da soli)
 - [ ] Voce registrata in `RICHIESTE.md` (audit contesto) — obbligo AGENTS.md
 
+## Aggiornamento sessione 2026-11-15 (thread 2 — deploy diagnosticato)
+
+### Esito accertato
+
+- **Git: pulito.** L'auto-commit pre-shutdown `5f11256d` ha committato e
+  pushato TUTTO il lavoro sporco (inclusi `_tmp-probe-*.mjs` e
+  `frame-v2.png` che questo handoff proponeva di escludere — ormai storia).
+  `main == origin/main`.
+- **Vercel: deploy di `5f11256d` FALLITO in build** (deployment id
+  `dpl_8apdVhwAQ3S8nfyZkonEvhbHaqhP`, state=failure). La causa:
+  `[assertDeployShape] ✗ deploy-manifest.json in drift` — l'auto-commit ha
+  portato ~99 file nuovi in `public/` (tmp-fan, hud-real, …) senza
+  rigenerare il manifest. L'alias `rpg-balancer.vercel.app` resta sul
+  deploy precedente `35b9f7e` (live, 200 OK).
+- **Fix applicato:** `node scripts/deploy/deployManifest.mjs` → manifest
+  rigenerato (`--check` verde: committato == rigenerato). Commit + push in
+  questo thread → nuovo deploy atteso verde sul gate assertDeployShape.
+- **Check GitHub rossi (separati dal deploy Vercel):**
+  - `Validate i18n…` → lo step rosso è `closure:lint`: residuo Director-gated
+    NOTO (game-menu-screens 2-owner, da handoff 2026-10-23) + NUOVO drift
+    dall'auto-commit (STRICT_FILES 0-owner su config mappa2/pixiSpike/
+    hudReal, scope_files divergenti, frontmatter mancante su
+    research-prompt-protocol.md). Serve un task dedicato di resync
+    contratti + ruling Director sui 2-owner.
+  - `Release` → fallimento AMBIENTALE: `npx playwright install` fallisce su
+    runner `ubuntu26.04-x64` (Playwright 1.58.2 non supporta l'immagine).
+    Non è un bug di codice: pin runner o bump Playwright.
+
+### Resume point — prossimo thread
+
+1. Verificare che il deploy del commit manifest-fix sia `state=success`
+   (`gh api repos/Kurokasaiken/RpgBalancer/deployments`) e che
+   `rpg-balancer.vercel.app` punti al nuovo sha.
+2. WebGL probe R-304: `node scripts/deploy/webglBootProbe.mjs https://rpg-balancer.vercel.app/game`
+   (e `/`) — headless con swiftshader, exit 0 = verde.
+3. Se verde: R-341 chiudibile `fatta` con citazione evidenza in RICHIESTE.
+4. Poi task separato: resync contratti/inventory per sbloccare
+   `closure:lint` in CI (ruling Director sui 2-owner game-menu-screens).
+5. R-342 dibattito MW: T-002 collect pendente (comandi nel § sopra).
+
 ## Non verificato (dillo al Director)
 
-- Perché esattamente il deploy precedente è fallito (log Vercel/guardian
-  non letti — mancava budget).
-- Se le modified files sono tutte dello stesso scope funzionale.
+- WebGL probe su prod non ancora eseguito in questo thread (budget).
 - Se i due autostash contengono lavoro rilevante.
+- `mw-reap` mancante segnalato da closure:lint in CI (PLAN-071).
