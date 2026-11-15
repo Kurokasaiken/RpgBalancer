@@ -22,7 +22,8 @@ import { MatericRosterComponentV2 } from '@/ui/idleVillage/rosterV2';
 import { SkinScope } from '@/ui/idleVillage/skins/primitives';
 import { selectResourceOutlook, useMinimalGameplayWithIdleVillageConfig } from '@/store/useMinimalGameplay';
 import { buildResourceReadoutItems } from '@/ui/idleVillage/components/gameFrame';
-import { HudRealCassetto, type CassettoQuest, type CassettoLoadout } from './HudRealCassetto';
+import { ExpeditionDrawer } from '@/ui/idleVillage/components/gameFrame/ExpeditionDrawer';
+import type { CassettoQuest, CassettoLoadout } from './HudRealCassetto';
 
 const POI_ID = 'poi-goblin';
 /** Stable empty bag — inline `?? []` inside the store selector mints a new array
@@ -161,7 +162,9 @@ export const HudRealCassettoHost: React.FC = () => {
           />
         </SkinScope>
       </div>
-      <HudRealCassetto
+      {/* R-339/PLAN-119 T2: same mount as /game — the ExpeditionDrawer
+       *  primitive owns the column + the collapse chip. */}
+      <ExpeditionDrawer
         quest={quest}
         slots={slots}
         resourceItems={resourceItems}

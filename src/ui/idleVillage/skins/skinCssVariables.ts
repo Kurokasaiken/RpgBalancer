@@ -227,6 +227,30 @@ export const BASE_SKIN_CSS_VARS: SkinCssVarMap = {
   '--skin-statbar-sheen':
     'linear-gradient(180deg, rgba(255,255,255,0.28), transparent 50%)',
 
+  /* ── Expedition drawer CONFIRM plaque (R-339/PLAN-119 T1: CTA enabled/muted)
+   *  The emerald plaque itself is baked into the cassetto column art — these
+   *  tokens own everything the live layer paints on top: enabled text tone +
+   *  its shadow, the hover sheen/ring and press face, the focus ring, and the
+   *  muted-state opacity. The names are declared in
+   *  `cassettoLayoutConfig.cta.vars` (traceable config → token link); a skin
+   *  may retune the values via preset overrides without touching the
+   *  component. */
+  '--skin-cassetto-cta-text': '#eafff5',
+  '--skin-cassetto-cta-text-shadow': '0 1px 4px rgba(0,0,0,.9)',
+  '--skin-cassetto-cta-muted-opacity': '0.55',
+  '--skin-cassetto-cta-sheen':
+    'radial-gradient(ellipse at 50% 40%, rgba(170,255,214,0.55), rgba(90,225,150,0.22) 55%, transparent 78%)',
+  '--skin-cassetto-cta-sheen-ring':
+    'inset 0 0 0 1.5px rgba(214,255,234,0.6), inset 0 -8px 18px rgba(0,42,20,0.4), 0 0 30px rgba(96,232,164,0.45)',
+  '--skin-cassetto-cta-press-sheen':
+    'radial-gradient(ellipse at 50% 58%, rgba(0,34,17,0.5), rgba(0,22,10,0.2) 60%, transparent 80%)',
+  '--skin-cassetto-cta-press-ring':
+    'inset 0 0 0 1.5px rgba(126,222,172,0.4), inset 0 9px 20px rgba(0,26,13,0.7)',
+  '--skin-cassetto-cta-press-transform': 'translateY(1px) scale(0.965)',
+  '--skin-cassetto-cta-hover-text-glow':
+    '0 0 12px rgba(152,255,202,0.6), 0 1px 4px rgba(0,0,0,0.9)',
+  '--skin-cassetto-cta-focus-ring': 'rgba(196,255,224,0.75)',
+
   /* Drag handle & draggable states */
   '--skin-drag-handle-color': 'rgba(223,184,87,0.50)',
   '--skin-drag-handle-hover': '#dfb857',
