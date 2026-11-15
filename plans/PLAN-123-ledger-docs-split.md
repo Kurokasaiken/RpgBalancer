@@ -1,6 +1,6 @@
 # PLAN-123 — Ledger-docs split: DECISION_LOG + desiderata → file attivi ≤cap + archivio union-read
 
-**Stato:** `draft` (2026-11-15 — spec sola, in attesa di battesimo Director.
+**Stato:** `in corso` (2026-11-15 — battezzato; ruling Director "go": D-1=**a** cutoff ≥2026-10-24, D-2=**c** digest (canonico intatto), D-3=cap 50k, D-4 no-op sotto D-2c. Digest = indice tutte vN + verbatim suffisso più grande ≤50k (~v25–v38).
 Misura strutturale reale già eseguita in sede di draft; D-1..D-4 a ruling.)
 
 **Parent:** R-342/R-343 (ops: audit contesto fisso Devin + delega subagent);
@@ -89,10 +89,10 @@ continua dentro lo scope del plan.
 
 | ID | Decisione | Proposta | Quando |
 |---|---|---|---|
-| D-1 | Regola split **DECISION_LOG** | **(a)** attivo = header + datate `Data`≥cutoff; legacy + datate vecchie → `context/DECISION_LOG-archive.md` — **raccomandata** (cutoff 10-24 ⇒ ~45.8k); **(b)** attivo = header + `Decision NNN` + datate≥cutoff, meta-sezioni (Regressions/Open/Future ~3.2k) in archivio — cutoff ≥10-30 ⇒ ~48k; **(c)** digest come D-2c | T-0, ruling Director |
-| D-2 | Regola split **desiderata** | **(a)** split per status → **misurata NULLA: 100% FROZEN, archivia zero byte** (per onestà); **(b)** recency split: attivo = header + v25–v38 (~47.6k), v1–v24 → `desiderata-archive.md`, FROZEN archiviate restano binding via union-read — richiede D-4 pre-apply; **(c)** **digest — raccomandata**: `desiderata.md` canonico INTATTO (egress slice invariato, zero rischio), si genera `desiderata-digest.md` (indice vN + ultime K verbatim) che sostituisce il file in read-list | T-0, ruling Director |
-| D-3 | Cap per file | ≤50.000 char ciascuno sul file in read-list (D-1a: ~45.8k misurato; D-2c digest: ~35–48k con K da ruling) | T-0, ruling Director |
-| D-4 | Tooling desiderata (blocker sotto D-2b) | union-read in `desiderata_slice`/`mw-desiderata-slice` (glob ordinato `desiderata*.md` o manifest) + re-baseline slice; sotto D-2c = no-op, solo generator+check digest. `planForensics.ts` → union-read DECISION_LOG | T-2 |
+| D-1 | Regola split **DECISION_LOG** | **(a)** attivo = header + datate `Data`≥cutoff; legacy + datate vecchie → `context/DECISION_LOG-archive.md` — **raccomandata** (cutoff 10-24 ⇒ ~45.8k); **(b)** attivo = header + `Decision NNN` + datate≥cutoff, meta-sezioni (Regressions/Open/Future ~3.2k) in archivio — cutoff ≥10-30 ⇒ ~48k; **(c)** digest come D-2c | **DECISO: (a) ≥2026-10-24** |
+| D-2 | Regola split **desiderata** | **(a)** split per status → **misurata NULLA: 100% FROZEN, archivia zero byte** (per onestà); **(b)** recency split: attivo = header + v25–v38 (~47.6k), v1–v24 → `desiderata-archive.md`, FROZEN archiviate restano binding via union-read — richiede D-4 pre-apply; **(c)** **digest — raccomandata**: `desiderata.md` canonico INTATTO (egress slice invariato, zero rischio), si genera `desiderata-digest.md` (indice vN + ultime K verbatim) che sostituisce il file in read-list | **DECISO: (c) digest** |
+| D-3 | Cap per file | ≤50.000 char ciascuno sul file in read-list (D-1a: ~45.8k misurato; D-2c digest: ~35–48k con K da ruling) | **DECISO: ≤50k/file** |
+| D-4 | Tooling desiderata (blocker sotto D-2b) | union-read in `desiderata_slice`/`mw-desiderata-slice` (glob ordinato `desiderata*.md` o manifest) + re-baseline slice; sotto D-2c = no-op, solo generator+check digest. `planForensics.ts` → union-read DECISION_LOG | **DECISO: no-op (digest)**; `planForensics` union-read |
 
 ## 3. Fasi / Task
 
