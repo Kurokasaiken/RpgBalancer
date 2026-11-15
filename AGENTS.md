@@ -1,4 +1,4 @@
-All'inizio di ogni sessione: leggi `CANON.md`, `CURRENT_STATE.md`, `DESIGN_PILLARS.md`, `context/DECISION_LOG.md`, `RICHIESTE.md` (file attivo; le voci antecedenti 2026-11-08 sono in `RICHIESTE-backlog.md`/`RICHIESTE-archive.md` — consultabili on-demand, PLAN-121), `.mw/desiderata.md`, `context/INDEX.md` (se esiste) e `context/auto/` (advisory lane NON canonica: preferenze/veto durevoli — su conflitto vince il canonico).
+All'inizio di ogni sessione: leggi `CANON.md`, `CURRENT_STATE.md`, `DESIGN_PILLARS.md`, `context/DECISION_LOG.md` (attivo — entry datate ≥2026-10-24; le antecedenti + le 14 sezioni legacy sono in `context/DECISION_LOG-archive.md`, consultabili on-demand, PLAN-123), `RICHIESTE.md` (file attivo; le voci antecedenti 2026-11-08 sono in `RICHIESTE-backlog.md`/`RICHIESTE-archive.md` — consultabili on-demand, PLAN-121), `.mw/desiderata-digest.md` (indice v1–v38 + ultime vN verbatim; il canonico `.mw/desiderata.md` resta intatto ed è la fonte dello slice tooling, PLAN-123), `context/INDEX.md` (se esiste) e `context/auto/` (advisory lane NON canonica: preferenze/veto durevoli — su conflitto vince il canonico).
 
 ## Cosa sono, e cosa non sono
 
@@ -9,12 +9,17 @@ All'inizio di ogni sessione: leggi `CANON.md`, `CURRENT_STATE.md`, `DESIGN_PILLA
 - **`DESIGN_PILLARS.md` — la direzione.** I riferimenti d'ispirazione del gioco e le scelte
   concrete di gameplay/UI/visual che ne derivano. Il file dice di sé stesso di essere *"la lente
   con cui controllare: è coerente con i pillar?"*.
-- **`context/DECISION_LOG.md` — la storia.** Le decisioni prese e il perché.
+- **`context/DECISION_LOG.md` — la storia.** Le decisioni prese e il perché. Splittato
+  (PLAN-123): l'attivo tiene le entry datate ≥2026-10-24 ed è l'unico file in scrittura;
+  `context/DECISION_LOG-archive.md` = sezioni legacy + datate antecedenti (lookup on-demand).
 - **`RICHIESTE.md` — le richieste esplicite.** Ciò che Fausto ha chiesto, con le sue parole. Ledger
   splittato (PLAN-121): `RICHIESTE.md` = attivo (`Data` ≥ 2026-11-08, unico file in scrittura),
   `RICHIESTE-backlog.md` = open antecedenti, `RICHIESTE-archive.md` = chiuse antecedenti. Le voci
   `aperta` e `in corso` sono lavoro impegnato.
-- **`.mw/desiderata.md` — desiderata FROZEN.** Decisioni di intento approvate; il workflow parte da qui.
+- **`.mw/desiderata-digest.md` — desiderata FROZEN.** Decisioni di intento approvate; il workflow parte da qui.
+  Digest generato (PLAN-123): indice completo + corpo verbatim delle ultime versioni. Il canonico
+  `.mw/desiderata.md` resta byte-intatto e vincolante — le citazioni `vN` risolvono su di esso
+  (fonte unica di `mw-desiderata-slice`).
 - **`context/INDEX.md` — catalogo contesto.** Indice dei documenti caldi del progetto, da consultare
   quando serve.
 

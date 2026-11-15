@@ -22,7 +22,7 @@ Desiderata di riferimento: `.mw/desiderata.md` v26.
 
 ## Pre-flight
 
-1. Leggi `DESIGN_PILLARS.md`, `CURRENT_STATE.md`, `context/DECISION_LOG.md` e `src/docs/docs/MASTER_PLAN.md`.
+1. Leggi `DESIGN_PILLARS.md`, `CURRENT_STATE.md`, `context/DECISION_LOG.md` (attivo; unione con `context/DECISION_LOG-archive.md` per le voci antecedenti, PLAN-123) e `src/docs/docs/MASTER_PLAN.md`.
 2. Consulta `context/INDEX.md` per i documenti di dominio pertinenti al tema.
 3. Nessun gate di desiderata FROZEN: questa fase precede le desiderata.
 
@@ -35,7 +35,7 @@ Desiderata di riferimento: `.mw/desiderata.md` v26.
 ## Perimetro di scrittura
 
 - **Sì:** MASTER_PLAN, strategic plan in `src/docs/docs/plans/`, documenti di design/direzione — su decisione presa in discussione.
-- **Solo su parola esplicita del Director:** `CANON.md`, `DESIGN_PILLARS.md`, `context/DECISION_LOG.md`.
+- **Solo su parola esplicita del Director:** `CANON.md`, `DESIGN_PILLARS.md`, `context/DECISION_LOG.md` (scritture solo sul file ATTIVO — le entry nuove vanno in coda; l'archive è read-only, PLAN-123).
 - La decisione direzionale resta del Director; tu curi la forma.
 
 ## Handoff al pipeline

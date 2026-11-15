@@ -17,8 +17,10 @@ Format: `[filename](path) — one sentence — \`tag\``
 - **L1 — Canonical facts:** `CANON.md` (mappa delle autorità),
   `QUEST_RULES.md`, `src/docs/docs/architecture_state.md`, i doc canonici di
   dominio. Se la domanda è «cosa vale oggi», rispondi da qui.
-- **L2 — Rationale / relationships:** `context/DECISION_LOG.md`,
-  `plans/INDEX.md` + i plan linkati, `.mw/desiderata.md` (intento FROZEN).
+- **L2 — Rationale / relationships:** `context/DECISION_LOG.md` (attivo;
+  archive on-demand `context/DECISION_LOG-archive.md`),
+  `plans/INDEX.md` + i plan linkati, `.mw/desiderata-digest.md` (intento FROZEN —
+  digest; canonico intatto `.mw/desiderata.md`).
   Per «perché è così» scendi qui.
 - **L3 — Negative / unresolved:** `context/REJECTED.md`,
   `context/OPEN.md`, piani `superseded`. Per «cosa abbiamo scartato / cosa è
@@ -28,7 +30,9 @@ Format: `[filename](path) — one sentence — \`tag\``
   conoscenza / cosa è stato detto nella conversazione».
 
 [DESIGN_PILLARS.md](DESIGN_PILLARS.md) — direction and inspiration pillars — `direction`
-[context/DECISION_LOG.md](context/DECISION_LOG.md) — history of decisions — `history`
+[context/DECISION_LOG.md](context/DECISION_LOG.md) — history of decisions (active, dated ≥2026-10-24; PLAN-123) — `history`
+[context/DECISION_LOG-archive.md](context/DECISION_LOG-archive.md) — decision log archive: 14 legacy sections + dated <2026-10-24 (on-demand lookup, PLAN-123) — `history` `archive`
+[.mw/desiderata-digest.md](.mw/desiderata-digest.md) — FROZEN intent digest: index v1–v38 + verbatim suffix (read-list; canonical `.mw/desiderata.md` untouched — PLAN-123) — `intent` `digest`
 [context/QUEST_GAMEPLAY_SCIENCE.md](context/QUEST_GAMEPLAY_SCIENCE.md) — living bibliography: real studies on suspense/failure/choice psychology for quest gameplay — `research` `quest` `design`
 [context/COMPETITIVE_LANDSCAPE.md](context/COMPETITIVE_LANDSCAPE.md) — mappa concettuale competitor nicchia settlement/hero management: prezzi, errori, posizionamento WT (R-158) — `research` `market` `strategy`
 [context/GOOD_QUEST_DEFINITION.md](context/GOOD_QUEST_DEFINITION.md) — artefatto finale PLAN-019: definizione di buona quest, regole validate + proprietà emerse S1–S4, ingresso S5 — `quest` `design` `canon`
