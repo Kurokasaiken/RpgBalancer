@@ -377,3 +377,14 @@ più grande dell'intera context window. Prossimo candidato ottimizzazione:
 split RICHIESTE attive/archivio (richiede plan + ruling — formato del file è
 governance). Anomalia notata: `55-delegation-context-budget.md` dichiara
 always_on ma non era nel manifest iniettato (cap harness o lag indicizzazione).
+
+## Phase-4 ri-misura — FATTO (2026-11-15, subagent)
+
+Report: `.mw/runs/plan120-catalog-slim/phase4-remeasure.md`.
+Read-list mandata AGENTS.md: **1.543.965 → 578.169 char (~386k → ~145k
+token stimati, -62.6%)** — quasi tutto merito dello split PLAN-121.
+Fixed layer ~10.4k token invariato (AGENTS.md +332 char doc-update).
+Prossime leve identificate: `DECISION_LOG.md` (149k char) e
+`.mw/desiderata.md` (148k) — stesso pattern split applicabile (plan
+dedicato, ruling Director). Hazard noto: backlog+archivio (~978k) sono
+on-demand ma nulla impedisce a un agente di leggerli in bulk.
