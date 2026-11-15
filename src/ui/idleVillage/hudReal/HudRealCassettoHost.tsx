@@ -23,6 +23,7 @@ import { SkinScope } from '@/ui/idleVillage/skins/primitives';
 import { selectResourceOutlook, useMinimalGameplayWithIdleVillageConfig } from '@/store/useMinimalGameplay';
 import { buildResourceReadoutItems } from '@/ui/idleVillage/components/gameFrame';
 import { ExpeditionDrawer } from '@/ui/idleVillage/components/gameFrame/ExpeditionDrawer';
+import { expeditionFoodCost } from '@/ui/idleVillage/components/gameFrame/expeditionBagAssign';
 import type { CassettoQuest, CassettoLoadout } from './HudRealCassetto';
 
 const POI_ID = 'poi-goblin';
@@ -100,6 +101,23 @@ export const HudRealCassettoHost: React.FC = () => {
     };
   }, [poi, scenario, session.poiView, session.estimate, t]);
 
+  const slots = session.controller.slots as unknown as import('@/ui/idleVillage/slots/types').ResidentSlotViewModel[];
+
+  /* T3-S2 consequence preview — same formula as the /game adapter
+   *  (party × days × per-resident daily rate, insufficient vs the live
+   *  food readout) so the lab shows the reserved cost cell populated. */
+  const costPreview = useMemo(() => {
+    const partySize = slots.filter((s) => s.assignedResidentId).length;
+    const cost = expeditionFoodCost(
+      partySize,
+      quest.totalDays ?? 0,
+      gpConfig.globalRules?.foodConsumptionPerResidentPerDay ?? 0,
+    );
+    const foodItem = resourceItems.find((item) => item.id === 'food');
+    const foodStock = foodItem !== undefined ? Number(foodItem.value) : NaN;
+    return { icon: 'food', qty: String(cost), insufficient: Number.isFinite(foodStock) && cost > foodStock };
+  }, [slots, quest.totalDays, gpConfig, resourceItems]);
+
   /* Quest bag as SLOT FRAMES (R-337): the sparse ledger bag, not a catalogue
    *  list — empty slots open the (bound) stash affordance, packed slots release. */
   const loadout: CassettoLoadout = useMemo(() => {
@@ -119,8 +137,6 @@ export const HudRealCassettoHost: React.FC = () => {
       onOpenStash: () => { stashState.bindStash(POI_ID); console.info('[cassetto-host] open stash'); },
     };
   }, [bag, stashState, t]);
-
-  const slots = session.controller.slots as unknown as import('@/ui/idleVillage/slots/types').ResidentSlotViewModel[];
 
   return (
     <DndContext
@@ -165,7 +181,7 @@ export const HudRealCassettoHost: React.FC = () => {
       {/* R-339/PLAN-119 T2: same mount as /game — the ExpeditionDrawer
        *  primitive owns the column + the collapse chip. */}
       <ExpeditionDrawer
-        quest={quest}
+        quest={{ ...quest, costPreview }}
         slots={slots}
         resourceItems={resourceItems}
         onSlotClear={(slotId) => session.handleSlotClear(slotId)}

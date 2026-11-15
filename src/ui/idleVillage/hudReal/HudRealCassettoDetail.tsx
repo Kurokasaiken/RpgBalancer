@@ -12,11 +12,12 @@ import { useTranslation } from 'react-i18next';
 import type { QuestExpeditionDetailProps } from '@/ui/idleVillage/quests/QuestExpeditionDetail';
 import { journeyFasiOf } from '@/ui/idleVillage/quests/questJourney';
 import { expeditionTotalDays } from '@/ui/idleVillage/quests/questExpedition';
-import { QUEST_STASH } from '@/balancing/config/idleVillage/quests/questStash';
 import { DEFAULT_IDLE_VILLAGE_CONFIG } from '@/balancing/config/idleVillage/defaultConfig';
 import { DANGER_BANDS } from '@/balancing/config/idleVillage/quests/questPois';
 import type { ResourceReadoutItem } from '@/ui/idleVillage/components/gameFrame/ResourceReadout';
 import { ExpeditionDrawer } from '@/ui/idleVillage/components/gameFrame/ExpeditionDrawer';
+import { expeditionFoodCost } from '@/ui/idleVillage/components/gameFrame/expeditionBagAssign';
+import { emptyStashBag, useVillageStashStore } from '@/ui/idleVillage/store/useVillageStashStore';
 import type { CassettoLoadout, CassettoQuest } from './HudRealCassetto';
 
 /** `labelKey`/`i18nKey` may carry the `idleVillage.` prefix — stripped before `t`. */
@@ -25,7 +26,7 @@ const stripNs = (k: string) => k.replace(/^idleVillage\./, '');
 export type HudRealCassettoDetailProps = QuestExpeditionDetailProps & {
   /** REAL village resource readout for the frame's header well (R-339). */
   resourceItems?: ResourceReadoutItem[];
-  /** R-339/PLAN-119 AC4: tapping a party seat opens the roster rail. */
+  /** R-339/PLAN-119 AC4: tapping a party seat opens the roster panel. */
   onOpenRoster?: () => void;
 };
 
@@ -49,6 +50,19 @@ export const HudRealCassettoDetail: React.FC<HudRealCassettoDetailProps> = (p) =
       fasi?.travelDays ?? 0,
       DEFAULT_IDLE_VILLAGE_CONFIG.globalRules.dayLengthInTimeUnits,
     );
+    /* T3-S2 consequence preview (artifact-r004 "reserved cost slot"): food
+     *  the departing members consume over the whole journey — party seats
+     *  filled × total days × the engine's per-resident daily rate
+     *  (`globalRules.foodConsumptionPerResidentPerDay`). `insufficient`
+     *  marks the value when the live food readout cannot cover it. */
+    const partySize = p.slots.filter((s) => s.assignedResidentId).length;
+    const costFood = expeditionFoodCost(
+      partySize,
+      totalDays,
+      DEFAULT_IDLE_VILLAGE_CONFIG.globalRules.foodConsumptionPerResidentPerDay,
+    );
+    const foodItem = p.resourceItems?.find((item) => item.id === 'food');
+    const foodStock = foodItem !== undefined ? Number(foodItem.value) : NaN;
     return {
       title: p.scenario?.title ?? '',
       subtitle: t('gameFrame.cassetto.demo.subtitle', 'Pianifica la spedizione'),
@@ -61,18 +75,26 @@ export const HudRealCassettoDetail: React.FC<HudRealCassettoDetailProps> = (p) =
       totalDays,
       riskLabel: dangerBand ? t(stripNs(dangerBand.i18nKey)) : '—',
       rewards: [{ icon: 'gold', qty: String(p.scenario?.rewardBase ?? 60) }],
+      costPreview: {
+        icon: 'food',
+        qty: String(costFood),
+        insufficient: Number.isFinite(foodStock) && costFood > foodStock,
+      },
     };
-  }, [p.poi, p.scenario, p.estimate, p.expeditionDuration, t]);
+  }, [p.poi, p.scenario, p.estimate, p.expeditionDuration, p.slots, p.resourceItems, t]);
 
-  /* Quest bag as SLOT FRAMES (R-337 contract): `bagSlots` wells, slot i =
-   * `selectedItemIds[i]` (selection order, same as the stock `QuestBagSlot`).
-   * An empty pouch opens the bound magazzino (`onOpenStash` — the session
-   * binds the stash owner to THIS poi first); a packed tile releases its item
-   * back to the shared pool via the real `toggleItem`. */
-  const loadout = useMemo<CassettoLoadout>(
-    () => ({
-      slots: Array.from({ length: QUEST_STASH.bagSlots }, (_, i) => {
-        const id = p.selectedItemIds[i];
+  /* Quest bag as SLOT FRAMES (R-337 contract): the ledger's sparse
+   * `bags[poi.id]` is the authoritative slot layout — positions stay put,
+   * a release leaves a hole in place, an assign lands in the first free
+   * well. An empty pouch opens the bound magazzino (`onOpenStash` — the
+   * session binds the stash owner to THIS poi first); a packed tile
+   * releases its item back to the shared pool via the real `toggleItem`. */
+  const stashBag = useVillageStashStore((s) => s.bags[p.poi.id]);
+  const loadout = useMemo<CassettoLoadout>(() => {
+    const bag = stashBag ?? emptyStashBag();
+    return {
+      slots: emptyStashBag().map((_, i) => {
+        const id = bag[i] ?? null;
         if (!id) return null;
         const entry = p.items.find((e) => e.item.id === id);
         if (!entry) return null;
@@ -83,11 +105,10 @@ export const HudRealCassettoDetail: React.FC<HudRealCassettoDetailProps> = (p) =
           qty: entry.qty,
         };
       }),
-      onReleaseItem: (itemId: string) => p.onToggleItem(itemId),
+      onReleaseItem: p.onToggleItem,
       onOpenStash: p.onOpenStash,
-    }),
-    [p.selectedItemIds, p.items, p.onToggleItem, p.onOpenStash, t],
-  );
+    };
+  }, [stashBag, p.items, p.onToggleItem, p.onOpenStash, t]);
 
   /* R-339/PLAN-119 T2: the mount is the `ExpeditionDrawer` primitive — the
    *  signed column plus its fold contract (collapse chip ⇄ right-edge chip).

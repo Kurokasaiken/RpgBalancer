@@ -458,6 +458,7 @@ export default interface Resources {
           "partyIncomplete": "Party incomplete — fill the required slots",
           "unavailable": "Expedition not ready yet"
         },
+        "cost": "Cost",
         "demo": {
           "subtitle": "Plan the expedition"
         },
@@ -877,14 +878,6 @@ export default interface Resources {
         },
         "waiting": "A decision is waiting"
       },
-      "rail": {
-        "ariaLabel": "Roster and village stash",
-        "collapse": "Collapse the roster column",
-        "expand": "Open the roster column",
-        "memberStats": "Member condition",
-        "tabStash": "Stash",
-        "tablist": "Roster and stash"
-      },
       "regions": {
         "eastern_mountains": "Ember Highlands",
         "eastern_woods": "Eastern Groves",
@@ -969,6 +962,7 @@ export default interface Resources {
           "swapped": "{item} packed — the displaced item returned to the store"
         },
         "bagFull": "The expedition bag is full",
+        "bagFullHint": "Bag full — release an item to pack another",
         "capacity": "{count} of {max} goods in store",
         "elsewhere": "{count} packed or committed elsewhere",
         "empty": "The shelf is empty — every copy is packed or away",

@@ -1133,6 +1133,7 @@
       "empty": "Lo scaffale è vuoto — ogni copia è in sacca o in viaggio",
       "addToBag": "Metti {item} nella sacca della spedizione",
       "bagFull": "La sacca della spedizione è piena",
+      "bagFullHint": "Sacca piena — libera un oggetto per metterne un altro",
       "unavailable": "Nessuna copia rimasta in magazzino",
       "alreadyInBag": "Già nella sacca",
       "announce": {
@@ -1556,6 +1557,7 @@
       "journey": "Viaggio",
       "riskRewards": "Rischio e ricompense",
       "risk": "Rischio",
+      "cost": "Costo",
       "confirm": "CONFERMA",
       "collapse": "Comprimi il cassetto della spedizione",
       "expand": "Apri il planner della spedizione",
@@ -1576,14 +1578,6 @@
         "site": "Sul posto",
         "return": "Ritorno"
       }
-    },
-    "rail": {
-      "ariaLabel": "Roster e magazzino del villaggio",
-      "expand": "Apri la colonna roster",
-      "collapse": "Comprimi la colonna roster",
-      "tablist": "Roster e magazzino",
-      "tabStash": "Scorte",
-      "memberStats": "Condizione dei membri"
     },
     "topChrome": {
       "ariaLabel": "Giorno e risorse"

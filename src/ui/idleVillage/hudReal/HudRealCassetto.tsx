@@ -48,6 +48,13 @@ export interface CassettoQuest {
   totalDays?: number;
   riskLabel: string;
   rewards: { icon: string; qty: string }[];
+  /** R-339/PLAN-119 T3-S2 (artifact-r004 "consequence preview"): the food
+   *  cost the expedition drains over the journey, rendered in the reserved
+   *  `cassetto-cost-slot` cell between risk and rewards. `icon` is a
+   *  `res-*` resource id (same convention as `rewards[].icon`);
+   *  `insufficient` flips the value to the danger tone when the village
+   *  stock cannot cover it. Display-only — the cell never takes input. */
+  costPreview?: { icon: string; qty: string; insufficient?: boolean };
 }
 export interface CassettoLoadoutSlot {
   id: string;
@@ -507,15 +514,18 @@ export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
           ))}
         </div>
 
-        {/* T2 reserved cost slot (artifact-r004 "reserved cost slot"): the
-         *  food-cost preview is S2 scope — this cell reserves its seat in the
-         *  gap between risk and rewards (derived from the measured zones,
-         *  variant-adaptive). Flagged placeholder, intentionally empty and
-         *  non-interactive — nothing painted on the signed art. */}
+        {/* T2/T3-S2 reserved cost slot (artifact-r004 "reserved cost slot"):
+         *  the food-cost consequence preview lands here — the cell sits in
+         *  the gap between risk and rewards (derived from the measured
+         *  zones, variant-adaptive). Without `quest.costPreview` it stays a
+         *  flagged, empty placeholder; in both forms it never takes input —
+         *  nothing interactive is painted on the signed art. */}
         <div
           data-testid="cassetto-cost-slot"
-          data-placeholder="cost-preview"
-          aria-hidden="true"
+          data-placeholder={quest.costPreview ? undefined : 'cost-preview'}
+          aria-hidden={quest.costPreview ? undefined : true}
+          role="group"
+          aria-label={quest.costPreview ? t('gameFrame.cassetto.cost', 'Cost') : undefined}
           style={{
             ...zp({
               x: Z.riskValue.x + Z.riskValue.w + 12,
@@ -524,8 +534,35 @@ export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
               h: Z.riskValue.h,
             }),
             pointerEvents: 'none',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
           }}
-        />
+        >
+          {quest.costPreview && (
+            <>
+              <span style={{ fontSize: fz(15), letterSpacing: '0.14em', textTransform: 'uppercase', color: C.muted }}>
+                {t('gameFrame.cassetto.cost', 'Cost')}
+              </span>
+              <span
+                data-testid="cassetto-cost-value"
+                data-tone={quest.costPreview.insufficient ? 'danger' : undefined}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: fz(5),
+                  fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: fz(24), fontWeight: 700,
+                  color: quest.costPreview.insufficient ? C.danger : C.goldHi,
+                  textShadow: '0 1px 3px rgba(0,0,0,.9)',
+                }}
+              >
+                <img
+                  src={`/assets/ui/resources/res-${quest.costPreview.icon}-64.webp`}
+                  alt=""
+                  style={{ width: fz(26), height: fz(26) }}
+                  draggable={false}
+                />
+                {quest.costPreview.qty}
+              </span>
+            </>
+          )}
+        </div>
         </div>
 
         {/* T2 block `launch-cta` — inline reason + the CONFIRM plaque. */}
