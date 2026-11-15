@@ -114,7 +114,7 @@ riservata da D10). Nessuna modifica a regole gameplay/quest.
 - ESLint scopato: i file `src/ui/idleVillage/**` e `tests/unit/**` risultano ignored dalla config — copertura lint non significativa.
 - `tests/i18n/icuInterpolation.test.ts`: 2 failure preesistenti su placeholder `{{...}}` legacy in `questGenLab` — NON causati da questa slice.
 
-**Non fatto (prossime sessioni):** T1 token skin (clamp 360/23vw/460, detents), T2 struttura completa oltre l'esistente, T3 bag assign (S2), ~~T6 top chrome + sole + zona Chronicle~~ (fatto, vedi ledger T6), T8 mobile bottom-sheet, cablaggio insets→safeFit. File sporchi della sessione parallela (voce R-338, poi-radial, reliquary/cassettoDetail) non toccati né committati.
+**Non fatto (prossime sessioni):** T1 token skin (clamp 360/23vw/460, detents), ~~T2 struttura completa oltre l'esistente~~ (fatto, vedi ledger T2), T3 bag assign (S2), ~~T6 top chrome + sole + zona Chronicle~~ (fatto, vedi ledger T6), T8 mobile bottom-sheet, cablaggio insets→safeFit. File sporchi della sessione parallela (voce R-338, poi-radial, reliquary/cassettoDetail) non toccati né committati.
 
 ### Seal + contratti (2026-11-15, ruling Director)
 - `trusted:seal` eseguito (×2): BASE = HEAD. Errori miei risolti: unità `expedition-edge-tab` creata (INV-1, ex INV-5), inventory rigenerato via `componentInventory.ts --write`, scaffold `place-fan-cards` auto-creato. Push su main.
@@ -155,4 +155,39 @@ riservata da D10). Nessuna modifica a regole gameplay/quest.
 
 ### safeFit wiring — scoperta: NON è una prop, è un cambio di framing
 `/game` monta `PixiWorldMap` **senza** `safeFit` → cover-fit, "the framing the Director approved" (commento in pagina). Attivare safeFit con `insets.right` dal ledger richiede: `landBounds` dal manifest + `seaMarginPx/YPx` + verifica che a riposo il framing non cambi (T-01) + witness T-04 su apertura/chiusura drawer. Task dedicato, stimato non banale — NON fatto.
-### Prossimi: ~~T6 chrome+sole~~ (fatto) · T8 sheet · T1/T2/T3 restanti · gate chiusura R-339.
+
+## Ledger — T1 token skin completamento (2026-11-15, stessa sessione)
+
+**Stato T1 all'apertura:** layout già tokenizzati in `cassettoLayoutConfig` (commit `be53077e`): drawer clamp {360, 0.23, 460} (consumato come cap in `cassettoColumnWidthFor`), rail {320/40/margin/bottomInset/mutex 1100}, `bottomSheet` detents {56, .5, .92} (consumo in T8), `topChrome.chronicleReservePx` (consumato in T6), `rail.bars[].fill` → `var(--skin-statbar-*)`. **Unico residuo: "CTA enabled/muted"** — i colori/opacity del CONFIRM erano hardcoded in `HudRealCassetto` (`RACK_SCOPED_CSS` + inline `opacity 0.55` + `color #eafff5`).
+
+**Fatto:**
+- 10 nuovi token `--skin-cassetto-cta-*` in `BASE_SKIN_CSS_VARS` (`skinCssVariables.ts`): text, textShadow, mutedOpacity, sheen, sheenRing, pressSheen, pressRing, pressTransform, hoverTextGlow, focusRing — override per preset possibili, nessun componente tocca più un letterale colore/opacity per la CTA.
+- `cassettoLayoutConfig.cta.vars` (blocco Zod strict): dichiara i NOMI dei token consumati — catena tracciabile config → `var(--skin-*)` → registry (AC8), stesso pattern di `rail.bars[].fill`.
+- `HudRealCassetto`: `RACK_SCOPED_CSS` interpola `CTA_VARS.*`; lo stato muted è una regola `:disabled` nel foglio scoped (`opacity: var(--skin-cassetto-cta-muted-opacity)`) — rimosso l'inline `opacity 0.55` e il colore/test-shadow letterali di `.confirm-text`. Delta visivo: **zero** (valori identici, ora da token).
+- Test permanente `tests/unit/idleVillage/r339ExpeditionTokens.test.tsx` 6/6: pin schema (strict, numeri T1), cap `widthMaxPx`, tracciabilità token (ogni `var(--skin-*)` nominato in config esiste in `BASE_SKIN_CSS_VARS`), regole CONFIRM senza letterali colore, muted via token.
+- Contratto `.mw/contracts/components/expedition-layout-tokens.md` (INV-1..3, shared-kernel t2; scope solo `cassettoLayoutConfig.ts` + `cassettoColumn.ts` — i file strict già owned restano ai loro contratti).
+
+**Verifiche:** nuovo test 6/6; suite adiacenti `r339ExpeditionStates` 10/10, `r339DawnDuskWash` 8/8, `r339TopChrome` 11/11, `r339RosterStashRail` 10/10 verdi; `i18n:types` OK; `build:check` OK (`test-results/build-check-2026-11-15.log`); lint scope 0 errori (file ignored — gap noto). `contracts:index-sync` "già sincronizzato" (unit non in inventory: `componentInventory --write` è bloccato dal drift partition estero — 2-owner su `gameFrame/menu/*` + `placeFanGeometry.ts` — stessa situazione di `hud-real-cassetto`; riga index in attesa di re-seal). Witness headless **lab** `/hud-compose?comp=cassetto` (`test-results/r339-cta-tokens-lab.png`): computed `opacity 0.55` (muted, party vuota), `color rgb(234,255,245)`, sheen gradient risolti via `var()` dal layer skin — token live, visual identico.
+
+**Nota T-13 (witness /game):** il witness diretto su `/game?poiDemo=1` è rimasto bloccato dalla tempesta HMR della sessione parallela — 18 navigations in ~170s, boot Pixi (fasi manifest→assets→build→warmup→ready) resettata in loop; un unico quiet window ha raggiunto `phase:"ready"` + `data-map-ready` alle ~163s, poi reload prima del click POI. Stessa componente già witnessata su /game nelle slice T5/T6; il delta T1 è pura estrazione token (verificato computed-identico sul lab). Il probe retry è in `scripts/hud-real/_tmp-probe-game-cta.mjs` per la prossima finestra calma. **Inoltre la prima stesura di questa voce di ledger è stata cancellata dal worktree churn (pull --rebase + checkout della sessione parallela): riapplicata.**
+
+**Misura AC2 (da registrare, non risolta):** con rail 320 + colonna art 420px @1440×900 la mappa libera è (1440-320-420)/1440 = **48,6%** — sotto il 50% "both open" del contratto D4. Il token `widthVwFraction`/clamp era stato pensato per un drawer 360–460px; l'art firmata R-323 (420px) eccede il budget solo a 1440 (a 1366 ≈50,4% e a 1920 ≈59,4% restano sopra). Serve ruling: accettare 48,6%, estendere il mutex band, o ridurre la riserva. Il probe misurato (obbligazione 2) confermerà.
+
+**Scope residue del file:** `HudRealCassetto.tsx` mantiene letterali colore legacy fuori dal path CONFIRM (palette `C.*`, risorse, bag slots) — la tokenizzazione completa del file è oltre T1 (flaggato, non fatto in silenzio).
+
+## Ledger — T2 ExpeditionDrawer primitiva (2026-11-15, stessa sessione)
+
+**Fatto:**
+- `ExpeditionDrawer` (`components/gameFrame/`): la primitiva drawer expedition — wrapper docked del `HudRealCassetto` firmato + contratto di piega. Due sole forme con quest selezionata: colonna espansa (invariata) e chip destro ripiegata; il riposo no-quest resta `ExpeditionEdgeTab` (superficie diversa, contratto `expedition-edge-tab`), non un modo del drawer.
+- Fold chip sul bordo sinistro vivo della colonna — offset `min(aspect × 100vh, widthMaxPx)` in CSS puro (stessa regola di `cassettoColumnWidthFor`, nessun secondo listener); chip ripiegata 40×72 docked `right:0`, mirror di `rail-expand-chip` (pouch + chevron).
+- `useExpeditionDrawer` (Zustand): `expanded` default true, persiste tra remount e switch quest come intenzione utente (mirror D2 "state preserved"). Store proprio perché il drawer monta dentro `wrapDetail` e superfici sorelle (mutex rail ≤1100, sheet T8) possono dover pilotare il fold dall'esterno.
+- Sei blocchi nominati `data-block` (`quest-banner`, `party-slots`, `bag-slots`, `journey-strip`, `risk-rewards`, `launch-cta`) via wrapper `display:contents` in `HudRealCassetto` — zero delta layout. Cella costo riservata `cassetto-cost-slot` (`data-placeholder="cost-preview"`, vuota e non interattiva, flaggata) nel gap risk↔rewards — sede della preview food-cost S2 (artifact-r004 "reserved cost slot").
+- Config: `drawer.chipWidthPx=40` (schema strict + RAW); il pin T1 in `r339ExpeditionTokens` aggiornato alla nuova shape. Occupazione onesta: il chip pubblica `chipWidthPx` in `insets.right`, espanso la colonna continua a possedere la propria misura (mai clobberata), unmount/`visible=false` → 0.
+- Wiring: `HudRealCassettoDetail` (/game via `wrapDetail`) e `HudRealCassettoHost` (lab) montano `ExpeditionDrawer` — stesse prop, stesso stato sessione (fold solo visivo, nessun closeDetail). `useCassettoColumnSpec` esportato da `HudRealCassetto` per il chip.
+- i18n `gameFrame.cassetto.collapse` / `.expand` EN+IT; tipi rigenerati. Contratto `.mw/contracts/components/expedition-drawer.md` INV-1..5.
+
+**Verifiche:** `r339ExpeditionDrawer.test.tsx` 7/7 + tutte le suite r339 (52 test) verdi; `r335CassettoResources`/`r337CassettoBagSlots` 1 failure ciascuna = **asserzioni statiche stale preesistenti su `HudRealCassettoDetail` (rosse già a HEAD, già note nel ledger T5 — non mie)**; `i18n:types` OK; `build:check` OK (`test-results/build-check-2026-11-15.log`); `contracts:index-sync` "già sincronizzato" (unit non in inventory: `componentInventory --write` bloccato dal drift partition estero come T1 — riga index in attesa di re-seal); lint scope 0 errori (file ignored — gap noto). Witness headless **lab** `/hud-compose?comp=cassetto` (`test-results/r339-t2-lab-{expanded,foldchip,chip,edgechip,restored}.png`): EXPANDED sei `data-block` + cost-slot, fold chip `min(46.68vh,460px)` sul bordo sinistro colonna; FOLDED solo chip 40×72 a `right:1440` (insets.right=chipWidthPx); RESTORED colonna+CONFIRM.
+
+**Nota T-13:** il witness diretto su `/game?poiDemo=1` resta bloccato dalla tempesta HMR della sessione parallela (boot reset in loop, identico a T1) — retry probe `scripts/hud-real/_tmp-probe-game-drawer.mjs`. Il lab monta fixture proprie sopra i chip (debug roster strip x740–1040, POI card sul bordo destro) — occlusioni di laboratorio, non del drawer; click DOM + occluder nascosti solo per gli screenshot dei chip.
+
+### Prossimi: T3 slot/assign affinamenti (S2) · T8 sheet · cablaggio insets→safeFit · gate chiusura R-339.

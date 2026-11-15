@@ -1557,6 +1557,8 @@
       "riskRewards": "Rischio e ricompense",
       "risk": "Rischio",
       "confirm": "CONFERMA",
+      "collapse": "Comprimi il cassetto della spedizione",
+      "expand": "Apri il planner della spedizione",
       "legDays": "{count, plural, one {# giorno} other {# giorni}}",
       "journeyTotal": "Totale: {count, plural, one {# giorno} other {# giorni}}",
       "confirmReason": {

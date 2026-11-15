@@ -16,7 +16,8 @@ import { QUEST_STASH } from '@/balancing/config/idleVillage/quests/questStash';
 import { DEFAULT_IDLE_VILLAGE_CONFIG } from '@/balancing/config/idleVillage/defaultConfig';
 import { DANGER_BANDS } from '@/balancing/config/idleVillage/quests/questPois';
 import type { ResourceReadoutItem } from '@/ui/idleVillage/components/gameFrame/ResourceReadout';
-import { HudRealCassetto, type CassettoLoadout, type CassettoQuest } from './HudRealCassetto';
+import { ExpeditionDrawer } from '@/ui/idleVillage/components/gameFrame/ExpeditionDrawer';
+import type { CassettoLoadout, CassettoQuest } from './HudRealCassetto';
 
 /** `labelKey`/`i18nKey` may carry the `idleVillage.` prefix — stripped before `t`. */
 const stripNs = (k: string) => k.replace(/^idleVillage\./, '');
@@ -88,8 +89,11 @@ export const HudRealCassettoDetail: React.FC<HudRealCassettoDetailProps> = (p) =
     [p.selectedItemIds, p.items, p.onToggleItem, p.onOpenStash, t],
   );
 
+  /* R-339/PLAN-119 T2: the mount is the `ExpeditionDrawer` primitive — the
+   *  signed column plus its fold contract (collapse chip ⇄ right-edge chip).
+   *  The same props flow through untouched. */
   return (
-    <HudRealCassetto
+    <ExpeditionDrawer
       quest={quest}
       slots={p.slots}
       resourceItems={p.resourceItems}

@@ -1562,6 +1562,8 @@
       "riskRewards": "Risk & Rewards",
       "risk": "Risk",
       "confirm": "CONFIRM",
+      "collapse": "Collapse the expedition drawer",
+      "expand": "Open the expedition planner",
       "legDays": "{count, plural, one {# day} other {# days}}",
       "journeyTotal": "Total: {count, plural, one {# day} other {# days}}",
       "confirmReason": {

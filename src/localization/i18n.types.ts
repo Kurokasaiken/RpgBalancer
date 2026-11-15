@@ -452,6 +452,7 @@ export default interface Resources {
         }
       },
       "cassetto": {
+        "collapse": "Collapse the expedition drawer",
         "confirm": "CONFIRM",
         "confirmReason": {
           "partyIncomplete": "Party incomplete — fill the required slots",
@@ -463,6 +464,7 @@ export default interface Resources {
         "edgeTab": {
           "hint": "Select a quest marker"
         },
+        "expand": "Open the expedition planner",
         "journey": "Journey",
         "journeyTotal": "Total: {count, plural, one {# day} other {# days}}",
         "leg": {

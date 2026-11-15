@@ -9,6 +9,10 @@
  * Zero opaque cover patches: live i18n text, the REAL certified ResidentSlotRack mount,
  * the REAL village stash bag, and the live CONFIRM button sit directly inside the
  * clean painted enamel/navy wells.
+ * PLAN-119 T2: the interior is partitioned into the six named mockup blocks via
+ * `display:contents` wrappers (`data-block` = quest-banner / party-slots /
+ * bag-slots / journey-strip / risk-rewards / launch-cta) so the drawer's
+ * structure is testable without moving a pixel of the signed zones.
  */
 import React, { useSyncExternalStore } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -109,7 +113,9 @@ const subscribeWide = (cb: () => void) => {
   return () => mq.removeEventListener('change', cb);
 };
 const readWide = () => window.matchMedia(WIDE_MQ).matches;
-const useColumnSpec = () => {
+/** The live column spec for the current viewport width — shared with the
+ *  T2 `ExpeditionDrawer` fold chip, which must sit at the column's left edge. */
+export const useCassettoColumnSpec = () => {
   const wide = useSyncExternalStore(subscribeWide, readWide, () => true);
   return cassettoColumnSpec(wide ? 1440 : 1280);
 };
@@ -120,6 +126,11 @@ function compactRes(v: string | number): string {
   if (!Number.isFinite(n) || Math.abs(n) < 100000) return String(v);
   return new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 }).format(n);
 }
+
+/* R-339/PLAN-119 T1: the CONFIRM states read ONLY the skin tokens named in
+ * `CASSETTO_LAYOUT_CONFIG.cta.vars` (values in BASE_SKIN_CSS_VARS) — no
+ * literal color or opacity for the CTA anywhere in this component. */
+const CTA_VARS = CASSETTO_LAYOUT_CONFIG.cta.vars;
 
 /* Force the 4 detail slots onto a single evenly-spaced 4-column row inside the Party Slots well */
 const RACK_SCOPED_CSS = `
@@ -133,27 +144,33 @@ const RACK_SCOPED_CSS = `
 }
 /* CONFIRM — the plaque is baked into the column art, so the feedback lives
    on an invisible sheen + the text layer: hover ignites an emerald glow,
-   press sinks the text and darkens the plaque's face, focus gets a ring. */
+   press sinks the text and darkens the plaque's face, focus gets a ring.
+   Every value below is a var(--skin-cassetto-cta-*) token (T1/AC8). */
 [data-hudreal-cassetto] [data-testid="cassetto-confirm"] .confirm-sheen {
   position: absolute; inset: 8% 6%; border-radius: 999px;
-  background: radial-gradient(ellipse at 50% 40%, rgba(170,255,214,0.55), rgba(90,225,150,0.22) 55%, transparent 78%);
-  box-shadow: inset 0 0 0 1.5px rgba(214,255,234,0.6), inset 0 -8px 18px rgba(0,42,20,0.4), 0 0 30px rgba(96,232,164,0.45);
+  background: ${CTA_VARS.sheen};
+  box-shadow: ${CTA_VARS.sheenRing};
   opacity: 0; transition: opacity 160ms ease; pointer-events: none;
 }
 [data-hudreal-cassetto] [data-testid="cassetto-confirm"]:not(:disabled):hover .confirm-sheen { opacity: 1; }
 [data-hudreal-cassetto] [data-testid="cassetto-confirm"]:not(:disabled):active .confirm-sheen {
   opacity: 1;
-  background: radial-gradient(ellipse at 50% 58%, rgba(0,34,17,0.5), rgba(0,22,10,0.2) 60%, transparent 80%);
-  box-shadow: inset 0 0 0 1.5px rgba(126,222,172,0.4), inset 0 9px 20px rgba(0,26,13,0.7);
+  background: ${CTA_VARS.pressSheen};
+  box-shadow: ${CTA_VARS.pressRing};
 }
+/* Muted state (T1): the disabled CONFIRM dims to the skin token — the
+   inline reason beside it is the component's job, the look is the token's. */
+[data-hudreal-cassetto] [data-testid="cassetto-confirm"]:disabled { opacity: ${CTA_VARS.mutedOpacity}; }
 [data-hudreal-cassetto] [data-testid="cassetto-confirm"] .confirm-text {
+  color: ${CTA_VARS.text};
+  text-shadow: ${CTA_VARS.textShadow};
   transition: transform 120ms cubic-bezier(0.25, 0.46, 0.45, 0.94), text-shadow 160ms ease;
 }
 [data-hudreal-cassetto] [data-testid="cassetto-confirm"]:not(:disabled):hover .confirm-text {
-  text-shadow: 0 0 12px rgba(152,255,202,0.6), 0 1px 4px rgba(0,0,0,0.9);
+  text-shadow: ${CTA_VARS.hoverTextGlow};
 }
-[data-hudreal-cassetto] [data-testid="cassetto-confirm"]:not(:disabled):active .confirm-text { transform: translateY(1px) scale(0.965); }
-[data-hudreal-cassetto] [data-testid="cassetto-confirm"]:focus-visible { outline: 2px solid rgba(196,255,224,0.75); outline-offset: -5px; border-radius: 14px; }
+[data-hudreal-cassetto] [data-testid="cassetto-confirm"]:not(:disabled):active .confirm-text { transform: ${CTA_VARS.pressTransform}; }
+[data-hudreal-cassetto] [data-testid="cassetto-confirm"]:focus-visible { outline: 2px solid ${CTA_VARS.focusRing}; outline-offset: -5px; border-radius: 14px; }
 /* Bag slots — pouch brightens on hover, packed tiles lift and glow. */
 [data-hudreal-cassetto] [data-testid^="bag-slot-empty-"] svg { transition: opacity 160ms ease, filter 160ms ease; }
 [data-hudreal-cassetto] [data-testid^="bag-slot-empty-"]:hover svg { opacity: 0.95 !important; filter: drop-shadow(0 0 6px rgba(223,184,87,0.6)); }
@@ -166,7 +183,7 @@ export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
   quest, slots, resourceItems, onSlotClick, onSlotClear, suppressedResidentIds, loadout, canSend = true, disabledReason, onConfirm,
 }) => {
   const { t } = useTranslation('idleVillage');
-  const spec = useColumnSpec();
+  const spec = useCassettoColumnSpec();
   const Z = spec.geo.zones;
   const { artW, artH } = spec.geo;
   const zp = (z: Zone) => pct(z, artW, artH);
@@ -300,43 +317,51 @@ export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
           </div>
         )}
 
-        {/* Title inside the clean emerald cartouche */}
-        <div style={{ ...zp(Z.title), display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 2%' }}>
-          <span style={{
-            fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: fz(27), fontWeight: 700,
-            letterSpacing: '0.05em', textTransform: 'uppercase', color: C.goldHi,
-            textShadow: '0 1px 3px rgba(0,0,0,.9)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-          }}>
-            {quest.title}
-          </span>
+        {/* T2 block `quest-banner` — title + subtitle + briefing. The
+         *  `display:contents` wrapper names the mockup block without
+         *  generating a box: children still position against the art
+         *  container (zero layout delta). Same convention for every block. */}
+        <div data-block="quest-banner" style={{ display: 'contents' }}>
+          {/* Title inside the clean emerald cartouche */}
+          <div style={{ ...zp(Z.title), display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 2%' }}>
+            <span style={{
+              fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: fz(27), fontWeight: 700,
+              letterSpacing: '0.05em', textTransform: 'uppercase', color: C.goldHi,
+              textShadow: '0 1px 3px rgba(0,0,0,.9)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+            }}>
+              {quest.title}
+            </span>
+          </div>
+
+          {/* Subtitle on the emerald band */}
+          <div style={{ ...zp(Z.subtitle), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span style={{ fontStyle: 'italic', fontSize: fz(21), color: C.muted, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {quest.subtitle}
+            </span>
+          </div>
+
+          {/* Briefing well */}
+          <div style={{ ...zp(Z.briefing), padding: '3.5% 4.5%', overflow: 'hidden' }}>
+            <p style={{ margin: 0, fontSize: fz(23), lineHeight: 1.42, color: C.ink }}>
+              {quest.briefing}
+            </p>
+          </div>
         </div>
 
-        {/* Subtitle on the emerald band */}
-        <div style={{ ...zp(Z.subtitle), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ fontStyle: 'italic', fontSize: fz(21), color: C.muted, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {quest.subtitle}
-          </span>
-        </div>
+        {/* T2 block `party-slots` — the well header + the REAL certified rack. */}
+        <div data-block="party-slots" style={{ display: 'contents' }}>
+          {/* Party Slots well header */}
+          <div style={{ ...zp(Z.partyLabel), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: fz(22), fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: C.goldHi }}>
+              {t('gameFrame.cassetto.party', 'Party Slots')}
+            </span>
+          </div>
 
-        {/* Briefing well */}
-        <div style={{ ...zp(Z.briefing), padding: '3.5% 4.5%', overflow: 'hidden' }}>
-          <p style={{ margin: 0, fontSize: fz(23), lineHeight: 1.42, color: C.ink }}>
-            {quest.briefing}
-          </p>
-        </div>
-
-        {/* Party Slots well header */}
-        <div style={{ ...zp(Z.partyLabel), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: fz(22), fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: C.goldHi }}>
-            {t('gameFrame.cassetto.party', 'Party Slots')}
-          </span>
-        </div>
-
-        {/* REAL certified ResidentSlotRack — all 4 seats fit cleanly inside the upper Party Slots well */}
-        <div
-          data-cassetto-rack=""
-          style={{ ...zp(Z.slots), display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'visible' }}
-        >
+          {/* REAL certified ResidentSlotRack — all 4 seats fit cleanly inside the upper Party Slots well */}
+          <div
+            data-cassetto-rack=""
+            style={{ ...zp(Z.slots), display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'visible' }}
+          >
           {/* R-335: the draghi bezels paint wider than their 44 px token boxes —
            *  the painted band must stay clear of the well's margins on every side. */}
           <div style={{ transform: 'scale(0.62)', transformOrigin: 'center center' }}>
@@ -352,8 +377,12 @@ export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
               suppressedResidentIds={suppressedResidentIds}
             />
           </div>
+          </div>
         </div>
 
+        {/* T2 block `bag-slots` — the quest bag wells (R-337), display-only
+         *  assign is S2 per artifact-r004. */}
+        <div data-block="bag-slots" style={{ display: 'contents' }}>
         {/* Quest bag — empty slot frames inside the lower Party Slots well
             (R-337). Items arrive ONLY by clicking rows in the bound magazzino
             (`VillageStashPanel` → `assign` on this POI's ledger bag): an empty
@@ -404,7 +433,11 @@ export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
             ))}
           </div>
         )}
+        </div>
 
+        {/* T2 block `journey-strip` — header + 3 chevron legs + sub-labels +
+         *  the explicit total (AC6). */}
+        <div data-block="journey-strip" style={{ display: 'contents' }}>
         {/* Journey header + 3 chevron legs + localized sub-labels */}
         <div style={{ ...zp(Z.journeyLabel), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <span style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: fz(22), fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', color: C.goldHi }}>
@@ -445,7 +478,12 @@ export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
             </span>
           </div>
         )}
+        </div>
 
+        {/* T2 block `risk-rewards` — header + risk value + rewards + the
+         *  reserved cost slot (artifact-r004: the future food-cost preview
+         *  of S2 lands here; flagged placeholder, intentionally empty). */}
+        <div data-block="risk-rewards" style={{ display: 'contents' }}>
         {/* Risk & Rewards header + live values */}
         <div style={{ ...zp(Z.riskLabel), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <span style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: fz(22), fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', color: C.goldHi }}>
@@ -469,6 +507,29 @@ export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
           ))}
         </div>
 
+        {/* T2 reserved cost slot (artifact-r004 "reserved cost slot"): the
+         *  food-cost preview is S2 scope — this cell reserves its seat in the
+         *  gap between risk and rewards (derived from the measured zones,
+         *  variant-adaptive). Flagged placeholder, intentionally empty and
+         *  non-interactive — nothing painted on the signed art. */}
+        <div
+          data-testid="cassetto-cost-slot"
+          data-placeholder="cost-preview"
+          aria-hidden="true"
+          style={{
+            ...zp({
+              x: Z.riskValue.x + Z.riskValue.w + 12,
+              y: Z.riskValue.y,
+              w: Math.max(0, Z.rewards.x - Z.riskValue.x - Z.riskValue.w - 24),
+              h: Z.riskValue.h,
+            }),
+            pointerEvents: 'none',
+          }}
+        />
+        </div>
+
+        {/* T2 block `launch-cta` — inline reason + the CONFIRM plaque. */}
+        <div data-block="launch-cta" style={{ display: 'contents' }}>
         {/* R-339/PLAN-119 AC4: inline reason above the muted plaque — the stock
          *  detail carries `quest-planner-reason-line`; the drawer renders it in
          *  the free band right above CONFIRM (derived zone, no geometry edit). */}
@@ -500,18 +561,17 @@ export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
             padding: 0, border: 'none', background: 'transparent',
             cursor: canSend ? 'pointer' : 'default',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            opacity: canSend ? 1 : 0.55,
           }}
         >
           <span className="confirm-sheen" aria-hidden />
           <span className="confirm-text" style={{
             fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: fz(30), fontWeight: 800,
-            letterSpacing: '0.28em', textTransform: 'uppercase', color: '#eafff5',
-            textShadow: '0 1px 4px rgba(0,0,0,.9)',
+            letterSpacing: '0.28em', textTransform: 'uppercase',
           }}>
             {t('gameFrame.cassetto.confirm', 'CONFIRM')}
           </span>
         </button>
+        </div>
       </div>
     </div>
   );
