@@ -8,7 +8,7 @@
     "mechanical": "a mechanical check exists or is honestly buildable (AST/lint/script)",
     "kernel": "binding prose that must stay always-on (needs conversation context / is agent behavior)",
     "human-review": "requires a human or runtime witness judgment at a defined point",
-    "gap": "no check, kernel line, or human review can honestly verify it — declared for Director approval"
+    "gap": "no check, kernel line, or human review can honestly verify it \u2014 declared for Director approval"
   },
   "entries": [
     {
@@ -77,7 +77,7 @@
       "line": 27,
       "line_end": 28,
       "section": "Skin/Theme system",
-      "verbatim": "If a prompt requests creating a `.css` file for a skin/theme, it is by definition in violation of this invariant — do not execute, flag the violation.",
+      "verbatim": "If a prompt requests creating a `.css` file for a skin/theme, it is by definition in violation of this invariant \u2014 do not execute, flag the violation.",
       "enforcement_candidate": "mechanical"
     },
     {
@@ -125,7 +125,7 @@
       "line": 40,
       "line_end": 42,
       "section": "Component Reuse",
-      "verbatim": "NEVER duplicate primitive markup/styling from scratch. Creating a new standalone component that duplicates an existing primitive is a VIOLATION of this invariant — do not execute, flag the violation.",
+      "verbatim": "NEVER duplicate primitive markup/styling from scratch. Creating a new standalone component that duplicates an existing primitive is a VIOLATION of this invariant \u2014 do not execute, flag the violation.",
       "enforcement_candidate": "human-review"
     },
     {
@@ -145,7 +145,7 @@
       "line": 48,
       "line_end": 55,
       "section": "State Management",
-      "verbatim": "Zustand store: for domain/game state shared between multiple pages or components not necessarily close in the tree … — survives navigation. React Context: for local presentation/UI state scoped to a specific subtree … Decision criterion: if the state is needed outside the subtree of components that consume it, use Zustand. If it describes only how a local portion of UI behaves/appears, use Context.",
+      "verbatim": "Zustand store: for domain/game state shared between multiple pages or components not necessarily close in the tree \u2026 \u2014 survives navigation. React Context: for local presentation/UI state scoped to a specific subtree \u2026 Decision criterion: if the state is needed outside the subtree of components that consume it, use Zustand. If it describes only how a local portion of UI behaves/appears, use Context.",
       "enforcement_candidate": "kernel"
     },
     {
@@ -155,7 +155,7 @@
       "line": 56,
       "line_end": 57,
       "section": "State Management",
-      "verbatim": "Creating a new Context for data that should be in a shared store (or vice versa) is a VIOLATION of this invariant — do not execute, flag the violation.",
+      "verbatim": "Creating a new Context for data that should be in a shared store (or vice versa) is a VIOLATION of this invariant \u2014 do not execute, flag the violation.",
       "enforcement_candidate": "human-review"
     },
     {
@@ -202,7 +202,7 @@
       "line": 69,
       "line_end": 75,
       "section": "Foreground windows",
-      "verbatim": "An agent must NEVER open a window, app, or browser in the foreground automatically — the Director must never lose the window he is watching. All automated browser runs (Puppeteer / Chrome for Testing, Playwright, captures, perf probes) are headless or background. Headed mode only via explicit Director opt-in (`HEADLESS=false`, manual headed npm scripts).",
+      "verbatim": "An agent must NEVER open a window, app, or browser in the foreground automatically \u2014 the Director must never lose the window he is watching. All automated browser runs (Puppeteer / Chrome for Testing, Playwright, captures, perf probes) are headless or background. Headed mode only via explicit Director opt-in (`HEADLESS=false`, manual headed npm scripts).",
       "enforcement_candidate": "mechanical"
     },
     {
@@ -232,7 +232,7 @@
       "line": 90,
       "line_end": 99,
       "section": "Deploy verification",
-      "verbatim": "\"Page responds 200\" is not proof: the check must exercise the real runtime path. For Pixi surfaces (`/`, `/game`, `/mappa2-lab`, `/hud-lab`) that means a headless probe **with WebGL enabled** … `scripts/deploy/webglBootProbe.mjs` is wired into `guardian:deploy-guard` post-verification … a boot error, page exception or missing world canvas FAILS the deployment.",
+      "verbatim": "\"Page responds 200\" is not proof: the check must exercise the real runtime path. For Pixi surfaces (`/`, `/game`, `/mappa2-lab`, `/hud-lab`) that means a headless probe **with WebGL enabled** \u2026 `scripts/deploy/webglBootProbe.mjs` is wired into `guardian:deploy-guard` post-verification \u2026 a boot error, page exception or missing world canvas FAILS the deployment.",
       "enforcement_candidate": "mechanical"
     },
     {
@@ -242,7 +242,7 @@
       "line": 100,
       "line_end": 102,
       "section": "Deploy verification",
-      "verbatim": "On any verification failure: fix the problem and iterate until the whole cycle (safeguards → deploy → post-deploy verification) is green. Never report \"deploy OK\" on a failed or unverified check — say what was not verified (T-04).",
+      "verbatim": "On any verification failure: fix the problem and iterate until the whole cycle (safeguards \u2192 deploy \u2192 post-deploy verification) is green. Never report \"deploy OK\" on a failed or unverified check \u2014 say what was not verified (T-04).",
       "enforcement_candidate": "human-review"
     },
     {
@@ -262,7 +262,7 @@
       "line": 110,
       "line_end": 112,
       "section": "Workflow operativo",
-      "verbatim": "Ciclo corrente: **plan con contratto** (obbligazioni verificabili) → **implementazione con l'agente locale** → **`verify:bundle`** sul contratto → chiusura `fatta` in `RICHIESTE.md` con citazione `bundle:`.",
+      "verbatim": "Ciclo corrente: **plan con contratto** (obbligazioni verificabili) \u2192 **implementazione con l'agente locale** \u2192 **`verify:bundle`** sul contratto \u2192 chiusura `fatta` in `RICHIESTE.md` con citazione `bundle:`.",
       "enforcement_candidate": "kernel"
     },
     {
@@ -292,7 +292,7 @@
       "line": 120,
       "line_end": 129,
       "section": "Command timeouts",
-      "verbatim": "Every command must have a maximum runtime. If the timeout is exceeded, stop the command, log the event, and switch to a narrower scope or an alternative approach. Default maxima: `closure:lint`: 30s … `npm run lint -- <scope>`: 120s … `npm run build:check` / `npm run build`: 180s … `npm run test -- <scope>`: 300s … `harness:run` per task: 600s (harness in pausa R-208, solo benchmark dedicati) … `harness:dispatch` total: 1800s (in pausa R-208). A command that hangs is treated as a failure, not as \"still running\".",
+      "verbatim": "Every command must have a maximum runtime. If the timeout is exceeded, stop the command, log the event, and switch to a narrower scope or an alternative approach. Default maxima: `closure:lint`: 30s \u2026 `npm run lint -- <scope>`: 120s \u2026 `npm run build:check` / `npm run build`: 180s \u2026 `npm run test -- <scope>`: 300s \u2026 `harness:run` per task: 600s (harness in pausa R-208, solo benchmark dedicati) \u2026 `harness:dispatch` total: 1800s (in pausa R-208). A command that hangs is treated as a failure, not as \"still running\".",
       "enforcement_candidate": "kernel"
     },
     {
@@ -312,10 +312,9 @@
       "line": 138,
       "line_end": 143,
       "section": "This layer is the shared baseline",
-      "verbatim": "`.windsurf/rules/` is the single source of truth for what everyone (Strategist, Coordinator, Agents) must always follow. When a new \"a-priori\" / cross-cutting system becomes mandatory (skin system, i18n, telemetry contract, persistence pattern, theming, frozen kits, documentation governance), it MUST be registered here — not left implicit in a single prompt. Strategist and Coordinator share this duty.",
+      "verbatim": "`.windsurf/rules/` is the single source of truth for what everyone (Strategist, Coordinator, Agents) must always follow. When a new \"a-priori\" / cross-cutting system becomes mandatory (skin system, i18n, telemetry contract, persistence pattern, theming, frozen kits, documentation governance), it MUST be registered here \u2014 not left implicit in a single prompt. Strategist and Coordinator share this duty.",
       "enforcement_candidate": "kernel"
     },
-
     {
       "id": "INV-40-SSOT",
       "source_file": ".windsurf/rules/40-documentation-governance.md",
@@ -392,7 +391,6 @@
       "verbatim": "Kit exceptions are tracked in `src/docs/docs/idle_village/EXCEPTIONS.md`.",
       "enforcement_candidate": "kernel"
     },
-
     {
       "id": "INV-50-ONLY-MANAGER",
       "source_file": ".windsurf/rules/50-shutdown-governance.md",
@@ -446,7 +444,7 @@
       "line": 28,
       "line_end": 31,
       "section": "Quiet window",
-      "verbatim": "When `policy.quietWindow.enabled` is true, shutdown is allowed only while the quiet window is active. `restrictedDaysOfWeek` (0=Sunday … 6=Saturday, default `[1,2,3,4,5]`) names the days on which the window covers only `startHour`–`endHour` (overnight, wraps midnight). On days not listed, the window is active all day … An empty `restrictedDaysOfWeek` means no day is restricted: the window is active all day, every day. A missing `restrictedDaysOfWeek` field (legacy registries or hand-built policy objects) resolves to the Mon–Fri default.",
+      "verbatim": "When `policy.quietWindow.enabled` is true, shutdown is allowed only while the quiet window is active. `restrictedDaysOfWeek` (0=Sunday \u2026 6=Saturday, default `[1,2,3,4,5]`) names the days on which the window covers only `startHour`\u2013`endHour` (overnight, wraps midnight). On days not listed, the window is active all day \u2026 An empty `restrictedDaysOfWeek` means no day is restricted: the window is active all day, every day. A missing `restrictedDaysOfWeek` field (legacy registries or hand-built policy objects) resolves to the Mon\u2013Fri default.",
       "enforcement_candidate": "kernel"
     },
     {
@@ -456,7 +454,7 @@
       "line": 35,
       "line_end": 36,
       "section": "Unregistered-process backstop",
-      "verbatim": "The `ps`-based backstop classifies matches before vetoing (R-212): real work — test runners, builds, harness, coordinator, deliberation — blocks shutdown; server fixtures (`vite preview`, dev servers) are reported but **never** veto. … New blocking patterns may be added only for actual work; new server/fixture patterns must go to the non-blocking list.",
+      "verbatim": "The `ps`-based backstop classifies matches before vetoing (R-212): real work \u2014 test runners, builds, harness, coordinator, deliberation \u2014 blocks shutdown; server fixtures (`vite preview`, dev servers) are reported but **never** veto. \u2026 New blocking patterns may be added only for actual work; new server/fixture patterns must go to the non-blocking list.",
       "enforcement_candidate": "kernel"
     },
     {
@@ -476,7 +474,7 @@
       "line": 46,
       "line_end": 52,
       "section": "Capability ownership",
-      "verbatim": "Only `scripts/shutdownManager/shutdownExecutor.ts` (or the explicit successor module named in this rule) may execute machine shutdown. Every other component — including harness, coordinator, deployment guards, and commit guardians — may only: register a session, send heartbeats, update session state, request a shutdown evaluation. No other module may call `shutdown`, `poweroff`, `halt`, `pmset sleep`, `osascript …`, `sudo shutdown -h now`, or any equivalent API.",
+      "verbatim": "Only `scripts/shutdownManager/shutdownExecutor.ts` (or the explicit successor module named in this rule) may execute machine shutdown. Every other component \u2014 including harness, coordinator, deployment guards, and commit guardians \u2014 may only: register a session, send heartbeats, update session state, request a shutdown evaluation. No other module may call `shutdown`, `poweroff`, `halt`, `pmset sleep`, `osascript \u2026`, `sudo shutdown -h now`, or any equivalent API.",
       "enforcement_candidate": "mechanical"
     },
     {
@@ -516,7 +514,6 @@
       "verbatim": "Any prompt that adds shutdown/auto-shutdown/idle-shutdown behavior must first update this invariant and register the component in `session-registry.json`. All changes require `npm run shutdown:status` diagnostics and an evidence log in `test-results/`.",
       "enforcement_candidate": "kernel"
     },
-
     {
       "id": "INV-55-NO-ROTATE",
       "source_file": ".windsurf/rules/55-delegation-context-budget.md",
@@ -524,7 +521,7 @@
       "line": 13,
       "line_end": 14,
       "section": "Session lifecycle",
-      "verbatim": "Devin **compacts context automatically** when it fills. Do NOT rotate sessions or open new windows to \"save context\" — compact and continue.",
+      "verbatim": "Devin **compacts context automatically** when it fills. Do NOT rotate sessions or open new windows to \"save context\" \u2014 compact and continue.",
       "enforcement_candidate": "kernel"
     },
     {
@@ -534,7 +531,7 @@
       "line": 16,
       "line_end": 17,
       "section": "Session lifecycle",
-      "verbatim": "**WARN (>=70%)**: declare the remaining budget to the Director; no new multi-file tasks — only small fixes, questions, docs. Prefer delegation.",
+      "verbatim": "**WARN (>=70%)**: declare the remaining budget to the Director; no new multi-file tasks \u2014 only small fixes, questions, docs. Prefer delegation.",
       "enforcement_candidate": "kernel"
     },
     {
@@ -554,7 +551,7 @@
       "line": 20,
       "line_end": 22,
       "section": "Session lifecycle",
-      "verbatim": "After compaction, governance reads may be dropped — the global `PostCompaction` hook (`devin-context-hooks.py`) re-injects the canonical docs it finds in the project. Follow it before continuing.",
+      "verbatim": "After compaction, governance reads may be dropped \u2014 the global `PostCompaction` hook (`devin-context-hooks.py`) re-injects the canonical docs it finds in the project. Follow it before continuing.",
       "enforcement_candidate": "kernel"
     },
     {
@@ -564,7 +561,7 @@
       "line": 26,
       "line_end": 34,
       "section": "Delegate, don't hoard",
-      "verbatim": "Spawn a subagent (`run_subagent`) instead of working inline when the task is: …",
+      "verbatim": "Spawn a subagent (`run_subagent`) instead of working inline when the task is: \u2026",
       "enforcement_candidate": "kernel"
     },
     {
@@ -574,7 +571,7 @@
       "line": 36,
       "line_end": 43,
       "section": "Delegate, don't hoard",
-      "verbatim": "`rpg-researcher` / `rpg-verifier` / `rpg-implementer` are project profiles in `.devin/agents/`, pinned to `swe-1-6-fast` so they never bill the parent's model. … `subagent_general` inherits the parent's model — use it only when the work genuinely needs the primary model's strength. This delegation is a Director-approved standing request — it does not need per-task permission.",
+      "verbatim": "`rpg-researcher` / `rpg-verifier` / `rpg-implementer` are project profiles in `.devin/agents/`, pinned to `swe-1-6-fast` so they never bill the parent's model. \u2026 `subagent_general` inherits the parent's model \u2014 use it only when the work genuinely needs the primary model's strength. This delegation is a Director-approved standing request \u2014 it does not need per-task permission.",
       "enforcement_candidate": "kernel"
     },
     {
@@ -603,7 +600,7 @@
       "source_trigger": "always_on",
       "line": 52,
       "section": "Subagent contract",
-      "verbatim": "The parent distills the result for the Director — never relay raw output.",
+      "verbatim": "The parent distills the result for the Director \u2014 never relay raw output.",
       "enforcement_candidate": "kernel"
     },
     {
@@ -613,7 +610,7 @@
       "line": 53,
       "line_end": 54,
       "section": "Subagent contract",
-      "verbatim": "Do NOT delegate a trivial single-file lookup or a one-command check — delegation has its own cost.",
+      "verbatim": "Do NOT delegate a trivial single-file lookup or a one-command check \u2014 delegation has its own cost.",
       "enforcement_candidate": "kernel"
     },
     {
@@ -626,14 +623,13 @@
       "verbatim": "A subagent report is not a witness (trap T-04): claims about scenes, animations or UI still need runtime verification before they are \"done\".",
       "enforcement_candidate": "human-review"
     },
-
     {
       "id": "INV-AGENTS-SESSION-READS",
       "source_file": "AGENTS.md",
       "source_trigger": "prose (root agent instructions)",
       "line": 1,
       "section": "Session bootstrap",
-      "verbatim": "All'inizio di ogni sessione: leggi `CANON.md`, `CURRENT_STATE.md`, `DESIGN_PILLARS.md`, `context/DECISION_LOG.md`, `RICHIESTE.md` (file attivo; le voci antecedenti 2026-11-08 sono in `RICHIESTE-backlog.md`/`RICHIESTE-archive.md` — consultabili on-demand, PLAN-122), `.mw/desiderata.md`, `context/INDEX.md` (se esiste) e `context/auto/` (advisory lane NON canonica: preferenze/veto durevoli — su conflitto vince il canonico).",
+      "verbatim": "All'inizio di ogni sessione: leggi `CANON.md`, `CURRENT_STATE.md`, `DESIGN_PILLARS.md`, `context/DECISION_LOG.md`, `RICHIESTE.md` (file attivo; le voci antecedenti 2026-11-08 sono in `RICHIESTE-backlog.md`/`RICHIESTE-archive.md` \u2014 consultabili on-demand, PLAN-122), `.mw/desiderata.md`, `context/INDEX.md` (se esiste) e `context/auto/` (advisory lane NON canonica: preferenze/veto durevoli \u2014 su conflitto vince il canonico).",
       "enforcement_candidate": "kernel"
     },
     {
@@ -642,7 +638,7 @@
       "source_trigger": "prose (root agent instructions)",
       "line": 19,
       "section": "Cosa sono, e cosa non sono",
-      "verbatim": "Questo progetto ha `CANON.md` come mappa delle autorità; fino a una revisione esplicita, ogni documento elencato qui conserva il proprio ruolo. Direzione e storia non sono la stessa cosa di un vincolo, e non vanno trattate come tale.",
+      "verbatim": "Questo progetto ha `CANON.md` come mappa delle autorit\u00e0; fino a una revisione esplicita, ogni documento elencato qui conserva il proprio ruolo. Direzione e storia non sono la stessa cosa di un vincolo, e non vanno trattate come tale.",
       "enforcement_candidate": "kernel"
     },
     {
@@ -652,7 +648,7 @@
       "line": 23,
       "line_end": 29,
       "section": "Workflow Mind Weaver in RPG",
-      "verbatim": "kanban board e dispatch (coordinator/ai-worker/harness, prompt-spec) sono **in pausa**. Il flusso è: plan con contratto (obbligazioni verificabili) → implementazione con l'agente locale → `verify:bundle` sul contratto → chiusura `fatta` in `RICHIESTE.md` con `bundle:`. Il gate meccanico è `npm run closure:lint` … Niente righe su `src/docs/docs/coordinator/agent_assignments.md`.",
+      "verbatim": "kanban board e dispatch (coordinator/ai-worker/harness, prompt-spec) sono **in pausa**. Il flusso \u00e8: plan con contratto (obbligazioni verificabili) \u2192 implementazione con l'agente locale \u2192 `verify:bundle` sul contratto \u2192 chiusura `fatta` in `RICHIESTE.md` con `bundle:`. Il gate meccanico \u00e8 `npm run closure:lint` \u2026 Niente righe su `src/docs/docs/coordinator/agent_assignments.md`.",
       "enforcement_candidate": "mechanical"
     },
     {
@@ -662,7 +658,7 @@
       "line": 30,
       "line_end": 39,
       "section": "Workflow Mind Weaver in RPG",
-      "verbatim": "Fase esplorativa: invoca `.windsurf/skills/mw-explorer/SKILL.md`. Fase di pianificazione: invoca `.windsurf/skills/mw-planner/SKILL.md`. … Fase esecutiva: invoca `.windsurf/skills/mw-executor/SKILL.md`, che a sua volta carica il mandato `.windsurf/skills/agent-execution-mandate/SKILL.md` per i task specifici di RPG. Prima di toccare codice esistente: invoca `.windsurf/skills/mw-regression/SKILL.md`.",
+      "verbatim": "Fase esplorativa: invoca `.windsurf/skills/mw-explorer/SKILL.md`. Fase di pianificazione: invoca `.windsurf/skills/mw-planner/SKILL.md`. \u2026 Fase esecutiva: invoca `.windsurf/skills/mw-executor/SKILL.md`, che a sua volta carica il mandato `.windsurf/skills/agent-execution-mandate/SKILL.md` per i task specifici di RPG. Prima di toccare codice esistente: invoca `.windsurf/skills/mw-regression/SKILL.md`.",
       "enforcement_candidate": "kernel"
     },
     {
@@ -672,7 +668,7 @@
       "line": 32,
       "line_end": 36,
       "section": "Workflow Mind Weaver in RPG",
-      "verbatim": "Visual fork gate (v35 FROZEN, PLAN-047): un task che crea/modifica elementi grafici con ≥2 rappresentazioni materialmente diverse non viene deciso dall'agente — fork visivo in explorer (card + preview su localhost), ruling Director, baseline congelata. Se non serve fork: skip con puntatore verificabile. Enforcement meccanico in `closure:lint`.",
+      "verbatim": "Visual fork gate (v35 FROZEN, PLAN-047): un task che crea/modifica elementi grafici con \u22652 rappresentazioni materialmente diverse non viene deciso dall'agente \u2014 fork visivo in explorer (card + preview su localhost), ruling Director, baseline congelata. Se non serve fork: skip con puntatore verificabile. Enforcement meccanico in `closure:lint`.",
       "enforcement_candidate": "mechanical"
     },
     {
@@ -682,7 +678,7 @@
       "line": 40,
       "line_end": 43,
       "section": "Workflow Mind Weaver in RPG",
-      "verbatim": "Pre-flight delle trappole ricorrenti — anche senza invocare nessuna skill. … prima di toccare codice leggi l'indice per superficie di `context/recurring-traps.md` e le trappole che il task tocca; prima di dichiarare il lavoro fatto, riapplicale.",
+      "verbatim": "Pre-flight delle trappole ricorrenti \u2014 anche senza invocare nessuna skill. \u2026 prima di toccare codice leggi l'indice per superficie di `context/recurring-traps.md` e le trappole che il task tocca; prima di dichiarare il lavoro fatto, riapplicale.",
       "enforcement_candidate": "kernel"
     },
     {
@@ -692,7 +688,7 @@
       "line": 43,
       "line_end": 45,
       "section": "Workflow Mind Weaver in RPG",
-      "verbatim": "T-04: un claim su scene, animazioni o UI si chiude solo con un testimone che può vedere ciò che afferma (non basta il diff né una metrica), e ciò che non è stato verificato va detto.",
+      "verbatim": "T-04: un claim su scene, animazioni o UI si chiude solo con un testimone che pu\u00f2 vedere ci\u00f2 che afferma (non basta il diff n\u00e9 una metrica), e ci\u00f2 che non \u00e8 stato verificato va detto.",
       "enforcement_candidate": "human-review"
     },
     {
@@ -702,7 +698,7 @@
       "line": 45,
       "line_end": 48,
       "section": "Workflow Mind Weaver in RPG",
-      "verbatim": "T-13: un failure di safeguard/probe va prima sospettato come collisione di stato condiviso (mtime + autore), non come bug nel tuo scope — riprova prima di intervenire, e mai commit scoped che catturerebbe lavoro altrui.",
+      "verbatim": "T-13: un failure di safeguard/probe va prima sospettato come collisione di stato condiviso (mtime + autore), non come bug nel tuo scope \u2014 riprova prima di intervenire, e mai commit scoped che catturerebbe lavoro altrui.",
       "enforcement_candidate": "kernel"
     },
     {
@@ -712,7 +708,7 @@
       "line": 49,
       "line_end": 53,
       "section": "Workflow Mind Weaver in RPG",
-      "verbatim": "Mai aprire finestre, app o browser in primo piano in automatico. Ogni esecuzione automatizzata è headless o in background (Puppeteer/Chrome for Testing, Playwright, screenshot, probe perf, `open` solo con `-g`). Una finestra visibile richiede opt-in esplicito del Director in sessione.",
+      "verbatim": "Mai aprire finestre, app o browser in primo piano in automatico. Ogni esecuzione automatizzata \u00e8 headless o in background (Puppeteer/Chrome for Testing, Playwright, screenshot, probe perf, `open` solo con `-g`). Una finestra visibile richiede opt-in esplicito del Director in sessione.",
       "enforcement_candidate": "mechanical"
     },
     {
@@ -752,7 +748,7 @@
       "line": 84,
       "line_end": 88,
       "section": "Lane advisory (context/auto/)",
-      "verbatim": "Mid-session delta (come il tool bio di ChatGPT): quando il Director esprime in conversazione una preferenza, un gusto, un veto, una correzione o un \"fallo così\" con valenza durevole (non solo questo task), appenderlo SUBITO con `mw-delta.py append` — non aspettare la chiusura. Dubbio → appendi con confidence:low e review_by breve …",
+      "verbatim": "Mid-session delta (come il tool bio di ChatGPT): quando il Director esprime in conversazione una preferenza, un gusto, un veto, una correzione o un \"fallo cos\u00ec\" con valenza durevole (non solo questo task), appenderlo SUBITO con `mw-delta.py append` \u2014 non aspettare la chiusura. Dubbio \u2192 appendi con confidence:low e review_by breve \u2026",
       "enforcement_candidate": "gap"
     },
     {
@@ -782,7 +778,7 @@
       "line": 102,
       "line_end": 109,
       "section": "Director memory (director-knowledge)",
-      "verbatim": "Consultare quando servono preferenze/gusti del Director, contesto cross-progetto, o la ripresa di una conversazione esterna. … Non consultare per stato o decisioni di progetto: quelli restano nei canonical docs locali … Read-only: questo progetto non scrive nel vault.",
+      "verbatim": "Consultare quando servono preferenze/gusti del Director, contesto cross-progetto, o la ripresa di una conversazione esterna. \u2026 Non consultare per stato o decisioni di progetto: quelli restano nei canonical docs locali \u2026 Read-only: questo progetto non scrive nel vault.",
       "enforcement_candidate": "kernel"
     },
     {
@@ -792,7 +788,7 @@
       "line": 110,
       "line_end": 114,
       "section": "Director memory (director-knowledge)",
-      "verbatim": "Trigger (mw-director): su task non banali — design, architettura, direzione, scelte che dipendono da gusti/preferenze del Director — lanciare `python3 ~/progetti_personali/mind-weaver/scripts/mw-director.py bootstrap` all'avvio e `recall --topic \"<tema>\"` prima di proporre.",
+      "verbatim": "Trigger (mw-director): su task non banali \u2014 design, architettura, direzione, scelte che dipendono da gusti/preferenze del Director \u2014 lanciare `python3 ~/progetti_personali/mind-weaver/scripts/mw-director.py bootstrap` all'avvio e `recall --topic \"<tema>\"` prima di proporre.",
       "enforcement_candidate": "kernel"
     },
     {
@@ -802,7 +798,7 @@
       "line": 121,
       "line_end": 126,
       "section": "Cosa fai",
-      "verbatim": "Se una proposta è in tensione con un pilastro, con una decisione registrata o con la desiderata FROZEN, **dillo prima di procedere, citando la riga.** Non aggirarla in silenzio, non risolverla da solo. … il modo corretto è nominare la tensione e chiedere se la direzione va rivista — non scegliere da solo quale delle due vince. Quella scelta è di Fausto.",
+      "verbatim": "Se una proposta \u00e8 in tensione con un pilastro, con una decisione registrata o con la desiderata FROZEN, **dillo prima di procedere, citando la riga.** Non aggirarla in silenzio, non risolverla da solo. \u2026 il modo corretto \u00e8 nominare la tensione e chiedere se la direzione va rivista \u2014 non scegliere da solo quale delle due vince. Quella scelta \u00e8 di Fausto.",
       "enforcement_candidate": "gap"
     },
     {
@@ -811,7 +807,7 @@
       "source_trigger": "prose (root agent instructions)",
       "line": 128,
       "section": "Cosa fai",
-      "verbatim": "Se non sai, dillo. Non dedurre una direzione che non è scritta.",
+      "verbatim": "Se non sai, dillo. Non dedurre una direzione che non \u00e8 scritta.",
       "enforcement_candidate": "gap"
     },
     {
@@ -824,7 +820,6 @@
       "verbatim": "Qualsiasi lavoro su arte di scena quest/teatro passa SEMPRE dalla skill `.agents/skills/scene-author/SKILL.md` prima di generare, iterare o presentare immagini. Il suo gate meccanico sostituisce la memoria.",
       "enforcement_candidate": "mechanical"
     },
-
     {
       "id": "INV-CLAUDE-PREFLIGHT",
       "source_file": "CLAUDE.md",
@@ -834,7 +829,6 @@
       "verbatim": "Pre-flight, even when no `mw-*` skill is invoked: before touching code read the surface index in `context/recurring-traps.md`, and before calling work done re-apply the traps your surface hits (T-04: a claim about a scene, animation or UI is closed only with a witness that can actually see it, not by the diff or a metric; say what was not verified).",
       "enforcement_candidate": "kernel"
     },
-
     {
       "id": "INV-10UI-SKIN-DEFAULT",
       "source_file": ".windsurf/rules/10-ui-invariants.md",
@@ -938,7 +932,7 @@
       "line": 42,
       "line_end": 48,
       "section": "Visual component layering (Blizzard-Style)",
-      "verbatim": "Follow the \"Visual Design Philosophy - Blizzard-Style Layered Components\" core principles … **Organic Imperfections**: Use feTurbulence filters, scratches, patina, noise overlays (no perfect surfaces) … **Config-First Design**: All visual parameters in config (color tokens, filter params, animation timing)",
+      "verbatim": "Follow the \"Visual Design Philosophy - Blizzard-Style Layered Components\" core principles \u2026 **Organic Imperfections**: Use feTurbulence filters, scratches, patina, noise overlays (no perfect surfaces) \u2026 **Config-First Design**: All visual parameters in config (color tokens, filter params, animation timing)",
       "enforcement_candidate": "human-review"
     },
     {
@@ -950,7 +944,6 @@
       "verbatim": "HTML prototype first, then React integration with config extraction.",
       "enforcement_candidate": "kernel"
     },
-
     {
       "id": "INV-20-CONFIG-SSOT",
       "source_file": ".windsurf/rules/20-config-persistence.md",
@@ -975,7 +968,7 @@
       "source_trigger": "glob",
       "line": 18,
       "section": "Config-first",
-      "verbatim": "No hardcoded gameplay/UI constants leaking into components — expose them here.",
+      "verbatim": "No hardcoded gameplay/UI constants leaking into components \u2014 expose them here.",
       "enforcement_candidate": "kernel"
     },
     {
@@ -1003,7 +996,7 @@
       "source_trigger": "glob",
       "line": 24,
       "section": "Persistence",
-      "verbatim": "Autosave loops ≥ 30s; recurring timers ≥ 500ms.",
+      "verbatim": "Autosave loops \u2265 30s; recurring timers \u2265 500ms.",
       "enforcement_candidate": "mechanical"
     },
     {
@@ -1015,7 +1008,6 @@
       "verbatim": "JSDoc on every exported function/interface/schema.",
       "enforcement_candidate": "mechanical"
     },
-
     {
       "id": "INV-30-KIT-REGISTER",
       "source_file": ".windsurf/rules/30-frozen-kits.md",
@@ -1095,7 +1087,6 @@
       "verbatim": "Use `npm run freeze:kit <KitName>` to scaffold a new kit and append it to `KIT_REGISTRY`. Keep the kit module small and focused on the canonical component.",
       "enforcement_candidate": "kernel"
     },
-
     {
       "id": "INV-50IP-PATTERN-REF",
       "source_file": ".windsurf/rules/50-interaction-patterns.md",
@@ -1113,7 +1104,7 @@
       "line": 41,
       "line_end": 42,
       "section": "Regole",
-      "verbatim": "Lo status dei pattern legati a frozen kit DERIVA da `KIT_REGISTRY`/cert.json — mai ridichiarato nel catalog.",
+      "verbatim": "Lo status dei pattern legati a frozen kit DERIVA da `KIT_REGISTRY`/cert.json \u2014 mai ridichiarato nel catalog.",
       "enforcement_candidate": "mechanical"
     },
     {
@@ -1136,7 +1127,6 @@
       "verbatim": "Due pattern con la stessa struttura ma `referenceIntent` diverso sono pattern DIVERSI: non unificarli.",
       "enforcement_candidate": "human-review"
     },
-
     {
       "id": "INV-10PORT-URL",
       "source_file": ".windsurf/rules/10-canonical-dev-port.md",
@@ -1190,10 +1180,9 @@
       "line": 30,
       "line_end": 36,
       "section": "Avoiding the Devin preview trap",
-      "verbatim": "Before opening any `browser_preview`, run: `curl -s -o /dev/null -w \"status:%{http_code}\\ncontent-type:%{content_type}\\n\" http://localhost:5173/src/main.tsx`. The response must be `text/javascript` or `application/javascript`. If it is `text/html`, the server is not Vite — start `npm run dev` first.",
+      "verbatim": "Before opening any `browser_preview`, run: `curl -s -o /dev/null -w \"status:%{http_code}\\ncontent-type:%{content_type}\\n\" http://localhost:5173/src/main.tsx`. The response must be `text/javascript` or `application/javascript`. If it is `text/html`, the server is not Vite \u2014 start `npm run dev` first.",
       "enforcement_candidate": "kernel"
     },
-
     {
       "id": "INV-15-URL",
       "source_file": ".windsurf/rules/15-browser-preview-guard.md",
@@ -1233,7 +1222,6 @@
       "verbatim": "A harness or an explicit user instruction may override the port. If the override URL fails the same `/src/main.tsx` content-type check, treat the server as invalid and fall back to `http://localhost:5173/`.",
       "enforcement_candidate": "kernel"
     },
-
     {
       "id": "INV-16-HARD",
       "source_file": ".windsurf/rules/16-no-foreground-windows.md",
@@ -1241,7 +1229,7 @@
       "line": 14,
       "line_end": 15,
       "section": "Hard rule",
-      "verbatim": "**NEVER open a window, app, or browser in the foreground automatically.** Not even \"just for a second\". All automated browser runs — Puppeteer / Chrome for Testing, Playwright, CDP probes, screenshot/capture scripts, perf probes, verification harnesses — MUST run **headless** or in the **background**.",
+      "verbatim": "**NEVER open a window, app, or browser in the foreground automatically.** Not even \"just for a second\". All automated browser runs \u2014 Puppeteer / Chrome for Testing, Playwright, CDP probes, screenshot/capture scripts, perf probes, verification harnesses \u2014 MUST run **headless** or in the **background**.",
       "enforcement_candidate": "mechanical"
     },
     {
@@ -1251,7 +1239,7 @@
       "line": 16,
       "line_end": 22,
       "section": "Hard rule",
-      "verbatim": "FORBIDDEN without an explicit Director request made in the current session: `headless: false` in any `launch()` call; `playwright test --headed`, `--ui`, `--debug`, `playwright show-report`; `open` without `-g` on macOS, `xdg-open`, `start` (Windows); `osascript -e 'tell application ... to activate'`, `Page.bringToFront`, `window.focus()`, `window.open` issued by automation; **implicit activation**: attaching to a headed/visible browser (`connectOverCDP`, `puppeteer.connect`, CDP `Target.createTarget` without `background:true`, `newPage()` on an attached headed instance). … auto-opening a browser preview, Storybook, report HTML, or any OS window as a side effect of a command.",
+      "verbatim": "FORBIDDEN without an explicit Director request made in the current session: `headless: false` in any `launch()` call; `playwright test --headed`, `--ui`, `--debug`, `playwright show-report`; `open` without `-g` on macOS, `xdg-open`, `start` (Windows); `osascript -e 'tell application ... to activate'`, `Page.bringToFront`, `window.focus()`, `window.open` issued by automation; **implicit activation**: attaching to a headed/visible browser (`connectOverCDP`, `puppeteer.connect`, CDP `Target.createTarget` without `background:true`, `newPage()` on an attached headed instance). \u2026 auto-opening a browser preview, Storybook, report HTML, or any OS window as a side effect of a command.",
       "enforcement_candidate": "mechanical"
     },
     {
@@ -1261,7 +1249,7 @@
       "line": 26,
       "line_end": 31,
       "section": "Opt-in convention",
-      "verbatim": "Scripts that legitimately can show a browser MUST default to headless and gate headed mode on the existing env convention: `headless: process.env.HEADLESS !== 'false'` … `open` calls that surface a file/URL for the user use the background flag (`open -g`), never plain `open`.",
+      "verbatim": "Scripts that legitimately can show a browser MUST default to headless and gate headed mode on the existing env convention: `headless: process.env.HEADLESS !== 'false'` \u2026 `open` calls that surface a file/URL for the user use the background flag (`open -g`), never plain `open`.",
       "enforcement_candidate": "mechanical"
     },
     {
@@ -1270,7 +1258,7 @@
       "source_trigger": "model_decision",
       "line": 32,
       "section": "Opt-in convention",
-      "verbatim": "Legitimate headed entry points exist for **manual** use only (`test:e2e:headed`, `test:e2e:ui:dev`, `test:minimal:headed`, `test:minimal:debug`, `HEADLESS=false`, interactive debug scripts). An agent may use them only when the Director explicitly asks for a visible window in that session — never as a side effect, never \"to check quickly\".",
+      "verbatim": "Legitimate headed entry points exist for **manual** use only (`test:e2e:headed`, `test:e2e:ui:dev`, `test:minimal:headed`, `test:minimal:debug`, `HEADLESS=false`, interactive debug scripts). An agent may use them only when the Director explicitly asks for a visible window in that session \u2014 never as a side effect, never \"to check quickly\".",
       "enforcement_candidate": "human-review"
     },
     {
@@ -1288,7 +1276,7 @@
       "source_trigger": "model_decision",
       "line": 37,
       "section": "Plans and prompts",
-      "verbatim": "If a task genuinely needs a visible window (e.g. human-eye verification), the plan marks it as a manual/Director step. An agent never launches a foreground window on its own initiative — it asks.",
+      "verbatim": "If a task genuinely needs a visible window (e.g. human-eye verification), the plan marks it as a manual/Director step. An agent never launches a foreground window on its own initiative \u2014 it asks.",
       "enforcement_candidate": "kernel"
     },
     {
@@ -1309,7 +1297,6 @@
       "verbatim": "When in doubt, choose the headless path and report that a visible check was not performed (see T-04 in `context/recurring-traps.md` for perceptual claims).",
       "enforcement_candidate": "human-review"
     },
-
     {
       "id": "INV-17-DECLARED-END",
       "source_file": ".windsurf/rules/17-resource-lifecycle.md",
@@ -1317,7 +1304,7 @@
       "line": 8,
       "line_end": 11,
       "section": "R-LIFECYCLE contract",
-      "verbatim": "Every resource an agent creates (process, server, browser, temp file, scheduled job) is born with a declared end: `scoped` (dies with the command), `leased` (TTL), `kept` (registered with owner+purpose, Director-authorized). Anything else is a leak — a defect, not a style choice.",
+      "verbatim": "Every resource an agent creates (process, server, browser, temp file, scheduled job) is born with a declared end: `scoped` (dies with the command), `leased` (TTL), `kept` (registered with owner+purpose, Director-authorized). Anything else is a leak \u2014 a defect, not a style choice.",
       "enforcement_candidate": "mechanical"
     },
     {
@@ -1327,7 +1314,7 @@
       "line": 15,
       "line_end": 17,
       "section": "Contract",
-      "verbatim": "`mw-run -- <cmd>` / `mw-run --ttl 10m -- <cmd>` — scoped; process-group kill on exit or timeout. Use for every command that can hang or fork children (probes, screenshots, builds).",
+      "verbatim": "`mw-run -- <cmd>` / `mw-run --ttl 10m -- <cmd>` \u2014 scoped; process-group kill on exit or timeout. Use for every command that can hang or fork children (probes, screenshots, builds).",
       "enforcement_candidate": "kernel"
     },
     {
@@ -1337,7 +1324,7 @@
       "line": 18,
       "line_end": 19,
       "section": "Contract",
-      "verbatim": "`mw-run --lease 2h --port 5173 --purpose \"…\" -- npm run dev` — detached server with expiry; run `mw-ps --port 5173` first, never stack a second.",
+      "verbatim": "`mw-run --lease 2h --port 5173 --purpose \"\u2026\" -- npm run dev` \u2014 detached server with expiry; run `mw-ps --port 5173` first, never stack a second.",
       "enforcement_candidate": "kernel"
     },
     {
@@ -1347,7 +1334,7 @@
       "line": 20,
       "line_end": 21,
       "section": "Contract",
-      "verbatim": "`mw-run --keep`/`mw-keep` — persistent resources: fail-closed without a `--purpose` citing the Director request.",
+      "verbatim": "`mw-run --keep`/`mw-keep` \u2014 persistent resources: fail-closed without a `--purpose` citing the Director request.",
       "enforcement_candidate": "mechanical"
     },
     {
@@ -1357,7 +1344,7 @@
       "line": 22,
       "line_end": 25,
       "section": "Contract",
-      "verbatim": "`mw-pw <file.mjs>` — Playwright probes: `browser.close()` in finally + watchdog + `process.exit` guaranteed. **Never** a raw `node -e` with `chromium.launch` — that exact pattern leaked 10 headless trees for ~6h (incident 2026-11-13).",
+      "verbatim": "`mw-pw <file.mjs>` \u2014 Playwright probes: `browser.close()` in finally + watchdog + `process.exit` guaranteed. **Never** a raw `node -e` with `chromium.launch` \u2014 that exact pattern leaked 10 headless trees for ~6h (incident 2026-11-13).",
       "enforcement_candidate": "mechanical"
     },
     {
@@ -1375,7 +1362,7 @@
       "source_trigger": "model_decision",
       "line": 27,
       "section": "Contract",
-      "verbatim": "`mw-adopt <pid|--port N> --purpose \"…\"` — adopt an orphan as kept.",
+      "verbatim": "`mw-adopt <pid|--port N> --purpose \"\u2026\"` \u2014 adopt an orphan as kept.",
       "enforcement_candidate": "kernel"
     },
     {
@@ -1405,10 +1392,9 @@
       "line": 38,
       "line_end": 39,
       "section": "What the sweep does",
-      "verbatim": "L3 orphan servers in project cwd: **report only** — never killed. Only the Director decides which servers die.",
+      "verbatim": "L3 orphan servers in project cwd: **report only** \u2014 never killed. Only the Director decides which servers die.",
       "enforcement_candidate": "kernel"
     },
-
     {
       "id": "INV-45-SSOT",
       "source_file": ".windsurf/rules/45-director-intent-to-spec.md",
@@ -1433,7 +1419,7 @@
       "source_trigger": "model_decision",
       "line": 16,
       "section": "Invariants",
-      "verbatim": "**One update, one place.** If the same behavior crosses multiple components …, add a `Comportamento atteso` note in each relevant doc, but keep the canonical detailed scenario in the most specific doc and cross-link the others.",
+      "verbatim": "**One update, one place.** If the same behavior crosses multiple components \u2026, add a `Comportamento atteso` note in each relevant doc, but keep the canonical detailed scenario in the most specific doc and cross-link the others.",
       "enforcement_candidate": "human-review"
     },
     {
@@ -1463,7 +1449,6 @@
       "verbatim": "Run `npm run build:check` and `npm run closure:lint` before considering the turn complete.",
       "enforcement_candidate": "kernel"
     },
-
     {
       "id": "INV-46-PRESERVE",
       "source_file": ".windsurf/rules/46-approved-references.md",
@@ -1471,7 +1456,7 @@
       "line": 12,
       "line_end": 15,
       "section": "Rule",
-      "verbatim": "Anything the Director **baptizes** — approves, calls \"va bene\", \"questo\", \"così\" — and anything the Director **passes in chat as a screenshot and designates as reference or similar** becomes a **reference artifact** and MUST be preserved durably. Reference artifacts are input to future work, not disposable output.",
+      "verbatim": "Anything the Director **baptizes** \u2014 approves, calls \"va bene\", \"questo\", \"cos\u00ec\" \u2014 and anything the Director **passes in chat as a screenshot and designates as reference or similar** becomes a **reference artifact** and MUST be preserved durably. Reference artifacts are input to future work, not disposable output.",
       "enforcement_candidate": "kernel"
     },
     {
@@ -1481,7 +1466,7 @@
       "line": 19,
       "line_end": 22,
       "section": "Duties of the agent",
-      "verbatim": "**Persist the artifact in a durable location** — the spec's `refs/` directory (e.g. `.mw/specs/<spec>/refs/`), never only in `gen/`, `test-results/`, `/tmp` or other regenerable/scratch paths. Copy, don't move: keep the generated original too.",
+      "verbatim": "**Persist the artifact in a durable location** \u2014 the spec's `refs/` directory (e.g. `.mw/specs/<spec>/refs/`), never only in `gen/`, `test-results/`, `/tmp` or other regenerable/scratch paths. Copy, don't move: keep the generated original too.",
       "enforcement_candidate": "kernel"
     },
     {
@@ -1531,10 +1516,9 @@
       "line": 33,
       "line_end": 35,
       "section": "Duties of the agent",
-      "verbatim": "**Chat screenshots**: when the Director pastes an image and calls it a reference (or \"una cosa simile\"), save it from the pasted-image temp path into `refs/` immediately — temp paths are not durable.",
+      "verbatim": "**Chat screenshots**: when the Director pastes an image and calls it a reference (or \"una cosa simile\"), save it from the pasted-image temp path into `refs/` immediately \u2014 temp paths are not durable.",
       "enforcement_candidate": "kernel"
     },
-
     {
       "id": "INV-85-FIELD",
       "source_file": ".windsurf/rules/85-documentation-impact.md",
@@ -1542,7 +1526,7 @@
       "line": 8,
       "line_end": 10,
       "section": "Documentation Impact Contract",
-      "verbatim": "Ogni piano in `plans/` e ogni task esecutivo che modifica conoscenza di progetto dichiara un campo **Documentation Impact**. Un piano con impact `REQUIRED` non è completo finché i documenti indicati non sono aggiornati.",
+      "verbatim": "Ogni piano in `plans/` e ogni task esecutivo che modifica conoscenza di progetto dichiara un campo **Documentation Impact**. Un piano con impact `REQUIRED` non \u00e8 completo finch\u00e9 i documenti indicati non sono aggiornati.",
       "enforcement_candidate": "mechanical"
     },
     {
@@ -1552,7 +1536,7 @@
       "line": 14,
       "line_end": 15,
       "section": "Vocabolario",
-      "verbatim": "`NONE` — nessuna conoscenza cambiata (bugfix interno, refactor meccanico). Richiede una riga di motivazione nel piano.",
+      "verbatim": "`NONE` \u2014 nessuna conoscenza cambiata (bugfix interno, refactor meccanico). Richiede una riga di motivazione nel piano.",
       "enforcement_candidate": "mechanical"
     },
     {
@@ -1562,7 +1546,7 @@
       "line": 18,
       "line_end": 19,
       "section": "Vocabolario",
-      "verbatim": "`REQUIRED` — il piano modifica regole, decisioni, stato o terminologia: deve elencare i **target documentali** prima del battesimo.",
+      "verbatim": "`REQUIRED` \u2014 il piano modifica regole, decisioni, stato o terminologia: deve elencare i **target documentali** prima del battesimo.",
       "enforcement_candidate": "mechanical"
     },
     {
@@ -1572,7 +1556,7 @@
       "line": 23,
       "line_end": 35,
       "section": "Routing degli update",
-      "verbatim": "Routing degli update (§23 del refactor): | Cosa cambia | Documento da aggiornare | …",
+      "verbatim": "Routing degli update (\u00a723 del refactor): | Cosa cambia | Documento da aggiornare | \u2026",
       "enforcement_candidate": "kernel"
     },
     {
@@ -1582,7 +1566,7 @@
       "line": 39,
       "line_end": 40,
       "section": "Vincoli",
-      "verbatim": "Non duplicare la stessa regola in più documenti canonici: un'unica fonte + riferimenti (vedi `CANON.md` mappa delle autorità).",
+      "verbatim": "Non duplicare la stessa regola in pi\u00f9 documenti canonici: un'unica fonte + riferimenti (vedi `CANON.md` mappa delle autorit\u00e0).",
       "enforcement_candidate": "human-review"
     },
     {
@@ -1610,10 +1594,9 @@
       "line": 51,
       "line_end": 55,
       "section": "Enforcement meccanico",
-      "verbatim": "Spec harness (pipeline di dispatch in pausa, R-208 — si riattiva solo su decisione Director): campo `documentation_impact` in `prompts/<id>.spec.json` (`{level, targets[], justification}`); `harness:dispatch` applica il gate post-esecuzione sul diff del worktree — un task REQUIRED senza i doc nel diff resta FAILED, non completato.",
+      "verbatim": "Spec harness (pipeline di dispatch in pausa, R-208 \u2014 si riattiva solo su decisione Director): campo `documentation_impact` in `prompts/<id>.spec.json` (`{level, targets[], justification}`); `harness:dispatch` applica il gate post-esecuzione sul diff del worktree \u2014 un task REQUIRED senza i doc nel diff resta FAILED, non completato.",
       "enforcement_candidate": "kernel"
     },
-
     {
       "id": "INV-MWBRIDGE-PATTERNS",
       "source_file": ".windsurf/rules/mw-rpg-bridge.md",
@@ -1621,7 +1604,7 @@
       "line": 12,
       "line_end": 37,
       "section": "Trigger patterns",
-      "verbatim": "Load the `explorer` skill when the Director's message contains: … Load the `planner` skill when the Director's message contains: … Load the `executor` skill when the Director's message contains: … Conditional verbs are **NOT** present (if \"dovrei\", \"vorrei\", \"dovrebbe\", \"potremmo\" are present, use explorer).",
+      "verbatim": "Load the `explorer` skill when the Director's message contains: \u2026 Load the `planner` skill when the Director's message contains: \u2026 Load the `executor` skill when the Director's message contains: \u2026 Conditional verbs are **NOT** present (if \"dovrei\", \"vorrei\", \"dovrebbe\", \"potremmo\" are present, use explorer).",
       "enforcement_candidate": "kernel"
     },
     {
@@ -1631,7 +1614,7 @@
       "line": 40,
       "line_end": 43,
       "section": "Order of evaluation",
-      "verbatim": "1. Check for executor triggers (single task, no conditionals). If match → executor. 2. Check for planner triggers (explicit planning). If match → planner. 3. Check for explorer triggers (open-ended, brainstorming). If match → explorer. 4. If no match, default to explorer (safer for personal project).",
+      "verbatim": "1. Check for executor triggers (single task, no conditionals). If match \u2192 executor. 2. Check for planner triggers (explicit planning). If match \u2192 planner. 3. Check for explorer triggers (open-ended, brainstorming). If match \u2192 explorer. 4. If no match, default to explorer (safer for personal project).",
       "enforcement_candidate": "kernel"
     },
     {
@@ -1643,6 +1626,16 @@
       "section": "Notes",
       "verbatim": "This rule is for **Mind Weaver skills only**, not RPG skills. When a request clearly belongs to an RPG skill (e.g., \"execute prompt\", \"run harness\"), defer to the RPG skill system instead of MW.",
       "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-00-GOVCHECK",
+      "source_file": ".windsurf/rules/00-project-invariants.md",
+      "source_trigger": "always_on",
+      "line": 86,
+      "line_end": 86,
+      "section": "Mandatory safeguards before \"done\"",
+      "verbatim": "`npm run governance:check` (invariant-checks orchestrator, PLAN-122) MUST also pass before declaring a task done \u2014 it is wired into `.husky/pre-commit`.",
+      "enforcement_candidate": "check"
     }
   ]
 }

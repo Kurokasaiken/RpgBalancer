@@ -1,7 +1,9 @@
 # Invariant → Enforcement Matrix (PLAN-122, T-1)
 
-**Stato:** `draft — PENDING Director sign-off` (§0b gate: nessuna demozione
-prima dell'approvazione di questa matrice, gap inclusi).
+**Stato:** `approved — Director sign-off 2026-11-15 ("go")`: 4 GAP dichiarati
+approvati come tali, disposizioni accettate come proposte. Demozioni restano
+subordinate a check fixture-validated (P3) — nessuna demozione automatica da
+questo sign-off.
 
 **Sorgente:** `context/governance/invariant-ledger.json` (167 invarianti
 atomiche, doppia estrazione anti-T-06). Ogni riga cita l'ID del ledger; il
@@ -29,7 +31,7 @@ verbatim vincolante sta nel ledger, non duplicato qui.
 
 | invariant ID | invariant (short) | disposition | proposed check name or kernel line | notes |
 |---|---|---|---|---|
-| INV-00-CONFLICT-FLAG | flag invariant conflicts, never silently break | GAP | — | **gap_approval: pending** — a silent non-flag leaves no trace in any artifact; kernel line retained but cannot verify an omission. |
+| INV-00-CONFLICT-FLAG | flag invariant conflicts, never silently break | GAP | — | **gap_approval: approved (Director 2026-11-15)** — a silent non-flag leaves no trace in any artifact; kernel line retained but cannot verify an omission. |
 | INV-00-PERSIST-SVC | all save/load via PersistenceService | check: | persistence:no-forbidden-apis (proposed — T-3 v1) | Ban side is mechanical; "all traffic through service" only partially provable — kernel line retained. |
 | INV-00-PERSIST-BAN | no localStorage/sessionStorage/sync persistence | check: | persistence:no-forbidden-apis (proposed — T-3 v1) | Verified: eslint.config.js has NO localStorage/sessionStorage ban today (plan §0 fact confirmed). AST rule per D-6. |
 | INV-00-CONFIG-NO-HARDCODE | no hardcoded gameplay/UI values in components | kernel: | "No hardcoded gameplay/UI values in components." | What counts as a gameplay/UI value is semantic judgment — kernel. |
@@ -60,6 +62,7 @@ verbatim vincolante sta nel ledger, non duplicato qui.
 | INV-00-TIMEOUTS | every command has max runtime; hang = failure | kernel: | "Every command must have a maximum runtime… A command that hangs is treated as a failure, not as 'still running'." | Agent behavior + numeric contract — kernel. |
 | INV-00-SEPARATION | no work-project logic; scoped legacy edits only | human-review: | Director/Strategist flags cross-project contamination | Boundary judgment. |
 | INV-00-BASELINE-REGISTER | new cross-cutting systems MUST register here | kernel: | "it MUST be registered here — not left implicit in a single prompt." | Meta-rule — kernel. |
+| INV-00-GOVCHECK | run `npm run governance:check` before declaring done | check: | .husky/pre-commit → governance:check --staged (existing — wired T-4) | Added by PLAN-122 T-2 as the plan-mandated kernel line; the hook enforces it at commit time, the "before done" phrasing is kernel residual. |
 
 ### `.windsurf/rules/40-documentation-governance.md` (8)
 
@@ -124,13 +127,13 @@ verbatim vincolante sta nel ledger, non duplicato qui.
 | INV-AGENTS-INTENT-CAPTURE | capture Director intent in RICHIESTE.md before responding | check: | closure:lint → checkIntentGate (existing — partial) | Gate exists; the "prima di rispondere" timing is not verifiable — residual kernel. |
 | INV-AGENTS-MW-INVOKE | invoke MW scripts as `python scripts/<nome>.py`, never `./scripts/…` | kernel: | "Invoca sempre come `python scripts/<nome>.py`, mai `./scripts/<nome>.py`." | Agent command discipline — kernel. |
 | INV-AGENTS-DELTA-INGEST | ingestions → durable items → director-profile.jsonl | kernel: | "estrarre item durevoli … e appenderli in `context/auto/director-profile.jsonl` via `mw-delta.py append`." | Kernel. |
-| INV-AGENTS-DELTA-MID | mid-session durable Director statements → append SUBITO | GAP | — | **gap_approval: pending** — "SUBITO" is a timing obligation: no artifact can prove when the append happened vs. end-of-task; a skipped append leaves no trace. Kernel line retained. |
+| INV-AGENTS-DELTA-MID | mid-session durable Director statements → append SUBITO | GAP | — | **gap_approval: approved (Director 2026-11-15)** — "SUBITO" is a timing obligation: no artifact can prove when the append happened vs. end-of-task; a skipped append leaves no trace. Kernel line retained. |
 | INV-AGENTS-DELTA-CLOSE | close-time delta: only non-derivable items | kernel: | "alla chiusura di un task, appendere SOLO item non derivabili da codice/git/file canonici." | Kernel. |
-| INV-AGENTS-ADVISORY-NONCANON | advisory notes never override canonical docs | kernel: | "Le note sono ADVISORY: mai riscrivere/contraddire CANON/desiderata/RICHIESTE; su conflitto il canonico vince." | The "lint advisory-vs-canonical fail-closed" mentioned in the line has NO script in `scripts/`/`package.json` (verified) — flagged as ambiguity for Director. |
+| INV-AGENTS-ADVISORY-NONCANON | advisory notes never override canonical docs | kernel: | "Le note sono ADVISORY: mai riscrivere/contraddire CANON/desiderata/RICHIESTE; su conflitto il canonico vince." | The "lint advisory-vs-canonical fail-closed" mentioned in the line has NO script in `scripts/`/`package.json` (verified). Director ruling 2026-11-15: proposed post-v1 check `advisory:canonical-conflict`; kernel retains until fixture-validated. |
 | INV-AGENTS-DK-SCOPE | director-knowledge vault: consult for preferences, not project state; read-only | kernel: | "Non consultare per stato o decisioni di progetto… Read-only: questo progetto non scrive nel vault." | Kernel. |
 | INV-AGENTS-DK-TRIGGER | mw-director bootstrap + recall on non-trivial tasks | kernel: | "su task non banali … lanciare `mw-director.py bootstrap` all'avvio e `recall --topic` prima di proporre." | "Non banale" is judgment — kernel. |
-| INV-AGENTS-TENSION-FLAG | name pillar/desiderata tensions before proceeding; Fausto decides | GAP | — | **gap_approval: pending** — same silence problem as INV-00-CONFLICT-FLAG: an unflagged tension is invisible. Kernel line retained. |
-| INV-AGENTS-ADMIT-UNKNOWN | "if you don't know, say it" — don't deduce direction | GAP | — | **gap_approval: pending** — an undetected silent deduction produces a confident artifact indistinguishable from a true one. Kernel line retained. |
+| INV-AGENTS-TENSION-FLAG | name pillar/desiderata tensions before proceeding; Fausto decides | GAP | — | **gap_approval: approved (Director 2026-11-15)** — same silence problem as INV-00-CONFLICT-FLAG: an unflagged tension is invisible. Kernel line retained. |
+| INV-AGENTS-ADMIT-UNKNOWN | "if you don't know, say it" — don't deduce direction | GAP | — | **gap_approval: approved (Director 2026-11-15)** — an undetected silent deduction produces a confident artifact indistinguishable from a true one. Kernel line retained. |
 | INV-AGENTS-SCENEAUTH | scene art MUST go through scene-author skill gates | check: | scripts/check-scene-prompt.py + scripts/check-scene-art.py (existing — skill-internal) | Gates exist INSIDE the skill; nothing in closure:lint forces invocation — invocation obligation stays kernel; candidate post-v1 wiring. |
 
 ### `CLAUDE.md` (1)
@@ -290,33 +293,34 @@ verbatim vincolante sta nel ledger, non duplicato qui.
   them, follow the invariant and flag the conflict instead of silently breaking
   it."* A silent non-flag produces no artifact: no check can detect an omission
   in the agent's reasoning; a human reviewer sees only the compliant-looking
-  output. Kernel line retained as exhortation. `gap_approval: pending`
+  output. Kernel line retained as exhortation. `gap_approval: approved (Director 2026-11-15)`
 - **INV-AGENTS-TENSION-FLAG** — verbatim: *"Se una proposta è in tensione con
   un pilastro, con una decisione registrata o con la desiderata FROZEN, **dillo
   prima di procedere, citando la riga.** Non aggirarla in silenzio, non
   risolverla da solo."* Same class: the violation is the *absence* of a flag.
   Partially mitigable by Director-side review, not agent-side verification.
-  `gap_approval: pending`
+  `gap_approval: approved (Director 2026-11-15)`
 - **INV-AGENTS-ADMIT-UNKNOWN** — verbatim: *"Se non sai, dillo. Non dedurre una
   direzione che non è scritta."* A confident but deduced direction is
-  indistinguishable from a correct one in the artifact. `gap_approval: pending`
+  indistinguishable from a correct one in the artifact. `gap_approval: approved (Director 2026-11-15)`
 - **INV-AGENTS-DELTA-MID** — verbatim: *"…appenderlo SUBITO con
   `mw-delta.py append` — non aspettare la chiusura."* Timing obligation: the
   jsonl proves *that* an append happened, never *when*. A skipped mid-session
-  append leaves no trace. `gap_approval: pending`
+  append leaves no trace. `gap_approval: approved (Director 2026-11-15)`
 
-## Ambiguities needing Director ruling
+## Ambiguities — Director dispositions (ruled 2026-11-15)
 
-1. **"lint advisory-vs-canonical" referenced but not found** (INV-AGENTS-ADVISORY-NONCANON, AGENTS.md:92): the line asserts a fail-closed lint exists; no such script is in `scripts/` or `package.json`. Options: (a) treat as aspirational → stays kernel; (b) Director mandates building it (post-v1 check `advisory:canonical-conflict`).
-2. **`contracts:index-sync` / `trusted:check` real coverage** (INV-40-SSOT, INV-30-REGISTRY-*): matrix marks them "partial" — whether they verify "exactly one trusted doc" and registry metadata completeness must be confirmed in T-3 before any demotion license is derived.
-3. **`prompt:check` (checkPromptLock) scope**: not mapped — it guards prompt-spec locking, and the spec pipeline is in pausa (R-208). Left unmapped rather than overclaimed.
-4. **Kernel-candidate mechanizable-but-noisy rows** (INV-00-REUSE-DIR, INV-20-TIMERS→proposed, INV-16-PLAN-STATE→proposed): marked proposed-check where lint is feasible; Director may veto any proposed check — the row then falls back to kernel, no GAP.
+1. **"lint advisory-vs-canonical" referenced but not found** (INV-AGENTS-ADVISORY-NONCANON, AGENTS.md:92): the line asserts a fail-closed lint exists; no such script is in `scripts/` or `package.json`. **Ruling:** proposed **post-v1** check `advisory:canonical-conflict` — kernel line retained until the check is fixture-validated (P3).
+2. **`contracts:index-sync` / `trusted:check` real coverage** (INV-40-SSOT, INV-30-REGISTRY-*): matrix marks them "partial". **Ruling:** stays partial — actual coverage must be confirmed before any demotion license is derived from these checks.
+3. **`prompt:check` (checkPromptLock) scope**: it guards prompt-spec locking, and the spec pipeline is in pausa (R-208). **Ruling:** stays unmapped — not orchestrated in `governance:check` v1 either.
+4. **Kernel-candidate mechanizable-but-noisy rows** (INV-00-REUSE-DIR, INV-20-TIMERS→proposed, INV-16-PLAN-STATE→proposed): **Ruling:** all proposed post-v1 checks keep "kernel retains until fixture-validated" — no check licenses a demotion before its fixture pair is green in `--selftest` (P3).
+5. **`lint:painter` coverage** (INV-10UI-NO-HARDCOLOR): **Ruling:** flagged **partial** — covers only 2 files in `TARGET_FILES`; must be extended (glob scope) before it can license anything.
 
 ## Sign-off
 
-- [ ] Director approves matrix dispositions (OB-8)
-- [ ] Director approves each `gap_approval: pending` → `approved:<ruling>` per GAP row
-- [ ] Director rules on ambiguities 1–4
+- [x] Director approves matrix dispositions (OB-8) — **approved 2026-11-15 ("go")**
+- [x] Director approves each `gap_approval: approved (Director 2026-11-15)` per GAP row — 4/4 approved as declared
+- [x] Director rules on ambiguities — dispositions recorded above (1–5)
 
-> **Gate reminder (§0b):** nessuna demozione (T-7) prima di questo sign-off.
-> Sviluppo check (T-2/T-3) non subordinato alla firma.
+> **Gate reminder (§0b):** nessuna demozione (T-7) senza check fixture-validated,
+> anche con sign-off acquisito. Sviluppo check (T-2/T-3) non subordinato alla firma.

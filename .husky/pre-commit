@@ -1,0 +1,16 @@
+#!/usr/bin/env sh
+# PLAN-122 T-4 — governance pre-commit gate.
+#
+# 1. lint-staged: eslint --fix on the configured globs (existing config, now wired).
+# 2. governance:check --staged: only checks whose target set intersects the
+#    staged files run (check→globs map in scripts/governance/governanceCheck.ts);
+#    per-check timeout 30s, total well under the 120s rule.
+#
+# NOTE: this hook is staged-scoped by design — it inspects YOUR staged files,
+# but some checks (e.g. foreground:lint) scan their whole surface and will
+# block the commit on pre-existing violations elsewhere. If a commit is
+# blocked by violations outside your scope, fix them or report them —
+# emergency escape hatch: `HUSKY=0 git commit …` (husky skips all hooks).
+
+npm run lint:staged || exit 1
+npm run governance:check -- --staged || exit 1

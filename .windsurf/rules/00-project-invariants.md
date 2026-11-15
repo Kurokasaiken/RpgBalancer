@@ -83,6 +83,7 @@ npm run build:check
 npm run closure:lint
 ```
 If any safeguard fails, the task is **BLOCKED**, not complete.
+`npm run governance:check` (invariant-checks orchestrator, PLAN-122) MUST also pass before declaring a task done — it is wired into `.husky/pre-commit`.
 
 ## Deploy verification (R-304, Director 2026-11-01)
 - A Vercel deploy is **not "done"** until post-deploy verification is green on
