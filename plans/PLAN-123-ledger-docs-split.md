@@ -1,6 +1,15 @@
 # PLAN-123 — Ledger-docs split: DECISION_LOG + desiderata → file attivi ≤cap + archivio union-read
 
-**Stato:** `in corso` (2026-11-15 — battezzato; ruling Director "go": D-1=**a** cutoff ≥2026-10-24, D-2=**c** digest (canonico intatto), D-3=cap 50k, D-4 no-op sotto D-2c. Digest = indice tutte vN + verbatim suffisso più grande ≤50k (~v25–v38).
+**Stato:** `fatto` (pending verifica Director OB-5) — T-0..T-3 eseguiti 2026-11-15:
+DECISION_LOG 149.255→**46.473B** attivo (38 sezioni datate ≥2026-10-24) +
+`context/DECISION_LOG-archive.md` 103.143B (70 sezioni: 14 legacy + datate <cutoff);
+union-check sha256 `292fe4a7…` **PASS** (108→108, multiset identico, header byte-identico).
+`.mw/desiderata.md` **byte-intatto** (`eae71073…`); digest `.mw/desiderata-digest.md`
+47.824B = indice v1–v38 + verbatim **v27–v38** (suffisso max ≤50k con header+indice).
+Guard `npm run ledger:check` verde (4/4). Commits `6adc859a` (files) + `554960a5`
+(tool/docs) + `7fde4d3d` (coverage_exception). closure:lint red = drift parallelo
+R-345 non-PLAN-123 (documentato nel report). Report:
+`.mw/runs/plan123-ledger-split/report.md`.
 Misura strutturale reale già eseguita in sede di draft; D-1..D-4 a ruling.)
 
 **Parent:** R-342/R-343 (ops: audit contesto fisso Devin + delega subagent);
