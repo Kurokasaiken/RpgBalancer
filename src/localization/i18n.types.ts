@@ -875,6 +875,14 @@ export default interface Resources {
         },
         "waiting": "A decision is waiting"
       },
+      "rail": {
+        "ariaLabel": "Roster and village stash",
+        "collapse": "Collapse the roster column",
+        "expand": "Open the roster column",
+        "memberStats": "Member condition",
+        "tabStash": "Stash",
+        "tablist": "Roster and stash"
+      },
       "regions": {
         "eastern_mountains": "Ember Highlands",
         "eastern_woods": "Eastern Groves",
@@ -2142,7 +2150,8 @@ export default interface Resources {
         "away": "Away",
         "dead": "Fallen",
         "exhausted": "Exhausted",
-        "injured": "Injured"
+        "injured": "Injured",
+        "locked": "Locked"
       },
       "title": "Roster"
     },

@@ -30,6 +30,28 @@ export const cassettoLayoutSchema = z
       widthPx: z.number().positive(),
       /** Width below which only one side surface may be open (mutual exclusion). */
       mutualExclusionBelowPx: z.number().positive(),
+      /** Screen-edge margin above/beside the rail (px). */
+      marginPx: z.number().nonnegative(),
+      /** D8: the rail's max-height ends this far above the viewport bottom —
+       *  the reserved zone of the bottom-left medallion/narrator (voce). */
+      bottomInsetPx: z.number().nonnegative(),
+      /** Width of the collapsed edge chip (px) — the rail's only folded form. */
+      chipWidthPx: z.number().positive(),
+      /** Bars each roster row shows, in order — config-driven (T5): which
+       *  metric, its i18n label, and the skin-token pair the fill reads. */
+      bars: z
+        .array(
+          z.object({
+            id: z.string(),
+            /** Resident metric the bar renders: `hp` = currentHp/maxHp,
+             *  `stamina` = 1 − fatigue/100 (same derivation as the roster). */
+            value: z.enum(['hp', 'stamina']),
+            labelKey: z.string(),
+            /** CSS variables (or values) the gradient fill reads, [start, end]. */
+            fill: z.tuple([z.string(), z.string()]),
+          }),
+        )
+        .min(1),
     }),
     bottomSheet: z.object({
       /** Non-modal sheet detents (T8): peek height, half/full viewport fractions. */
@@ -44,7 +66,27 @@ export type CassettoLayoutConfig = z.infer<typeof cassettoLayoutSchema>;
 
 const RAW_CASSETTO_LAYOUT_CONFIG: CassettoLayoutConfig = {
   drawer: { widthMinPx: 360, widthVwFraction: 0.23, widthMaxPx: 460 },
-  rail: { widthPx: 320, mutualExclusionBelowPx: 1100 },
+  rail: {
+    widthPx: 320,
+    mutualExclusionBelowPx: 1100,
+    marginPx: 24,
+    bottomInsetPx: 240,
+    chipWidthPx: 40,
+    bars: [
+      {
+        id: 'hp',
+        value: 'hp',
+        labelKey: 'gameFrame.heroLevel.hp',
+        fill: ['var(--skin-statbar-hp-start)', 'var(--skin-statbar-hp-end)'],
+      },
+      {
+        id: 'stamina',
+        value: 'stamina',
+        labelKey: 'gameFrame.roster.zanara.stamina',
+        fill: ['var(--skin-statbar-stamina-start)', 'var(--skin-statbar-stamina-end)'],
+      },
+    ],
+  },
   bottomSheet: { peekPx: 56, halfFraction: 0.5, fullFraction: 0.92 },
 };
 

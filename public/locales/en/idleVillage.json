@@ -395,7 +395,8 @@
       "dead": "Fallen",
       "exhausted": "Exhausted",
       "away": "Away",
-      "assigned": "Assigned"
+      "assigned": "Assigned",
+      "locked": "Locked"
     },
     "stats": {
       "hp": "Health",
@@ -1578,6 +1579,14 @@
         "site": "At site",
         "return": "Return"
       }
+    },
+    "rail": {
+      "ariaLabel": "Roster and village stash",
+      "expand": "Open the roster column",
+      "collapse": "Collapse the roster column",
+      "tablist": "Roster and stash",
+      "tabStash": "Stash",
+      "memberStats": "Member condition"
     }
   },
   "missionPlanner": {

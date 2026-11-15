@@ -104,6 +104,9 @@ import { HudEventLedger, QuestJourneyRoute, QuestOverlays, QuestRewardPopup, Que
 import { MapDemoPoi } from '@/ui/idleVillage/components/gameFrame/MapDemoPoi';
 import { VillageStashPanel } from '@/ui/idleVillage/components/gameFrame/VillageStashPanel';
 import { ExpeditionEdgeTab } from '@/ui/idleVillage/components/gameFrame/ExpeditionEdgeTab';
+import { RosterStashRail } from '@/ui/idleVillage/components/gameFrame/RosterStashRail';
+import { useExpeditionRail } from '@/ui/idleVillage/store/useExpeditionRail';
+import { CASSETTO_LAYOUT_CONFIG } from '@/balancing/config/idleVillage/cassettoLayoutConfig';
 import { useVillageStashStore } from '@/ui/idleVillage/store/useVillageStashStore';
 import { MerchantPanel } from '@/ui/idleVillage/components/gameFrame/MerchantPanel';
 import { VILLAGE_STASH_CONFIG } from '@/balancing/config/idleVillage/villageStashConfig';
@@ -529,10 +532,11 @@ export default function GameMappa2Page() {
           {isValidElement(node) ? (
             <HudRealCassettoDetail
               {...(node.props as QuestExpeditionDetailProps)}
-              /* R-339/PLAN-119 AC4: tap an empty party seat → open the roster
-               *  rail so the player picks a member (Claude note: tap member →
-               *  fills the slot, existing assign flow). */
-              onOpenRoster={() => panels.set('roster', true)}
+              /* R-339/PLAN-119 AC4+T5: tap an empty party seat → open the
+               *  docked Roster|Stash rail on the Roster tab so the player
+               *  picks a member (tap member → fills the slot, existing
+               *  assign flow). */
+              onOpenRoster={() => useExpeditionRail.getState().open('roster')}
             />
           ) : (
             node
@@ -619,6 +623,22 @@ export default function GameMappa2Page() {
   );
   const anyExpeditionDetailOpen = expeditions.some((exp) => exp.isDetailOpen && (!exp.run || exp.run.ended));
   usePanelWhileOpen(panels, 'roster', anyExpeditionDetailOpen);
+  /* R-339/PLAN-119 T5 D2 mutual exclusion (≤1100px): when the player EXPANDS
+   *  the docked rail while a drawer holds the screen, the rail wins and the
+   *  drawer detail closes. Only a false→true transition counts — an already
+   *  expanded rail does not veto a drawer the player is opening (the rail's
+   *  own mutex folds it in that direction). */
+  const railExpanded = useExpeditionRail((s) => s.expanded);
+  const railExpandedPrev = useRef(railExpanded);
+  useEffect(() => {
+    const wasExpanded = railExpandedPrev.current;
+    railExpandedPrev.current = railExpanded;
+    if (!railExpanded || wasExpanded || !anyExpeditionDetailOpen) return;
+    if (!window.matchMedia(`(max-width: ${CASSETTO_LAYOUT_CONFIG.rail.mutualExclusionBelowPx}px)`).matches) return;
+    expeditionsRef.current.forEach((exp) => {
+      if (exp.isDetailOpen) exp.closeDetail();
+    });
+  }, [railExpanded, anyExpeditionDetailOpen]);
   /* Stage occupancy follows the real surfaces: a planner being open means the
    *  `questDetail` panel is on stage; no run means `quest` must be released. */
   useEffect(() => {
@@ -637,10 +657,14 @@ export default function GameMappa2Page() {
     .join(',');
   const activeStashOwner = useVillageStashStore((s) => s.activeStashOwner);
   const stashPanelOpen = panels.visible.villageStash;
+  /* T5: the docked rail's Stash tab is a stash surface too — a single open
+   *  planner binds the ledger to it exactly like the floating magazzino. */
+  const railStashOpen = useExpeditionRail((s) => s.expanded && s.tab === 'stash');
+  const stashSurfaceOpen = stashPanelOpen || railStashOpen;
   useEffect(() => {
     const stash = useVillageStashStore.getState();
     const openPlannerIds = openPlannerKey ? openPlannerKey.split(',') : [];
-    if (!stashPanelOpen) {
+    if (!stashSurfaceOpen) {
       if (stash.activeStashOwner) stash.bindStash(null);
       return;
     }
@@ -649,7 +673,7 @@ export default function GameMappa2Page() {
       return;
     }
     if (!stash.activeStashOwner && openPlannerIds.length === 1) stash.bindStash(openPlannerIds[0]);
-  }, [stashPanelOpen, activeStashOwner, openPlannerKey]);
+  }, [stashSurfaceOpen, activeStashOwner, openPlannerKey]);
   const expeditionsRef = useRef(expeditions);
   expeditionsRef.current = expeditions;
   const closeAnyExpeditionDetail = useCallback(() => {
@@ -1142,7 +1166,7 @@ export default function GameMappa2Page() {
    *  (no key/menu entry), so nothing else drives it — no intercept bridge
    *  needed here (/gameOld's version exists for the stage). No quest window on
    *  this page yet → `questBounds` null; no drag yet → `dragActive` false. */
-  const { residentsById } = useRosterKitData();
+  const { residents, residentsById } = useRosterKitData();
   /* Page chrome insets (top time bar, bottom nav) — the hero sheet avoids them,
    *  the event card centres on the free area they leave. */
   const heroSheetChrome = {
@@ -1593,6 +1617,29 @@ export default function GameMappa2Page() {
        *  right-edge tab with the mechanism hint while no quest is selected.
        *  The signed cassetto replaces it the moment a marker opens a detail. */}
       <ExpeditionEdgeTab visible={view === 'map' && !anyExpeditionDetailOpen && !hudHidden} />
+      {/* R-339/PLAN-119 T5 (D1/D2): the docked left Roster|Stash column —
+       *  persistent by default, publishes `insets.left`, ends above the
+       *  bottom-left medallion zone (rail.bottomInsetPx). Member picks route
+       *  through the same expedition→session chain the floating roster uses. */}
+      <RosterStashRail
+        visible={view === 'map' && !hudHidden}
+        residents={residents}
+        stashConfig={VILLAGE_STASH_CONFIG}
+        lockedResidentIds={[
+          ...new Set([
+            ...session.lockedResidentIds,
+            ...expeditionGoblin.lockedResidentIds,
+            ...expeditionRovine.lockedResidentIds,
+          ]),
+        ]}
+        lockedStatusLabel={session.t('roster.status.assigned')}
+        selectedResidentId={draggingResidentId ?? null}
+        onResidentSelect={(residentId) => {
+          if (expeditionGoblin.handleResidentSelect(residentId)) return;
+          if (expeditionRovine.handleResidentSelect(residentId)) return;
+          session.handleResidentSelect(residentId);
+        }}
+      />
 
       {view === 'map' && regionHover && (
         <RegionTooltip name={t(`gameFrame.regions.${regionHover.region.id}`)} x={regionHover.x} y={regionHover.y} />
