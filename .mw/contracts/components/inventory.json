@@ -1,6 +1,6 @@
 {
   "schema": "plan054-component-inventory/1",
-  "generated_at": "2026-11-15T13:13:08.098Z",
+  "generated_at": "2026-11-15T15:55:40.545Z",
   "strict_files": [
     "src/pages/game-frame-pixi.tsx",
     "src/pages/game-frame.tsx",
@@ -111,6 +111,7 @@
     "src/ui/idleVillage/components/destinyAstrolabeV62/tentacles.ts",
     "src/ui/idleVillage/components/gameFrame/AmanuensePage.tsx",
     "src/ui/idleVillage/components/gameFrame/DirectorPanel.tsx",
+    "src/ui/idleVillage/components/gameFrame/ExpeditionDrawer.tsx",
     "src/ui/idleVillage/components/gameFrame/ExpeditionEdgeTab.tsx",
     "src/ui/idleVillage/components/gameFrame/GameBootScreen.tsx",
     "src/ui/idleVillage/components/gameFrame/GameFrame.tsx",
@@ -154,7 +155,6 @@
     "src/ui/idleVillage/components/gameFrame/QuestVerdictCard.tsx",
     "src/ui/idleVillage/components/gameFrame/RegionTooltip.tsx",
     "src/ui/idleVillage/components/gameFrame/ResourceReadout.tsx",
-    "src/ui/idleVillage/components/gameFrame/RosterStashRail.tsx",
     "src/ui/idleVillage/components/gameFrame/TuningPanel.tsx",
     "src/ui/idleVillage/components/gameFrame/VillageBuildingLayers.tsx",
     "src/ui/idleVillage/components/gameFrame/VillageDirectorView.tsx",
@@ -680,16 +680,6 @@
       "tier_source": "default"
     },
     {
-      "id": "canonical-data-bridge",
-      "role": "shared-kernel",
-      "tier": 1,
-      "root_file": "src/ui/idleVillage/frozen/_infra/CanonicalDataBridge.ts",
-      "scope_files": [
-        "src/ui/idleVillage/frozen/_infra/CanonicalDataBridge.ts"
-      ],
-      "tier_source": "kernel"
-    },
-    {
       "id": "canonical-roster-bundle",
       "role": "shared-kernel",
       "tier": 1,
@@ -948,16 +938,6 @@
       "tier_source": "kernel"
     },
     {
-      "id": "drag-sensors",
-      "role": "shared-kernel",
-      "tier": 1,
-      "root_file": "src/ui/idleVillage/interaction/dragSensors.ts",
-      "scope_files": [
-        "src/ui/idleVillage/interaction/dragSensors.ts"
-      ],
-      "tier_source": "kernel"
-    },
-    {
       "id": "drag-test-container",
       "role": "ui-component",
       "tier": 2,
@@ -1020,6 +1000,37 @@
       "root_file": "src/ui/idleVillage/components/gameFrame/engravedIcons.tsx",
       "scope_files": [
         "src/ui/idleVillage/components/gameFrame/engravedIcons.tsx"
+      ],
+      "tier_source": "default"
+    },
+    {
+      "id": "expedition-bag-assign",
+      "role": "ui-component",
+      "tier": 2,
+      "root_file": "src/ui/idleVillage/components/gameFrame/expeditionBagAssign.ts",
+      "scope_files": [
+        "src/ui/idleVillage/components/gameFrame/expeditionBagAssign.ts"
+      ],
+      "tier_source": "default"
+    },
+    {
+      "id": "expedition-bottom-sheet",
+      "role": "ui-component",
+      "tier": 2,
+      "root_file": "src/ui/idleVillage/components/gameFrame/ExpeditionBottomSheet.tsx",
+      "scope_files": [
+        "src/ui/idleVillage/components/gameFrame/ExpeditionBottomSheet.tsx",
+        "src/ui/idleVillage/store/useExpeditionSheet.ts"
+      ],
+      "tier_source": "default"
+    },
+    {
+      "id": "expedition-drawer",
+      "role": "ui-component",
+      "tier": 2,
+      "root_file": "src/ui/idleVillage/components/gameFrame/ExpeditionDrawer.tsx",
+      "scope_files": [
+        "src/ui/idleVillage/components/gameFrame/ExpeditionDrawer.tsx"
       ],
       "tier_source": "default"
     },
@@ -1129,14 +1140,18 @@
         "src/ui/idleVillage/components/gameFrame/useHudPanels.ts",
         "src/ui/idleVillage/components/gameFrame/useHudScale.ts",
         "src/ui/idleVillage/components/gameFrame/usePanelWhileOpen.ts",
+        "src/ui/idleVillage/components/gameFrame/villageStashViewModel.ts",
         "src/ui/idleVillage/config/gamePerfBudgets.ts",
         "src/ui/idleVillage/config/worldSurfaceConfig.ts",
+        "src/ui/idleVillage/frozen/_infra/CanonicalDataBridge.ts",
         "src/ui/idleVillage/hooks/useFrameMetrics.ts",
         "src/ui/idleVillage/hooks/useQuestLoreDrop.ts",
         "src/ui/idleVillage/hooks/useReducedMotion.ts",
         "src/ui/idleVillage/hooks/useSettlementLostGrade.ts",
         "src/ui/idleVillage/hooks/useThrottledValue.ts",
+        "src/ui/idleVillage/interaction/dragSensors.ts",
         "src/ui/idleVillage/interaction/magneticCollision.ts",
+        "src/ui/idleVillage/interaction/useDragOutcome.ts",
         "src/ui/idleVillage/pixiSpike/pixiDestroy.ts",
         "src/ui/idleVillage/questS1Lab/questArt.ts",
         "src/ui/idleVillage/questS1Lab/questForecast.worker.ts",
@@ -1148,7 +1163,9 @@
         "src/ui/idleVillage/questS1Lab/useQuestRun.ts",
         "src/ui/idleVillage/quests/rosterCompatibility.ts",
         "src/ui/idleVillage/rosterV2/heroLevelCue.ts",
+        "src/ui/idleVillage/rosterV2/heroLevelMock.ts",
         "src/ui/idleVillage/rosterV2/heroLevelUpEvents.ts",
+        "src/ui/idleVillage/rosterV2/heroLevelViewModel.ts",
         "src/ui/idleVillage/rosterV2/index.ts",
         "src/ui/idleVillage/rosterV2/mountedCardRegistry.ts",
         "src/ui/idleVillage/rosterV2/runHeroLevelUpStaging.ts",
@@ -1157,6 +1174,7 @@
         "src/ui/idleVillage/skins/dayNightPoiSkinConfig.ts",
         "src/ui/idleVillage/skins/resolveInitialSkin.ts",
         "src/ui/idleVillage/slots/useResidentSlotController.ts",
+        "src/ui/idleVillage/store/useVillageStashStore.ts",
         "src/ui/idleVillage/utils/gameAssetWarmup.ts",
         "src/ui/idleVillage/utils/gamePerfProbe.ts"
       ],
@@ -1296,26 +1314,6 @@
         "src/ui/idleVillage/rosterV2/HeroLevelDecor.tsx"
       ],
       "tier_source": "default"
-    },
-    {
-      "id": "hero-level-mock",
-      "role": "shared-kernel",
-      "tier": 1,
-      "root_file": "src/ui/idleVillage/rosterV2/heroLevelMock.ts",
-      "scope_files": [
-        "src/ui/idleVillage/rosterV2/heroLevelMock.ts"
-      ],
-      "tier_source": "kernel"
-    },
-    {
-      "id": "hero-level-view-model",
-      "role": "shared-kernel",
-      "tier": 1,
-      "root_file": "src/ui/idleVillage/rosterV2/heroLevelViewModel.ts",
-      "scope_files": [
-        "src/ui/idleVillage/rosterV2/heroLevelViewModel.ts"
-      ],
-      "tier_source": "kernel"
     },
     {
       "id": "hero-sheet-panel",
@@ -2739,16 +2737,6 @@
       "tier_source": "default"
     },
     {
-      "id": "roster-stash-rail",
-      "role": "ui-component",
-      "tier": 2,
-      "root_file": "src/ui/idleVillage/components/gameFrame/RosterStashRail.tsx",
-      "scope_files": [
-        "src/ui/idleVillage/components/gameFrame/RosterStashRail.tsx"
-      ],
-      "tier_source": "default"
-    },
-    {
       "id": "sandbox-diagnostics",
       "role": "shared-kernel",
       "tier": 1,
@@ -3111,16 +3099,6 @@
       "tier_source": "kernel"
     },
     {
-      "id": "use-drag-outcome",
-      "role": "shared-kernel",
-      "tier": 1,
-      "root_file": "src/ui/idleVillage/interaction/useDragOutcome.ts",
-      "scope_files": [
-        "src/ui/idleVillage/interaction/useDragOutcome.ts"
-      ],
-      "tier_source": "kernel"
-    },
-    {
       "id": "use-drag-preview-instrumentation",
       "role": "shared-kernel",
       "tier": 1,
@@ -3285,16 +3263,6 @@
       "tier_source": "kernel"
     },
     {
-      "id": "use-village-stash-store",
-      "role": "shared-kernel",
-      "tier": 1,
-      "root_file": "src/ui/idleVillage/store/useVillageStashStore.ts",
-      "scope_files": [
-        "src/ui/idleVillage/store/useVillageStashStore.ts"
-      ],
-      "tier_source": "kernel"
-    },
-    {
       "id": "v9-glass-layers-only",
       "role": "ui-component",
       "tier": 2,
@@ -3424,16 +3392,6 @@
         "src/ui/idleVillage/components/gameFrame/VillageStashPanel.tsx"
       ],
       "tier_source": "default"
-    },
-    {
-      "id": "village-stash-view-model",
-      "role": "shared-kernel",
-      "tier": 1,
-      "root_file": "src/ui/idleVillage/components/gameFrame/villageStashViewModel.ts",
-      "scope_files": [
-        "src/ui/idleVillage/components/gameFrame/villageStashViewModel.ts"
-      ],
-      "tier_source": "kernel"
     },
     {
       "id": "wanderlust-ambient-field",
@@ -3752,9 +3710,9 @@
   ],
   "stats": {
     "files": 500,
-    "units": 305,
-    "ui_components": 227,
-    "shared_kernels": 78
+    "units": 299,
+    "ui_components": 228,
+    "shared_kernels": 71
   },
-  "content_sha256": "1d5b6a5f47c8d2a9508736075193f392e4140bcd615238f0407ffad294b3b266"
+  "content_sha256": "4b8067910c1421f561a0375f774e3ea19bb71334d2c9ba9fefeca2eb3bb20ba9"
 }

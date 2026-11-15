@@ -941,6 +941,10 @@ export default interface Resources {
           }
         }
       },
+      "sheet": {
+        "collapse": "Lower the expedition planner",
+        "expand": "Raise the expedition planner"
+      },
       "speed": {
         "ariaLabel": "Simulation speed",
         "pause": "Pause",

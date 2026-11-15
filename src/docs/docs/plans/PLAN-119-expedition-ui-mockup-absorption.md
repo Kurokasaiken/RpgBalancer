@@ -218,4 +218,79 @@ riservata da D10). Nessuna modifica a regole gameplay/quest.
 
 **Nota T-13:** `/game?poiDemo=1` resta bloccato dalla tempesta HMR della sessione parallela (3 round, mai `data-map-ready`) — retry probe `_tmp-probe-t3s2-game.mjs` scritto per la prossima finestra calma (copre cella + `data-assign-state` sulla shelf bound end-to-end). Click roster nel lab non assegna via headless (path click→assign è session/drag-driven, plumbing di laboratorio — non superficie del contratto); il valore non-zero e il tono danger sono coperti dai test unit.
 
-### Prossimi: T8 sheet · cablaggio insets→safeFit · gate chiusura R-339.
+## Ledger — T8 mobile bottom-sheet (2026-11-15, stessa sessione)
+
+**Fatto:**
+- `ExpeditionBottomSheet` (`components/gameFrame/`): la forma mobile/narrow della superficie expedition (D5). Shell non-modale: wrapper `position:fixed; inset:0; pointer-events:none`, solo il box dello sheet `pointer-events:auto` — nessuno scrim, nessun focus trap, `role="region"` (mappa sempre interattiva, AC9).
+- Detent dai token `bottomSheet`: `peek` = `calc(56px + env(safe-area-inset-bottom))` (la strip CTA resta visibile), `half` = 50vh, `full` = 92vh. Stato in `useExpeditionSheet` (Zustand — sopravvive ai remount come intenzione utente, stesso contratto del fold drawer).
+- Drag SOLO sulla strip handle+header ≥44px (`touch-action:none`): pointerdown → window pointermove/up, live-height clampata peek↔full, rilascio → snap al detent più vicino. Il body scrolla e non dragga mai; CONFIRM/chevron non iniziano un drag (`closest('button…')` veto). Chevron toggla peek ⇄ half come affordance non-drag.
+- Stessi sei blocchi nominati `data-block` e testid del cassetto (`cassetto-confirm`, `cassetto-confirm-reason`+`aria-describedby`, `cassetto-journey-total`, `cassetto-cost-slot` flaggato, `bag-slot-*`, `loadout-item-*`, `ResidentSlotRack` reale a `slotPx`=48): `launch-cta` siede nella strip (peek = CTA row per D5), gli altri nel body scrollabile. Testo ≥`minTextPx` (16) ovunque; CONFIRM riusa `cta.vars` (`--skin-cassetto-cta-*`), nessun letterale colore/opacity per la CTA.
+- Mutua esclusione (AC10, boundary incluso ≤1100): `useExpeditionSheetMode` (matchMedia `max-width: 1100px`, stesso token) — `ExpeditionDrawer` in quella banda monta lo sheet al posto della colonna: colonna ed entrambi i chip NON montano mai, anche con `expanded=false`; `insets.right` resta 0. La pagina esclude `ExpeditionEdgeTab` con `win.w > maxWidthPx`. Sopra 1100 il drawer mantiene la colonna (test di boundary).
+- Occupazione onesta: l'altezza misurata dello sheet pubblica `insets.bottom` (fallback al token del detent quando `offsetHeight`=0); unmount/`visible=false` → 0.
+- i18n `gameFrame.sheet.{expand,collapse}` EN+IT; tipi rigenerati; pseudo rigenerato.
+- Contratto `.mw/contracts/components/expedition-bottom-sheet.md` INV-1..7.
+- **Nota scope (drift D5 → ruling):** D5 prevedeva "stash = terzo tab (Quest|Party|Stash)" — NON implementato: il ruling Director 2026-11-15 (roster e stash sempre superfici separate) prevale; lo sheet non ospita tab. Flagged per il record.
+
+**Verifiche:** `r339ExpeditionSheet.test.tsx` nuovo **19/19** (shell non-modale, detent da token, drag solo handle + snap-nearest entrambe le direzioni, sei blocchi + cost-slot, CTA muted/enabled, insets.bottom + cleanup, target ≥44/testo ≥16, mutua esclusione ≤1100 sia folded sia expanded + boundary >1100). Suite r33* **99/100** — unico rosso = `r335CassettoResources` static assertion stale preesistente (identica a HEAD, già documentata T2/T5, estera). `i18n:types` OK; `build:check` OK (`test-results/build-check-2026-11-15.log`); lint scope 0 errori (file idleVillage/tests ignored — gap noto). `contracts:index-sync` "già sincronizzato" — unit NON in inventory (drift partition estero come T1/T2/T3: riga index in attesa di re-seal, `--write` non forzato per istruzione). `contracts:check` timeout >170s sul worktree condiviso (T-13) — blocco documentato, non risolto.
+
+**Witness headless LAB** `/hud-compose?comp=cassetto` @1024×800 (`test-results/r339-t8-sheet-{peek,half,full,backpeek}-lab-1024.png`): PEEK strip 56px a bottom con pouch+reason+CONFIRM+chevron, `pointer-events` wrapper none/sheet auto, zero colonna/chip/edgeTab, sei `data-block`; HALF h=400=50vh esatto; drag up → FULL h=736=92vh; drag down → HALF (snap-nearest). Artefatto lab: lo sheet è largo 400px perché il lab monta il drawer dentro un contenitore trasformato (il `position:fixed` si ancora al contenitore, non al viewport) — su /game il wrapper `wrapDetail` è `fixed inset:0` senza transform → sheet full-width. Non verificato su /game.
+
+**Nota T-13:** il witness diretto su `/game?poiDemo=1` resta bloccato dalla tempesta HMR della sessione parallela (2 round, mai `data-map-ready` in 300s+200s) — retry probe `scripts/hud-real/_tmp-probe-t8-sheet.mjs` scritto per la prossima finestra calma (copre edge-tab assente pre-quest + sheet + detent + mutua esclusione a 1024). Probe lab in `_tmp-probe-t8-sheet-lab.mjs` / `_tmp-probe-t8-drag.mjs`.
+
+### Re-verifica post-churn (2026-11-15, sessione serale)
+
+La storia riscritta dalla sessione parallela non ha toccato i file T8 — tutto
+il materiale è intatto nel worktree (`ExpeditionBottomSheet.tsx`,
+`useExpeditionSheet.ts`, `r339ExpeditionSheet.test.tsx`, contratto, wiring
+`game-mappa2`/`ExpeditionDrawer`, token `bottomSheet`, i18n `gameFrame.sheet.*`).
+Ri-verifica completa eseguita sui file vivi:
+
+- `r339ExpeditionSheet.test.tsx` **19/19** verdi; suite `r33*` **99/100** —
+  unico rosso `r335CassettoResources` (asserzione statica stale su
+  `useMinimalGameplayWithIdleVillageConfig`: 0 occorrenze nel file a HEAD,
+  rossa già prima di questa slice — estera, già documentata in T2/T5).
+- `i18n:types` rigenerati OK; `build:check` OK (`test-results/build-check-2026-11-15.log`);
+  lint scope 0 errori (file idleVillage/tests ignored — gap noto).
+- **Inventory/index:** `componentInventory --check` conferma il blocco estero
+  (sha partizione `18f0fdc9` ≠ stored `4b806791` + 2-owner `gameFrame/menu/*` +
+  `placeFanGeometry.ts` + `scene-reveal-layer` senza contratto) — `--write` non
+  forzato per istruzione. Riga `expedition-bottom-sheet` inserita a mano in
+  `inventory.json` (precedente T3 per `expedition-bag-assign`: la partizione
+  meccanica GIÀ calcola l'unità — nessun warning "non in inventory" — manca
+  solo la riga stored; `content_sha256` lasciato com'è perché la deriva è
+  estera e va vista, non mascherata). `contracts:index-sync` → riga in
+  `COMPONENT_MASTER_INDEX` (r.268), `--check` **drift zero**.
+- **Witness lab re-run** `/hud-compose?comp=cassetto` @1024×800: PEEK h=56,
+  wrapper `pointer-events:none` / sheet `auto`, zero colonna/chip/edgeTab,
+  sei `data-block`, CONFIRM in strip; HALF h=400=50vh esatto; probe drag
+  dedicato `_tmp-probe-t8-drag.mjs` (presa a x+20 sulla strip) → FULL
+  h=736=92vh, drag down → HALF 400 (snap-nearest). Screenshot aggiornati
+  `test-results/r339-t8-sheet-{peek,half,full,backpeek}-lab-1024.png`.
+  Nota probe: il drag dead-center di `_tmp-probe-t8-sheet-lab.mjs` resta a
+  `half` perché a 400px di larghezza il centro della strip cade sul CONFIRM —
+  veto corretto di INV-3 (i figli interattivi non iniziano un drag), artefatto
+  del probe non difetto dello sheet.
+- **Witness /game:** ancora bloccato — `_tmp-probe-t8-sheet.mjs` ha esaurito
+  il deadline 420s in 3 round senza mai `data-map-ready` (tempesta HMR
+  estera persistente, identica a T1/T2/T3). Retry probe invariato.
+- **Gate T8-specifici chiusi:** `closure:lint` (~94s sul worktree sporco)
+  resta FAIL ma le due voci T8 sono risolte: (a) `useExpeditionSheet.ts`
+  «file senza superficie mappata» → `coverage_exception`
+  `EXC-20261115205437-8t8s` (stesso percorso di `useGameLayoutInsets` T1);
+  (b) `visual-fork: useExpeditionSheet.ts … ≥v35 senza card né skip puntato`
+  → card di skip registrata `.mw/runs/r339-expedition-ui/visual-fork-t8-bottom-sheet.md`
+  (baseline = mockup approvato Director, scope = i due file T8). I tre probe
+  `_tmp-probe-t8-*.mjs` coperti da `EXC-20261115205911-p3t8`; lo store del
+  drawer (debito T2, stessa classe) coperto da `EXC-20261115210122-d2st`.
+- **Residui closure:lint NON miei (documentati):** `deliverables/tambu-*`
+  (file esteri); assert BASE rail rimossi (`expedition-layout-tokens.INV-1/-3`,
+  `hud-real-cassetto.INV-3` — conseguenza del revert rail, ratchet pendente
+  approvazione Director); Mode B-amend `game-menu-screens`/`game-save`/`game-settings`
+  (esteri); sync-gate 50 amend/retire > cap 3 (cumulato, override pendente);
+  `expedition-drawer` scope diverge dall'unità inventory (regen estero ha
+  perso `useExpeditionDrawer.ts` dallo scope — precedente del T2); probe
+  `_tmp` delle slice precedenti senza exception; `executedCount(BASE) unknown`
+  su `expedition-edge-tab`/`game-top-chrome`/`hud-real-cassetto` (re-seal
+  pendente, T-13: niente checkout consentito).
+
+### Prossimi: cablaggio insets→safeFit · witness /game T8 in finestra calma · gate chiusura R-339.

@@ -1584,6 +1584,10 @@
         "return": "Return"
       }
     },
+    "sheet": {
+      "expand": "Raise the expedition planner",
+      "collapse": "Lower the expedition planner"
+    },
     "topChrome": {
       "ariaLabel": "Day and resources"
     }
