@@ -222,33 +222,42 @@ visibile. Verificare il contatore all'avvio della PROSSIMA sessione fresca.
 5. Fixare/rimuovere github-mcp-server e vercel MCP (morti); pulizia
    risorse puppeteer stale.
 
-### Stato dibattito (aggiornato 2026-11-15, fine sessione)
+### Stato dibattito (aggiornato 2026-11-15, thread 3 — CONVERGED)
 
-Run: `mind-weaver/.mw/runs/20261115-context-budget-audit/`
-- Fase clarification CHIUSA: tutti e 5 READY, zero domande →
-  `grounding-ledger.md` scritto, `electorate_init` + `phase_transition`
-  registrati. DeepSeek recuperato via reconcile EXTRACT.
-- **T-002 (R1 proposals) POSTED a tutti e 5 — collect PENDENTE.**
-  Attenzione: role-hat NON assegnati (bash 3.2, `{ROLE}` vuoto — vedi
-  `ORCHESTRATOR-NOTE.md` nel run dir). Prompt identico per tutti.
-- **Resume:** `cd ~/progetti_personali/mind-weaver &&
-  browser-runtime/.venv/bin/python scripts/mw-web-turn.py collect --run
-  20261115-context-budget-audit --provider <p> --turn_id T-002` per i 5.
-  Poi mediare: leggere proposte → R2 con iniezioni cross-provider
-  (blinding `mw_blind.py` se ≥2 risposte) + ruoli critica diversificati
-  (prompt-enhancers: objective_critic / critique_and_counterplan).
-  Convergenza: acceptance su artifact-rNNN.md → `converged` o
-  `decision_memo` → report.md col Direttore.
+Run: `mind-weaver/.mw/runs/20261115-context-budget-audit/` — **chiusa**
+- R1 (T-002): 5 proposte raccolte → sintetizzate in `artifact-r001.md`.
+- R2 (T-003): critiche incrociate blindate (`mw_blind`, map in
+  `blind-map.json`) con ruoli diversi per provider → 3× "needs major
+  revision" + 2× "amendments". 7 obiezioni registrate (WITNESS-01..07)
+  e disposizionate (events seq 35-48).
+- `artifact-r002.md` sha256 `e8f1f03f…` incorpora gli amendment
+  (Phase-0 a delta senza stop-gate, Phase-3 = matrice
+  invariante→enforcement, telemetry primaria sul canary).
+- Acceptance (T-004): ACCEPT claude, gemini, chatgpt, deepseek; grok
+  3× risposta incoerente (word salad) → rimosso `provider_dead`
+  (turn_resolution T-004/05/06, electorate_change seq 68).
+- `converged` registrato seq 73; `report.md` completo delle 3 sezioni.
+- **Phase-1 APPLICATA (2026-11-15, ruling "procedi"):** MCP
+  github+vercel rimossi dai 2 mcp_config (backup .bak-20261115);
+  puppeteer sano (7 tool, zero risorse stale); 4 skill obsolete in
+  `skills-archive/` fuori scan (mind-weaver/.agents, ~/.cursor,
+  RPG/coordinator); frontmatter `model_decision`+description alle 8
+  regole orfane.
+- **Residuo:** Phase-0/2/3/4 di artifact-r002 = task dedicati da
+  pianificare (misura a delta, slim catalogo + telemetry, matrice
+  enforcement + governance:check).
 
 ### Contratto (obbligazioni verificabili)
 
 - [x] Meccanismo di metering documentato (fonte: docs devin-cli)
 - [x] Peso stimato di ogni componente iniettato (parziale — gap 262k irrisolto)
 - [x] Symlink-vs-copia accertato: SYMLINK, dedup attivo
-- [ ] Dibattito mw-web-debate eseguito, artifact in `.mw/runs/<ts>/`
+- [x] Dibattito mw-web-debate eseguito, artifact in `.mw/runs/<ts>/`
+      → CONVERGED su `artifact-r002.md` (run `20261115-context-budget-audit`)
 - [ ] Lista ottimizzazioni con risparmio stimato, approvata dal Director
        PRIMA di applicare (regole = governance, non si toccano da soli)
-- [ ] Voce registrata in `RICHIESTE.md` (audit contesto) — obbligo AGENTS.md
+- [x] Voce registrata in `RICHIESTE.md` (audit contesto) — R-342 aggiornata
+      con esito dibattito (2026-11-15, thread 3)
 
 ## Aggiornamento sessione 2026-11-15 (thread 2 — deploy diagnosticato)
 
@@ -289,19 +298,55 @@ Run: `mind-weaver/.mw/runs/20261115-context-budget-audit/`
 
 ### Resume point — prossimo thread
 
-1. Task separato: resync contratti/inventory per sbloccare `closure:lint`
-   in CI — voci rosse: frontmatter `research-prompt-protocol.md`, inventory
-   drift (regen `componentInventory.ts --write`), 3 unità senza contratto
-   (canonical-data-bridge, drag-sensors, use-drag-outcome), STRICT_FILES
-   0-owner (config mappa2/pixiSpike/hudReal nuovi), scope_files divergenti,
-   e i 2-owner game-menu-screens (ruling Director già pendente dal
-   2026-10-23: migrare invarianti nei per-file o dichiarare l'aggregato
-   owner).
-2. Check `Release` rosso ambientale: pin runner o bump Playwright >1.58.2.
-3. R-342 dibattito MW: T-002 collect pendente (comandi nel § sopra).
+**Fatto in thread 3 (subagent):**
+- Check `Release`: pin `ubuntu-24.04` su `semantic-release.yml` +
+  `minimal-tests.yml` (`07779dcd`) → sbloccato, semantic-release ha
+  emesso v1.0.0 (`d05034c6`).
+- Contract resync meccanico pushato (`75bea3e2`): inventory regen,
+  frontmatter `research-prompt-protocol.md`, 5 skeleton contracts,
+  scope_files pixi-world-map/use-quest-expedition-session, index sync.
+- RICHIESTE.md: formato Chiusura fixato su R-341/R-343/R-344
+  (`**Chiusura:** nessuna-verifica-tecnica:` + rimosso token `bundle:`
+  non-path — l'intent-gate risolve ogni `bundle: <tok>` come path).
+  Lasciato non committato: lo committa la sessione proprietaria di
+  R-343/344.
+- R-342 dibattito: CONVERGED dall'altra sessione (artifact-r002 ACCEPT
+  4/4, Phase-1 applicata). Residui Phase-0/2/3/4 in RICHIESTE.
+
+**Resta Director-gated (report subagent 5c23096d, da schedulare):**
+1. `ratchetSets` non implementa l'escape via approval: `membro/INV/check
+   rimosso` sono errori incondizionati → ogni fix di rimozione (2-owner
+   game-menu-screens/game-frame-pixi, scope_files removal-side,
+   bare INV ids) serve o gate-code change (gate-diff + director_answer)
+   o accettazione del rosso.
+2. 2-owner: game-frame-pixi (11 file), menu/*, place-fan-geometry,
+   hudTones; depth-scene add-only vs quest-run-window.
+3. INV: duplicati (pixi-world-map.INV-8, use-quest-expedition-session.INV-5),
+   non dichiarati (amanuense-page ×10, game-top-chrome ×5, gf.INV-3,
+   qrw.INV-6), INV-12 game-menu-screens non estraibile (Mode B-amend).
+4. tier-1 zero-invariants ×20 contratti; sync-gate cap 53>3 →
+   `sync-amend-override`; `INV:CTR-game-005.INV-1..3` baseline capture
+   fail-closed (serve seal-baseline run).
+5. Caveat: NON usare `populateComponentContracts --write` globale
+   (riscrive 142 contratti, droppa check esistenti → errori ratchet);
+   ri-runnare `componentInventory.ts --write` prima di ogni commit
+   (inventory = moving target su worktree condiviso).
 
 ## Non verificato (dillo al Director)
 
 - WebGL probe su prod non ancora eseguito in questo thread (budget).
 - Se i due autostash contengono lavoro rilevante.
 - `mw-reap` mancante segnalato da closure:lint in CI (PLAN-071).
+
+## PLAN-120 Phase-2 catalog slim — FATTO (2026-11-15)
+
+Catalogo skill `~/.agents/skills`: 46 skill, description totali
+**21.763 → 7.274 char (-67%)**, blocco pixijs **16.596 → 4.156 (-75%)**.
+Metodo ripetibile: `mind-weaver/scripts/mw-skill-desc.py` +
+`.mw/plan120/desc-slim-map.yaml`. Guard: `audit --fail-over 240` PASS.
+Evidenze: `RPG/.mw/runs/plan120-catalog-slim/` (baseline/report/report.md,
+snapshot telemetry 1.826 eventi) + `test-results/plan120/canary-prompts.md`.
+Body SKILL.md invariati (check automatico); mw-web-debate + webapp-testing
+avevano body-edit paralleli — description slim resta in worktree MW.
+Restano Phase 0 (misura gap 262k), Phase 3 (matrice invarianti), Phase 4
+(ri-misura). OB-5 advisory: diff skill-usage.jsonl a +7gg.
