@@ -22,7 +22,8 @@ rule, and a divergence from a FROZEN source is never resolved silently.
    rule, `QUEST_RULES.md` is updated in the same session. A rule left only in
    conversation is lost knowledge.
 2. **Explicit status.** Every rule records its status: `vigente` (ratified —
-   FROZEN desiderata, DECISION_LOG, or explicit Director ratification),
+   FROZEN desiderata, DECISION_LOG (union active+`context/DECISION_LOG-archive.md`,
+   PLAN-123), or explicit Director ratification),
    `proposta` (Director floated it, not ratified), or `divergenza-nota`
    (conflicts with a FROZEN/canonical source, unresolved).
 3. **No silent absorption.** If a new Director statement diverges from a

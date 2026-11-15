@@ -19,7 +19,7 @@ non è completo finché i documenti indicati non sono aggiornati.
 |---|---|
 | Regola quest vigente | `QUEST_RULES.md` (vedi `.windsurf/rules/80-quest-rules-maintenance.md`) |
 | Regola gameplay generale | `GAMEPLAY_DESIGN.md` (visione) — verificare se il dominio ha un doc canonico più specifico in `CANON.md` |
-| Decisione nuova/cambiata | `context/DECISION_LOG.md` + doc canonico del dominio |
+| Decisione nuova/cambiata | `context/DECISION_LOG.md` (attivo — unico file in scrittura; `-archive.md` è read-only, PLAN-123) + doc canonico del dominio |
 | Domanda irrisolta | `context/OPEN.md` |
 | Approccio rifiutato | `context/REJECTED.md` |
 | Termine importante | `GLOSSARY.md` |

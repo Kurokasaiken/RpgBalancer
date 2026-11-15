@@ -87,7 +87,8 @@ this skill.
    (regola 80) — mai assorbimento silenzioso di divergenze da FROZEN.
 4. **Documentation impact.** Se il task cambia regole/decisioni/stato, dichiara
    i target documentali secondo `85-documentation-impact.md` (NONE/OPTIONAL/
-   REQUIRED + routing: `DECISION_LOG`, `OPEN`, `REJECTED`, `GLOSSARY`,
+   REQUIRED + routing: `DECISION_LOG` (scritture sull'attivo; ref antecedenti
+   in `context/DECISION_LOG-archive.md`, PLAN-123), `OPEN`, `REJECTED`, `GLOSSARY`,
    `architecture_state`, `CURRENT_STATE`+`SESSION_HANDOFF`, `plans/INDEX`).
 5. **Foreground windows.** Nessuna finestra in primo piano in automatico:
    verifiche, catture e probe sempre headless o in background; una finestra

@@ -89,6 +89,7 @@
     "closure:lint": "tsx scripts/closureLint.ts",
     "governance:check": "tsx scripts/governance/governanceCheck.ts",
     "richeste:check": "tsx scripts/richesteSplit.ts check --cap 150000",
+    "ledger:check": "tsx scripts/ledgerSplit.ts check --cap 50000",
     "agents:lint": "tsx scripts/agentsLint.ts",
     "contracts:check": "tsx scripts/contractsCheck.ts",
     "surface:coverage": "tsx scripts/verification/gameSurfaceCoverage.ts --write",

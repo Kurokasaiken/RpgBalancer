@@ -16,7 +16,7 @@ Use for open requests, idea exploration, and direction evaluation before plannin
 
 1. Read `.mw/desiderata.md` and identify the latest FROZEN version.
 2. Read `RICHIESTE.md` (file attivo; le voci open antecedenti 2026-11-08 sono in `RICHIESTE-backlog.md`, le chiuse in `RICHIESTE-archive.md` — PLAN-121) and check for `aperta` or `in corso` items.
-3. Read `DESIGN_PILLARS.md`, `context/DECISION_LOG.md`, and `context/INDEX.md`.
+3. Read `DESIGN_PILLARS.md`, `context/DECISION_LOG.md` (active; union with `context/DECISION_LOG-archive.md` for pre-2026-10-24 entries, PLAN-123), and `context/INDEX.md`.
 4. If the Director's request changes the FROZEN goal, scope, or constraints, emit `## Desiderata drift detected` and ask before continuing.
 
 ## When to use

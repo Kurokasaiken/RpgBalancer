@@ -40,6 +40,7 @@ import { execFileSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
 import { readRichiesteUnion } from './verification/richiesteUnion';
+import { DECISION_LOG_UNION_PARTS } from './verification/ledgerUnion';
 
 const REPO_ROOT = process.cwd();
 const LEDGER_PATH = path.join(REPO_ROOT, 'context', 'workflow-timing.jsonl');
@@ -199,13 +200,16 @@ export function outOfPlanShare(files: Map<string, number>, named: string[]): num
   return b ? b.scope + b.bookkeeping : null;
 }
 
-/** Contabilità di stato: file mai nominati nei plan ma editati a ogni task. */
+/** Contabilità di stato: file mai nominati nei plan ma editati a ogni task.
+ *  PLAN-123: tutte le parti dell'unione DECISION_LOG (attivo + archive)
+ *  contano come bookkeeping — lo churn sull'archive è raro ma è lo stesso
+ *  ledger, non scope discovery. */
 const BOOKKEEPING_FILES = new Set([
   'RICHIESTE.md',
   'SESSION_HANDOFF.md',
   'plans/INDEX.md',
   'context/INDEX.md',
-  'context/DECISION_LOG.md',
+  ...DECISION_LOG_UNION_PARTS,
   'CURRENT_STATE.md',
   'src/docs/docs/coordinator/agent_assignments.md',
 ]);

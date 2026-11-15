@@ -20,7 +20,7 @@ Use when there is enough clarity to commit to a concrete plan.
 ## Pre-flight
 
 1. Read `.mw/desiderata.md` (latest FROZEN) and `RICHIESTE.md` (attivo; open/chiuse antecedenti in `RICHIESTE-backlog.md`/`RICHIESTE-archive.md`, PLAN-121).
-2. Read `DESIGN_PILLARS.md`, `context/DECISION_LOG.md`, and `context/INDEX.md` for relevant constraints.
+2. Read `DESIGN_PILLARS.md`, `context/DECISION_LOG.md` (active; union with `context/DECISION_LOG-archive.md` for pre-2026-10-24 entries, PLAN-123), and `context/INDEX.md` for relevant constraints.
 3. If the request materially changes the FROZEN desiderata, stop and ask.
 4. Check `src/docs/docs/MASTER_PLAN.md` for scope alignment.
 5. Check `context/recurring-traps.md` for traps on the surfaces the plan will touch; a plan must not re-propose a fix already documented as failed or a pattern already promoted to a trap.

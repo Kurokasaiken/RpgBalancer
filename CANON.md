@@ -13,8 +13,8 @@ Per ogni domanda, il documento di riferimento è:
 
 - **Gameplay reale e regole** → `GAMEPLAY_DESIGN.md`
 - **Direzione visiva e design pillars** → `DESIGN_PILLARS.md`
-- **Intenti congelati / vincoli approvati** → `.mw/desiderata.md` (versione `FROZEN` più alta)
-- **Decisioni prese e perché** → `context/DECISION_LOG.md`
+- **Intenti congelati / vincoli approvati** → `.mw/desiderata.md` (versione `FROZEN` più alta; canonico intatto, fonte slice — read-path: `.mw/desiderata-digest.md`, PLAN-123)
+- **Decisioni prese e perché** → `context/DECISION_LOG.md` (attivo, datate ≥2026-10-24) + `context/DECISION_LOG-archive.md` (legacy + antecedenti — PLAN-123)
 - **Richieste attive del Director** → `RICHIESTE.md` (attivo; ledger split PLAN-121: `RICHIESTE-backlog.md` open antecedenti, `RICHIESTE-archive.md` chiuse antecedenti)
 - **Piano operativo della vertical slice** → `VERTICAL_SLICE_ROADMAP.md`
 - **Stato attuale del runtime, blocker, pezzi completati** → `CURRENT_STATE.md`
@@ -40,7 +40,7 @@ Per ogni domanda, il documento di riferimento è:
 Ogni affermazione su progetto, codice o design deve essere classificata così:
 
 - **FACT** — è verificabile nel repository (codice, test, config, dati).
-- **DECISION** — è registrata in `.mw/desiderata.md` FROZEN, `context/DECISION_LOG.md` o `CANON.md`.
+- **DECISION** — è registrata in `.mw/desiderata.md` FROZEN, `context/DECISION_LOG.md` (unione attivo+archive) o `CANON.md`.
 - **PROPOSAL** — è una proposta non ancora accettata.
 - **OBSOLETE** — era vera, ma è stata superata da una decisione successiva.
 
