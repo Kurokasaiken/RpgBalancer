@@ -1,3 +1,21 @@
+---
+# Contratto vivo a livello documento (PLAN-054): il gate parsa OGNI .md
+# sotto .mw/contracts/. Questo protocollo non governa superficie eseguibile
+# — scope_files ancora alla dir contenitore (una directory non compare mai
+# nel diff dei file, quindi il sync gate resta inerte); le modifiche a
+# questo file restano comunque tracciate via contractChanged.
+id: research-prompt-protocol
+kind: component
+role: shared-kernel
+tier: 2
+root_file: ".mw/contracts/research-prompt-protocol.md"
+scope_files:
+  - ".mw/contracts"
+fast_checks: []
+e2e_checks: []
+e2e_trigger_globs: []
+invariants: []
+---
 
 ## Beauty layer (scorecard aggiuntiva, 2026-10-27)
 
