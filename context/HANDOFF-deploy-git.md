@@ -350,3 +350,16 @@ Body SKILL.md invariati (check automatico); mw-web-debate + webapp-testing
 avevano body-edit paralleli — description slim resta in worktree MW.
 Restano Phase 0 (misura gap 262k), Phase 3 (matrice invarianti), Phase 4
 (ri-misura). OB-5 advisory: diff skill-usage.jsonl a +7gg.
+
+## Phase-0 inventario contesto — FATTO (2026-11-15, subagent)
+
+Report: `.mw/runs/plan120-catalog-slim/phase0-context-inventory.md`.
+Fixed injection ~10.3k token stimati (<4% di 262k) — lo slim PLAN-120 ha già
+mangiato il grosso del layer fisso. **Il gap vero è la read-list mandata da
+AGENTS.md**: CANON+CURRENT_STATE+DESIGN_PILLARS+DECISION_LOG+RICHIESTE+
+desiderata+INDEX+veto-block+recurring-traps+PROPOSALS = ~1,54 MB (~386k
+token stimati). **RICHIESTE.md da solo = 1.088.151 char (~272k token)** —
+più grande dell'intera context window. Prossimo candidato ottimizzazione:
+split RICHIESTE attive/archivio (richiede plan + ruling — formato del file è
+governance). Anomalia notata: `55-delegation-context-budget.md` dichiara
+always_on ma non era nel manifest iniettato (cap harness o lag indicizzazione).
