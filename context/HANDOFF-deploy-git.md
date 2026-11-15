@@ -338,6 +338,20 @@ Run: `mind-weaver/.mw/runs/20261115-context-budget-audit/` — **chiusa**
 - Se i due autostash contengono lavoro rilevante.
 - `mw-reap` mancante segnalato da closure:lint in CI (PLAN-071).
 
+## PLAN-121 RICHIESTE split — FATTO (2026-11-15, subagent)
+
+`RICHIESTE.md` 1.078.041 char → **attivo 113.479 char** (29 entry `Data`≥
+2026-11-08) + `RICHIESTE-backlog.md` (126 open antecedenti) +
+`RICHIESTE-archive.md` (204 chiuse antecedenti). Union-check sha256 PASS
+(359→359 entry, header byte-identico, ordine preservato — manifest in
+`.mw/runs/plan121-richeste-split/`). Split commit `ffd90721` (solo i 3
+file). Union-read nei gate: `scripts/verification/richiesteUnion.ts`
+nuovo helper; intentGate D-3 (baseline post-split → prefix check su
+attivo; pre-split → entry verbatim nell'unione); closureLint/contractSchema
+union; taskClose/write-path restano su attivo. Guard `npm run
+richeste:check` (cap 150k) verde. Read-list AGENTS.md aggiornata (attivo
++ archivi on-demand). Report: `.mw/runs/plan121-richeste-split/report.md`.
+
 ## PLAN-120 Phase-2 catalog slim — FATTO (2026-11-15)
 
 Catalogo skill `~/.agents/skills`: 46 skill, description totali

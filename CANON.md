@@ -15,7 +15,7 @@ Per ogni domanda, il documento di riferimento è:
 - **Direzione visiva e design pillars** → `DESIGN_PILLARS.md`
 - **Intenti congelati / vincoli approvati** → `.mw/desiderata.md` (versione `FROZEN` più alta)
 - **Decisioni prese e perché** → `context/DECISION_LOG.md`
-- **Richieste attive del Director** → `RICHIESTE.md`
+- **Richieste attive del Director** → `RICHIESTE.md` (attivo; ledger split PLAN-121: `RICHIESTE-backlog.md` open antecedenti, `RICHIESTE-archive.md` chiuse antecedenti)
 - **Piano operativo della vertical slice** → `VERTICAL_SLICE_ROADMAP.md`
 - **Stato attuale del runtime, blocker, pezzi completati** → `CURRENT_STATE.md`
 - **Regole tecniche e invarianti** → `DEVELOPMENT_GUIDELINES.md`, `.windsurf/rules/00-project-invariants.md`, `.windsurf/rules/40-documentation-governance.md`

@@ -1,6 +1,9 @@
 # PLAN-121 — RICHIESTE split attive/archivio: ledger 1.089k char → file attivo ≤cap
 
-**Stato:** `in corso` (2026-11-15 — battezzato; ruling Director "il migliore":
+**Stato:** `fatto` (pending verifica) (2026-11-15 — eseguito T-0..T-3:
+split commit `ffd90721`, 359 entry → attivo 29/113.479 chars, backlog
+126/492.606, archive 204/473.292; union-check sha256 PASS; report
+`.mw/runs/plan121-richeste-split/report.md`. Ruling Director "il migliore":
 D-1=**b**, D-2=**150k / cutoff `Data`≥2026-11-08**, D-3=**re-baseline** +
 union-read ref R-NNN; update read-list AGENTS.md approvato col plan)
 
@@ -36,7 +39,7 @@ desiderata né altri file della read-list.
   RICHIESTE.md **append-only vs commit di battesimo** (ROSSO su rimozione)
   → re-baseline o gate amend (D-3).
 - Trappole: **T-13** (append paralleli — freeze window + commit atomico).
-  `visual-fork: skipped — nessuna decisione estetica; puntatore: Phase-0`.
+  `visual-fork: skipped — nessuna decisione estetica — .mw/runs/plan120-catalog-slim/phase0-context-inventory.md`.
 
 ## 0b. Regola di esecuzione (Director, 2026-11-15)
 

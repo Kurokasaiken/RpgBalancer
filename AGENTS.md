@@ -1,4 +1,4 @@
-All'inizio di ogni sessione: leggi `CANON.md`, `CURRENT_STATE.md`, `DESIGN_PILLARS.md`, `context/DECISION_LOG.md`, `RICHIESTE.md`, `.mw/desiderata.md`, `context/INDEX.md` (se esiste) e `context/auto/` (advisory lane NON canonica: preferenze/veto durevoli — su conflitto vince il canonico).
+All'inizio di ogni sessione: leggi `CANON.md`, `CURRENT_STATE.md`, `DESIGN_PILLARS.md`, `context/DECISION_LOG.md`, `RICHIESTE.md` (file attivo; le voci antecedenti 2026-11-08 sono in `RICHIESTE-backlog.md`/`RICHIESTE-archive.md` — consultabili on-demand, PLAN-121), `.mw/desiderata.md`, `context/INDEX.md` (se esiste) e `context/auto/` (advisory lane NON canonica: preferenze/veto durevoli — su conflitto vince il canonico).
 
 ## Cosa sono, e cosa non sono
 
@@ -10,7 +10,9 @@ All'inizio di ogni sessione: leggi `CANON.md`, `CURRENT_STATE.md`, `DESIGN_PILLA
   concrete di gameplay/UI/visual che ne derivano. Il file dice di sé stesso di essere *"la lente
   con cui controllare: è coerente con i pillar?"*.
 - **`context/DECISION_LOG.md` — la storia.** Le decisioni prese e il perché.
-- **`RICHIESTE.md` — le richieste esplicite.** Ciò che Fausto ha chiesto, con le sue parole. Le voci
+- **`RICHIESTE.md` — le richieste esplicite.** Ciò che Fausto ha chiesto, con le sue parole. Ledger
+  splittato (PLAN-121): `RICHIESTE.md` = attivo (`Data` ≥ 2026-11-08, unico file in scrittura),
+  `RICHIESTE-backlog.md` = open antecedenti, `RICHIESTE-archive.md` = chiuse antecedenti. Le voci
   `aperta` e `in corso` sono lavoro impegnato.
 - **`.mw/desiderata.md` — desiderata FROZEN.** Decisioni di intento approvate; il workflow parte da qui.
 - **`context/INDEX.md` — catalogo contesto.** Indice dei documenti caldi del progetto, da consultare

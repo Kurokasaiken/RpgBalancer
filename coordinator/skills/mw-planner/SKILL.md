@@ -19,7 +19,7 @@ Use when there is enough clarity to commit to a concrete plan.
 
 ## Pre-flight
 
-1. Read `.mw/desiderata.md` (latest FROZEN) and `RICHIESTE.md`.
+1. Read `.mw/desiderata.md` (latest FROZEN) and `RICHIESTE.md` (attivo; open/chiuse antecedenti in `RICHIESTE-backlog.md`/`RICHIESTE-archive.md`, PLAN-121).
 2. Read `DESIGN_PILLARS.md`, `context/DECISION_LOG.md`, and `context/INDEX.md` for relevant constraints.
 3. If the request materially changes the FROZEN desiderata, stop and ask.
 4. Check `src/docs/docs/MASTER_PLAN.md` for scope alignment.

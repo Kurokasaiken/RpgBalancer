@@ -139,7 +139,7 @@ Un caso singolo resta un pattern-candidate: non viene promosso.
 
 ## T-06 — Sintesi sopra un ledger: coverage check per-ID alla scrittura
 
-**Surface:** mappe, spec, riassunti strutturati prodotti sopra Extraction Ledger, RICHIESTE, liste di requisiti o contratti enumerati.
+**Surface:** mappe, spec, riassunti strutturati prodotti sopra Extraction Ledger, RICHIESTE (unione `RICHIESTE.md`/`-backlog`/`-archive`, PLAN-121), liste di requisiti o contratti enumerati.
 
 - **Cosa succede:** riorganizzando un ledger atomico per un'altra chiave
   (meccanica, fase, componente), i dettagli senza slot nello schema di

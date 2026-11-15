@@ -81,7 +81,7 @@ this skill.
    dominio: v3/v4 (POI quest, pannelli flottanti), v8 (Golden UI), v23 (Mission
    Planner), v24/v27 (quest S1→S5, `QuestRunWindow`), v30 (Vista Villaggio).
 3. **Director intent.** Se il Director esprime un intento operativo: catturalo
-   in `RICHIESTE.md` e piegalo nello spec canonico (regola
+   in `RICHIESTE.md` (file attivo — PLAN-121) e piegalo nello spec canonico (regola
    `45-director-intent-to-spec`). Una nuova regola quest va in `QUEST_RULES.md`
    nella stessa sessione, con status `vigente`/`proposta`/`divergenza-nota`
    (regola 80) — mai assorbimento silenzioso di divergenze da FROZEN.

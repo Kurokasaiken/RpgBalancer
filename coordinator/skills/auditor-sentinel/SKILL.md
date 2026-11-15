@@ -33,7 +33,7 @@ The Sentinel persona is a post-feature reviewer that protects RPG Balancer from 
 - `src/docs/docs/strategies/MINIMAL_GAMEPLAY_STRATEGY.md`
 - `src/docs/docs/plans/minimal_gameplay_implementation_plan.md`
 - `src/docs/docs/accessibility/idle_village_drag_accessibility.md` (UI/a11y gaps)
-- Any feature-specific plan linked from RICHIESTE.md / plans/INDEX.md.
+- Any feature-specific plan linked from RICHIESTE.md / plans/INDEX.md (entry antecedenti 2026-11-08: `RICHIESTE-backlog.md`/`RICHIESTE-archive.md`, PLAN-121).
 - `.windsurf/plans/style-lab-flexibility-1a9890.md`
 - `material-canvas-v2.html`
 - `.windsurf/plans/style-lab-wanderlust-refinement-9c241b.md`

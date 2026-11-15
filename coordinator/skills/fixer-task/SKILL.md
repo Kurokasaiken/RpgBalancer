@@ -13,7 +13,7 @@ triggers:
 Automate the "apri → leggi errore → risolvi → riesegui" loop across every surface (pages, components, tests) affected by Idle Village / Minimal Gameplay, ensuring each fix respects:
 - Project philosophy (`.windsurf/rules/philosophy.md`)
 - Implementation plans (`src/docs/docs/plans/idle_village_plan.md`, `minimal_gameplay_implementation_plan.md`, `minimal-to-vertical-slice-roadmap-*.md`)
-- Voci ledger (`RICHIESTE.md`, `plans/INDEX.md`; la kanban board `agent_assignments.md` è in pausa R-208 — consultabile come storico, non scrivere righe)
+- Voci ledger (`RICHIESTE.md` attivo + `RICHIESTE-backlog.md`/`RICHIESTE-archive.md` per le antecedenti 2026-11-08, PLAN-121; `plans/INDEX.md`; la kanban board `agent_assignments.md` è in pausa R-208 — consultabile come storico, non scrivere righe)
 - Closed tasks/Evidence logs (scan `test-results/*.log` & RICHIESTE history to understand prior work before altering shared modules)
 
 ### Mandatory References (consult + cite every run)
@@ -36,7 +36,7 @@ Before touching code, list these references at the top of your fixer notes (mark
 ### Phase 1 – Discovery & Context
 1. **Enumerate Targets**: Build the list of pages/components/tests to audit (source: failing CI, QA list, Playwright/visual suites, manual roster). Document order in evidence log.
 2. **Load Context** for each target before touching code:
-   - Read the associated R-### entry in RICHIESTE.md and any closed tasks mentioning the same files.
+   - Read the associated R-### entry in RICHIESTE.md (o in `RICHIESTE-backlog.md`/`RICHIESTE-archive.md` se antecedente 2026-11-08, PLAN-121) and any closed tasks mentioning the same files.
    - Review latest plan section (IMPLEMENTED_PLAN / DEVELOPMENT_GUIDELINES) for layout/density/audio/token rules.
 3. **Execute Detection**:
    - Run the most relevant check (Playwright spec, Puppeteer scripted flow if available, visual baseline, RTL test, lint, manual page load) for the current target only.

@@ -14,7 +14,7 @@ Use for single, well-defined implementation tasks.
 
 ## Pre-flight
 
-1. Read `AGENTS.md`, `RICHIESTE.md`, and `.mw/desiderata.md`.
+1. Read `AGENTS.md`, `RICHIESTE.md` (file attivo; archivio/backlog on-demand in `RICHIESTE-backlog.md`/`RICHIESTE-archive.md`, PLAN-121), and `.mw/desiderata.md`.
 2. If the task is unclear or conditional (`dovrei`, `vorrei`, `potremmo`), stop and return to `mw-explorer`.
 3. Load `mw-regression` before touching existing code.
 4. For RPG-specific surface work (idle village, UI, gameplay, balancing), also load `agent-execution-mandate` and `idle-village-task`.
