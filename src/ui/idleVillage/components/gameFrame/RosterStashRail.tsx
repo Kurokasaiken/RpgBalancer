@@ -26,9 +26,10 @@
  * Member stat chips sit on top so the bench condition stays visible while
  * packing (artifact-r004 S1).
  */
-import React, { useEffect, useMemo, useSyncExternalStore, type CSSProperties } from 'react';
+import React, { useCallback, useEffect, useMemo, useSyncExternalStore, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Tooltip from '@radix-ui/react-tooltip';
+import { useDraggable, useDndMonitor, type DragEndEvent, type DragStartEvent } from '@dnd-kit/core';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 import { getResidentPortraitUrl } from '@/engine/game/idleVillage/residentVisualResolver';
 import { CASSETTO_LAYOUT_CONFIG } from '@/balancing/config/idleVillage/cassettoLayoutConfig';
@@ -46,6 +47,14 @@ import { zanaraRosterState } from '@/ui/idleVillage/zanara/zanaraRosterState';
 import { heroLevelView } from '@/ui/idleVillage/rosterV2/heroLevelViewModel';
 import { HudPlaque } from '@/ui/idleVillage/skins/primitives/HudPlaque';
 import { EngravedIcon } from './engravedIcons';
+import { useDragOutcome, elementCenter } from '@/ui/idleVillage/interaction/useDragOutcome';
+import { DragOutcomeFlight } from '@/ui/idleVillage/interaction/DragOutcomeFlight';
+import { CustomDragOverlay } from '@/ui/idleVillage/components/CustomDragOverlay';
+import type { RosterDropVerdict } from '@/ui/idleVillage/frozen/kits/rosterKit';
+
+/** Drag payload tag: only rail-sourced drags feed the rail's outcome machine —
+ *  roster-card drags keep flowing through the floating roster's monitor. */
+const RAIL_DRAG_SOURCE = 'roster-rail';
 
 const RAIL = CASSETTO_LAYOUT_CONFIG.rail;
 const NARROW_MQ = `(max-width: ${RAIL.mutualExclusionBelowPx}px)`;
@@ -149,11 +158,50 @@ const RosterRow: React.FC<{
   lockedLabel?: string;
   selected: boolean;
   onSelect?: (id: string) => void;
-}> = ({ resident, locked, lockedLabel, selected, onSelect }) => {
+  /** Kill-switch while the floating roster panel owns the drag surface. */
+  dragDisabled?: boolean;
+}> = ({ resident, locked, lockedLabel, selected, onSelect, dragDisabled }) => {
   const { t } = useTranslation('idleVillage');
   const view = zanaraRosterState(resident, locked);
   const { level } = heroLevelView(resident);
   const name = resident.displayName ?? resident.id;
+  /* Same payload as the production roster card (`WanderlustRosterCardV2`)
+   * plus the rail source tag — the session chain reads `active.id` as the
+   * resident id and `data.type` to tell roster drags from slot tokens. */
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: resident.id,
+    disabled: !view.interactive || dragDisabled === true,
+    data: {
+      workerId: resident.id,
+      label: name,
+      portraitUrl: resident.portraitUrl ?? getResidentPortraitUrl(resident),
+      type: 'resident',
+      source: RAIL_DRAG_SOURCE,
+      resident: { stats: { hp: resident.statSnapshot?.hp ?? 0 }, fatigue: resident.fatigue },
+    },
+  });
+  /* Cursor offset + portrait center for the overlay spring-back — same
+   * contract the production card writes on pointerdown. Chained AFTER the
+   * dnd-kit listener (its own pointerdown activates the sensor). */
+  const handlePointerDown = useCallback(
+    (event: React.PointerEvent<HTMLElement>) => {
+      listeners?.onPointerDown?.(event);
+      const rect = event.currentTarget.getBoundingClientRect();
+      (window as unknown as Record<string, unknown>).__dragCursorOffset = {
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top,
+        width: rect.width,
+        height: rect.height,
+      };
+      const portraitImg = event.currentTarget.querySelector('img');
+      const target = portraitImg?.getBoundingClientRect() ?? rect;
+      (window as unknown as Record<string, unknown>).__dragHomeCenter = {
+        x: target.left + target.width / 2,
+        y: target.top + target.height / 2,
+      };
+    },
+    [listeners],
+  );
   const stateLabel =
     view.state === 'locked'
       ? (lockedLabel ?? t('roster.status.locked'))
@@ -222,13 +270,23 @@ const RosterRow: React.FC<{
     background: selected ? 'var(--skin-raised-bg)' : 'var(--skin-inset-bg)',
     color: 'inherit',
     textAlign: 'left',
-    cursor: view.interactive && onSelect ? 'pointer' : 'default',
-    opacity: view.interactive ? 1 : 0.72,
+    cursor: view.interactive ? 'grab' : 'default',
+    /* Grabbed row fades like the production card while the overlay ghosts it. */
+    opacity: isDragging ? 0.4 : view.interactive ? 1 : 0.72,
+    pointerEvents: isDragging ? 'none' : undefined,
+    touchAction: 'none',
   };
   return (
     <div role="listitem" data-testid={`rail-roster-row-${resident.id}`}>
-      {view.interactive && onSelect ? (
-        <button type="button" style={chrome} onClick={() => onSelect(resident.id)}>
+      {view.interactive ? (
+        <button
+          type="button"
+          ref={setNodeRef}
+          {...attributes}
+          style={chrome}
+          onPointerDown={handlePointerDown}
+          onClick={() => onSelect?.(resident.id)}
+        >
           {body}
         </button>
       ) : (
@@ -380,6 +438,14 @@ export interface RosterStashRailProps {
   selectedResidentId?: string | null;
   /** Member pick — same routing as the floating roster's `onResidentSelect`. */
   onResidentSelect?: (id: string) => void;
+  /** Roster-row drag→slot verdict — same session chain the floating roster's
+   *  `onDragEnd` routes (rejected / flightToSlot / void). */
+  onDragEnd?: (event: DragEndEvent) => RosterDropVerdict;
+  /** Commit when a `flightToSlot` lands — same routing as the roster's. */
+  onFlightComplete?: (residentId: string, slotId?: string) => void;
+  /** Kill-switch while the floating roster panel owns the drag surface:
+   *  one drag source at a time, no double monitor processing. */
+  dragEnabled?: boolean;
 }
 
 export const RosterStashRail: React.FC<RosterStashRailProps> = ({
@@ -390,6 +456,9 @@ export const RosterStashRail: React.FC<RosterStashRailProps> = ({
   lockedStatusLabel,
   selectedResidentId,
   onResidentSelect,
+  onDragEnd,
+  onFlightComplete,
+  dragEnabled = true,
 }) => {
   const { t } = useTranslation('idleVillage');
   const expanded = useExpeditionRail((s) => s.expanded);
@@ -422,6 +491,42 @@ export const RosterStashRail: React.FC<RosterStashRailProps> = ({
   const reserved = useMemo(() => countReservations(bags, committed), [bags, committed]);
   const stash = useMemo(() => villageStashViewModel(stashConfig, reserved), [stashConfig, reserved]);
   const stashInteractive = hydration === 'ready' && activeStashOwner !== null;
+
+  /* Roster-row drag machine — the same outcome state the floating roster
+   *  runs (`useDragOutcome`): rail-sourced drags only, the page owns the
+   *  DndContext/sensors/collision so slot magnets Just Work. */
+  const { state: dragVisualState, startDrag, startFlight, springBack, settle } = useDragOutcome();
+  const residentsById = useMemo(
+    () => Object.fromEntries(residents.map((r) => [r.id, r])),
+    [residents],
+  );
+  useDndMonitor({
+    onDragStart: (event: DragStartEvent) => {
+      if (event.active.data.current?.source !== RAIL_DRAG_SOURCE) return;
+      startDrag(String(event.active.id));
+    },
+    onDragEnd: (event: DragEndEvent) => {
+      if (event.active.data.current?.source !== RAIL_DRAG_SOURCE) return;
+      const residentId = String(event.active.id);
+      const verdict = onDragEnd?.(event);
+      if (!event.over || verdict === false) {
+        springBack(residentId);
+        return;
+      }
+      if (verdict && typeof verdict === 'object' && 'flightToSlot' in verdict) {
+        const { slotId, element } = verdict.flightToSlot;
+        const target = elementCenter(element);
+        if (target) startFlight({ residentId, slotId, isInset: true, toX: target.x, toY: target.y });
+        else {
+          /* Slot not rendered (closed detail): commit without animation. */
+          settle();
+          onFlightComplete?.(residentId, slotId);
+        }
+        return;
+      }
+      settle();
+    },
+  });
 
   if (!visible) return null;
 
@@ -465,6 +570,7 @@ export const RosterStashRail: React.FC<RosterStashRailProps> = ({
   }
 
   return (
+    <>
     <HudPlaque
       shape="panel"
       as="section"
@@ -554,6 +660,7 @@ export const RosterStashRail: React.FC<RosterStashRailProps> = ({
                 lockedLabel={lockedStatusLabel}
                 selected={resident.id === selectedResidentId}
                 onSelect={onResidentSelect}
+                dragDisabled={!dragEnabled}
               />
             ))}
           </div>
@@ -594,5 +701,22 @@ export const RosterStashRail: React.FC<RosterStashRailProps> = ({
         )}
       </div>
     </HudPlaque>
+    {/* Rail drag visuals — same ghost/medallion and slot-flight as the
+     *  floating roster (`CustomDragOverlay` + `DragOutcomeFlight` inside
+     *  the page's DndContext/DragProvider). */}
+    <CustomDragOverlay
+      residentsById={residentsById}
+      usePgCardPreview={true}
+      dragVisualState={dragVisualState}
+    />
+    <DragOutcomeFlight
+      state={dragVisualState}
+      residentsById={residentsById}
+      onComplete={(residentId, slotId) => {
+        settle();
+        onFlightComplete?.(residentId, slotId);
+      }}
+    />
+    </>
   );
 };

@@ -3,12 +3,14 @@
  * which screen is open and what «Esci al titolo» does, and hands the menu its
  * callbacks plus the screens to render.
  */
-import { useState, type ReactNode } from 'react';
+import { useContext, useState, type FC, type ReactNode } from 'react';
 import { MemorialPanel } from './MemorialPanel';
 import { useTranslation } from 'react-i18next';
 import { LoadGamePanel } from './LoadGamePanel';
 import { SettingsPanel } from './SettingsPanel';
+import { GameMenuDialog, MenuDialogDress } from './GameMenuDialog';
 import { GameMenuConfirm } from './GameMenuConfirm';
+import { HudRealMemorial } from '@/ui/idleVillage/hudReal/HudRealMemorial';
 import { decideQuit, markSkipTitle, quitToTitle } from './menuFlow';
 import type { HudScaleControl } from '../hudScale';
 import { getLastSaved, hasUnsavedProgress, saveNowToManualSlot } from '../../../state/gameSaveService';
@@ -25,6 +27,25 @@ export interface GameMenuFlow {
   menuProps: { onLoadGame: () => void; onOpenSettings: () => void; onOpenMemorial: () => void; onQuit: () => void };
   screens: ReactNode;
 }
+
+/**
+ * MemorialScreen — picks the memorial surface by dialog dress (R-340):
+ * `zanara` pages get the signed 8-A Solemn Gallery (`HudRealMemorial`, same
+ * `s.memorial` feed) inside a chromeless dialog — veil, Escape and focus
+ * contract unchanged; `skin` pages keep the stock plaque panel.
+ */
+const MemorialScreen: FC<{ onClose: () => void }> = ({ onClose }) => {
+  const { t } = useTranslation('idleVillage');
+  const dress = useContext(MenuDialogDress);
+  if (dress !== 'zanara') return <MemorialPanel onClose={onClose} />;
+  return (
+    <GameMenuDialog title={t('gameFrame.menu.memorialTitle')} onClose={onClose} chromeless width={920} data-testid="memorial-panel">
+      <div style={{ width: '100%', height: 'min(560px, 62vh)' }}>
+        <HudRealMemorial onClose={onClose} />
+      </div>
+    </GameMenuDialog>
+  );
+};
 
 export function useGameMenuFlow({ currentTick, currentDay, flush, scale }: UseGameMenuFlowOptions): GameMenuFlow {
   const { t, i18n } = useTranslation('idleVillage');
@@ -60,7 +81,7 @@ export function useGameMenuFlow({ currentTick, currentDay, flush, scale }: UseGa
         window.location.reload();
       }} />}
       {screen === 'settings' && <SettingsPanel onClose={close} scale={scale} />}
-      {screen === 'memorial' && <MemorialPanel onClose={close} />}
+      {screen === 'memorial' && <MemorialScreen onClose={close} />}
       {screen === 'quit' && (
         <GameMenuConfirm
           title={t('gameFrame.menu.quitConfirm.title')}

@@ -5788,7 +5788,8 @@ seed picker; save-on-approval → store condiviso. Dibattito multi-AI
 **Data:** 2026-11-14
 **Stato:** `in corso`
 **Implementazione:** `/game` montava `QuestExpeditionDetail` via `wrapQuestDetail`; ora `src/ui/idleVillage/hudReal/HudRealCassettoDetail.tsx` è un drop-in che accetta le stesse `QuestExpeditionDetailProps` — lette dal nodo wrappato dentro `wrapDetail` in `game-mappa2.tsx` — e renderizza `HudRealCassetto` dentro `StagePanelFrame` (stage ownership, suspension ed Escape arbitration invariati). Niente stato duplicato: slots, estimate, items, canSend, send, onSlotClear, suppressedResidentIds sono quelli della sessione `useQuestExpeditionSession` reale per-POI.
-**Verificato dal vivo (Playwright, `?poiDemo=1`):** click `poi-goblin` → cassetto con "Goblin Extermination", briefing, journey 2d/2d, loadout reale (toggle item `false→true`), CONFIRM disabilitato a slot vuoti; ESC chiude; click `poi-rovine` → cassetto "The Ruins Beneath the…" con journey 3d/3d (niente leak tra sessioni); drag roster→slot committa l'assegnazione reale ("GIGGIOLILLO ASSIGNED" nel roster + ritratto nel medaglione). `tsc` pulito, lint 0 errori. Limiti noti: niente bottone stash né close nel frame firmato (ESC chiude); `estimate.riskLabel` grezzo della banda.
+**Contratto completo (2026-11-15):** l'adapter copre il contratto R-337/R-339 — bag slot frames (`selectedItemIds[i]` → pouch i, pouch vuota apre il magazzino bound via `onOpenStash` della sessione, tile packata rilascia via `toggleItem`), `resourceItems` reali nella testata, `disabledReason` (stessa `questExpedition.forecast.incomplete` dello stock), `totalDays` e gamba "At site" da `expeditionTotalDays`, danger band localizzata via `DANGER_BANDS.i18nKey`, `onOpenRoster` su tap del sedile.
+**Verificato dal vivo (Playwright, `?poiDemo=1`):** click `poi-goblin` → cassetto "Goblin Extermination", briefing, journey 2/2/2 + "Total: 6 days", 3 pouch, resources targhette (15 Gold / 8-20 Food / 0 Wood), reason line sotto CONFIRM; click pouch vuota → `VillageStashPanel` bound si apre con i quest item reali; ESC chiude; `poi-rovine` con dati propri; drag roster→slot committa l'assegnazione. `tsc` pulito, lint 0 errori, `build:check` ✅. Resta non coperto (nessuna zona sul frame): forecast/key-stats/intel/hero della colonna destra stock, `onReleaseAllItems`, bottone close (ESC copre).
 
 ---
 
@@ -5885,3 +5886,29 @@ seed picker; save-on-approval → store condiviso. Dibattito multi-AI
 **Verifica (T-04):** witness headless dev-server (`import.meta.env.DEV=true`) su `/game?tod=day|dusk|night`, viewport 800×600 — `test-results/tod-{day,dusk,night}-final.png`: giorno saturo → dusk con velo ambra + finestre a mezza potenza → notte scura con luci finestre dorate + bioluminescenza mare. Probe stage: `nMult multiply z=20 α≈0.92`, `nAdd` respirante, `bio-a/b` in cross-fade. Clone-test isolato (stessa texture, tint bianco) conferma che il pipeline blend è sano e il grade notturno baked è **volutamente morbido** (~25-30% di scurimento — luna, non buio pesto; se il Director vuole notte più profonda è tuning di `night-mult.webp`/`fullNightAt`, non bug).
 **Test:** `tests/unit/idleVillage/r339DawnDuskWash.test.ts` 8/8 (regressione permanente su washGradeFor: notte senza placche, warm-only con placche, giorno neutro) · `npm run build:check` ✅.
 **Trappole probe incontrate (da non ripetere):** (a) `?tod=` è silenziosamente **morto su `vite preview`/build prod** (`DEV_Q` è vuoto fuori da `import.meta.env.DEV`) — screenshot "giorno pieno" da preview NON sono prova di bug; (b) `__pixiApp` può puntare all'istanza StrictMode smontata (stage senza placche) — verificare sempre che `__pixiApp.canvas` sia la canvas nel DOM prima di trarre conclusioni.
+
+## R-340 — /game: audit superfici non collegate + porting merchant/ledger/lost/level-up
+
+**Richiesta (verbatim, 2026-11-15):** *"ci sn altri componenti su /game nn correttamente collegati ai dati veri? menù o componenti che c servono, nn riportati?"* — poi *"procedi"* (implementazione dei porting dopo l'audit).
+**Data:** 2026-11-15
+**Stato:** `in corso`
+**Audit eseguito:** nessun'altra superficie su `/game` mostrava dati fabbricati — il cassetto era l'unico caso firmato-ma-staccato (fixato in R-334). Il problema residuo era **migrazione visiva**: 6 superfici con dati reali ma visual stock e controparte `hudReal` firmata esistente.
+**Swap eseguiti in `game-mappa2.tsx` (4/6):**
+- `HudEventLedger` → **`HudRealLedgerPanel`** — stesso feed `gameEvents`/`focusEvent`, montato al stage rect dentro `StagePanelFrame`, chiusura stage-owned (ESC).
+- `MerchantPanel` → **`HudRealMerchantPanel`** — stesso `MERCHANT_CONFIG` reale; azione BUY resta disabilitata per contratto del componente firmato (non ridisegnata in questo giro).
+- Lost report → **`HudRealExpeditionLost`** — stesso `QuestRunState` staged (`stageExpeditionLost` su copia), quest name reale, `onClose` vero. Il path reward (`QuestRewardPopup`) resta stock finché non esiste la superficie firmata.
+- `HeroLevelCeremony` → **`HudRealLevelUp`** — stessa sorgente eventi `subscribeHeroLevelUp`, stesso prop `residentsById`, ESC già gestito.
+- `MemorialPanel` → **`HudRealMemorial`** (dress `zanara`) — stesso feed `s.memorial` dello store reale. `GameMenuDialog` ha il nuovo flag `chromeless`: veil/portal/Escape/focus invariati, la placca chrome si toglie per lasciare la gallery a tutta superficie; dress `skin` (titolo) resta sul panel stock.
+**Non portati (decisione motivata):**
+- **Skill check:** `QuestSkillCheckColumn` monta già il motore vero `DestinyAstrolabeV62Standalone` (frozen kit, stat party reali, `QuestCheckBridge` + resolve callback); `HudRealAstrolabe` è una targa da lab, non un drop-in → nessun porting necessario.
+- **Roster:** `HudRealRosterColumn` è click-only mentre il roster `/game` serve il drag-to-assign nei slot expedition (DndContext di pagina + `DragOutcomeFlight`) → porting rinviato, richiede design rail/pannello firmato compatibile DnD.
+**Verificato dal vivo (Playwright, T-04):**
+- Merchant via menu → pannello firmato "TRADER ROWEN" con offerte reali (Healing draughts 9g / Field rations 4g), BUY disabilitato, ESC chiude.
+- Ledger via menu → pannello "CRONACA / EVENTS" empty-state reale; via director invasion + "PREPARE THE DEFENSES" → pannello si apre con row live "Goblin host reaches the village — tra 5 gg" + toast THREAT. `panels:1 rows:1`.
+- Lost: director "Start goblin quest" (demoLaunch: assign+pack+send reali) + "Expedition lost" → `hudreal-lost-layer` montato, report con quest name reale + tomba FALLEN del residente assegnato.
+- Level-up: director "Hero level-up" → 3 targhe firmate con residenti e stat-gain reali (SIR SPACCACULI Lv IV, SALVATRICE Lv VI, GIGGIOLILLO Lv V).
+- Memorial: menu → MEMORIAL → gallery firmata Solemn montata nel dialog flow (`hudreal-memorial:1`, empty-state reale "No one has fallen yet."); voci live già verificate su hud-compose con `?seed=memorial` (stesso store selector).
+- `errors: 0` su tutte le probe; `tsc` pulito; `build:check` ✅; `closure:lint` ✅ (exit 0, completato entro budget 30s dopo ripetuti timeout precedenti); lint `game-mappa2.tsx` 0 errori / 33 warning preesistenti (no-restricted-imports kit + exhaustive-deps).
+**Non verificato:** screenshot cassetto aperto su `/game` in headless (blocco map-ready preesistente documentato in R-335).
+**Nota parità:** il BUY del merchant era disabilitato anche nello stock (badge Preview) — la firma mantiene il comportamento di produzione, l'acquisto interattivo è una feature nuova, non un gap di porting.
+**Resta sulla lista:** roster→superficie firmata compatibile drag (rail PLAN-119 vs pannello flottante — decisione di superficie canonica); merchant BUY interattivo (feature nuova); reward path (vittoria) quando esiste superficie firmata (richiede arte + visual fork); Voce/C10 (R-338, delivered — chiusura formale bloccata da worktree condiviso); mockup Chronicle drawer (R-339/PLAN-119).
