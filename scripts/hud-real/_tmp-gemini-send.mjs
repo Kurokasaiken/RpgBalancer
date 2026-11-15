@@ -11,7 +11,7 @@ const b = await chromium.connectOverCDP('http://localhost:9222');
 const ctx = b.contexts()[0];
 let p = ctx.pages().filter(pg => pg.url().includes('gemini.google.com')).pop();
 if (!p) { p = await ctx.newPage(); await p.goto('https://gemini.google.com/app',{waitUntil:'domcontentloaded'}); }
-await p.bringToFront().catch(()=>{});
+// no bringToFront: CDP click/insertText work on background tabs (16-no-foreground-windows)
 await p.waitForTimeout(4000);
 const composer = p.locator('div[contenteditable="true"]').first();
 if (await composer.count()) {

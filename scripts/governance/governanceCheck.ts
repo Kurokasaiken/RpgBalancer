@@ -85,15 +85,18 @@ const CHECKS: CheckDef[] = [
   {
     id: 'foreground:lint',
     cmd: ['scripts/foregroundLint.ts'],
-    // The check scans its own SCAN_DIRS (repo-state, not delta) — 2 committed
-    // violations pre-date the hook and would block unrelated commits.
-    stagedGlobs: null,
-    note: 'full-only — pre-existing committed violations would block unrelated commits',
+    // Scans its own SCAN_DIRS (repo-state, not delta) but is fast (~1s) and
+    // invariant-level: green at HEAD must stay green — staged scope is the
+    // point. (Former committed violations removed 2026-11-15.)
+    stagedGlobs: ['scripts/**', 'tools/**', '.github/**', '**/*.mjs'],
   },
   {
     id: 'shutdown:lint-capability',
     cmd: ['scripts/shutdownManager/lintCapability.ts'],
     stagedGlobs: ['scripts/**', 'tools/**', '.husky/**', 'package.json', '**/*.plist'],
+    // Rule-50 static enforcement: stays in staged scope. Typical ~10s
+    // standalone, observed >30s once under load — 90s ceiling.
+    timeoutMs: 90_000,
   },
   {
     id: 'contracts:index-sync',
