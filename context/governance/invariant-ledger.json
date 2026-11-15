@@ -1,0 +1,1648 @@
+{
+  "$schema": "invariant-ledger/v1",
+  "plan": "PLAN-121",
+  "generated": "2026-11-15",
+  "idScheme": "INV-<file>-<slug> (D-5): immutable even if the text moves",
+  "extraction": "double-pass: per-file read + grep sweep on MUST/FORBIDDEN/mai/never/only/vietato/VIOLATION/blocking/SEMPRE markers (anti T-06)",
+  "enforcementCandidateLegend": {
+    "mechanical": "a mechanical check exists or is honestly buildable (AST/lint/script)",
+    "kernel": "binding prose that must stay always-on (needs conversation context / is agent behavior)",
+    "human-review": "requires a human or runtime witness judgment at a defined point",
+    "gap": "no check, kernel line, or human review can honestly verify it — declared for Director approval"
+  },
+  "entries": [
+    {
+      "id": "INV-00-CONFLICT-FLAG",
+      "source_file": ".windsurf/rules/00-project-invariants.md",
+      "source_trigger": "always_on",
+      "line": 8,
+      "line_end": 10,
+      "section": "Preamble",
+      "verbatim": "These constraints are **non-negotiable** and apply to any change, on any surface, no matter how the request is worded. If a request seems to conflict with them, follow the invariant and flag the conflict instead of silently breaking it.",
+      "enforcement_candidate": "gap"
+    },
+    {
+      "id": "INV-00-PERSIST-SVC",
+      "source_file": ".windsurf/rules/00-project-invariants.md",
+      "source_trigger": "always_on",
+      "line": 13,
+      "line_end": 14,
+      "section": "Persistence",
+      "verbatim": "All save/load MUST go through the async service `@/shared/persistence/PersistenceService` (`saveData` / `loadData` / `clearData`).",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-00-PERSIST-BAN",
+      "source_file": ".windsurf/rules/00-project-invariants.md",
+      "source_trigger": "always_on",
+      "line": 15,
+      "line_end": 16,
+      "section": "Persistence",
+      "verbatim": "FORBIDDEN: direct `localStorage` / `sessionStorage`, synchronous persistence, or ad-hoc storage middleware.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-00-CONFIG-NO-HARDCODE",
+      "source_file": ".windsurf/rules/00-project-invariants.md",
+      "source_trigger": "always_on",
+      "line": 19,
+      "line_end": 20,
+      "section": "Config-first",
+      "verbatim": "No hardcoded gameplay/UI values in components. Read stats, tokens, timings, and copy keys from config modules (e.g. `src/balancing/config/**`, skin/style configs).",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-00-CONFIG-ZOD",
+      "source_file": ".windsurf/rules/00-project-invariants.md",
+      "source_trigger": "always_on",
+      "line": 21,
+      "section": "Config-first",
+      "verbatim": "New config modules use Zod schemas for validation.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-00-SKIN-PRESET",
+      "source_file": ".windsurf/rules/00-project-invariants.md",
+      "source_trigger": "always_on",
+      "line": 25,
+      "line_end": 26,
+      "section": "Skin/Theme system",
+      "verbatim": "Any new skin/visual theme MUST be implemented as a preset in `skinConfigRegistry`, never as a standalone `.css` file.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-00-SKIN-CSS-VIOLATION",
+      "source_file": ".windsurf/rules/00-project-invariants.md",
+      "source_trigger": "always_on",
+      "line": 27,
+      "line_end": 28,
+      "section": "Skin/Theme system",
+      "verbatim": "If a prompt requests creating a `.css` file for a skin/theme, it is by definition in violation of this invariant — do not execute, flag the violation.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-00-I18N-NO-HARDCODE",
+      "source_file": ".windsurf/rules/00-project-invariants.md",
+      "source_trigger": "always_on",
+      "line": 31,
+      "line_end": 32,
+      "section": "Localization",
+      "verbatim": "No hardcoded user-facing strings. Every user-facing string goes through i18n (`react-i18next` `useTranslation`, config in `@/localization/i18n`).",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-00-I18N-NAMESPACES",
+      "source_file": ".windsurf/rules/00-project-invariants.md",
+      "source_trigger": "always_on",
+      "line": 33,
+      "section": "Localization",
+      "verbatim": "Namespaces: `common`, `idleVillage`. New keys added to locale resources, not inline.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-00-I18N-TELEMETRY",
+      "source_file": ".windsurf/rules/00-project-invariants.md",
+      "source_trigger": "always_on",
+      "line": 34,
+      "section": "Localization",
+      "verbatim": "Missing keys are telemetered via `translation_missing`; do not suppress them.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-00-REUSE-VERIFY",
+      "source_file": ".windsurf/rules/00-project-invariants.md",
+      "source_trigger": "always_on",
+      "line": 37,
+      "line_end": 39,
+      "section": "Component Reuse",
+      "verbatim": "Before writing a new UI component, verify if an equivalent primitive exists in `src/ui/atoms/`, `src/ui/fantasy/atoms/`, or `src/ui/idleVillage/skins/primitives/`. If a primitive covers the use case, reuse or extend it via props.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-00-REUSE-NODUP",
+      "source_file": ".windsurf/rules/00-project-invariants.md",
+      "source_trigger": "always_on",
+      "line": 40,
+      "line_end": 42,
+      "section": "Component Reuse",
+      "verbatim": "NEVER duplicate primitive markup/styling from scratch. Creating a new standalone component that duplicates an existing primitive is a VIOLATION of this invariant — do not execute, flag the violation.",
+      "enforcement_candidate": "human-review"
+    },
+    {
+      "id": "INV-00-REUSE-DIR",
+      "source_file": ".windsurf/rules/00-project-invariants.md",
+      "source_trigger": "always_on",
+      "line": 43,
+      "line_end": 45,
+      "section": "Component Reuse",
+      "verbatim": "If no existing primitive covers the use case, creating a new one is acceptable, but it must be added to the correct primitive directory (not left as an isolated component in a page).",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-00-STATE-SPLIT",
+      "source_file": ".windsurf/rules/00-project-invariants.md",
+      "source_trigger": "always_on",
+      "line": 48,
+      "line_end": 55,
+      "section": "State Management",
+      "verbatim": "Zustand store: for domain/game state shared between multiple pages or components not necessarily close in the tree … — survives navigation. React Context: for local presentation/UI state scoped to a specific subtree … Decision criterion: if the state is needed outside the subtree of components that consume it, use Zustand. If it describes only how a local portion of UI behaves/appears, use Context.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-00-STATE-VIOLATION",
+      "source_file": ".windsurf/rules/00-project-invariants.md",
+      "source_trigger": "always_on",
+      "line": 56,
+      "line_end": 57,
+      "section": "State Management",
+      "verbatim": "Creating a new Context for data that should be in a shared store (or vice versa) is a VIOLATION of this invariant — do not execute, flag the violation.",
+      "enforcement_candidate": "human-review"
+    },
+    {
+      "id": "INV-00-DOC-JSDOC",
+      "source_file": ".windsurf/rules/00-project-invariants.md",
+      "source_trigger": "always_on",
+      "line": 60,
+      "section": "Documentation",
+      "verbatim": "Every new function/interface gets JSDoc.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-00-DOC-PLAN-UPDATE",
+      "source_file": ".windsurf/rules/00-project-invariants.md",
+      "source_trigger": "always_on",
+      "line": 61,
+      "section": "Documentation",
+      "verbatim": "Update the relevant plan/changelog before marking a task complete.",
+      "enforcement_candidate": "human-review"
+    },
+    {
+      "id": "INV-00-DOC-LIVING-PLANS",
+      "source_file": ".windsurf/rules/00-project-invariants.md",
+      "source_trigger": "always_on",
+      "line": 62,
+      "section": "Documentation",
+      "verbatim": "Plans are living documents: the Strategist and every Agent must reference the master plan and the relevant implementation plans, cite useful information from them, and update them when the implementation diverges or advances.",
+      "enforcement_candidate": "human-review"
+    },
+    {
+      "id": "INV-00-NODE-PIN",
+      "source_file": ".windsurf/rules/00-project-invariants.md",
+      "source_trigger": "always_on",
+      "line": 65,
+      "line_end": 66,
+      "section": "Node / tooling",
+      "verbatim": "Use the pinned Node version from `.nvmrc` (`source ~/.nvm/nvm.sh && nvm use`). Never mutate the global Node version.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-00-NO-FOREGROUND",
+      "source_file": ".windsurf/rules/00-project-invariants.md",
+      "source_trigger": "always_on",
+      "line": 69,
+      "line_end": 75,
+      "section": "Foreground windows",
+      "verbatim": "An agent must NEVER open a window, app, or browser in the foreground automatically — the Director must never lose the window he is watching. All automated browser runs (Puppeteer / Chrome for Testing, Playwright, captures, perf probes) are headless or background. Headed mode only via explicit Director opt-in (`HEADLESS=false`, manual headed npm scripts).",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-00-SAFEGUARDS",
+      "source_file": ".windsurf/rules/00-project-invariants.md",
+      "source_trigger": "always_on",
+      "line": 78,
+      "line_end": 85,
+      "section": "Mandatory safeguards",
+      "verbatim": "Run and pass (fix on failure): `npm run lint -- <scope>`, `npm run test -- <scope>`, `npm run build:check`, `npm run closure:lint`. If any safeguard fails, the task is **BLOCKED**, not complete.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-00-DEPLOY-VERIFY",
+      "source_file": ".windsurf/rules/00-project-invariants.md",
+      "source_trigger": "always_on",
+      "line": 88,
+      "line_end": 89,
+      "section": "Deploy verification",
+      "verbatim": "A Vercel deploy is **not \"done\"** until post-deploy verification is green on the production alias (`rpg-balancer.vercel.app`), not just \"deployment live\".",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-00-DEPLOY-WEBGL",
+      "source_file": ".windsurf/rules/00-project-invariants.md",
+      "source_trigger": "always_on",
+      "line": 90,
+      "line_end": 99,
+      "section": "Deploy verification",
+      "verbatim": "\"Page responds 200\" is not proof: the check must exercise the real runtime path. For Pixi surfaces (`/`, `/game`, `/mappa2-lab`, `/hud-lab`) that means a headless probe **with WebGL enabled** … `scripts/deploy/webglBootProbe.mjs` is wired into `guardian:deploy-guard` post-verification … a boot error, page exception or missing world canvas FAILS the deployment.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-00-DEPLOY-HONESTY",
+      "source_file": ".windsurf/rules/00-project-invariants.md",
+      "source_trigger": "always_on",
+      "line": 100,
+      "line_end": 102,
+      "section": "Deploy verification",
+      "verbatim": "On any verification failure: fix the problem and iterate until the whole cycle (safeguards → deploy → post-deploy verification) is green. Never report \"deploy OK\" on a failed or unverified check — say what was not verified (T-04).",
+      "enforcement_candidate": "human-review"
+    },
+    {
+      "id": "INV-00-WORKFLOW-PAUSA",
+      "source_file": ".windsurf/rules/00-project-invariants.md",
+      "source_trigger": "always_on",
+      "line": 106,
+      "line_end": 109,
+      "section": "Workflow operativo",
+      "verbatim": "La kanban board (`src/docs/docs/coordinator/agent_assignments.md`), il dispatch coordinator/ai-worker e la pipeline prompt-spec sono **in pausa**: nessuna nuova riga sulla board, nessun dispatch, workflow GitHub coordinator/ai-worker solo `workflow_dispatch`.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-00-WORKFLOW-CICLO",
+      "source_file": ".windsurf/rules/00-project-invariants.md",
+      "source_trigger": "always_on",
+      "line": 110,
+      "line_end": 112,
+      "section": "Workflow operativo",
+      "verbatim": "Ciclo corrente: **plan con contratto** (obbligazioni verificabili) → **implementazione con l'agente locale** → **`verify:bundle`** sul contratto → chiusura `fatta` in `RICHIESTE.md` con citazione `bundle:`.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-00-WORKFLOW-CLOSURE-GATE",
+      "source_file": ".windsurf/rules/00-project-invariants.md",
+      "source_trigger": "always_on",
+      "line": 113,
+      "line_end": 114,
+      "section": "Workflow operativo",
+      "verbatim": "`closure:lint` resta il gate meccanico di chiusura (R-189): blocca transizioni `fatta`/`Completato` senza bundle valido.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-00-WORKFLOW-DISPATCH-DIRECTOR",
+      "source_file": ".windsurf/rules/00-project-invariants.md",
+      "source_trigger": "always_on",
+      "line": 115,
+      "line_end": 116,
+      "section": "Workflow operativo",
+      "verbatim": "Riattivazione del dispatch solo su decisione esplicita del Director (PLAN-039 benchmark informa la scelta).",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-00-TIMEOUTS",
+      "source_file": ".windsurf/rules/00-project-invariants.md",
+      "source_trigger": "always_on",
+      "line": 120,
+      "line_end": 129,
+      "section": "Command timeouts",
+      "verbatim": "Every command must have a maximum runtime. If the timeout is exceeded, stop the command, log the event, and switch to a narrower scope or an alternative approach. Default maxima: `closure:lint`: 30s … `npm run lint -- <scope>`: 120s … `npm run build:check` / `npm run build`: 180s … `npm run test -- <scope>`: 300s … `harness:run` per task: 600s (harness in pausa R-208, solo benchmark dedicati) … `harness:dispatch` total: 1800s (in pausa R-208). A command that hangs is treated as a failure, not as \"still running\".",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-00-SEPARATION",
+      "source_file": ".windsurf/rules/00-project-invariants.md",
+      "source_trigger": "always_on",
+      "line": 133,
+      "line_end": 134,
+      "section": "Separation of concerns",
+      "verbatim": "Personal project only: never import work-project logic, rules, or memories here. Do not modify legacy/dev-only tools as part of gameplay work unless explicitly scoped.",
+      "enforcement_candidate": "human-review"
+    },
+    {
+      "id": "INV-00-BASELINE-REGISTER",
+      "source_file": ".windsurf/rules/00-project-invariants.md",
+      "source_trigger": "always_on",
+      "line": 138,
+      "line_end": 143,
+      "section": "This layer is the shared baseline",
+      "verbatim": "`.windsurf/rules/` is the single source of truth for what everyone (Strategist, Coordinator, Agents) must always follow. When a new \"a-priori\" / cross-cutting system becomes mandatory (skin system, i18n, telemetry contract, persistence pattern, theming, frozen kits, documentation governance), it MUST be registered here — not left implicit in a single prompt. Strategist and Coordinator share this duty.",
+      "enforcement_candidate": "kernel"
+    },
+
+    {
+      "id": "INV-40-SSOT",
+      "source_file": ".windsurf/rules/40-documentation-governance.md",
+      "source_trigger": "always_on",
+      "line": 12,
+      "line_end": 13,
+      "section": "Single source of truth",
+      "verbatim": "Every `trusted`/`frozen` component or contract has exactly one `*_trusted.md` trusted doc and one entry in `src/docs/docs/idle_village/COMPONENT_MASTER_INDEX.md`.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-40-NODUP",
+      "source_file": ".windsurf/rules/40-documentation-governance.md",
+      "source_trigger": "always_on",
+      "line": 14,
+      "section": "Single source of truth",
+      "verbatim": "General documents index and link; they do not duplicate the contract.",
+      "enforcement_candidate": "human-review"
+    },
+    {
+      "id": "INV-40-CHANGE-POLICY",
+      "source_file": ".windsurf/rules/40-documentation-governance.md",
+      "source_trigger": "always_on",
+      "line": 18,
+      "line_end": 22,
+      "section": "Change policy",
+      "verbatim": "Modifying the behavior, visual contract, runtime contract, source-of-truth usage, or runtime binding of a `trusted`/`frozen` component requires updating: 1. The corresponding `*_trusted.md` doc. 2. The `COMPONENT_MASTER_INDEX.md` row (status, link, test page, last certified). 3. Evidence log in `test-results/`.",
+      "enforcement_candidate": "human-review"
+    },
+    {
+      "id": "INV-40-RUNTIME-VERIFY",
+      "source_file": ".windsurf/rules/40-documentation-governance.md",
+      "source_trigger": "always_on",
+      "line": 26,
+      "line_end": 28,
+      "section": "Runtime verification",
+      "verbatim": "No documentation closure without runtime verification. `npm run build:check`, `npm run lint -- <scope>`, and relevant contract/RTL tests must pass before the task can be considered complete.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-40-PLAN-SYNC",
+      "source_file": ".windsurf/rules/40-documentation-governance.md",
+      "source_trigger": "always_on",
+      "line": 32,
+      "line_end": 33,
+      "section": "Plan synchronization",
+      "verbatim": "The master plan and all relevant implementation plans must be referenced before drafting a new plan and updated when the implementation advances or diverges.",
+      "enforcement_candidate": "human-review"
+    },
+    {
+      "id": "INV-40-PLAN-BUG",
+      "source_file": ".windsurf/rules/40-documentation-governance.md",
+      "source_trigger": "always_on",
+      "line": 34,
+      "section": "Plan synchronization",
+      "verbatim": "A plan that is out of sync with the code is treated as a bug and blocks task closure.",
+      "enforcement_candidate": "human-review"
+    },
+    {
+      "id": "INV-40-STATUSES",
+      "source_file": ".windsurf/rules/40-documentation-governance.md",
+      "source_trigger": "always_on",
+      "line": 38,
+      "section": "Canonical statuses",
+      "verbatim": "Use only these statuses: `draft`, `candidate`, `trusted`, `frozen`, `deprecated`.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-40-EXCEPTIONS",
+      "source_file": ".windsurf/rules/40-documentation-governance.md",
+      "source_trigger": "always_on",
+      "line": 42,
+      "section": "Exceptions",
+      "verbatim": "Kit exceptions are tracked in `src/docs/docs/idle_village/EXCEPTIONS.md`.",
+      "enforcement_candidate": "kernel"
+    },
+
+    {
+      "id": "INV-50-ONLY-MANAGER",
+      "source_file": ".windsurf/rules/50-shutdown-governance.md",
+      "source_trigger": "always_on",
+      "line": 12,
+      "section": "Single source of truth",
+      "verbatim": "The **Global Session Shutdown Manager** (`scripts/shutdownManager/shutdownManager.ts`, launched via `com.rpgbalancer.shutdown-manager.plist`) is the only component authorized to request macOS shutdown.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-50-NO-DIRECT-SHUTDOWN",
+      "source_file": ".windsurf/rules/50-shutdown-governance.md",
+      "source_trigger": "always_on",
+      "line": 13,
+      "section": "Single source of truth",
+      "verbatim": "No shell script, Python script, Node script, Git hook, cron job, LaunchAgent, or application code may call `shutdown`, `poweroff`, `halt`, `pmset sleep`, `osascript -e 'tell application \"System Events\" to shut down'`, `sudo shutdown -h now`, or any equivalent command except through this manager.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-50-SESSION-REGISTER",
+      "source_file": ".windsurf/rules/50-shutdown-governance.md",
+      "source_trigger": "always_on",
+      "line": 17,
+      "section": "Project and session registration",
+      "verbatim": "Any project, Devin window, harness run, or long-lived process that must block shutdown must register in `~/.rpg-shutdown/session-registry.json` and send periodic heartbeats.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-50-NO-FS-SIGNALS",
+      "source_file": ".windsurf/rules/50-shutdown-governance.md",
+      "source_trigger": "always_on",
+      "line": 18,
+      "section": "Project and session registration",
+      "verbatim": "Filesystem writes, Git dirty state, CPU usage, or coordinator log writes are not valid shutdown signals by themselves.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-50-FAILCLOSED",
+      "source_file": ".windsurf/rules/50-shutdown-governance.md",
+      "source_trigger": "always_on",
+      "line": 22,
+      "line_end": 24,
+      "section": "Fail-closed defaults",
+      "verbatim": "Real shutdown is disabled by default (`policy.shutdownEnabled === false`). Dry-run mode (`DRY_RUN=true`) must be implemented and verified before real shutdown is enabled. Unknown, expired, corrupted, or unreadable registry state blocks shutdown.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-50-QUIETWINDOW",
+      "source_file": ".windsurf/rules/50-shutdown-governance.md",
+      "source_trigger": "always_on",
+      "line": 28,
+      "line_end": 31,
+      "section": "Quiet window",
+      "verbatim": "When `policy.quietWindow.enabled` is true, shutdown is allowed only while the quiet window is active. `restrictedDaysOfWeek` (0=Sunday … 6=Saturday, default `[1,2,3,4,5]`) names the days on which the window covers only `startHour`–`endHour` (overnight, wraps midnight). On days not listed, the window is active all day … An empty `restrictedDaysOfWeek` means no day is restricted: the window is active all day, every day. A missing `restrictedDaysOfWeek` field (legacy registries or hand-built policy objects) resolves to the Mon–Fri default.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-50-BACKSTOP",
+      "source_file": ".windsurf/rules/50-shutdown-governance.md",
+      "source_trigger": "always_on",
+      "line": 35,
+      "line_end": 36,
+      "section": "Unregistered-process backstop",
+      "verbatim": "The `ps`-based backstop classifies matches before vetoing (R-212): real work — test runners, builds, harness, coordinator, deliberation — blocks shutdown; server fixtures (`vite preview`, dev servers) are reported but **never** veto. … New blocking patterns may be added only for actual work; new server/fixture patterns must go to the non-blocking list.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-50-AUTOCOMMIT-SEP",
+      "source_file": ".windsurf/rules/50-shutdown-governance.md",
+      "source_trigger": "always_on",
+      "line": 40,
+      "line_end": 42,
+      "section": "Auto-commit / auto-push separation",
+      "verbatim": "Automated Git backup (`auto-commit`, `auto-push`) may be preserved as an opt-in per-project policy. Git state must never be used as a global shutdown criterion. No script may combine auto-commit, auto-push, and shutdown without explicit review and policy configuration.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-50-CAPOWN",
+      "source_file": ".windsurf/rules/50-shutdown-governance.md",
+      "source_trigger": "always_on",
+      "line": 46,
+      "line_end": 52,
+      "section": "Capability ownership",
+      "verbatim": "Only `scripts/shutdownManager/shutdownExecutor.ts` (or the explicit successor module named in this rule) may execute machine shutdown. Every other component — including harness, coordinator, deployment guards, and commit guardians — may only: register a session, send heartbeats, update session state, request a shutdown evaluation. No other module may call `shutdown`, `poweroff`, `halt`, `pmset sleep`, `osascript …`, `sudo shutdown -h now`, or any equivalent API.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-50-LINTCAP-MANDATE",
+      "source_file": ".windsurf/rules/50-shutdown-governance.md",
+      "source_trigger": "always_on",
+      "line": 56,
+      "section": "Static enforcement",
+      "verbatim": "`npm run shutdown:lint-capability` (or a CI step) must scan the repository and fail if shutdown-capable commands appear outside `scripts/shutdownManager/`.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-50-LINTCAP-WIRE",
+      "source_file": ".windsurf/rules/50-shutdown-governance.md",
+      "source_trigger": "always_on",
+      "line": 57,
+      "section": "Static enforcement",
+      "verbatim": "Any prompt that adds shutdown behavior must wire this guard or update it.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-50-VIOLATION-FLAG",
+      "source_file": ".windsurf/rules/50-shutdown-governance.md",
+      "source_trigger": "always_on",
+      "line": 58,
+      "section": "Static enforcement",
+      "verbatim": "Violations must be flagged to the Strategist/Coordinator before the task is considered complete.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-50-ADDBEHAVIOR",
+      "source_file": ".windsurf/rules/50-shutdown-governance.md",
+      "source_trigger": "always_on",
+      "line": 62,
+      "line_end": 63,
+      "section": "Adding or modifying shutdown behavior",
+      "verbatim": "Any prompt that adds shutdown/auto-shutdown/idle-shutdown behavior must first update this invariant and register the component in `session-registry.json`. All changes require `npm run shutdown:status` diagnostics and an evidence log in `test-results/`.",
+      "enforcement_candidate": "kernel"
+    },
+
+    {
+      "id": "INV-55-NO-ROTATE",
+      "source_file": ".windsurf/rules/55-delegation-context-budget.md",
+      "source_trigger": "always_on",
+      "line": 13,
+      "line_end": 14,
+      "section": "Session lifecycle",
+      "verbatim": "Devin **compacts context automatically** when it fills. Do NOT rotate sessions or open new windows to \"save context\" — compact and continue.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-55-WARN",
+      "source_file": ".windsurf/rules/55-delegation-context-budget.md",
+      "source_trigger": "always_on",
+      "line": 16,
+      "line_end": 17,
+      "section": "Session lifecycle",
+      "verbatim": "**WARN (>=70%)**: declare the remaining budget to the Director; no new multi-file tasks — only small fixes, questions, docs. Prefer delegation.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-55-CRIT",
+      "source_file": ".windsurf/rules/55-delegation-context-budget.md",
+      "source_trigger": "always_on",
+      "line": 18,
+      "line_end": 19,
+      "section": "Session lifecycle",
+      "verbatim": "**CRIT (>=85%)**: finish the current step only, write the exact resume point into the task's handoff/ledger, and propose a new thread.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-55-POSTCOMPACT",
+      "source_file": ".windsurf/rules/55-delegation-context-budget.md",
+      "source_trigger": "always_on",
+      "line": 20,
+      "line_end": 22,
+      "section": "Session lifecycle",
+      "verbatim": "After compaction, governance reads may be dropped — the global `PostCompaction` hook (`devin-context-hooks.py`) re-injects the canonical docs it finds in the project. Follow it before continuing.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-55-DELEGATE",
+      "source_file": ".windsurf/rules/55-delegation-context-budget.md",
+      "source_trigger": "always_on",
+      "line": 26,
+      "line_end": 34,
+      "section": "Delegate, don't hoard",
+      "verbatim": "Spawn a subagent (`run_subagent`) instead of working inline when the task is: …",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-55-PROFILES",
+      "source_file": ".windsurf/rules/55-delegation-context-budget.md",
+      "source_trigger": "always_on",
+      "line": 36,
+      "line_end": 43,
+      "section": "Delegate, don't hoard",
+      "verbatim": "`rpg-researcher` / `rpg-verifier` / `rpg-implementer` are project profiles in `.devin/agents/`, pinned to `swe-1-6-fast` so they never bill the parent's model. … `subagent_general` inherits the parent's model — use it only when the work genuinely needs the primary model's strength. This delegation is a Director-approved standing request — it does not need per-task permission.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-55-CONTRACT",
+      "source_file": ".windsurf/rules/55-delegation-context-budget.md",
+      "source_trigger": "always_on",
+      "line": 47,
+      "line_end": 49,
+      "section": "Subagent contract",
+      "verbatim": "Front-load everything: subagents do NOT see the conversation. Give them file paths, canonical doc names, the exact deliverable, and the report format you need back.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-55-FG-BG",
+      "source_file": ".windsurf/rules/55-delegation-context-budget.md",
+      "source_trigger": "always_on",
+      "line": 50,
+      "line_end": 51,
+      "section": "Subagent contract",
+      "verbatim": "Prefer foreground when the answer blocks the next step; background for parallel breadth (background subagents cannot ask for new permissions).",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-55-DISTILL",
+      "source_file": ".windsurf/rules/55-delegation-context-budget.md",
+      "source_trigger": "always_on",
+      "line": 52,
+      "section": "Subagent contract",
+      "verbatim": "The parent distills the result for the Director — never relay raw output.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-55-NO-TRIVIAL",
+      "source_file": ".windsurf/rules/55-delegation-context-budget.md",
+      "source_trigger": "always_on",
+      "line": 53,
+      "line_end": 54,
+      "section": "Subagent contract",
+      "verbatim": "Do NOT delegate a trivial single-file lookup or a one-command check — delegation has its own cost.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-55-T04",
+      "source_file": ".windsurf/rules/55-delegation-context-budget.md",
+      "source_trigger": "always_on",
+      "line": 55,
+      "line_end": 56,
+      "section": "Subagent contract",
+      "verbatim": "A subagent report is not a witness (trap T-04): claims about scenes, animations or UI still need runtime verification before they are \"done\".",
+      "enforcement_candidate": "human-review"
+    },
+
+    {
+      "id": "INV-AGENTS-SESSION-READS",
+      "source_file": "AGENTS.md",
+      "source_trigger": "prose (root agent instructions)",
+      "line": 1,
+      "section": "Session bootstrap",
+      "verbatim": "All'inizio di ogni sessione: leggi `CANON.md`, `CURRENT_STATE.md`, `DESIGN_PILLARS.md`, `context/DECISION_LOG.md`, `RICHIESTE.md` (file attivo; le voci antecedenti 2026-11-08 sono in `RICHIESTE-backlog.md`/`RICHIESTE-archive.md` — consultabili on-demand, PLAN-121), `.mw/desiderata.md`, `context/INDEX.md` (se esiste) e `context/auto/` (advisory lane NON canonica: preferenze/veto durevoli — su conflitto vince il canonico).",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-AGENTS-DOCROLES",
+      "source_file": "AGENTS.md",
+      "source_trigger": "prose (root agent instructions)",
+      "line": 19,
+      "section": "Cosa sono, e cosa non sono",
+      "verbatim": "Questo progetto ha `CANON.md` come mappa delle autorità; fino a una revisione esplicita, ogni documento elencato qui conserva il proprio ruolo. Direzione e storia non sono la stessa cosa di un vincolo, e non vanno trattate come tale.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-AGENTS-WORKFLOW-PAUSA",
+      "source_file": "AGENTS.md",
+      "source_trigger": "prose (root agent instructions)",
+      "line": 23,
+      "line_end": 29,
+      "section": "Workflow Mind Weaver in RPG",
+      "verbatim": "kanban board e dispatch (coordinator/ai-worker/harness, prompt-spec) sono **in pausa**. Il flusso è: plan con contratto (obbligazioni verificabili) → implementazione con l'agente locale → `verify:bundle` sul contratto → chiusura `fatta` in `RICHIESTE.md` con `bundle:`. Il gate meccanico è `npm run closure:lint` … Niente righe su `src/docs/docs/coordinator/agent_assignments.md`.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-AGENTS-MW-PHASES",
+      "source_file": "AGENTS.md",
+      "source_trigger": "prose (root agent instructions)",
+      "line": 30,
+      "line_end": 39,
+      "section": "Workflow Mind Weaver in RPG",
+      "verbatim": "Fase esplorativa: invoca `.windsurf/skills/mw-explorer/SKILL.md`. Fase di pianificazione: invoca `.windsurf/skills/mw-planner/SKILL.md`. … Fase esecutiva: invoca `.windsurf/skills/mw-executor/SKILL.md`, che a sua volta carica il mandato `.windsurf/skills/agent-execution-mandate/SKILL.md` per i task specifici di RPG. Prima di toccare codice esistente: invoca `.windsurf/skills/mw-regression/SKILL.md`.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-AGENTS-VISUALFORK",
+      "source_file": "AGENTS.md",
+      "source_trigger": "prose (root agent instructions)",
+      "line": 32,
+      "line_end": 36,
+      "section": "Workflow Mind Weaver in RPG",
+      "verbatim": "Visual fork gate (v35 FROZEN, PLAN-047): un task che crea/modifica elementi grafici con ≥2 rappresentazioni materialmente diverse non viene deciso dall'agente — fork visivo in explorer (card + preview su localhost), ruling Director, baseline congelata. Se non serve fork: skip con puntatore verificabile. Enforcement meccanico in `closure:lint`.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-AGENTS-PREFLIGHT",
+      "source_file": "AGENTS.md",
+      "source_trigger": "prose (root agent instructions)",
+      "line": 40,
+      "line_end": 43,
+      "section": "Workflow Mind Weaver in RPG",
+      "verbatim": "Pre-flight delle trappole ricorrenti — anche senza invocare nessuna skill. … prima di toccare codice leggi l'indice per superficie di `context/recurring-traps.md` e le trappole che il task tocca; prima di dichiarare il lavoro fatto, riapplicale.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-AGENTS-T04",
+      "source_file": "AGENTS.md",
+      "source_trigger": "prose (root agent instructions)",
+      "line": 43,
+      "line_end": 45,
+      "section": "Workflow Mind Weaver in RPG",
+      "verbatim": "T-04: un claim su scene, animazioni o UI si chiude solo con un testimone che può vedere ciò che afferma (non basta il diff né una metrica), e ciò che non è stato verificato va detto.",
+      "enforcement_candidate": "human-review"
+    },
+    {
+      "id": "INV-AGENTS-T13",
+      "source_file": "AGENTS.md",
+      "source_trigger": "prose (root agent instructions)",
+      "line": 45,
+      "line_end": 48,
+      "section": "Workflow Mind Weaver in RPG",
+      "verbatim": "T-13: un failure di safeguard/probe va prima sospettato come collisione di stato condiviso (mtime + autore), non come bug nel tuo scope — riprova prima di intervenire, e mai commit scoped che catturerebbe lavoro altrui.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-AGENTS-NO-FG",
+      "source_file": "AGENTS.md",
+      "source_trigger": "prose (root agent instructions)",
+      "line": 49,
+      "line_end": 53,
+      "section": "Workflow Mind Weaver in RPG",
+      "verbatim": "Mai aprire finestre, app o browser in primo piano in automatico. Ogni esecuzione automatizzata è headless o in background (Puppeteer/Chrome for Testing, Playwright, screenshot, probe perf, `open` solo con `-g`). Una finestra visibile richiede opt-in esplicito del Director in sessione.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-AGENTS-INTENT-CAPTURE",
+      "source_file": "AGENTS.md",
+      "source_trigger": "prose (root agent instructions)",
+      "line": 54,
+      "line_end": 55,
+      "section": "Workflow Mind Weaver in RPG",
+      "verbatim": "Quando il Director esprime un'intenzione operativa, catturala in `RICHIESTE.md` prima di rispondere. Il riferimento deve essere `.mw/desiderata.md` v1 (FROZEN).",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-AGENTS-MW-INVOKE",
+      "source_file": "AGENTS.md",
+      "source_trigger": "prose (root agent instructions)",
+      "line": 62,
+      "line_end": 63,
+      "section": "Riferimenti operativi Mind Weaver in RPG",
+      "verbatim": "Invoca sempre come `python scripts/<nome>.py`, mai `./scripts/<nome>.py`: i wrapper in `RPG/scripts/` sono symlinks a `.mw/bin/forward.py` e non hanno il bit eseguibile.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-AGENTS-DELTA-INGEST",
+      "source_file": "AGENTS.md",
+      "source_trigger": "prose (root agent instructions)",
+      "line": 80,
+      "line_end": 83,
+      "section": "Lane advisory (context/auto/)",
+      "verbatim": "Ingest-time delta: quando il Director incolla una discussione/ricerca esterna in `context/ingestions/`, estrarre item durevoli (preferenze, scelte, veto, correzioni, vincoli) e appenderli in `context/auto/director-profile.jsonl` via `mind-weaver/scripts/mw-delta.py append` (provenance+confidence+review_by).",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-AGENTS-DELTA-MID",
+      "source_file": "AGENTS.md",
+      "source_trigger": "prose (root agent instructions)",
+      "line": 84,
+      "line_end": 88,
+      "section": "Lane advisory (context/auto/)",
+      "verbatim": "Mid-session delta (come il tool bio di ChatGPT): quando il Director esprime in conversazione una preferenza, un gusto, un veto, una correzione o un \"fallo così\" con valenza durevole (non solo questo task), appenderlo SUBITO con `mw-delta.py append` — non aspettare la chiusura. Dubbio → appendi con confidence:low e review_by breve …",
+      "enforcement_candidate": "gap"
+    },
+    {
+      "id": "INV-AGENTS-DELTA-CLOSE",
+      "source_file": "AGENTS.md",
+      "source_trigger": "prose (root agent instructions)",
+      "line": 89,
+      "line_end": 90,
+      "section": "Lane advisory (context/auto/)",
+      "verbatim": "Close-time delta: alla chiusura di un task, appendere SOLO item non derivabili da codice/git/file canonici (filtro \"skip derivable\").",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-AGENTS-ADVISORY-NONCANON",
+      "source_file": "AGENTS.md",
+      "source_trigger": "prose (root agent instructions)",
+      "line": 91,
+      "line_end": 93,
+      "section": "Lane advisory (context/auto/)",
+      "verbatim": "Le note sono ADVISORY: mai riscrivere/contraddire CANON/desiderata/RICHIESTE; su conflitto il canonico vince (lint advisory-vs-canonical fail-closed). `context/auto/veto-block.md` = blocco surfacing deterministico dei veto attivi.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-AGENTS-DK-SCOPE",
+      "source_file": "AGENTS.md",
+      "source_trigger": "prose (root agent instructions)",
+      "line": 102,
+      "line_end": 109,
+      "section": "Director memory (director-knowledge)",
+      "verbatim": "Consultare quando servono preferenze/gusti del Director, contesto cross-progetto, o la ripresa di una conversazione esterna. … Non consultare per stato o decisioni di progetto: quelli restano nei canonical docs locali … Read-only: questo progetto non scrive nel vault.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-AGENTS-DK-TRIGGER",
+      "source_file": "AGENTS.md",
+      "source_trigger": "prose (root agent instructions)",
+      "line": 110,
+      "line_end": 114,
+      "section": "Director memory (director-knowledge)",
+      "verbatim": "Trigger (mw-director): su task non banali — design, architettura, direzione, scelte che dipendono da gusti/preferenze del Director — lanciare `python3 ~/progetti_personali/mind-weaver/scripts/mw-director.py bootstrap` all'avvio e `recall --topic \"<tema>\"` prima di proporre.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-AGENTS-TENSION-FLAG",
+      "source_file": "AGENTS.md",
+      "source_trigger": "prose (root agent instructions)",
+      "line": 121,
+      "line_end": 126,
+      "section": "Cosa fai",
+      "verbatim": "Se una proposta è in tensione con un pilastro, con una decisione registrata o con la desiderata FROZEN, **dillo prima di procedere, citando la riga.** Non aggirarla in silenzio, non risolverla da solo. … il modo corretto è nominare la tensione e chiedere se la direzione va rivista — non scegliere da solo quale delle due vince. Quella scelta è di Fausto.",
+      "enforcement_candidate": "gap"
+    },
+    {
+      "id": "INV-AGENTS-ADMIT-UNKNOWN",
+      "source_file": "AGENTS.md",
+      "source_trigger": "prose (root agent instructions)",
+      "line": 128,
+      "section": "Cosa fai",
+      "verbatim": "Se non sai, dillo. Non dedurre una direzione che non è scritta.",
+      "enforcement_candidate": "gap"
+    },
+    {
+      "id": "INV-AGENTS-SCENEAUTH",
+      "source_file": "AGENTS.md",
+      "source_trigger": "prose (root agent instructions)",
+      "line": 132,
+      "line_end": 134,
+      "section": "Scene authoring (obbligatorio)",
+      "verbatim": "Qualsiasi lavoro su arte di scena quest/teatro passa SEMPRE dalla skill `.agents/skills/scene-author/SKILL.md` prima di generare, iterare o presentare immagini. Il suo gate meccanico sostituisce la memoria.",
+      "enforcement_candidate": "mechanical"
+    },
+
+    {
+      "id": "INV-CLAUDE-PREFLIGHT",
+      "source_file": "CLAUDE.md",
+      "source_trigger": "prose (root agent instructions)",
+      "line": 3,
+      "section": "Pre-flight",
+      "verbatim": "Pre-flight, even when no `mw-*` skill is invoked: before touching code read the surface index in `context/recurring-traps.md`, and before calling work done re-apply the traps your surface hits (T-04: a claim about a scene, animation or UI is closed only with a witness that can actually see it, not by the diff or a metric; say what was not verified).",
+      "enforcement_candidate": "kernel"
+    },
+
+    {
+      "id": "INV-10UI-SKIN-DEFAULT",
+      "source_file": ".windsurf/rules/10-ui-invariants.md",
+      "source_trigger": "glob",
+      "line": 14,
+      "line_end": 15,
+      "section": "Skin system (default-first)",
+      "verbatim": "UI must use the default skin system, not bespoke styling. Read skin state via `useSkinPreferences` (`src/ui/idleVillage/hooks/useSkinPreferences.ts`).",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-10UI-SKIN-PRESETID",
+      "source_file": ".windsurf/rules/10-ui-invariants.md",
+      "source_trigger": "glob",
+      "line": 16,
+      "line_end": 18,
+      "section": "Skin system (default-first)",
+      "verbatim": "Default preset is `DEFAULT_SKIN_PRESET_ID` from `src/ui/idleVillage/skins/skinConfigRegistry.ts`; resolve slot-rack presets via `resolveSlotRackPresetId`.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-10UI-NO-HARDCOLOR",
+      "source_file": ".windsurf/rules/10-ui-invariants.md",
+      "source_trigger": "glob",
+      "line": 19,
+      "section": "Skin system (default-first)",
+      "verbatim": "Skin visuals come from Style Lab tokens + `applySkinCssVariables`, never hardcoded colors.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-10UI-TOKEN-REGISTER",
+      "source_file": ".windsurf/rules/10-ui-invariants.md",
+      "source_trigger": "glob",
+      "line": 20,
+      "section": "Skin system (default-first)",
+      "verbatim": "New skin semantic tokens (e.g. `--skin-status-wound`, `--skin-status-death`) must be registered in `src/ui/idleVillage/skins/skinConfigRegistry.ts` and in the canonical CSS token file (`src/ui/styleLab/tokens/gilded-observatory.css` or the active preset token file). Components cannot introduce ad-hoc CSS variables for colors.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-10UI-I18N",
+      "source_file": ".windsurf/rules/10-ui-invariants.md",
+      "source_trigger": "glob",
+      "line": 23,
+      "line_end": 24,
+      "section": "Localization",
+      "verbatim": "Every user-facing string uses `useTranslation` (`react-i18next`), keyed into the `common` or `idleVillage` namespace. No inline literals in JSX.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-10UI-THEME",
+      "source_file": ".windsurf/rules/10-ui-invariants.md",
+      "source_trigger": "glob",
+      "line": 27,
+      "line_end": 28,
+      "section": "Theme",
+      "verbatim": "Follow the Gilded Observatory theme: base classes from `src/index.css` and tokens from `src/ui/styleLab/tokens/gilded-observatory.css`. Reuse existing wrappers/atoms.",
+      "enforcement_candidate": "human-review"
+    },
+    {
+      "id": "INV-10UI-PERF",
+      "source_file": ".windsurf/rules/10-ui-invariants.md",
+      "source_trigger": "glob",
+      "line": 31,
+      "line_end": 32,
+      "section": "Game-feel performance budget",
+      "verbatim": "Target < 16ms/frame. Animate with `transform`/`opacity` only (GPU-friendly). Use refs for high-frequency updates; avoid layout-thrashing state updates.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-10UI-FEEDBACK",
+      "source_file": ".windsurf/rules/10-ui-invariants.md",
+      "source_trigger": "glob",
+      "line": 33,
+      "section": "Game-feel performance budget",
+      "verbatim": "Layered feedback (visual + audio + tactile) where interactions warrant it.",
+      "enforcement_candidate": "human-review"
+    },
+    {
+      "id": "INV-10UI-DND",
+      "source_file": ".windsurf/rules/10-ui-invariants.md",
+      "source_trigger": "glob",
+      "line": 37,
+      "line_end": 38,
+      "section": "Drag & drop",
+      "verbatim": "Use `@dnd-kit` with existing helpers (`useResidentDropValidation`, `DropFeedbackUI`); do not reintroduce native HTML5 drag handlers alongside dnd-kit.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-10UI-LAYERS",
+      "source_file": ".windsurf/rules/10-ui-invariants.md",
+      "source_trigger": "glob",
+      "line": 41,
+      "section": "Visual component layering (Blizzard-Style)",
+      "verbatim": "Every visual component must be composed of **at least 6 layers** (recommended 8-12) to create depth and material richness.",
+      "enforcement_candidate": "human-review"
+    },
+    {
+      "id": "INV-10UI-BLIZZARD",
+      "source_file": ".windsurf/rules/10-ui-invariants.md",
+      "source_trigger": "glob",
+      "line": 42,
+      "line_end": 48,
+      "section": "Visual component layering (Blizzard-Style)",
+      "verbatim": "Follow the \"Visual Design Philosophy - Blizzard-Style Layered Components\" core principles … **Organic Imperfections**: Use feTurbulence filters, scratches, patina, noise overlays (no perfect surfaces) … **Config-First Design**: All visual parameters in config (color tokens, filter params, animation timing)",
+      "enforcement_candidate": "human-review"
+    },
+    {
+      "id": "INV-10UI-PROTOTYPE",
+      "source_file": ".windsurf/rules/10-ui-invariants.md",
+      "source_trigger": "glob",
+      "line": 49,
+      "section": "Visual component layering (Blizzard-Style)",
+      "verbatim": "HTML prototype first, then React integration with config extraction.",
+      "enforcement_candidate": "kernel"
+    },
+
+    {
+      "id": "INV-20-CONFIG-SSOT",
+      "source_file": ".windsurf/rules/20-config-persistence.md",
+      "source_trigger": "glob",
+      "line": 16,
+      "section": "Config-first",
+      "verbatim": "Config modules are the single source of truth for stats, tokens, timings, and copy keys.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-20-CONFIG-ZOD",
+      "source_file": ".windsurf/rules/20-config-persistence.md",
+      "source_trigger": "glob",
+      "line": 17,
+      "section": "Config-first",
+      "verbatim": "Validate config shapes with Zod schemas; export typed accessors, not raw objects.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-20-CONFIG-NOLEAK",
+      "source_file": ".windsurf/rules/20-config-persistence.md",
+      "source_trigger": "glob",
+      "line": 18,
+      "section": "Config-first",
+      "verbatim": "No hardcoded gameplay/UI constants leaking into components — expose them here.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-20-PERSIST-SVC",
+      "source_file": ".windsurf/rules/20-config-persistence.md",
+      "source_trigger": "glob",
+      "line": 21,
+      "line_end": 22,
+      "section": "Persistence",
+      "verbatim": "Persist only through `@/shared/persistence/PersistenceService` (`saveData` / `loadData` / `clearData`), which handles Tauri FS + web fallback.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-20-PERSIST-BAN",
+      "source_file": ".windsurf/rules/20-config-persistence.md",
+      "source_trigger": "glob",
+      "line": 23,
+      "section": "Persistence",
+      "verbatim": "FORBIDDEN: direct `localStorage`/`sessionStorage`, sync persistence, bespoke storage layers.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-20-TIMERS",
+      "source_file": ".windsurf/rules/20-config-persistence.md",
+      "source_trigger": "glob",
+      "line": 24,
+      "section": "Persistence",
+      "verbatim": "Autosave loops ≥ 30s; recurring timers ≥ 500ms.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-20-JSDOC",
+      "source_file": ".windsurf/rules/20-config-persistence.md",
+      "source_trigger": "glob",
+      "line": 27,
+      "section": "Documentation",
+      "verbatim": "JSDoc on every exported function/interface/schema.",
+      "enforcement_candidate": "mechanical"
+    },
+
+    {
+      "id": "INV-30-KIT-REGISTER",
+      "source_file": ".windsurf/rules/30-frozen-kits.md",
+      "source_trigger": "glob",
+      "line": 16,
+      "line_end": 17,
+      "section": "Kit registration",
+      "verbatim": "Every new Idle Village component must be added as a frozen kit, extend an existing kit, or have a documented exception in `src/docs/docs/idle_village/EXCEPTIONS.md`.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-30-BARREL",
+      "source_file": ".windsurf/rules/30-frozen-kits.md",
+      "source_trigger": "glob",
+      "line": 18,
+      "line_end": 19,
+      "section": "Kit registration",
+      "verbatim": "Public consumers import from `src/ui/idleVillage/frozen/kits/index.ts` (one-line barrel). Do not import from internal component paths.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-30-PROVIDER",
+      "source_file": ".windsurf/rules/30-frozen-kits.md",
+      "source_trigger": "glob",
+      "line": 23,
+      "line_end": 24,
+      "section": "Provider chain",
+      "verbatim": "Each kit must have a `KitShell`/`withKitShell` provider chain so it is self-contained and provider-safe.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-30-REGISTRY-CERT",
+      "source_file": ".windsurf/rules/30-frozen-kits.md",
+      "source_trigger": "glob",
+      "line": 28,
+      "line_end": 29,
+      "section": "Registry entries",
+      "verbatim": "Certified kits must have `contract`, `certManifestPath`, `docPath`, and `hub` metadata in `src/ui/idleVillage/frozen/registry.ts` (`KIT_REGISTRY`).",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-30-REGISTRY-DRAFT",
+      "source_file": ".windsurf/rules/30-frozen-kits.md",
+      "source_trigger": "glob",
+      "line": 30,
+      "line_end": 31,
+      "section": "Registry entries",
+      "verbatim": "Draft kits must be in `KIT_REGISTRY` with `status: 'draft'` and a `docPath` (optional but recommended for draft kits).",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-30-HUB",
+      "source_file": ".windsurf/rules/30-frozen-kits.md",
+      "source_trigger": "glob",
+      "line": 32,
+      "line_end": 33,
+      "section": "Registry entries",
+      "verbatim": "New minimal pages must add `hub` metadata to the relevant `KIT_REGISTRY` entry so `TestHub` stays generated.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-30-CONTRACT-TEST",
+      "source_file": ".windsurf/rules/30-frozen-kits.md",
+      "source_trigger": "glob",
+      "line": 37,
+      "section": "Contract verification",
+      "verbatim": "`tests/contract/minimal-vs-test.spec.ts` must pass for every certified kit.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-30-FREEZE-CMD",
+      "source_file": ".windsurf/rules/30-frozen-kits.md",
+      "source_trigger": "glob",
+      "line": 41,
+      "line_end": 42,
+      "section": "Creating new kits",
+      "verbatim": "Use `npm run freeze:kit <KitName>` to scaffold a new kit and append it to `KIT_REGISTRY`. Keep the kit module small and focused on the canonical component.",
+      "enforcement_candidate": "kernel"
+    },
+
+    {
+      "id": "INV-50IP-PATTERN-REF",
+      "source_file": ".windsurf/rules/50-interaction-patterns.md",
+      "source_trigger": "glob",
+      "line": 39,
+      "line_end": 40,
+      "section": "Regole",
+      "verbatim": "Ogni nuova schermata di gioco DEVE riferirsi a un Interaction Pattern esistente in `/design-system`, o proporne uno nuovo (entry nel catalog PRIMA del merge).",
+      "enforcement_candidate": "human-review"
+    },
+    {
+      "id": "INV-50IP-STATUS-DERIVE",
+      "source_file": ".windsurf/rules/50-interaction-patterns.md",
+      "source_trigger": "glob",
+      "line": 41,
+      "line_end": 42,
+      "section": "Regole",
+      "verbatim": "Lo status dei pattern legati a frozen kit DERIVA da `KIT_REGISTRY`/cert.json — mai ridichiarato nel catalog.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-50IP-SEMANTIC-RULES",
+      "source_file": ".windsurf/rules/50-interaction-patterns.md",
+      "source_trigger": "glob",
+      "line": 43,
+      "line_end": 44,
+      "section": "Regole",
+      "verbatim": "`compositionRules` sono semantiche (`primaryContexts`/`forbiddenContexts`), mai matrici allowedWith.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-50IP-DIVERSE-INTENT",
+      "source_file": ".windsurf/rules/50-interaction-patterns.md",
+      "source_trigger": "glob",
+      "line": 45,
+      "line_end": 46,
+      "section": "Regole",
+      "verbatim": "Due pattern con la stessa struttura ma `referenceIntent` diverso sono pattern DIVERSI: non unificarli.",
+      "enforcement_candidate": "human-review"
+    },
+
+    {
+      "id": "INV-10PORT-URL",
+      "source_file": ".windsurf/rules/10-canonical-dev-port.md",
+      "source_trigger": "model_decision",
+      "line": 12,
+      "section": "Single source of truth",
+      "verbatim": "The canonical agent testing URL is `http://localhost:5173/`.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-10PORT-CMD",
+      "source_file": ".windsurf/rules/10-canonical-dev-port.md",
+      "source_trigger": "model_decision",
+      "line": 13,
+      "section": "Single source of truth",
+      "verbatim": "The only command authorized to start the dev server is `npm run dev`.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-10PORT-NVM",
+      "source_file": ".windsurf/rules/10-canonical-dev-port.md",
+      "source_trigger": "model_decision",
+      "line": 14,
+      "section": "Single source of truth",
+      "verbatim": "The pinned Node version from `.nvmrc` must be active before starting the server (`source ~/.nvm/nvm.sh && nvm use`).",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-10PORT-VERIFY",
+      "source_file": ".windsurf/rules/10-canonical-dev-port.md",
+      "source_trigger": "model_decision",
+      "line": 18,
+      "line_end": 23,
+      "section": "Enforcement",
+      "verbatim": "Before testing any page or feature, verify that a dev server is responding on `http://localhost:5173/`. If port 5173 is not serving: 1. Terminate any stale `npm run dev`, `vite`, or other process bound to 5173. 2. Activate the pinned Node version. 3. Run `npm run dev`. All smoke tests, curl checks, browser previews, and Playwright/RTL runtime checks must target `http://localhost:5173/` unless a harness explicitly overrides the port.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-10PORT-OVERRIDE",
+      "source_file": ".windsurf/rules/10-canonical-dev-port.md",
+      "source_trigger": "model_decision",
+      "line": 29,
+      "section": "Avoiding the Devin preview trap",
+      "verbatim": "If `browser_preview` is called with a URL other than `http://localhost:5173/`, **override it to the canonical URL** unless the user explicitly requests a different port.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-10PORT-PREFLIGHT",
+      "source_file": ".windsurf/rules/10-canonical-dev-port.md",
+      "source_trigger": "model_decision",
+      "line": 30,
+      "line_end": 36,
+      "section": "Avoiding the Devin preview trap",
+      "verbatim": "Before opening any `browser_preview`, run: `curl -s -o /dev/null -w \"status:%{http_code}\\ncontent-type:%{content_type}\\n\" http://localhost:5173/src/main.tsx`. The response must be `text/javascript` or `application/javascript`. If it is `text/html`, the server is not Vite — start `npm run dev` first.",
+      "enforcement_candidate": "kernel"
+    },
+
+    {
+      "id": "INV-15-URL",
+      "source_file": ".windsurf/rules/15-browser-preview-guard.md",
+      "source_trigger": "model_decision",
+      "line": 12,
+      "line_end": 13,
+      "section": "Canonical preview URL",
+      "verbatim": "The only default preview URL is `http://localhost:5173/`. `http://127.0.0.1:58678/` and similar Devin/Codeium injected URLs are **not** the Vite dev server. They serve `index.html` for every path and produce a blank white screen. Do not use them unless the user explicitly requests that exact URL.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-15-PREFLIGHT",
+      "source_file": ".windsurf/rules/15-browser-preview-guard.md",
+      "source_trigger": "model_decision",
+      "line": 17,
+      "line_end": 27,
+      "section": "Mandatory pre-flight check",
+      "verbatim": "Before opening any preview, verify the Vite dev server is serving JavaScript modules: `curl -s -o /dev/null -w \"status:%{http_code}\\ncontent-type:%{content_type}\\n\" http://localhost:5173/src/main.tsx`. The response must: - Have `status: 200` - Have `content-type:` containing `javascript` (`text/javascript` or `application/javascript`). If the response is `text/html` or any non-200, the server is not ready.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-15-AUTOSTART",
+      "source_file": ".windsurf/rules/15-browser-preview-guard.md",
+      "source_trigger": "model_decision",
+      "line": 31,
+      "line_end": 37,
+      "section": "Auto-start on failure",
+      "verbatim": "If the pre-flight check fails: 1. Terminate any stale `npm run dev`, `vite`, or other process bound to `5173`. 2. Activate the pinned Node version: `source ~/.nvm/nvm.sh && nvm use`. 3. Start the dev server: `npm run dev`. 4. Re-run the pre-flight check. 5. Only then open `browser_preview` (or any other preview tool) on `http://localhost:5173/`.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-15-OVERRIDE",
+      "source_file": ".windsurf/rules/15-browser-preview-guard.md",
+      "source_trigger": "model_decision",
+      "line": 41,
+      "section": "Overrides",
+      "verbatim": "A harness or an explicit user instruction may override the port. If the override URL fails the same `/src/main.tsx` content-type check, treat the server as invalid and fall back to `http://localhost:5173/`.",
+      "enforcement_candidate": "kernel"
+    },
+
+    {
+      "id": "INV-16-HARD",
+      "source_file": ".windsurf/rules/16-no-foreground-windows.md",
+      "source_trigger": "model_decision",
+      "line": 14,
+      "line_end": 15,
+      "section": "Hard rule",
+      "verbatim": "**NEVER open a window, app, or browser in the foreground automatically.** Not even \"just for a second\". All automated browser runs — Puppeteer / Chrome for Testing, Playwright, CDP probes, screenshot/capture scripts, perf probes, verification harnesses — MUST run **headless** or in the **background**.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-16-FORBIDDEN-APIS",
+      "source_file": ".windsurf/rules/16-no-foreground-windows.md",
+      "source_trigger": "model_decision",
+      "line": 16,
+      "line_end": 22,
+      "section": "Hard rule",
+      "verbatim": "FORBIDDEN without an explicit Director request made in the current session: `headless: false` in any `launch()` call; `playwright test --headed`, `--ui`, `--debug`, `playwright show-report`; `open` without `-g` on macOS, `xdg-open`, `start` (Windows); `osascript -e 'tell application ... to activate'`, `Page.bringToFront`, `window.focus()`, `window.open` issued by automation; **implicit activation**: attaching to a headed/visible browser (`connectOverCDP`, `puppeteer.connect`, CDP `Target.createTarget` without `background:true`, `newPage()` on an attached headed instance). … auto-opening a browser preview, Storybook, report HTML, or any OS window as a side effect of a command.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-16-OPTIN",
+      "source_file": ".windsurf/rules/16-no-foreground-windows.md",
+      "source_trigger": "model_decision",
+      "line": 26,
+      "line_end": 31,
+      "section": "Opt-in convention",
+      "verbatim": "Scripts that legitimately can show a browser MUST default to headless and gate headed mode on the existing env convention: `headless: process.env.HEADLESS !== 'false'` … `open` calls that surface a file/URL for the user use the background flag (`open -g`), never plain `open`.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-16-MANUAL-ONLY",
+      "source_file": ".windsurf/rules/16-no-foreground-windows.md",
+      "source_trigger": "model_decision",
+      "line": 32,
+      "section": "Opt-in convention",
+      "verbatim": "Legitimate headed entry points exist for **manual** use only (`test:e2e:headed`, `test:e2e:ui:dev`, `test:minimal:headed`, `test:minimal:debug`, `HEADLESS=false`, interactive debug scripts). An agent may use them only when the Director explicitly asks for a visible window in that session — never as a side effect, never \"to check quickly\".",
+      "enforcement_candidate": "human-review"
+    },
+    {
+      "id": "INV-16-PLAN-STATE",
+      "source_file": ".windsurf/rules/16-no-foreground-windows.md",
+      "source_trigger": "model_decision",
+      "line": 36,
+      "section": "Plans and prompts",
+      "verbatim": "Every plan, spec, or prompt that includes runtime verification, screenshots, playtests, or captures MUST state that the run is headless/background.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-16-MANUAL-STEP",
+      "source_file": ".windsurf/rules/16-no-foreground-windows.md",
+      "source_trigger": "model_decision",
+      "line": 37,
+      "section": "Plans and prompts",
+      "verbatim": "If a task genuinely needs a visible window (e.g. human-eye verification), the plan marks it as a manual/Director step. An agent never launches a foreground window on its own initiative — it asks.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-16-FAILURE",
+      "source_file": ".windsurf/rules/16-no-foreground-windows.md",
+      "source_trigger": "model_decision",
+      "line": 42,
+      "section": "Enforcement",
+      "verbatim": "A task that opens a foreground window is **failed**, not complete: log it in `.mw/bugs/` and flag the Coordinator.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-16-DOUBT",
+      "source_file": ".windsurf/rules/16-no-foreground-windows.md",
+      "source_trigger": "model_decision",
+      "line": 43,
+      "section": "Enforcement",
+      "verbatim": "When in doubt, choose the headless path and report that a visible check was not performed (see T-04 in `context/recurring-traps.md` for perceptual claims).",
+      "enforcement_candidate": "human-review"
+    },
+
+    {
+      "id": "INV-17-DECLARED-END",
+      "source_file": ".windsurf/rules/17-resource-lifecycle.md",
+      "source_trigger": "model_decision",
+      "line": 8,
+      "line_end": 11,
+      "section": "R-LIFECYCLE contract",
+      "verbatim": "Every resource an agent creates (process, server, browser, temp file, scheduled job) is born with a declared end: `scoped` (dies with the command), `leased` (TTL), `kept` (registered with owner+purpose, Director-authorized). Anything else is a leak — a defect, not a style choice.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-17-MWRUN",
+      "source_file": ".windsurf/rules/17-resource-lifecycle.md",
+      "source_trigger": "model_decision",
+      "line": 15,
+      "line_end": 17,
+      "section": "Contract",
+      "verbatim": "`mw-run -- <cmd>` / `mw-run --ttl 10m -- <cmd>` — scoped; process-group kill on exit or timeout. Use for every command that can hang or fork children (probes, screenshots, builds).",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-17-LEASE",
+      "source_file": ".windsurf/rules/17-resource-lifecycle.md",
+      "source_trigger": "model_decision",
+      "line": 18,
+      "line_end": 19,
+      "section": "Contract",
+      "verbatim": "`mw-run --lease 2h --port 5173 --purpose \"…\" -- npm run dev` — detached server with expiry; run `mw-ps --port 5173` first, never stack a second.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-17-KEEP-PURPOSE",
+      "source_file": ".windsurf/rules/17-resource-lifecycle.md",
+      "source_trigger": "model_decision",
+      "line": 20,
+      "line_end": 21,
+      "section": "Contract",
+      "verbatim": "`mw-run --keep`/`mw-keep` — persistent resources: fail-closed without a `--purpose` citing the Director request.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-17-MWPW",
+      "source_file": ".windsurf/rules/17-resource-lifecycle.md",
+      "source_trigger": "model_decision",
+      "line": 22,
+      "line_end": 25,
+      "section": "Contract",
+      "verbatim": "`mw-pw <file.mjs>` — Playwright probes: `browser.close()` in finally + watchdog + `process.exit` guaranteed. **Never** a raw `node -e` with `chromium.launch` — that exact pattern leaked 10 headless trees for ~6h (incident 2026-11-13).",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-17-TMP",
+      "source_file": ".windsurf/rules/17-resource-lifecycle.md",
+      "source_trigger": "model_decision",
+      "line": 26,
+      "section": "Contract",
+      "verbatim": "`mw-tmp` for temp dirs (`mw-<project>-*` prefix, sweepable).",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-17-ADOPT",
+      "source_file": ".windsurf/rules/17-resource-lifecycle.md",
+      "source_trigger": "model_decision",
+      "line": 27,
+      "section": "Contract",
+      "verbatim": "`mw-adopt <pid|--port N> --purpose \"…\"` — adopt an orphan as kept.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-17-PS-DONE",
+      "source_file": ".windsurf/rules/17-resource-lifecycle.md",
+      "source_trigger": "model_decision",
+      "line": 28,
+      "line_end": 29,
+      "section": "Contract",
+      "verbatim": "`mw-ps --mine` before declaring done: stop or adopt everything listed; paste output in the final message.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-17-REAP-GATE",
+      "source_file": ".windsurf/rules/17-resource-lifecycle.md",
+      "source_trigger": "model_decision",
+      "line": 30,
+      "line_end": 31,
+      "section": "Contract",
+      "verbatim": "Gate: `mw-reap --gate <project-cwd>` fails on unowned resources (closure gate integration point).",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-17-REAP-L3",
+      "source_file": ".windsurf/rules/17-resource-lifecycle.md",
+      "source_trigger": "model_decision",
+      "line": 38,
+      "line_end": 39,
+      "section": "What the sweep does",
+      "verbatim": "L3 orphan servers in project cwd: **report only** — never killed. Only the Director decides which servers die.",
+      "enforcement_candidate": "kernel"
+    },
+
+    {
+      "id": "INV-45-SSOT",
+      "source_file": ".windsurf/rules/45-director-intent-to-spec.md",
+      "source_trigger": "model_decision",
+      "line": 14,
+      "section": "Invariants",
+      "verbatim": "**No single-source violations.** A contract lives in exactly one spec/workflow/trusted doc. The error registry, bug reports, and prompt files may link to it, but must not copy it.",
+      "enforcement_candidate": "human-review"
+    },
+    {
+      "id": "INV-45-CAPTURE",
+      "source_file": ".windsurf/rules/45-director-intent-to-spec.md",
+      "source_trigger": "model_decision",
+      "line": 15,
+      "section": "Invariants",
+      "verbatim": "**Capture as expected behavior.** When the Director says \"X should happen\" or \"Y must not happen,\" translate that into a `Comportamento atteso` / `Expected behavior` / `Visual contract` block in the relevant spec, using the Director's own words.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-45-ONE-PLACE",
+      "source_file": ".windsurf/rules/45-director-intent-to-spec.md",
+      "source_trigger": "model_decision",
+      "line": 16,
+      "section": "Invariants",
+      "verbatim": "**One update, one place.** If the same behavior crosses multiple components …, add a `Comportamento atteso` note in each relevant doc, but keep the canonical detailed scenario in the most specific doc and cross-link the others.",
+      "enforcement_candidate": "human-review"
+    },
+    {
+      "id": "INV-45-TESTS",
+      "source_file": ".windsurf/rules/45-director-intent-to-spec.md",
+      "source_trigger": "model_decision",
+      "line": 17,
+      "section": "Invariants",
+      "verbatim": "**Tests derive from the spec.** For every `Comportamento atteso` added, either an existing test covers it or a new `test`/`test.fixme`/`test.fail` is added. The test is named after the scenario, not the error ID.",
+      "enforcement_candidate": "human-review"
+    },
+    {
+      "id": "INV-45-ERRIDX",
+      "source_file": ".windsurf/rules/45-director-intent-to-spec.md",
+      "source_trigger": "model_decision",
+      "line": 18,
+      "section": "Invariants",
+      "verbatim": "**Error registry is an index of deviations, not a contract store.** If a behavior is not yet implemented, record `ERR-NNN` with a short description and a link to the spec that contains the full contract. Do not paste the full contract into the registry.",
+      "enforcement_candidate": "human-review"
+    },
+    {
+      "id": "INV-45-SAFEGUARD",
+      "source_file": ".windsurf/rules/45-director-intent-to-spec.md",
+      "source_trigger": "model_decision",
+      "line": 27,
+      "section": "Workflow",
+      "verbatim": "Run `npm run build:check` and `npm run closure:lint` before considering the turn complete.",
+      "enforcement_candidate": "kernel"
+    },
+
+    {
+      "id": "INV-46-PRESERVE",
+      "source_file": ".windsurf/rules/46-approved-references.md",
+      "source_trigger": "model_decision",
+      "line": 12,
+      "line_end": 15,
+      "section": "Rule",
+      "verbatim": "Anything the Director **baptizes** — approves, calls \"va bene\", \"questo\", \"così\" — and anything the Director **passes in chat as a screenshot and designates as reference or similar** becomes a **reference artifact** and MUST be preserved durably. Reference artifacts are input to future work, not disposable output.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-46-DURABLE-LOC",
+      "source_file": ".windsurf/rules/46-approved-references.md",
+      "source_trigger": "model_decision",
+      "line": 19,
+      "line_end": 22,
+      "section": "Duties of the agent",
+      "verbatim": "**Persist the artifact in a durable location** — the spec's `refs/` directory (e.g. `.mw/specs/<spec>/refs/`), never only in `gen/`, `test-results/`, `/tmp` or other regenerable/scratch paths. Copy, don't move: keep the generated original too.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-46-NAMING",
+      "source_file": ".windsurf/rules/46-approved-references.md",
+      "source_trigger": "model_decision",
+      "line": 23,
+      "line_end": 24,
+      "section": "Duties of the agent",
+      "verbatim": "**Name it as reference**: `ref-<name>.<ext>` or `approved-<name>.<ext>` so a later session can tell it is binding, not exploratory.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-46-REGISTER",
+      "source_file": ".windsurf/rules/46-approved-references.md",
+      "source_trigger": "model_decision",
+      "line": 25,
+      "line_end": 27,
+      "section": "Duties of the agent",
+      "verbatim": "**Register it** in the spec's notes (e.g. `NOTES.md`) or plan: what was approved, when, verbatim quote of the Director's approval, and the artifact path. If the approval changed a decision, cite it in the relevant plan/contract.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-46-NO-OVERWRITE",
+      "source_file": ".windsurf/rules/46-approved-references.md",
+      "source_trigger": "model_decision",
+      "line": 28,
+      "line_end": 29,
+      "section": "Duties of the agent",
+      "verbatim": "**Never overwrite or delete** a reference artifact. New iterations go in new files.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-46-GENERATOR",
+      "source_file": ".windsurf/rules/46-approved-references.md",
+      "source_trigger": "model_decision",
+      "line": 30,
+      "line_end": 32,
+      "section": "Duties of the agent",
+      "verbatim": "**Generators**: if the artifact was produced by an ad-hoc script or inline code, save the generator (or the recipe/parameters) next to the artifact (`refs/` or `scripts/`), so the approved look can be reproduced or iterated.",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-46-CHAT-SHOT",
+      "source_file": ".windsurf/rules/46-approved-references.md",
+      "source_trigger": "model_decision",
+      "line": 33,
+      "line_end": 35,
+      "section": "Duties of the agent",
+      "verbatim": "**Chat screenshots**: when the Director pastes an image and calls it a reference (or \"una cosa simile\"), save it from the pasted-image temp path into `refs/` immediately — temp paths are not durable.",
+      "enforcement_candidate": "kernel"
+    },
+
+    {
+      "id": "INV-85-FIELD",
+      "source_file": ".windsurf/rules/85-documentation-impact.md",
+      "source_trigger": "model_decision",
+      "line": 8,
+      "line_end": 10,
+      "section": "Documentation Impact Contract",
+      "verbatim": "Ogni piano in `plans/` e ogni task esecutivo che modifica conoscenza di progetto dichiara un campo **Documentation Impact**. Un piano con impact `REQUIRED` non è completo finché i documenti indicati non sono aggiornati.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-85-NONE-MOTIV",
+      "source_file": ".windsurf/rules/85-documentation-impact.md",
+      "source_trigger": "model_decision",
+      "line": 14,
+      "line_end": 15,
+      "section": "Vocabolario",
+      "verbatim": "`NONE` — nessuna conoscenza cambiata (bugfix interno, refactor meccanico). Richiede una riga di motivazione nel piano.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-85-REQUIRED-TARGETS",
+      "source_file": ".windsurf/rules/85-documentation-impact.md",
+      "source_trigger": "model_decision",
+      "line": 18,
+      "line_end": 19,
+      "section": "Vocabolario",
+      "verbatim": "`REQUIRED` — il piano modifica regole, decisioni, stato o terminologia: deve elencare i **target documentali** prima del battesimo.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-85-ROUTING",
+      "source_file": ".windsurf/rules/85-documentation-impact.md",
+      "source_trigger": "model_decision",
+      "line": 23,
+      "line_end": 35,
+      "section": "Routing degli update",
+      "verbatim": "Routing degli update (§23 del refactor): | Cosa cambia | Documento da aggiornare | …",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-85-NODUP",
+      "source_file": ".windsurf/rules/85-documentation-impact.md",
+      "source_trigger": "model_decision",
+      "line": 39,
+      "line_end": 40,
+      "section": "Vincoli",
+      "verbatim": "Non duplicare la stessa regola in più documenti canonici: un'unica fonte + riferimenti (vedi `CANON.md` mappa delle autorità).",
+      "enforcement_candidate": "human-review"
+    },
+    {
+      "id": "INV-85-NONE-INCOMPLETE",
+      "source_file": ".windsurf/rules/85-documentation-impact.md",
+      "source_trigger": "model_decision",
+      "line": 41,
+      "section": "Vincoli",
+      "verbatim": "Documentation impact `NONE` con motivazione assente = piano incompleto.",
+      "enforcement_candidate": "mechanical"
+    },
+    {
+      "id": "INV-85-MECH-EXEMPT",
+      "source_file": ".windsurf/rules/85-documentation-impact.md",
+      "source_trigger": "model_decision",
+      "line": 42,
+      "section": "Vincoli",
+      "verbatim": "Aggiornamenti meccanici (link, banner di stato) non richiedono questo campo.",
+      "enforcement_candidate": "human-review"
+    },
+    {
+      "id": "INV-85-HARNESS",
+      "source_file": ".windsurf/rules/85-documentation-impact.md",
+      "source_trigger": "model_decision",
+      "line": 51,
+      "line_end": 55,
+      "section": "Enforcement meccanico",
+      "verbatim": "Spec harness (pipeline di dispatch in pausa, R-208 — si riattiva solo su decisione Director): campo `documentation_impact` in `prompts/<id>.spec.json` (`{level, targets[], justification}`); `harness:dispatch` applica il gate post-esecuzione sul diff del worktree — un task REQUIRED senza i doc nel diff resta FAILED, non completato.",
+      "enforcement_candidate": "kernel"
+    },
+
+    {
+      "id": "INV-MWBRIDGE-PATTERNS",
+      "source_file": ".windsurf/rules/mw-rpg-bridge.md",
+      "source_trigger": "model_decision",
+      "line": 12,
+      "line_end": 37,
+      "section": "Trigger patterns",
+      "verbatim": "Load the `explorer` skill when the Director's message contains: … Load the `planner` skill when the Director's message contains: … Load the `executor` skill when the Director's message contains: … Conditional verbs are **NOT** present (if \"dovrei\", \"vorrei\", \"dovrebbe\", \"potremmo\" are present, use explorer).",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-MWBRIDGE-ORDER",
+      "source_file": ".windsurf/rules/mw-rpg-bridge.md",
+      "source_trigger": "model_decision",
+      "line": 40,
+      "line_end": 43,
+      "section": "Order of evaluation",
+      "verbatim": "1. Check for executor triggers (single task, no conditionals). If match → executor. 2. Check for planner triggers (explicit planning). If match → planner. 3. Check for explorer triggers (open-ended, brainstorming). If match → explorer. 4. If no match, default to explorer (safer for personal project).",
+      "enforcement_candidate": "kernel"
+    },
+    {
+      "id": "INV-MWBRIDGE-SCOPE",
+      "source_file": ".windsurf/rules/mw-rpg-bridge.md",
+      "source_trigger": "model_decision",
+      "line": 48,
+      "line_end": 49,
+      "section": "Notes",
+      "verbatim": "This rule is for **Mind Weaver skills only**, not RPG skills. When a request clearly belongs to an RPG skill (e.g., \"execute prompt\", \"run harness\"), defer to the RPG skill system instead of MW.",
+      "enforcement_candidate": "kernel"
+    }
+  ]
+}
