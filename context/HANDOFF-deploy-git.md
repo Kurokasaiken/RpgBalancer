@@ -278,17 +278,27 @@ Run: `mind-weaver/.mw/runs/20261115-context-budget-audit/`
     runner `ubuntu26.04-x64` (Playwright 1.58.2 non supporta l'immagine).
     Non è un bug di codice: pin runner o bump Playwright.
 
+### Esito finale (chiusura thread 2)
+
+- Deploy `e5b8170d` → **● Ready** (`g6r856eo4`); sessione parallela ha
+  pushato `ad157925` sopra → `4gk1t9h02` Ready, alias prod sul più recente.
+- **WebGL probe R-304 PASS** su `https://rpg-balancer.vercel.app/` e
+  `/game` (exit 0, swiftshader, canvas + boot path reale).
+- **R-341 chiusa `fatta`** in RICHIESTE.md (evidenza inline, `bundle:` n/a
+  — closure:lint pre-rosso su drift noto, vedi sotto).
+
 ### Resume point — prossimo thread
 
-1. Verificare che il deploy del commit manifest-fix sia `state=success`
-   (`gh api repos/Kurokasaiken/RpgBalancer/deployments`) e che
-   `rpg-balancer.vercel.app` punti al nuovo sha.
-2. WebGL probe R-304: `node scripts/deploy/webglBootProbe.mjs https://rpg-balancer.vercel.app/game`
-   (e `/`) — headless con swiftshader, exit 0 = verde.
-3. Se verde: R-341 chiudibile `fatta` con citazione evidenza in RICHIESTE.
-4. Poi task separato: resync contratti/inventory per sbloccare
-   `closure:lint` in CI (ruling Director sui 2-owner game-menu-screens).
-5. R-342 dibattito MW: T-002 collect pendente (comandi nel § sopra).
+1. Task separato: resync contratti/inventory per sbloccare `closure:lint`
+   in CI — voci rosse: frontmatter `research-prompt-protocol.md`, inventory
+   drift (regen `componentInventory.ts --write`), 3 unità senza contratto
+   (canonical-data-bridge, drag-sensors, use-drag-outcome), STRICT_FILES
+   0-owner (config mappa2/pixiSpike/hudReal nuovi), scope_files divergenti,
+   e i 2-owner game-menu-screens (ruling Director già pendente dal
+   2026-10-23: migrare invarianti nei per-file o dichiarare l'aggregato
+   owner).
+2. Check `Release` rosso ambientale: pin runner o bump Playwright >1.58.2.
+3. R-342 dibattito MW: T-002 collect pendente (comandi nel § sopra).
 
 ## Non verificato (dillo al Director)
 
