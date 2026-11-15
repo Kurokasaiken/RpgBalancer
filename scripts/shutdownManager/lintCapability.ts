@@ -24,7 +24,12 @@ const SKIP_DIRS = new Set([
   'archive', 'test-results', 'coverage', '.next', '.turbo', 'out',
   'prompts', // spec JSON describe patterns to search for; they cannot execute
 ]);
-const SKIP_PATH_PREFIXES = ['src/docs/']; // documentation trees
+const SKIP_PATH_PREFIXES = [
+  'src/docs/', // documentation trees
+  'context/governance/', // PLAN-122: the invariant ledger/matrix quote the
+  // forbidden commands verbatim — same class as `prompts/` (documented
+  // patterns, cannot execute).
+];
 const SKIP_EXTENSIONS = new Set([
   '.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico', '.psd', '.zip',
   '.mp3', '.wav', '.mp4', '.mov', '.woff', '.woff2', '.ttf', '.otf',

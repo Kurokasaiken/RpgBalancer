@@ -1,0 +1,11 @@
+/**
+ * MUST-FAIL fixture for skin:no-adhoc-css (PLAN-122 T-3).
+ * A standalone skin stylesheet NOT present in
+ * scripts/governance/registries/cssAllowlist.json — the pattern the
+ * Skin/Theme invariant bans. `governance:check --selftest` verifies it fails.
+ */
+.rogue-skin {
+  --skin-hue: 666;
+  --skin-surface: #1a0f2e;
+  background: linear-gradient(180deg, #1a0f2e 0%, #000 100%);
+}
