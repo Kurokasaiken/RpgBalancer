@@ -72,7 +72,9 @@ If any safeguard fails, task is BLOCKED, not complete.
 La kanban board (`src/docs/docs/coordinator/agent_assignments.md`) e la
 pipeline di dispatch sono IN PAUSA: non si scrivono né si aggiornano righe
 sulla board, non si usano coordinator/ai-worker/manual-dispatch. Lo stato di
-lavoro vive solo in `RICHIESTE.md` (voce R-###) e `plans/INDEX.md`.
+lavoro vive solo in `RICHIESTE.md` (voce R-###, file attivo — PLAN-121: le
+voci antecedenti 2026-11-08 sono in `RICHIESTE-backlog.md`/`RICHIESTE-archive.md`)
+e `plans/INDEX.md`.
 When picking a task: porta la voce R-### a `in corso` (con data).
 Upon delivery: voce a `fatta` con citazione `bundle: .mw/runs/<task>/bundle.json`.
 Completed work is tracked only in RICHIESTE.md / plans + evidence logs.

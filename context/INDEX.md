@@ -57,7 +57,7 @@ Format: `[filename](path) — one sentence — \`tag\``
 |[.windsurf/skills/bugfix/SKILL.md](.windsurf/skills/bugfix/SKILL.md) — Mind Weaver generic bugfix workflow — `skill` `mind-weaver` `bugfix`
 [AGENTS.md](AGENTS.md) — agent instructions for RPG — `agent`
 [CLAUDE.md](CLAUDE.md) — pointer to AGENTS.md — `agent`
-[RICHIESTE.md](RICHIESTE.md) — intent ledger — `agent`
+[RICHIESTE.md](RICHIESTE.md) — intent ledger, file attivo (PLAN-121 split: [RICHIESTE-backlog.md](RICHIESTE-backlog.md) open antecedenti 2026-11-08, [RICHIESTE-archive.md](RICHIESTE-archive.md) chiuse antecedenti — lookup on-demand; guard `npm run richeste:check`) — `agent`
 [context/MIND_WEAVER_MULTI_AI_PROTOCOLS.md](context/MIND_WEAVER_MULTI_AI_PROTOCOLS.md) — comandi e workflow multi-AI di Mind Weaver in RPG — `mind-weaver` `multi-ai` `protocols`
 [src/docs/docs/plans/poi_quest_system_exploration.md](src/docs/docs/plans/poi_quest_system_exploration.md) — POI quest: cerchio magico come timer, quest card a fasi, skill check per fase (R-005, esplorazione con risposte) — `exploration` `idle-village`
 [src/docs/docs/plans/poi_quest_system_plan.md](src/docs/docs/plans/poi_quest_system_plan.md) — POI quest: piano implementativo T-001→T-009, desiderata v3 FROZEN — `plan` `idle-village`
