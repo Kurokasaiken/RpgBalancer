@@ -1,6 +1,10 @@
 ---
 trigger: glob
-globs: src/balancing/config/**,src/**/config/**,src/**/*Store.ts,src/**/persistence/**
+globs:
+  - src/balancing/config/**
+  - src/**/config/**
+  - src/**/*Store.ts
+  - src/**/persistence/**
 description: Config-first + persistence invariants for config modules and stores.
 ---
 

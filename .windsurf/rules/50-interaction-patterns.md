@@ -1,6 +1,8 @@
 ---
 trigger: glob
-globs: src/ui/designSystem/**,src/pages/design-system.tsx
+globs:
+  - src/ui/designSystem/**
+  - src/pages/design-system.tsx
 description: Interaction Patterns system — cross-cutting registry of approved UI compositions (layout + flow + emotional goal) that new screens must reference.
 ---
 
