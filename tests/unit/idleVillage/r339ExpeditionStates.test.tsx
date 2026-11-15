@@ -153,3 +153,29 @@ describe('R-339 — no quest: the surface rests as a docked edge tab', () => {
     expect(container).toBeEmptyDOMElement();
   });
 });
+
+describe('R-339 T1 — drawer width clamp tokens (INV-4 extension)', () => {
+  it('below the cap the width is aspect × viewportHeight (signed art rule)', async () => {
+    const { cassettoColumnSpec, cassettoColumnWidthFor, cassettoColumnHeightFor } = await import('@/ui/idleVillage/hudReal/layout/cassettoColumn');
+    const spec = cassettoColumnSpec(1440);
+    expect(cassettoColumnWidthFor(spec, 900)).toBeCloseTo(spec.aspect * 900);
+    expect(cassettoColumnHeightFor(spec, 900)).toBe(900);
+  });
+
+  it('above the cap the width stops at widthMaxPx and the column shortens', async () => {
+    const { cassettoColumnSpec, cassettoColumnWidthFor, cassettoColumnHeightFor } = await import('@/ui/idleVillage/hudReal/layout/cassettoColumn');
+    const { CASSETTO_LAYOUT_CONFIG } = await import('@/balancing/config/idleVillage/cassettoLayoutConfig');
+    const spec = cassettoColumnSpec(1440);
+    const capH = CASSETTO_LAYOUT_CONFIG.drawer.widthMaxPx / spec.aspect;
+    expect(cassettoColumnWidthFor(spec, capH * 2)).toBe(CASSETTO_LAYOUT_CONFIG.drawer.widthMaxPx);
+    expect(cassettoColumnHeightFor(spec, capH * 2)).toBeCloseTo(capH);
+  });
+
+  it('the published inset never exceeds widthMaxPx', async () => {
+    const { cassettoColumnSpec, cassettoColumnWidthFor } = await import('@/ui/idleVillage/hudReal/layout/cassettoColumn');
+    const { CASSETTO_LAYOUT_CONFIG } = await import('@/balancing/config/idleVillage/cassettoLayoutConfig');
+    for (const h of [600, 800, 900, 1080, 1440, 2160]) {
+      expect(cassettoColumnWidthFor(cassettoColumnSpec(1440), h)).toBeLessThanOrEqual(CASSETTO_LAYOUT_CONFIG.drawer.widthMaxPx);
+    }
+  });
+});
