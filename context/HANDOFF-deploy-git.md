@@ -428,3 +428,10 @@ drift (re-seal Director), `contracts:check` timeout 180s (verdict Mode-B
 missing key (debito `src/ui/idleVillage`). **Resume point:** sanificare
 i 3 residui → `--full` verde → solo allora T-6 kernel slim / T-7 demozioni
 + T-8 docs finali. Commits: `bd4246b5` (T-2..T-5) + `d06ca631` (fix).
+
+## Ruling "si a tutto" (2026-11-15)
+- MW RICHIESTE finestra attiva: confermata regola contratto PLAN-121
+  (Data>=2026-11-08 → attivo per TUTTE le famiglie, incl. fatta recenti).
+- SESSION_HANDOFF.md (MW, 100.8k): split approvato → in esecuzione.
+- mind-weaver/AGENTS.md (23k): proposta snellimento approvata → in drafting.
+- Push eseguito su entrambi i repo (include commit thread parallelo).
