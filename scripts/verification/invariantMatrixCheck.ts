@@ -1,6 +1,6 @@
 /**
  * invariantMatrixCheck — completeness guard for the invariant→enforcement
- * matrix (PLAN-121, T-1 / contract OB-1).
+ * matrix (PLAN-122, T-1 / contract OB-1).
  *
  * Verifies that EVERY entry in `context/governance/invariant-ledger.json`
  * appears exactly once in `context/governance/invariant-enforcement-matrix.md`
