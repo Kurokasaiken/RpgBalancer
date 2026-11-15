@@ -13,6 +13,8 @@ import {
   useVillageStashStore,
 } from '@/ui/idleVillage/store/useVillageStashStore';
 import { defaultQuestItems } from '@/balancing/config/idleVillage/quests/questItems';
+import { QUEST_STASH } from '@/balancing/config/idleVillage/quests/questStash';
+import { bagAssignEligibility, type BagAssignEligibility } from './expeditionBagAssign';
 import type { VillageStashConfig } from '@/balancing/config/idleVillage/villageStashConfig';
 
 /**
@@ -94,7 +96,14 @@ const StashRowTooltip: React.FC<{ row: VillageStashRowView; children: React.Reac
   </Tooltip.Root>
 );
 
-const rowChrome = (interactive: boolean): CSSProperties => ({
+/* R-339/PLAN-119 T3-S2 (artifact-r004 D7): the bound shelf marks each row's
+ * assign eligibility BEFORE the click — `data-assign-state` mirrors the
+ * ledger's own reject reasons (`eligible` | `packed` | `bagFull`). Eligible
+ * rows carry a faint accent wash; packed/bagFull rows dim but STAY
+ * clickable — the click still flows to the ledger, which announces the
+ * localized reject (`alreadyInBag`/`bagFull`) through lastEvent. The shelf
+ * never duplicates the mutation check: `assign` stays the only authority. */
+const rowChrome = (interactive: boolean, assignState?: BagAssignEligibility): CSSProperties => ({
   display: 'flex',
   alignItems: 'flex-start',
   gap: 'var(--skin-hud-inline-gap)',
@@ -109,6 +118,13 @@ const rowChrome = (interactive: boolean): CSSProperties => ({
         background: 'none',
         color: 'inherit',
         cursor: 'pointer',
+        ...(assignState === 'eligible'
+          ? {
+              background: 'color-mix(in srgb, var(--skin-icon-accent) 10%, transparent)',
+              borderColor: 'color-mix(in srgb, var(--skin-icon-accent) 45%, transparent)',
+            }
+          : {}),
+        ...(assignState === 'packed' || assignState === 'bagFull' ? { opacity: 0.55 } : {}),
       }
     : {}),
 });
@@ -120,7 +136,8 @@ const rowChrome = (interactive: boolean): CSSProperties => ({
  */
 const InteractiveStashRow: React.FC<{
   row: VillageStashRowView;
-}> = ({ row }) => {
+  assignState: BagAssignEligibility;
+}> = ({ row, assignState }) => {
   const { t } = useTranslation('idleVillage');
   const owner = useVillageStashStore((s) => s.activeStashOwner);
   const assign = useVillageStashStore((s) => s.assign);
@@ -130,6 +147,7 @@ const InteractiveStashRow: React.FC<{
         <button
           type="button"
           data-testid={`stash-item-${row.itemId}`}
+          data-assign-state={assignState}
           aria-label={t('gameFrame.stash.addToBag', { item: t(row.nameKey) })}
           onClick={() => {
             if (!owner) return;
@@ -140,7 +158,7 @@ const InteractiveStashRow: React.FC<{
               );
             }
           }}
-          style={rowChrome(true)}
+          style={rowChrome(true, assignState)}
         >
           <StashRowFace row={row} />
         </button>
@@ -199,6 +217,19 @@ export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, le
   const reserved = useMemo(() => countReservations(bags, committed), [bags, committed]);
   const vm = useMemo(() => villageStashViewModel(config, reserved), [config, reserved]);
   const interactive = hydration === 'ready' && activeStashOwner !== null;
+  /* T3-S2: per-row assign eligibility for the BOUND planner's sparse bag —
+   *  `bags[owner]` keeps slot positions; an absent bag counts as empty.
+   *  `bagFull` is true only when the bag has no free slot AND at least one
+   *  unpacked row remains on the shelf — a full bag with nothing left to
+   *  pack needs no hint. */
+  const boundBag = activeStashOwner ? bags[activeStashOwner] : undefined;
+  const assignStates = useMemo(() => {
+    if (!interactive) return {};
+    const states: Record<string, BagAssignEligibility> = {};
+    for (const row of vm.rows) states[row.itemId] = bagAssignEligibility(boundBag, row.itemId, QUEST_STASH.bagSlots);
+    return states;
+  }, [interactive, boundBag, vm.rows]);
+  const bagFullHint = interactive && Object.values(assignStates).some((s) => s === 'bagFull');
   /* Live-region split (no double announce): the bound planner's own region
    * narrates events that carry its poiId; the shelf narrates global events
    * (undefined poiId — commit releases, run-scoped mutations). */
@@ -378,7 +409,7 @@ export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, le
             )}
             {vm.rows.map((row) =>
               interactive ? (
-                <InteractiveStashRow key={row.itemId} row={row} />
+                <InteractiveStashRow key={row.itemId} row={row} assignState={assignStates[row.itemId] ?? 'eligible'} />
               ) : (
                 <StashRowTooltip key={row.itemId} row={row}>
                   <div role="listitem" style={rowChrome(false)}>
@@ -396,6 +427,19 @@ export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, le
               style={{ font: '12px var(--skin-font-serif)', color: 'var(--skin-text-secondary)' }}
             >
               {hydration !== 'ready' ? t('gameFrame.stash.notReady') : t('gameFrame.stash.openHint')}
+            </span>
+          )}
+
+          {/* T3-S2: bound-planner consequence hint — the bag is full, so
+           *  further clicks only announce the `bagFull` reject. The hint
+           *  says it upfront (D7: bag slots render as affordances, the
+           *  shelf explains why a pack can't land). */}
+          {interactive && bagFullHint && (
+            <span
+              data-testid="stash-bag-full-hint"
+              style={{ font: '12px var(--skin-font-serif)', color: 'var(--skin-text-secondary)' }}
+            >
+              {t('gameFrame.stash.bagFullHint')}
             </span>
           )}
 

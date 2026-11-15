@@ -56,6 +56,17 @@ invariants:
       StashQtyBadge angolare xN e tooltip condiviso da stashItemFace
     test_refs: 
       - tests/unit/idleVillage/villageStash.itemFace.test.tsx
+  - id: village-stash-panel.INV-2
+    source: plan
+    source_ref: PLAN-119
+    statement: >-
+      T3-S2 (artifact-r004 D7): in modo bound ogni riga dichiara la propria eleggibilità PRIMA del click —
+      `data-assign-state` = eligible | packed | bagFull, derivato via `bagAssignEligibility` sulla bag
+      sparsa `bags[activeStashOwner]` (stessa logica dei reject del ledger, mai una seconda autorità:
+      il click passa sempre a `store.assign`, i reject annunciano via lastEvent). Bag piena ⇒ hint
+      localizzato `stash-bag-full-hint` (`gameFrame.stash.bagFullHint`); read-only ⇒ nessun marker.
+    test_refs:
+      - tests/unit/idleVillage/r339BagAssign.test.tsx
 ---
 # village-stash-panel
 

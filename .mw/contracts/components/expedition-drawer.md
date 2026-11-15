@@ -47,11 +47,14 @@ invariants:
     source: plan
     source_ref: PLAN-119
     statement: >-
-      Il blocco `risk-rewards` riserva la cella costo (`cassetto-cost-slot`, `data-placeholder`
-      = cost-preview) tra rischio e ricompense per la preview food-cost di S2 — segnaposto flaggato,
-      intenzionalmente vuoto e non interattivo, nessuna superficie dipinta sull'arte firmata.
+      Il blocco `risk-rewards` riserva la cella costo (`cassetto-cost-slot`) tra rischio e ricompense
+      per la preview food-cost: senza `quest.costPreview` resta il segnaposto flaggato
+      (`data-placeholder` = cost-preview, `aria-hidden`); con la preview (T3-S2) mostra caption
+      localizzata + icona + qty — in entrambe le forme `pointer-events: none`, mai interattiva,
+      nessuna superficie dipinta sull'arte firmata.
     test_refs:
       - tests/unit/idleVillage/r339ExpeditionDrawer.test.tsx
+      - tests/unit/idleVillage/r339BagAssign.test.tsx
   - id: expedition-drawer.INV-5
     source: plan
     source_ref: PLAN-119

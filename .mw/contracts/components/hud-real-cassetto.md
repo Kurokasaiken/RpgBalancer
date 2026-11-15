@@ -35,8 +35,7 @@ invariants:
     source_ref: PLAN-119
     statement: >-
       Il tap su uno slot party VUOTO (unico evento che il rack emette su seat vuoto) è cablato a
-      `onOpenRoster` → `useExpeditionRail.getState().open('roster')` nella pagina — la rail Roster|Stash
-      docked (T5) è la superficie di pick; il Detail converte la prop.
+      `onOpenRoster` → `panels.set('roster', true)` nella pagina; il Detail converte la prop.
     test_refs:
       - tests/unit/idleVillage/r339ExpeditionStates.test.tsx
   - id: hud-real-cassetto.INV-4
@@ -49,4 +48,17 @@ invariants:
       l'art non si distorce).
     test_refs:
       - tests/unit/idleVillage/r339ExpeditionStates.test.tsx
+  - id: hud-real-cassetto.INV-5
+    source: plan
+    source_ref: PLAN-119
+    statement: >-
+      T3-S2: `quest.costPreview` riempie `cassetto-cost-slot` con caption localizzata
+      (`gameFrame.cassetto.cost`), icona `res-<icon>-64` e qty; `insufficient` applica il tono
+      danger (`data-tone="danger"`). Il Detail la deriva da
+      `expeditionFoodCost(partySize, totalDays, globalRules.foodConsumptionPerResidentPerDay)`
+      confrontata alla food viva della readout; i bag-slot frames specchiano il ledger sparso
+      `bags[poi.id]` (posizioni fisse — mai re-index denso di `selectedItemIds`).
+    test_refs:
+      - tests/unit/idleVillage/r339BagAssign.test.tsx
+      - tests/unit/idleVillage/r337CassettoBagSlots.test.tsx
 ---

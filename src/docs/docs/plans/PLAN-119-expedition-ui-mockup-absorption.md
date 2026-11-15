@@ -39,10 +39,11 @@ Zustand + pan/zoom clamp al rettangolo libero).
   `QuestBanner`, `PartySlots`, `BagSlots`, `JourneyStrip` ("N days" + "Total: N days"),
   `RiskRewards`, `LaunchCta`.
 - **T3** Slot party/bag: vuoto = icona ruolo + drop target; pieno = ritratto; selettore
-  condiviso col roster; **tap slot party vuoto → apre rail su tab Roster, tap membro →
-  riempie lo slot** (secondo passo esplicito, nota Claude); bag slot display-only (S2).
+  condiviso col roster; **tap slot party vuoto → apre il pannello roster
+  (`panels.roster`), tap membro → riempie lo slot** (secondo passo esplicito,
+  nota Claude); bag slot display-only (S2).
 - **T4** Stati CTA: enabled / disabled + motivo inline (party incompleto) / hidden-in-empty.
-- **T5** Colonna Roster|Stash: tab segmentati, ritratti, barre config-driven, righe stash
+- **T5** ~~Colonna Roster|Stash: tab segmentati, ritratti, barre config-driven, righe stash~~ **REVERTED 2026-11-15 (ruling Director): roster e stash restano superfici sempre divise e separate** — vedi banner nel ledger T5.
   icona+nome+una riga effetto, stat-chip compatti per membro nel tab Stash, persistente
   di default con collapse chip; altezza max sopra il medaglione bottom-left (inset).
 - **T6** Top chrome: day banner + resource bar snelliti **a sinistra/centro** (top-right
@@ -114,7 +115,7 @@ riservata da D10). Nessuna modifica a regole gameplay/quest.
 - ESLint scopato: i file `src/ui/idleVillage/**` e `tests/unit/**` risultano ignored dalla config — copertura lint non significativa.
 - `tests/i18n/icuInterpolation.test.ts`: 2 failure preesistenti su placeholder `{{...}}` legacy in `questGenLab` — NON causati da questa slice.
 
-**Non fatto (prossime sessioni):** T1 token skin (clamp 360/23vw/460, detents), ~~T2 struttura completa oltre l'esistente~~ (fatto, vedi ledger T2), T3 bag assign (S2), ~~T6 top chrome + sole + zona Chronicle~~ (fatto, vedi ledger T6), T8 mobile bottom-sheet, cablaggio insets→safeFit. File sporchi della sessione parallela (voce R-338, poi-radial, reliquary/cassettoDetail) non toccati né committati.
+**Non fatto (prossime sessioni):** T1 token skin (clamp 360/23vw/460, detents), ~~T2 struttura completa oltre l'esistente~~ (fatto, vedi ledger T2), ~~T3 bag assign (S2)~~ (fatto, vedi ledger T3/S2), ~~T6 top chrome + sole + zona Chronicle~~ (fatto, vedi ledger T6), T8 mobile bottom-sheet, cablaggio insets→safeFit. File sporchi della sessione parallela (voce R-338, poi-radial, reliquary/cassettoDetail) non toccati né committati.
 
 ### Seal + contratti (2026-11-15, ruling Director)
 - `trusted:seal` eseguito (×2): BASE = HEAD. Errori miei risolti: unità `expedition-edge-tab` creata (INV-1, ex INV-5), inventory rigenerato via `componentInventory.ts --write`, scaffold `place-fan-cards` auto-creato. Push su main.
@@ -122,7 +123,19 @@ riservata da D10). Nessuna modifica a regole gameplay/quest.
 
 ## Ledger — T5 colonna Roster|Stash (2026-11-15, stessa sessione)
 
-**Fatto:**
+> **REVERTED — ruling Director 2026-11-15:** *«qualche AI ha mischiato roster e
+> stash su /game, riportalo com'era prima»*. La colonna unica Roster|Stash è
+> stata rimossa (`RosterStashRail`, `useExpeditionRail`, test e contratto
+> `roster-stash-rail` cancellati; `onOpenRoster` → `panels.set('roster', true)`;
+> INV-3 ripristinata; config `rail.*` e i18n `gameFrame.rail.*` rimossi;
+> eccezione coverage dello store ritirata). **Invariante registrata: roster e
+> stash su /game restano superfici SEMPRE divise e separate** — il roster è il
+> pannello flottante `panels.roster` (`MatericRosterComponentV2`), lo stash è il
+> magazzino `panels.villageStash` (`VillageStashPanel`); nessuna colonna, tab o
+> superficie unificata. Chiunque proponga di nuovo una fusione deve passare da
+> ruling Director esplicito. Il ledger sotto resta come storia.
+
+**Fatto (poi revertito, vedi banner sopra):**
 - `RosterStashRail` (`components/gameFrame/`): docked `left:0`, `HudPlaque` panel 320px, top `rail.marginPx`, bottom `rail.bottomInsetPx` (D8 — sopra il medaglione voce). Tab segmentati Roster|Stash; collapse chip come unica forma ripiegata; expanded di default (D2).
 - Roster tab: riga per membro — medaglione ritratto (`getResidentPortraitUrl`), nome, badge `Lv N` (`heroLevelView`), stato (`zanaraRosterState` + `roster.status.locked`/zanara.state.*), barre da `rail.bars` in config (hp/stamina, labelKey + token skin `--skin-statbar-*` — config-driven, zero hardcode).
 - Stash tab: stat-chip compatti per membro (ritratto+nome+micro-barre config) poi righe ledger `villageStashViewModel` (tile+nome+una riga effetto ellissata, tooltip completo Radix); click→`assign(owner,itemId)` identico al magazzino quando `activeStashOwner` bound (la pagina ora binda anche con tab Stash aperto, non solo `villageStash` panel).
@@ -142,7 +155,7 @@ riservata da D10). Nessuna modifica a regole gameplay/quest.
 - `GameTopChrome` (`components/gameFrame/`): cluster docked fascia superiore, day banner + resource bar come due `data-hudslot` separati (`time`/`resources`), arte slim firmata `bar-slim.webp` (PLAN-112 F4) via `timeSlimGeometry`/`resourcesSlimGeometry`. Solo blueprint mode — phone/landscape mantengono il chrome full-size esistente.
 - Posizionamento: bordo sinistro = `insets.left/scale + topChrome.marginPx` (segue il fold della rail), bordo destro ≤ `W - chronicleReserve.widthPx` — **zona top-right riservata** alla futura Chronicle docked (D3+D10, niente tab pendente). Fit = min(1, banda/naturale); sotto `topChrome.minFitScale` la riserva cede e il bound duro resta `W - marginPx` (mai fuori schermo).
 - Sole ornamentale (D3): dial di fase riusato — disco `sun.webp`/`moon.webp` + corona tick seduto nell'emerald della slim bar, geometria misurata `timeOfDay.dialSlim` in `gameFrameConfig` (Zod), colori/URL da config.
-- `useGameLayoutInsets.insets.top` pubblicato = `marginPx` + riga scalata (× fit × frame.scale); 0 quando nascosto/smontato; rail continua a possedere `left`, cassetto `right`.
+- `useGameLayoutInsets.insets.top` pubblicato = `marginPx` + riga scalata (× fit × frame.scale); 0 quando nascosto/smontato; cassetto `right`, `left` non posseduto (rail revertita 2026-11-15 — chrome resta a `marginPx`).
 - `HudRealTime`/`HudRealTimeConnected`/`HudRealResources` parametrizzati (variante `slim`/`compact`, bar URL e geometria da config/prop) — nessuna superficie duplicata; chip compatti per gli slot risorse più stretti.
 - Config: `topChrome{marginPx, chronicleReserve.widthPx, minFitScale}` in `cassettoLayoutConfig` (Zod). i18n `gameFrame.topChrome.*` EN/IT; tipi rigenerati.
 - Contratto `.mw/contracts/components/game-top-chrome.md` INV-1..5; riga in `COMPONENT_MASTER_INDEX` via `contracts:index-sync`.
@@ -171,7 +184,7 @@ riservata da D10). Nessuna modifica a regole gameplay/quest.
 
 **Nota T-13 (witness /game):** il witness diretto su `/game?poiDemo=1` è rimasto bloccato dalla tempesta HMR della sessione parallela — 18 navigations in ~170s, boot Pixi (fasi manifest→assets→build→warmup→ready) resettata in loop; un unico quiet window ha raggiunto `phase:"ready"` + `data-map-ready` alle ~163s, poi reload prima del click POI. Stessa componente già witnessata su /game nelle slice T5/T6; il delta T1 è pura estrazione token (verificato computed-identico sul lab). Il probe retry è in `scripts/hud-real/_tmp-probe-game-cta.mjs` per la prossima finestra calma. **Inoltre la prima stesura di questa voce di ledger è stata cancellata dal worktree churn (pull --rebase + checkout della sessione parallela): riapplicata.**
 
-**Misura AC2 (da registrare, non risolta):** con rail 320 + colonna art 420px @1440×900 la mappa libera è (1440-320-420)/1440 = **48,6%** — sotto il 50% "both open" del contratto D4. Il token `widthVwFraction`/clamp era stato pensato per un drawer 360–460px; l'art firmata R-323 (420px) eccede il budget solo a 1440 (a 1366 ≈50,4% e a 1920 ≈59,4% restano sopra). Serve ruling: accettare 48,6%, estendere il mutex band, o ridurre la riserva. Il probe misurato (obbligazione 2) confermerà.
+**Misura AC2 (da registrare, non risolta):** con rail 320 + colonna art 420px @1440×900 la mappa libera è (1440-320-420)/1440 = **48,6%** — sotto il 50% "both open" del contratto D4. Il token `widthVwFraction`/clamp era stato pensato per un drawer 360–460px; l'art firmata R-323 (420px) eccede il budget solo a 1440 (a 1366 ≈50,4% e a 1920 ≈59,4% restano sopra). Serve ruling: accettare 48,6%, estendere il mutex band, o ridurre la riserva. Il probe misurato (obbligazione 2) confermerà. **Risolto dal ruling 2026-11-15:** la rail è stata rimossa del tutto → a 1440 la mappa libera con cassetto aperto torna (1440-420)/1440 ≈ **70,8%**.
 
 **Scope residue del file:** `HudRealCassetto.tsx` mantiene letterali colore legacy fuori dal path CONFIRM (palette `C.*`, risorse, bag slots) — la tokenizzazione completa del file è oltre T1 (flaggato, non fatto in silenzio).
 
@@ -190,4 +203,19 @@ riservata da D10). Nessuna modifica a regole gameplay/quest.
 
 **Nota T-13:** il witness diretto su `/game?poiDemo=1` resta bloccato dalla tempesta HMR della sessione parallela (boot reset in loop, identico a T1) — retry probe `scripts/hud-real/_tmp-probe-game-drawer.mjs`. Il lab monta fixture proprie sopra i chip (debug roster strip x740–1040, POI card sul bordo destro) — occlusioni di laboratorio, non del drawer; click DOM + occluder nascosti solo per gli screenshot dei chip.
 
-### Prossimi: T3 slot/assign affinamenti (S2) · T8 sheet · cablaggio insets→safeFit · gate chiusura R-339.
+## Ledger — T3/S2 bag-assign + food-cost preview (2026-11-15, stessa sessione)
+
+**Fatto:**
+- `expeditionBagAssign.ts` (`components/gameFrame/`, nuovo): due helper puri — `bagAssignEligibility(bag, itemId, bagSlots)` → `eligible | packed | bagFull`, specchio dei reject del ledger (`alreadyInBag`/`bagFull`) sulla bag SPARSA (posizioni fisse, bag assente = `bagSlots` liberi); `expeditionFoodCost(party, days, rate)` = ceil(party × days × `globalRules.foodConsumptionPerResidentPerDay`) — la stessa tariffa del TimeEngine, display-only, input malformati → 0. JSDoc su entrambi.
+- `HudRealCassetto`: `CassettoQuest.costPreview?: { icon, qty, insufficient? }`; la cella riservata `cassetto-cost-slot` ora dipinge caption `gameFrame.cassetto.cost` + icona `res-food-64` + qty, `data-tone="danger"` quando insufficiente — `pointer-events:none` in entrambe le forme, segnaposto flaggato quando la preview manca.
+- `HudRealCassettoDetail` (/game): ripristinato il mirror della bag sparsa — `useVillageStashStore((s) => s.bags[p.poi.id])` + `emptyStashBag().map` (era tornato denso su `selectedItemIds` per churn; `r337CassettoBagSlots` torna verde). `costPreview` derivata da party riempiti × `totalDays` × rate config vs la food viva della `resourceItems` (`id==='food'` → `insufficient`).
+- `HudRealCassettoHost` (lab): stessa formula → `quest={{ ...quest, costPreview }}` — il testimone lab mostra la cella popolata.
+- `VillageStashPanel` (magazzino canonico — superficie separata per ruling Director): righe bound portano `data-assign-state` (eligible → wash accento `--skin-icon-accent`; packed/bagFull → opacity .55, click SEMPRE verso `store.assign` — i reject annunciano via `lastEvent`, nessuna seconda autorità); hint `stash-bag-full-hint` (`gameFrame.stash.bagFullHint` EN+IT) quando la bag è piena e restano righe. Read-only: nessun marker (INV-2).
+- i18n `gameFrame.cassetto.cost` (Cost/Costo) + `gameFrame.stash.bagFullHint`; tipi rigenerati; pseudo rigenerato.
+- Contratti: nuovo `expedition-bag-assign.md` (INV-1/-2); `expedition-drawer.INV-4` emendato (cella popolabile, mai interattiva); `village-stash-panel.INV-2` nuovo (marker eleggibilità); `hud-real-cassetto.INV-5` nuovo (costPreview + mirror sparso). Riga inventory inserita a mano + `contracts:index-sync` eseguito.
+
+**Verifiche:** `r339BagAssign.test.tsx` nuovo **16/16** (helper, cella costo popolata/danger/placeholder, eleggibilità shelf eligible/packed/bagFull/hint/readonly, wiring statico Detail/Panel/Host); suite r339+r337 **62/62 verdi** (r337 incluso — la regression sparse-bag è chiusa dal mirror ripristinato); `i18n:types` OK (`i18n:validate` 217 missing key = debito preesistente `poiDetail`/`testRoster`/`questS1Lab` — nessuna chiave mia); `build:check` OK (`test-results/build-check-2026-11-15.log`); `contracts:index-sync` eseguito (riga `expedition-bag-assign` nel master index; `--check` residui: drift sha + two-owner `gameFrame/menu/*`+`placeFanGeometry` = foreign, documentato, `--write` non forzato; warning "expedition-bag-assign non in inventory" perché la partition vede solo file tracciati — si risolve al commit). Witness headless **lab** (`test-results/r339-t3s2-cost-slot.png` + probe `_tmp-probe-t3s2-cost.mjs`): cella popolata "Cost" + icona food + qty 0 (party lab vuota — 0×giorni×rate è il valore corretto), `pointer-events:none`, placeholder sollevato.
+
+**Nota T-13:** `/game?poiDemo=1` resta bloccato dalla tempesta HMR della sessione parallela (3 round, mai `data-map-ready`) — retry probe `_tmp-probe-t3s2-game.mjs` scritto per la prossima finestra calma (copre cella + `data-assign-state` sulla shelf bound end-to-end). Click roster nel lab non assegna via headless (path click→assign è session/drag-driven, plumbing di laboratorio — non superficie del contratto); il valore non-zero e il tono danger sono coperti dai test unit.
+
+### Prossimi: T8 sheet · cablaggio insets→safeFit · gate chiusura R-339.
