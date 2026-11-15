@@ -1,6 +1,8 @@
 ---
 trigger: glob
-globs: src/ui/**/*.tsx,src/pages/**/*.tsx
+globs:
+  - src/ui/**/*.tsx
+  - src/pages/**/*.tsx
 description: UI invariants for every React surface — default skin system, i18n, Gilded Observatory theme, and game-feel performance budget.
 ---
 

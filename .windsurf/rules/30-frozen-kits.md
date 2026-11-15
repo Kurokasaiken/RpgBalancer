@@ -1,6 +1,9 @@
 ---
 trigger: glob
-globs: src/ui/idleVillage/frozen/**,src/ui/idleVillage/**/*.tsx,src/pages/minimal-*.tsx
+globs:
+  - src/ui/idleVillage/frozen/**
+  - src/ui/idleVillage/**/*.tsx
+  - src/pages/minimal-*.tsx
 description: Frozen Kits invariants for Idle Village components — registration, certification, barrel imports, and TestHub generation.
 ---
 
