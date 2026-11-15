@@ -1,3 +1,18 @@
+## [1.2.0](https://github.com/Kurokasaiken/RpgBalancer/compare/v1.1.0...v1.2.0) (2026-11-15)
+
+### 🚀 Features
+
+* **governance:** governance:check + v1 checks + pre-commit (PLAN-122 T-2..T-5) ([bd4246b](https://github.com/Kurokasaiken/RpgBalancer/commit/bd4246b51eebf655d019c3d9978791c65aaffb03))
+* **governance:** invariant ledger + enforcement matrix (PLAN-121 T-0/T-1) ([15d7c2b](https://github.com/Kurokasaiken/RpgBalancer/commit/15d7c2b2eef51d1fb886cc0c7d902aca0c7196a4))
+
+### 🐛 Bug Fixes
+
+* **governance:** remove bringToFront violations; restore foreground:lint to staged scope ([d06ca63](https://github.com/Kurokasaiken/RpgBalancer/commit/d06ca631289ffc4a3f43f3b93384d5ddf982d226))
+
+### 📚 Documentation
+
+* **plan:** renumber enforcement-matrix plan to PLAN-122 (collision) ([1da7f81](https://github.com/Kurokasaiken/RpgBalancer/commit/1da7f819f88feb4482c5b1e8b498235fd89eea4b))
+
 ## [1.1.0](https://github.com/Kurokasaiken/RpgBalancer/compare/v1.0.0...v1.1.0) (2026-11-15)
 
 ### 🚀 Features
