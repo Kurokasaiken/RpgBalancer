@@ -5,7 +5,7 @@ const out = {};
 const p = await b.newPage({ viewport: { width: 1440, height: 900 } });
 p.on('pageerror', e => console.log('[pageerror]', String(e).slice(0, 300)));
 p.on('console', m => { if (m.type() === 'error') console.log('[console.error]', m.text().slice(0, 300)); });
-await p.goto('http://localhost:5174/game?poiDemo=1', { waitUntil: 'domcontentloaded', timeout: 60000 });
+await p.goto('http://localhost:5173/game?poiDemo=1', { waitUntil: 'domcontentloaded', timeout: 60000 });
 for (let i = 0; i < 40; i++) {
   const ok = await p.evaluate(() => document.querySelector('[data-testid="roster-stash-rail"]') !== null);
   if (ok) break;
@@ -57,7 +57,7 @@ await p.close();
 /* D — narrow viewport 1024: rail still mounts; ledger sees left inset. */
 const q = await b.newPage({ viewport: { width: 1024, height: 768 } });
 q.on('pageerror', e => console.log('[narrow pageerror]', String(e).slice(0, 300)));
-await q.goto('http://localhost:5174/game?poiDemo=1', { waitUntil: 'domcontentloaded', timeout: 60000 });
+await q.goto('http://localhost:5173/game?poiDemo=1', { waitUntil: 'domcontentloaded', timeout: 60000 });
 for (let i = 0; i < 40; i++) {
   const ok = await q.evaluate(() => document.querySelector('[data-testid="roster-stash-rail"],[data-testid="rail-expand-chip"]') !== null);
   if (ok) break;
