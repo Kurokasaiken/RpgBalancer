@@ -15,8 +15,11 @@
  *
  * The fold state lives in `useExpeditionDrawer` (Zustand): the drawer
  * mounts deep inside the session's `wrapDetail`, and sibling surfaces —
- * the rail's ≤1100px mutex today, the T8 sheet tomorrow — may need to
- * read or steer it from outside.
+ * the T8 sheet — may need to read or steer the fold from outside.
+ *
+ * T8 (mutual exclusion of the lateral surfaces, AC10): at or below
+ * `bottomSheet.maxWidthPx` this component mounts `ExpeditionBottomSheet`
+ * instead — the signed column and BOTH chips never mount in that band.
  */
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -30,6 +33,7 @@ import {
   type HudRealCassettoProps,
 } from '@/ui/idleVillage/hudReal/HudRealCassetto';
 import { EngravedIcon } from './engravedIcons';
+import { ExpeditionBottomSheet, useExpeditionSheetMode } from './ExpeditionBottomSheet';
 
 const DRAWER = CASSETTO_LAYOUT_CONFIG.drawer;
 
@@ -44,18 +48,28 @@ export const ExpeditionDrawer: React.FC<ExpeditionDrawerProps> = ({ visible = tr
   const setExpanded = useExpeditionDrawer((s) => s.setExpanded);
   const publish = useGameLayoutInsets((s) => s.publish);
   const spec = useCassettoColumnSpec();
+  /* T8: in the ≤`bottomSheet.maxWidthPx` band the sheet is the only
+   *  expedition form — the column and both chips never mount. */
+  const sheetMode = useExpeditionSheetMode();
 
   /* Honest occupancy while folded: the chip publishes `chipWidthPx`. While
    *  expanded `insets.right` is owned by the column itself (its own effect,
    *  hud-real-cassetto.INV-4) — this effect must NOT publish in that mode or
-   *  it would clobber the child's measure on the same commit. */
+   *  it would clobber the child's measure on the same commit. In the sheet
+   *  band `insets.right` stays 0 (the lateral surface does not exist). */
   useEffect(() => {
-    if (!visible || expanded) return;
+    if (!visible || expanded || sheetMode) return;
     publish({ right: DRAWER.chipWidthPx });
     return () => publish({ right: 0 });
-  }, [visible, expanded, publish]);
+  }, [visible, expanded, sheetMode, publish]);
 
   if (!visible) return null;
+
+  /* T8/AC10 mutual exclusion: the lateral drawer never mounts ≤1100 — the
+   *  same props flow into the non-modal bottom sheet instead. */
+  if (sheetMode) {
+    return <ExpeditionBottomSheet {...cassettoProps} visible={visible} />;
+  }
 
   /* The fold chip hugs the column's live left edge: right offset =
    *  `min(aspect × 100vh, widthMaxPx)` — the same width rule the column

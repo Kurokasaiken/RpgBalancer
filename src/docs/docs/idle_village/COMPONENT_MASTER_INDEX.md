@@ -265,6 +265,7 @@ La fonte normativa è `.mw/contracts/**` + `.mw/contracts/components/inventory.j
 | `drop-feedback-ui` | ui-component | 2 | `src/ui/idleVillage/components/DropFeedbackUI.tsx` | `.mw/contracts/components/drop-feedback-ui.md` |
 | `engraved-icons` | ui-component | 2 | `src/ui/idleVillage/components/gameFrame/engravedIcons.tsx` | `.mw/contracts/components/engraved-icons.md` |
 | `expedition-bag-assign` | ui-component | 2 | `src/ui/idleVillage/components/gameFrame/expeditionBagAssign.ts` | `.mw/contracts/components/expedition-bag-assign.md` |
+| `expedition-bottom-sheet` | ui-component | 2 | `src/ui/idleVillage/components/gameFrame/ExpeditionBottomSheet.tsx` | `.mw/contracts/components/expedition-bottom-sheet.md` |
 | `expedition-drawer` | ui-component | 2 | `src/ui/idleVillage/components/gameFrame/ExpeditionDrawer.tsx` | `.mw/contracts/components/expedition-drawer.md` |
 | `expedition-edge-tab` | ui-component | 2 | `src/ui/idleVillage/components/gameFrame/ExpeditionEdgeTab.tsx` | `.mw/contracts/components/expedition-edge-tab.md` |
 | `field-grain` | ui-component | 2 | `src/ui/visualFidelityLab/FieldGrain.tsx` | `.mw/contracts/components/field-grain.md` |

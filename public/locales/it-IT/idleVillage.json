@@ -1579,6 +1579,10 @@
         "return": "Ritorno"
       }
     },
+    "sheet": {
+      "expand": "Solleva il planner della spedizione",
+      "collapse": "Abbassa il planner della spedizione"
+    },
     "topChrome": {
       "ariaLabel": "Giorno e risorse"
     }
