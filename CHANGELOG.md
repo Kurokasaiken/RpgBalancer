@@ -1,3 +1,23 @@
+## [1.1.0](https://github.com/Kurokasaiken/RpgBalancer/compare/v1.0.0...v1.1.0) (2026-11-15)
+
+### 🚀 Features
+
+* **ops:** context inventory tool + Phase-0 measurement (R-342) ([9d8504a](https://github.com/Kurokasaiken/RpgBalancer/commit/9d8504a37da12b74c484a7a9214d35367360cca8))
+
+### 🐛 Bug Fixes
+
+* **deploy:** regenerate deploy-manifest.json after T6 slim-bar refs ([c02efdf](https://github.com/Kurokasaiken/RpgBalancer/commit/c02efdf7912d05498ac6e9da213970ebf4f3057f))
+* **rules:** globs CSV → YAML sequence — 4 glob rules never loaded ([aca97bc](https://github.com/Kurokasaiken/RpgBalancer/commit/aca97bcbf5c9904725590d1ca9b6e1528ef60b7e))
+
+### 📚 Documentation
+
+* **plan:** PLAN-121 draft — invariant→enforcement matrix (R-342 Phase-3) ([014e40a](https://github.com/Kurokasaiken/RpgBalancer/commit/014e40af82f14b2ba96a07a54cd5e245f7d36a07))
+* **traps:** T-29 deploy-manifest drift + T-13 closure:lint tsx child hang ([f1af387](https://github.com/Kurokasaiken/RpgBalancer/commit/f1af3878c1c419ca1aa960bc5ebecd887b63b60e))
+
+### 🔧 Chores
+
+* **contracts:** mechanical resync — inventory, skeletons, scope_files ([75bea3e](https://github.com/Kurokasaiken/RpgBalancer/commit/75bea3e2680f0d1bda0084aa0e87bdb9a19266cd))
+
 ## 1.0.0 (2026-11-15)
 
 ### 🚀 Features
