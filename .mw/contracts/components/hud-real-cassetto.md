@@ -7,7 +7,6 @@ root_file: src/ui/idleVillage/hudReal/HudRealCassetto.tsx
 scope_files:
   - src/ui/idleVillage/hudReal/HudRealCassetto.tsx
   - src/ui/idleVillage/hudReal/HudRealCassettoDetail.tsx
-  - src/ui/idleVillage/components/gameFrame/ExpeditionEdgeTab.tsx
   - src/ui/idleVillage/store/useGameLayoutInsets.ts
 fast_checks:
   - tests/unit/idleVillage/r337CassettoBagSlots.test.tsx
@@ -47,14 +46,6 @@ invariants:
       la azzera allo smontaggio — fondazione per safeFit/pan-clamp. La larghezza è `aspect × viewportH`
       cappata a `CASSETTO_LAYOUT_CONFIG.drawer.widthMaxPx` (clamp T1: sopra la soglia la colonna si accorcia,
       l'art non si distorce).
-    test_refs:
-      - tests/unit/idleVillage/r339ExpeditionStates.test.tsx
-  - id: hud-real-cassetto.INV-5
-    source: plan
-    source_ref: PLAN-119
-    statement: >-
-      Senza quest selezionata la superficie expedition si riduce a `ExpeditionEdgeTab` docked sul bordo destro
-      con il meccanismo esplicitato (seleziona un quest marker); nessun pannello/modal; il tab non ruba input alla mappa.
     test_refs:
       - tests/unit/idleVillage/r339ExpeditionStates.test.tsx
 ---
