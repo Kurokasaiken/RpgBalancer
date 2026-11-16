@@ -9,10 +9,10 @@
       "id": "hut-far-1",
       "file": "hut-far-1.webp",
       "box": [
-        1564,
-        760,
-        200,
-        222
+        1560,
+        750,
+        175,
+        231
       ],
       "source": "painting"
     },
@@ -31,10 +31,10 @@
       "id": "hut-far-2",
       "file": "hut-far-2.webp",
       "box": [
-        1697,
-        555,
-        323,
-        447
+        1731,
+        743,
+        275,
+        225
       ],
       "source": "painting"
     },
@@ -42,10 +42,10 @@
       "id": "house-stone-mid",
       "file": "house-stone-mid.webp",
       "box": [
-        1917,
-        528,
-        483,
-        554
+        1946,
+        558,
+        417,
+        413
       ],
       "source": "painting"
     },
@@ -53,10 +53,10 @@
       "id": "house-thatch-big",
       "file": "house-thatch-big.webp",
       "box": [
-        2255,
-        252,
-        777,
-        830
+        2366,
+        343,
+        665,
+        625
       ],
       "source": "painting"
     },
@@ -64,10 +64,10 @@
       "id": "house-east-edge",
       "file": "house-east-edge.webp",
       "box": [
-        2818,
-        121,
-        350,
-        961
+        3003,
+        83,
+        165,
+        930
       ],
       "source": "painting"
     },
@@ -98,9 +98,9 @@
       "file": "house-big-west.webp",
       "box": [
         0,
-        279,
-        795,
-        773
+        268,
+        723,
+        745
       ],
       "source": "painting"
     }
