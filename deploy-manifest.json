@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-17T14:47:00.539Z",
+  "generated": "2026-11-17T20:53:28.744Z",
   "generator": "scripts/deploy/deployManifest.mjs",
   "profile": "slim",
   "keptRoutes": [

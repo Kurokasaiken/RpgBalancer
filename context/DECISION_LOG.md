@@ -635,3 +635,14 @@ contraddicono la semantica config NON si portano (stamina ambrata > teal AI).
 - Packaging/bundling **killato** sotto il gate ≥2s riproducibile.
 - Il collo residuo è decode/scheduling (SwiftShader) e request fan-out + CDN tail (GPU): la leva byte (Fase B) resta utile sul piano decode ma non basta da sola a spiegare i ~122s prod — attesa forte componente di varianza CDN/env del probe.
 **Fonte:** `.mw/runs/plan126-boot-bytes/T-A-findings.md`, `har-budget.json`, `timing-*.json`, `ab-packaging.json`.
+
+## 2026-11-17 — R-358 / PLAN-126: ruling D-1 — parità visiva approvata, T-B4 sbloccato
+**Da:** D-1 aperta dal battesimo; pipeline che baka `game-grade-*` lossless per scelta (matematica affine) e canopy v2hi a q95.
+**Metodo (OB-4):** pixel-diff `asset-pixel-diff.py` (soglia RGB=8) su varianti q75/q80/q85 + **live in-game** prima/dopo via request interception (Metal GPU, 3200×2000@2x, nessuna modifica a public/ durante il test) — `.mw/runs/plan126-boot-bytes/d1-live/`.
+**A (verbatim Director):** *"approvo"* (dopo «testiamo» e «devo vedere il risultato dal vivo»).
+**Approvato:**
+- `game-grade-mult.webp` + `game-grade-add.webp`: lossless → **q85** (leva maggiore, ~3.5MB → ~0.48MB).
+- Tutti i 40 `*.canopy.v2hi.webp`: q95 → **q85** (diff live indistinguibili a zoom 2.0).
+- `assets/ui/bg.webp`: → **q75** (worst case testato live, indistinguibile sotto overlay).
+- Nessun downscale; T-B3 confermava i sorgenti prevalentemente sottocampionati (maxZoom=3, DPR2).
+**Fonte:** `d1-live/` compositi, `d1-variants/report/` pixel-diff, `director-signoff.json` nel run dir.

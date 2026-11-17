@@ -517,4 +517,11 @@ Triage 2026-10-12 (R-156): 28 voci chiuse su evidenza kanban/artefatto — `cont
 - **Fase B parziale**: T-B1 audit bake pipeline (`T-B1-bake-audit.md`) — lever maggiori: canopies v2hi + `game-grade-*` sheets **intenzionalmente lossless** → ruling D-1 richiesto; T-B2 harness pixel-diff pronto (`scripts/asset-pixel-diff.py`); T-B3 parziale (maxZoom=3+DPR2 → la maggior parte dei sorgenti è sottocampionata, non ridondante; `ui/bg.webp` 2816×1536 borderline).
 - **OB-3 test permanente**: `tests/unit/idleVillage/gameBootAssets.test.ts` 2/2 — golden set 352 path boot (14.38MB baseline) risolve in public/, budget ≤ baseline×1.10.
 - **Bloccanti residui**: OB-4 eyeball Director su pixel-diff (serve D-1 ruling sulle famiglie lossless), OB-5 probe post-deploy, OB-6 bundle; T-D1 spike KTX2 non avviato.
-- **Instrumentation aggiunta**: `performance.mark('game-boot:<phase>')` in `PixiWorldMap.emitBootProgress` + mark `uploaded` post `prepare.upload` — solo misura, zero cambio comportamento.
+- **Instrumentation**: `performance.mark('game-boot:<phase>')` al page seam `game-mappa2.tsx` (PixiWorldMap è sealed `game-frame-pixi.INV-1` — marks pipeline in patch nel run dir).
+
+**Progresso (2026-11-17, D-1 + T-B4):**
+- **D-1 ruling Director: «approvo»** dopo live in-game before/after (request interception, GPU Metal, 3200×2000) — OB-4 PASS, soglia diff RGB=8 (`director-signoff.json`).
+- **T-B4 applicato**: grade sheets →q85 (3.48MB→0.48MB), 40 canopy v2hi →q85 (−24.5%), bg.webp →q75 (−54%). **Wire golden set 14.38MB → 10.23MB (−29%)**. Bake pipeline allineata (`build-mappa2-tiles.py`, `build-mappa2-game-grade.py`).
+- **Smoke prod build**: `/game` interactive **4485ms** su Metal (era 7.2s), 43 URL swappate 200 OK, zero 404.
+- **T-D1 spike KTX2**: CONDITIONAL GO — leva VRAM/wire non boot-time (transcode single-worker serializza, più lento del decode WebP nativo parallelo); UASTC NO. Killato come leva boot.
+- **Residui**: OB-5 probe post-deploy, OB-6 bundle, chiusura.
