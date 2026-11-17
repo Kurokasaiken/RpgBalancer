@@ -1146,7 +1146,16 @@
         "released": "{item} returned to the store",
         "swapped": "{item} packed — the displaced item returned to the store",
         "releasedAll": "Bag emptied — every item returned to the store"
-      }
+      },
+      "filterLabel": "Filter goods",
+      "tabs": {
+        "all": "All",
+        "equipment": "Equipment",
+        "consumable": "Consumables"
+      },
+      "filterEmpty": "Nothing of this kind in store",
+      "detailLabel": "Item details",
+      "pack": "Pack"
     },
     "buildings": {
       "stash": {
@@ -1571,9 +1580,6 @@
       "confirmReason": {
         "partyIncomplete": "Party incomplete — fill the required slots",
         "unavailable": "Expedition not ready yet"
-      },
-      "edgeTab": {
-        "hint": "Select a quest marker"
       },
       "demo": {
         "subtitle": "Plan the expedition"

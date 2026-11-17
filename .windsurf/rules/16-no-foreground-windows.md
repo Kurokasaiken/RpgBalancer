@@ -1,3 +1,8 @@
+---
+trigger: model_decision
+description: "Hard rule (CTR-foreground-001): never open windows, apps or browsers in the foreground; all automated browser runs must be headless or background. Load when doing any browser/preview/probe automation."
+---
+
 # No Foreground Windows (ALL SKILLS)
 
 Applies to **every skill, agent, plan, script, and task** that can open a window, browser, app, or preview — automated or interactive. This is the RPG port of Director ruling CTR-foreground-001 (Mind Weaver, `mind-weaver/.mw/contracts/ui-focus.md`, 2026-10-15), issued after an agent opened Chrome for Testing in the foreground.

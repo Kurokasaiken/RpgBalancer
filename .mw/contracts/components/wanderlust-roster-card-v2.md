@@ -9,7 +9,18 @@ scope_files:
 fast_checks: []
 e2e_checks: []
 e2e_trigger_globs: []
-invariants: []
+invariants:
+  - id: wanderlust-roster-card-v2.INV-1
+    source: plan
+    source_ref: R-353
+    statement: >-
+      R-353 mockup row (mockup-stash-grid.jpg, ruling: restyle estetico, pannelli flottanti):
+      la strip compact monta il medaglione firmato C1 (data-wanderlust-portrait wrappa
+      C1Medallion ring+ritratto), nome oro display, doppia barra valori HP/stamina e
+      hairline incisa — nessun filetto-box; `data-density="compact"` marca la riga per
+      l'anchor badge del decor.
+    test_refs:
+      - tests/unit/idleVillage/r353RosterRow.test.tsx
 ---
 
 # wanderlust-roster-card-v2

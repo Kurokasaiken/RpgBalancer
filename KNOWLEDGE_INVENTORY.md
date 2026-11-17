@@ -1,8 +1,9 @@
-> **STATUS: HISTORICAL (one-shot PLAN-011, 2026-08-30 — 648 file mai rivisti)** — KB audit 2026-10-05 (desiderata v25, `KNOWLEDGE_AUDIT.md`). Canonico: KNOWLEDGE_AUDIT.md.
-
 # Knowledge Inventory
 
-## canonical (48)
+## canonical (50)
+- `src/docs/docs/architecture_state.md` — Architecture Router — RPG Balancer  
+  - markers: canonical  
+  - reason: trusted/frozen/canonical marker or ADR  
 - `src/docs/docs/art-direction/creatures/creatures/bronze-relic-guardian/decision-log.md` — Bronze Relic Guardian — Decision Log  
   - markers: canonical  
   - reason: trusted/frozen/canonical marker or ADR  
@@ -102,6 +103,9 @@
 - `src/docs/docs/art-direction/creatures/registry.md` — Creature Registry  
   - markers: canonical  
   - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/balancer/balance_model_v1.md` — Balance Model v1 — Canonical Mathematical Specification (Draft)  
+  - markers: canonical  
+  - reason: trusted/frozen/canonical marker or ADR  
 - `src/docs/docs/idle_village/roster_trusted_components.md` — Idle Village Roster – Canonical Snapshot (2026-03-03)  
   - markers: canonical  
   - reason: trusted/frozen/canonical marker or ADR  
@@ -146,17 +150,13 @@
   - markers: frozen  
   - reason: trusted/frozen/canonical marker or ADR  
 
-## candidate (648)
+## candidate (1808)
 - `src/docs/docs/ACTIVITY_ACTION_CARD_MIGRATION.md` — ActivityCapsule Migration Guide  
   - reason: documentation, pending canonical review  
 - `src/docs/docs/ACTIVITY_CAPSULE_TESTING_PLAN.md` — ActivityCapsule Testing Plan  
   - markers: decision  
   - reason: documentation, pending canonical review  
 - `src/docs/docs/ARCHITECTURE.md` — RPG Balancer - Technical Architecture  
-  - reason: documentation, pending canonical review  
-- `src/docs/docs/ARCHITECTURE_BIBLE.md` — RPG Balancer — Architecture & Strategy Bible  
-  - reason: documentation, pending canonical review  
-- `src/docs/docs/ARCHITECTURE_REFERENCE.md` — Single Source of Truth - Architecture Reference  
   - reason: documentation, pending canonical review  
 - `src/docs/docs/BALANCING_DEEP_DIVE.md` — 🔬 Balancing Deep Dive: Analysis & Findings  
   - reason: documentation, pending canonical review  
@@ -173,8 +173,6 @@
   - reason: documentation, pending canonical review  
 - `src/docs/docs/COMPONENT_SKIN_INTEGRATION_GUIDE.md` — Component Skin Integration Guide  
   - reason: documentation, pending canonical review  
-- `src/docs/docs/DEVELOPMENT_GUIDELINES.md` — RPG Balancer – Development Guidelines  
-  - reason: documentation, pending canonical review  
 - `src/docs/docs/DOCUMENTATION_GOVERNANCE.md` — Idle Village Documentation Governance Pack  
   - reason: documentation, pending canonical review  
 - `src/docs/docs/FILENAMES_METADATA.json` — FILENAMES_METADATA  
@@ -184,8 +182,6 @@
 - `src/docs/docs/IMPLEMENTATION_PLANS_INDEX.md` — Implementation Plans Index - RPG Balancer Project  
   - reason: documentation, pending canonical review  
 - `src/docs/docs/IMPLEMENTED_PLAN.md` — IMPLEMENTED PLAN  
-  - reason: documentation, pending canonical review  
-- `src/docs/docs/MASTER_PLAN.md` — 🎯 RPG Balancer - MASTER PLAN  
   - reason: documentation, pending canonical review  
 - `src/docs/docs/PROJECT_PHILOSOPHY.md` — RPG Balancer - Project Philosophy & Design System  
   - reason: documentation, pending canonical review  
@@ -278,8 +274,6 @@
   - reason: documentation, pending canonical review  
 - `src/docs/docs/architecture/idle_village_complete_architecture.md` — Idle Village - Complete Architecture Documentation  
   - reason: documentation, pending canonical review  
-- `src/docs/docs/architecture_state.md` — 🗺️ Project Architecture State Index  
-  - reason: documentation, pending canonical review  
 - `src/docs/docs/archive/2026-Q1/CODE_AUDIT_REPORT.md` — Code Audit Report - RPG Balancer Project  
   - reason: documentation, pending canonical review  
 - `src/docs/docs/archive/2026-Q1/GAME_VISION_IDLE_INCREMENTAL.md` — Idle Incremental RPG – Game Vision  
@@ -355,13 +349,107 @@
   - reason: documentation, pending canonical review  
 - `src/docs/docs/archmage/spell_lifecycle_telemetry_plan.md` — Spell Lifecycle Telemetry Plan  
   - reason: documentation, pending canonical review  
+- `src/docs/docs/art-direction/composition_archetypes.md` — Composition Archetypes — taxonomy & selection system (v1, 2026-10-24)  
+  - reason: documentation, pending canonical review  
 - `src/docs/docs/art-direction/creatures/creatures/gnarled-nightmare/versions/v0.1.0.md` — Gnarled Nightmare v0.1.0 — Goblin Concept  
   - reason: documentation, pending canonical review  
 - `src/docs/docs/art-direction/creatures/creatures/gnarled-nightmare/versions/v0.2.0.md` — Gnarled Nightmare v0.2.0 — Parasitic Wooden Organism  
   - reason: documentation, pending canonical review  
 - `src/docs/docs/art-direction/creatures/creatures/gnarled-nightmare/versions/v0.3.0.md` — Gnarled Nightmare v0.3.0 — Family Reference Candidate  
   - reason: documentation, pending canonical review  
+- `src/docs/docs/art-direction/creatures/creatures/goblin/decision-log.md` — Goblin — Decision Log  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/art-direction/creatures/creatures/goblin/identity.md` — Goblin — Identity Card  
+  - markers: candidate  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/art-direction/creatures/creatures/goblin/prompt.md` — Goblin — Image Prompt Injection  
+  - markers: candidate  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/art-direction/creatures/creatures/goblin/versions/v0.1.0.md` — Goblin v0.1.0 — candidate  
+  - markers: candidate  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/art-direction/creatures/creatures/gohul-combattente/identity.md` — Gohul Combattente — Identity Card  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/art-direction/creatures/creatures/gohul-combattente/reference-card.md` — Gohul Combattente — Reference Card  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/art-direction/creatures/creatures/gohul-esploratore/identity.md` — Gohul Esploratore — Identity Card  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/art-direction/creatures/creatures/gohul-esploratore/reference-card.md` — Gohul Esploratore — Reference Card  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/art-direction/creatures/creatures/guardia-reale/identity.md` — Guardia Reale — Identity Card  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/art-direction/creatures/creatures/guardia-reale/reference-card.md` — Guardia Reale — Reference Card  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/art-direction/creatures/creatures/regina-ibridi/decision-log.md` — Regina degli Ibridi — Decision Log  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/art-direction/creatures/creatures/regina-ibridi/design-intent.md` — Regina degli Ibridi — Design Intent  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/art-direction/creatures/creatures/regina-ibridi/identity.md` — Regina degli Ibridi  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/art-direction/creatures/creatures/regina-ibridi/prompt.md` — Regina degli Ibridi — Image Prompt (Prompt Engineering V2, §10.3)  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/art-direction/creatures/creatures/regina-ibridi/reference-card.md` — Regina degli Ibridi — Reference Card  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/art-direction/creatures/creatures/regina-pathfinder/decision-log.md` — Il Pathfinder della Regina — Decision Log  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/art-direction/creatures/creatures/regina-pathfinder/identity.md` — Il Pathfinder della Regina — Identity Card  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/art-direction/creatures/creatures/regina-pathfinder/prompt.md` — Il Pathfinder della Regina — Image Prompt (Prompt Engineering V2, §10.3)  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/art-direction/creatures/creatures/regina-pathfinder/reference-card.md` — Il Pathfinder della Regina — Reference Card  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/art-direction/creatures/creatures/uomini-rana/decision-log.md` — Uomini-Rana — Decision Log  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/art-direction/creatures/creatures/uomini-rana/design-intent.md` — Uomini-Rana — Design Intent  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/art-direction/creatures/creatures/uomini-rana/identity.md` — Uomini-Rana  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/art-direction/creatures/creatures/uomini-rana/prompt.md` — Uomini-Rana — Image Prompt Injection  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/art-direction/creatures/creatures/uomini-rana/reference-card.md` — Uomini-Rana — Reference Card  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/art-direction/creatures/creatures/uomini-rana/versions/v0.1.0.md` — Uomini-Rana v0.1.0 — Draft  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/art-direction/creatures/families/nm-mutants/family-dna.md` — Nm Mutants — Family DNA  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/art-direction/creatures/families/nm-mutants/rejected-directions.md` — Nm Mutants — Rejected Directions  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/art-direction/icons/prompt_kit.yaml` — Kit dei prompt d'icona dipinta — PLAN-058 T2.3, bibbia §11.5.  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/art-direction/icons/registry.yaml` — Registro icone — PLAN-058 T2.2, bibbia §11.  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/art-direction/scene_interaction_affordances.md` — Scene Interaction Affordances — catalogo (v1, 2026-10-24)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/art-direction/scene_prompt_authoring_guide.md` — Scene Prompt Authoring Guide — immagini ambientali per quest/eventi  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/art-direction/scene_prompt_form.md` — Scene Prompt Form v2 — template obbligatorio di compilazione  
+  - reason: documentation, pending canonical review  
 - `src/docs/docs/audio/minimal_audio_alert_scaffold.md` — Minimal Audio Alert Scaffold  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/balancer/RPG_BALANCER_MASTER_CONTEXT.md` — RPG BALANCER — MASTER CONTEXT / HANDOFF  
   - reason: documentation, pending canonical review  
 - `src/docs/docs/balancer/formula_safety_storage_test_suite.md` — Formula Safety Storage Test Suite  
   - reason: documentation, pending canonical review  
@@ -493,11 +581,13 @@
   - reason: documentation, pending canonical review  
 - `src/docs/docs/design/game_feel_design_guide.md` — Game Feel & Juice Design Guide  
   - reason: documentation, pending canonical review  
+- `src/docs/docs/design/game_map_fit_contract.md` — Come deve essere la schermata `/game`, e perché  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/design/hud_component_guide.md` — Guida: creare componenti HUD (skin `base`, lacca scura + ottone)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/design/poi_icon_prompts.md` — Icone dei POI — prompt (quest, job, event)  
+  - reason: documentation, pending canonical review  
 - `src/docs/docs/design/primitive_composition_rules.md` — Primitive Composition Rules  
-  - reason: documentation, pending canonical review  
-- `src/docs/docs/design/hud_component_guide.md` — Guida: creare componenti HUD (Lacquer Atlas) — superfici HudPlaque, token, controlli, schermate d'azione  
-  - reason: documentation, pending canonical review  
-- `src/docs/docs/idle_village/quest_ui_component_guide.md` — Quest UI Component Guide — cockpit, eventi strutturati, canale danno  
   - reason: documentation, pending canonical review  
 - `src/docs/docs/devops/multi_app_boot_guard.md` — Multi-App Dev Boot Guard & Auto-Recovery (NP-161)  
   - reason: documentation, pending canonical review  
@@ -512,6 +602,1140 @@
 - `src/docs/docs/freeze/POSTMORTEM_ARCHIVED.md` — Postmortem: `_ARCHIVED_ROSTER_SLOT_INTERACTION/`  
   - reason: documentation, pending canonical review  
 - `src/docs/docs/freeze/WAVE_0_SUMMARY.md` — Wave 0 — Summary & Gate  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/F0_inventario_e_stato.md` — F0 — Inventario /game, copertura doc e stato piani (solo lettura)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/F1a_harness_e_misura.md` — F1a — Harness unico di cattura + strumento di misura (Sonnet, 2026-10-20)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/F1b_stato_armato_clock_contrasto.md` — F1b — Stato armato, `page.clock`, contrasto da pixel, 1280×800 (Sonnet, 2026-10-20)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/F1c_lettura_visiva_skillcheck.md` — F1c — Lettura visiva dello skill check (Opus, 2026-10-20)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/F2_scheda_skill_check.md` — F2 — Scheda pilota: Skill check su /game (Opus, 2026-10-20)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/F3_scheda_herosheet_mercante_village.md` — F3 — Schede: Hero sheet · Mercante · Vista Village e Registro (Opus, 2026-10-20, R-234)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/F3_scheda_hud_fissa.md` — F3 — Scheda: HUD fissa (ribbon, tempo, risorse, obiettivo, menu, nav, registro eventi) (Opus, 2026-10-20)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/F3_scheda_poi_planner_roster_slot.md` — F3 — Scheda: POI sulla mappa · Planner (POI detail) · Roster · Slot (Opus, 2026-10-20)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/F3_scheda_quest_cinematica.md` — F3 — Scheda: la quest cinematografica (teatro della QuestRunWindow) (Opus, 2026-10-20, R-234)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/F3_scheda_questrunwindow.md` — F3 — Scheda: QuestRunWindow (finestra della quest in corso) (Opus, 2026-10-20)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/F3_scheda_village_stash.md` — F3 — Scheda: Village Stash (ingressi + pannello) (Opus, 2026-10-20)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/F4_documento_finale.md` — /game visto dal giocatore: audit, problemi di cattura, proposta con mockup, codice  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/F5_secondo_giro.md` — F5 — Secondo giro: tutto ciò che il primo giro non ha visto (Opus, 2026-10-20, R-234)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/F6_director_e_mock_di_ciclo.md` — F6 — Pannello Director e i mock del ciclo di gioco (level-up, run persa, eredità) (Opus, 2026-10-20, R-234)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/F7_village_vs_R202.md` — F7 — Vista Villaggio: cosa è stato chiesto (R-202) vs cosa c'è, e «i cerchi dappertutto»  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/F8_menu_carica_impostazioni_titolo.md` — F8 — Menu di gioco: «Carica partita», «Tutte le impostazioni», «Esci al titolo»  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/INVENTARIO_elementi_giocatore.md` — Inventario: tutto ciò che il giocatore vede su /game e stato dell'audit (2026-10-20, R-234)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/POI_brief_sigillo.md` — POI Sigillo — brief di design unico (explorer, 2026-10-20, R-234)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/POI_glifi_mancanti_brief.md` — POI Sigillo — glifi che mancano: tutto ciò che serve per scrivere i prompt (2026-10-22)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/POI_ricerca_glifo_campo.md` — POI Sigillo — ricerca: leggibilità del glifo sul campo senza scurirlo (explorer, 2026-10-20)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/README.md` — Audit della superficie /game (2026-10-20)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/harness/gl-probe.mjs.txt` — gl-probe.mjs  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/harness/harness.mjs.txt` — harness.mjs  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/harness/run-cine.mjs.txt` — run-cine.mjs  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/harness/run-clock.mjs.txt` — run-clock.mjs  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/harness/run-director.mjs.txt` — run-director.mjs  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/harness/run-f1b.mjs.txt` — run-f1b.mjs  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/harness/run-f3.mjs.txt` — run-f3.mjs  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/harness/run-f3hud.mjs.txt` — run-f3hud.mjs  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/harness/run-f3poi.mjs.txt` — run-f3poi.mjs  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/harness/run-f3stash.mjs.txt` — run-f3stash.mjs  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/harness/run-fullrun.mjs.txt` — run-fullrun.mjs  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/harness/run-hudtop.mjs.txt` — run-hudtop.mjs  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/harness/run-more.mjs.txt` — run-more.mjs  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/harness/smoke-f1a.mjs.txt` — smoke-f1a.mjs  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/harness/tour-a.mjs.txt` — tour-a.mjs  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/harness/tour-b.mjs.txt` — tour-b.mjs  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/harness/vite.audit.config.ts.txt` — vite.audit.config.ts  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/rulings/2026-10-20-fork-rulings.md` — Ruling Director sui fork del mockup — 2026-10-20 (R-234)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/rulings/baseline-sha256.txt` — baseline-sha256  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/F7/pins-1280x800.json` — pins-1280x800  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/F7/pins-1440x900.json` — pins-1440x900  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/director/00-director.json` — 00-director  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/director/a-invasion-1500ms.json` — a-invasion-1500ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/director/a-invasion-4000ms.json` — a-invasion-4000ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/director/a-invasion-400ms.json` — a-invasion-400ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/director/a-levelup-1500ms.json` — a-levelup-1500ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/director/a-levelup-4000ms.json` — a-levelup-4000ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/director/a-levelup-400ms.json` — a-levelup-400ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/director/a-poitypes-1500ms.json` — a-poitypes-1500ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/director/a-poitypes-4000ms.json` — a-poitypes-4000ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/director/a-poitypes-400ms.json` — a-poitypes-400ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/director/a-quest-1500ms.json` — a-quest-1500ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/director/a-quest-4000ms.json` — a-quest-4000ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/director/a-quest-400ms.json` — a-quest-400ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/director/a-questRun-1500ms.json` — a-questRun-1500ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/director/a-questRun-4000ms.json` — a-questRun-4000ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/director/a-questRun-400ms.json` — a-questRun-400ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/director/a-settlementLost-1500ms.json` — a-settlementLost-1500ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/director/a-settlementLost-4000ms.json` — a-settlementLost-4000ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/director/a-settlementLost-400ms.json` — a-settlementLost-400ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/director/a-settlementLost-verdict.json` — a-settlementLost-verdict  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/director/a-skin-1500ms.json` — a-skin-1500ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/director/a-skin-4000ms.json` — a-skin-4000ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/director/a-skin-400ms.json` — a-skin-400ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/director/a-wonder-1500ms.json` — a-wonder-1500ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/director/a-wonder-4000ms.json` — a-wonder-4000ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/director/a-wonder-400ms.json` — a-wonder-400ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/director/actions.json` — actions  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/director/manifest.json` — manifest  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/director/report.json` — report  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3/00-hud-at-rest.json` — 00-hud-at-rest  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3/01-measure-body.json` — 01-measure-body  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3/02-contrast-body.json` — 02-contrast-body  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3/10-hover-food.json` — 10-hover-food  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3/10-hover-gold.json` — 10-hover-gold  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3/10-hover-nav-village.json` — 10-hover-nav-village  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3/10-hover-nav-workshop.json` — 10-hover-nav-workshop  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3/10-hover-pause.json` — 10-hover-pause  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3/10-hover-speed-x2.json` — 10-hover-speed-x2  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3/30-game-menu.json` — 30-game-menu  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3/31-panels-menu.json` — 31-panels-menu  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3/40-events-ledger.json` — 40-events-ledger  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3/41-measure-ledger.json` — 41-measure-ledger  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3/42-contrast-ledger.json` — 42-contrast-ledger  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3/43-ledger-crop.json` — 43-ledger-crop  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3/44-events-after-15s-x4.json` — 44-events-after-15s-x4  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3/50-hud-hidden.json` — 50-hud-hidden  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3/60-map-panned.json` — 60-map-panned  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3/70-focus-visible-tab4.json` — 70-focus-visible-tab4  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3/manifest.json` — manifest  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3/notes.json` — notes  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3-1280/00-hud-at-rest.json` — 00-hud-at-rest  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3-1280/01-measure-body.json` — 01-measure-body  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3-1280/02-contrast-body.json` — 02-contrast-body  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3-1280/10-hover-food.json` — 10-hover-food  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3-1280/10-hover-gold.json` — 10-hover-gold  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3-1280/10-hover-nav-village.json` — 10-hover-nav-village  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3-1280/10-hover-nav-workshop.json` — 10-hover-nav-workshop  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3-1280/10-hover-pause.json` — 10-hover-pause  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3-1280/10-hover-speed-x2.json` — 10-hover-speed-x2  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3-1280/30-game-menu.json` — 30-game-menu  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3-1280/31-panels-menu.json` — 31-panels-menu  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3-1280/40-events-ledger.json` — 40-events-ledger  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3-1280/41-measure-ledger.json` — 41-measure-ledger  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3-1280/42-contrast-ledger.json` — 42-contrast-ledger  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3-1280/43-ledger-crop.json` — 43-ledger-crop  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3-1280/44-events-after-15s-x4.json` — 44-events-after-15s-x4  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3-1280/50-hud-hidden.json` — 50-hud-hidden  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3-1280/60-map-panned.json` — 60-map-panned  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3-1280/70-focus-visible-tab4.json` — 70-focus-visible-tab4  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3-1280/manifest.json` — manifest  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-f3-1280/notes.json` — notes  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-top-r234/hudtop-1280x800/manifest.json` — manifest  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-top-r234/hudtop-1280x800/menu-open.json` — menu-open  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-top-r234/hudtop-1280x800/plaque-clearance.json` — plaque-clearance  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-top-r234/hudtop-1280x800/plaque-overflow.json` — plaque-overflow  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-top-r234/hudtop-1280x800/plaques.json` — plaques  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-top-r234/hudtop-1440x900/manifest.json` — manifest  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-top-r234/hudtop-1440x900/menu-open.json` — menu-open  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-top-r234/hudtop-1440x900/plaque-clearance.json` — plaque-clearance  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-top-r234/hudtop-1440x900/plaque-overflow.json` — plaque-overflow  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/hud-top-r234/hudtop-1440x900/plaques.json` — plaques  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/more-f3/10-herosheet-hover.json` — 10-herosheet-hover  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/more-f3/11-herosheet-sticky-p.json` — 11-herosheet-sticky-p  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/more-f3/20-merchant.json` — 20-merchant  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/more-f3/22-measure-merchant.json` — 22-measure-merchant  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/more-f3/23-contrast-merchant.json` — 23-contrast-merchant  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/more-f3/24-merchant-after-buy.json` — 24-merchant-after-buy  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/more-f3/30-village.json` — 30-village  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/more-f3/31-registry.json` — 31-registry  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/more-f3/32-measure-registry.json` — 32-measure-registry  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/more-f3/33-pin-barracks.json` — 33-pin-barracks  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/more-f3/33-pin-farm.json` — 33-pin-farm  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/more-f3/33-pin-inn.json` — 33-pin-inn  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/more-f3/33-pin-smithy.json` — 33-pin-smithy  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/more-f3/34-contrast-village.json` — 34-contrast-village  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/more-f3/35-measure-village.json` — 35-measure-village  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/more-f3/40-workshop-click.json` — 40-workshop-click  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/more-f3/manifest.json` — manifest  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/more-f3/notes.json` — notes  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-brief/entrance-normal.json` — entrance-normal  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-brief/entrance-reduced-motion.json` — entrance-reduced-motion  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-brief/map-lost-after-minimise.json` — map-lost-after-minimise  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-brief/run-1440x900/10-after-launch.json` — 10-after-launch  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-brief/run-1440x900/11-map-run.json` — 11-map-run  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-brief/run-1440x900/13-map-run-late.json` — 13-map-run-late  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-brief/run-1440x900/manifest.json` — manifest  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-brief/run-1440x900/notes.json` — notes  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-brief/stage1-1280x800/01-map-boot.json` — 01-map-boot  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-brief/stage1-1280x800/05-after-enter.json` — 05-after-enter  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-brief/stage1-1280x800/06-map-two-pois.json` — 06-map-two-pois  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-brief/stage1-1280x800/08-click-planner.json` — 08-click-planner  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-brief/stage1-1280x800/manifest.json` — manifest  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-brief/stage1-1280x800/notes.json` — notes  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-brief/stage1-1440x900/01-map-boot.json` — 01-map-boot  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-brief/stage1-1440x900/05-after-enter.json` — 05-after-enter  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-brief/stage1-1440x900/06-map-two-pois.json` — 06-map-two-pois  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-brief/stage1-1440x900/08-click-planner.json` — 08-click-planner  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-brief/stage1-1440x900/manifest.json` — manifest  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-brief/stage1-1440x900/notes.json` — notes  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3/01-map-boot-pois.json` — 01-map-boot-pois  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3/02-poi-goblin-crop.json` — 02-poi-goblin-crop  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3/03-poi-hover.json` — 03-poi-hover  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3/10-planner-empty.json` — 10-planner-empty  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3/11-measure-planner.json` — 11-measure-planner  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3/12-contrast-planner.json` — 12-contrast-planner  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3/20-planner-plus-roster.json` — 20-planner-plus-roster  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3/21-measure-full.json` — 21-measure-full  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3/30-drag-midway-valid.json` — 30-drag-midway-valid  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3/31-drag-midway-invalid-or-occupied.json` — 31-drag-midway-invalid-or-occupied  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3/40-planner-party-full.json` — 40-planner-party-full  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3/41-swap-midway.json` — 41-swap-midway  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3/42-after-swap.json` — 42-after-swap  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3/50-tray-items.json` — 50-tray-items  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3/51-measure-tray.json` — 51-measure-tray  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3/52-tray-items-picked.json` — 52-tray-items-picked  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3/53-tray-residents.json` — 53-tray-residents  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3/60-planner-ready-send.json` — 60-planner-ready-send  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3/61-measure-planner-ready.json` — 61-measure-planner-ready  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3/62-contrast-ready.json` — 62-contrast-ready  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3/63-slot-hover.json` — 63-slot-hover  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3/70-roster-alone.json` — 70-roster-alone  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3/80-map-after-planner-closed.json` — 80-map-after-planner-closed  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3/manifest.json` — manifest  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3/notes.json` — notes  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3-1280/01-map-boot-pois.json` — 01-map-boot-pois  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3-1280/02-poi-goblin-crop.json` — 02-poi-goblin-crop  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3-1280/03-poi-hover.json` — 03-poi-hover  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3-1280/10-planner-empty.json` — 10-planner-empty  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3-1280/20-planner-plus-roster.json` — 20-planner-plus-roster  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3-1280/30-drag-midway-valid.json` — 30-drag-midway-valid  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3-1280/31-drag-midway-invalid-or-occupied.json` — 31-drag-midway-invalid-or-occupied  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3-1280/40-planner-party-full.json` — 40-planner-party-full  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3-1280/41-swap-midway.json` — 41-swap-midway  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3-1280/42-after-swap.json` — 42-after-swap  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3-1280/50-tray-items.json` — 50-tray-items  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3-1280/52-tray-items-picked.json` — 52-tray-items-picked  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3-1280/53-tray-residents.json` — 53-tray-residents  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3-1280/60-planner-ready-send.json` — 60-planner-ready-send  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3-1280/63-slot-hover.json` — 63-slot-hover  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3-1280/70-roster-alone.json` — 70-roster-alone  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3-1280/80-map-after-planner-closed.json` — 80-map-after-planner-closed  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3-1280/manifest.json` — manifest  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/poi-planner-f3-1280/notes.json` — notes  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/00-window-open.json` — 00-window-open  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/20-measure-window.json` — 20-measure-window  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/21-contrast-window.json` — 21-contrast-window  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/30-hover-quest-belt-toggle.json` — 30-hover-quest-belt-toggle  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/30-hover-quest-check-options-toggle.json` — 30-hover-quest-check-options-toggle  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/30-hover-quest-log-toggle.json` — 30-hover-quest-log-toggle  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/30-hover-quest-party-toggle.json` — 30-hover-quest-party-toggle  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/31-open-quest-belt-toggle.json` — 31-open-quest-belt-toggle  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/31-open-quest-check-options-toggle.json` — 31-open-quest-check-options-toggle  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/31-open-quest-log-toggle.json` — 31-open-quest-log-toggle  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/31-open-quest-party-toggle.json` — 31-open-quest-party-toggle  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/40-abandon-tooltip.json` — 40-abandon-tooltip  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/41-abandon-confirm.json` — 41-abandon-confirm  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/50-footer-collapsed.json` — 50-footer-collapsed  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/60-minimised.json` — 60-minimised  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/61-minimised-crop.json` — 61-minimised-crop  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/62-measure-minimised.json` — 62-measure-minimised  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/90-end-reward.json` — 90-end-reward  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/91-end-reward-2500.json` — 91-end-reward-2500  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/92-contrast-end.json` — 92-contrast-end  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/manifest.json` — manifest  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/n-gob-accampamento-beat.json` — n-gob-accampamento-beat  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/n-gob-accampamento-choice.json` — n-gob-accampamento-choice  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/n-gob-agguato-beat.json` — n-gob-agguato-beat  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/n-gob-agguato-pending.json` — n-gob-agguato-pending  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/n-gob-agguato-scelta-beat.json` — n-gob-agguato-scelta-beat  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/n-gob-agguato-scelta-choice.json` — n-gob-agguato-scelta-choice  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/n-gob-combattimento-beat.json` — n-gob-combattimento-beat  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/n-gob-combattimento-choice.json` — n-gob-combattimento-choice  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/n-gob-esplora-beat.json` — n-gob-esplora-beat  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/n-gob-esplora-choice.json` — n-gob-esplora-choice  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/n-gob-esplora-extra-beat.json` — n-gob-esplora-extra-beat  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/n-gob-esplora-extra-choice.json` — n-gob-esplora-extra-choice  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/n-gob-esplora-extra-pending.json` — n-gob-esplora-extra-pending  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/n-gob-esplora-pending.json` — n-gob-esplora-pending  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/n-gob-fine-beat.json` — n-gob-fine-beat  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/n-gob-incalzare-beat.json` — n-gob-incalzare-beat  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/n-gob-incalzare-choice.json` — n-gob-incalzare-choice  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/notes.json` — notes  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3/series.json` — series  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-1280/00-window-open.json` — 00-window-open  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-1280/60-minimised.json` — 60-minimised  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-1280/61-minimised-crop.json` — 61-minimised-crop  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-1280/62-measure-minimised.json` — 62-measure-minimised  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-1280/90-end-reward.json` — 90-end-reward  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-1280/91-end-reward-2500.json` — 91-end-reward-2500  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-1280/92-contrast-end.json` — 92-contrast-end  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-1280/manifest.json` — manifest  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-1280/n-gob-accampamento-beat.json` — n-gob-accampamento-beat  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-1280/n-gob-accampamento-choice.json` — n-gob-accampamento-choice  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-1280/n-gob-agguato-beat.json` — n-gob-agguato-beat  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-1280/n-gob-agguato-pending.json` — n-gob-agguato-pending  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-1280/n-gob-agguato-scelta-beat.json` — n-gob-agguato-scelta-beat  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-1280/n-gob-agguato-scelta-choice.json` — n-gob-agguato-scelta-choice  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-1280/n-gob-combattimento-beat.json` — n-gob-combattimento-beat  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-1280/n-gob-combattimento-choice.json` — n-gob-combattimento-choice  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-1280/n-gob-esplora-beat.json` — n-gob-esplora-beat  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-1280/n-gob-esplora-choice.json` — n-gob-esplora-choice  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-1280/n-gob-esplora-extra-beat.json` — n-gob-esplora-extra-beat  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-1280/n-gob-esplora-extra-choice.json` — n-gob-esplora-extra-choice  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-1280/n-gob-esplora-extra-pending.json` — n-gob-esplora-extra-pending  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-1280/n-gob-esplora-pending.json` — n-gob-esplora-pending  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-1280/n-gob-fine-beat.json` — n-gob-fine-beat  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-1280/n-gob-incalzare-beat.json` — n-gob-incalzare-beat  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-1280/n-gob-incalzare-choice.json` — n-gob-incalzare-choice  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-1280/notes.json` — notes  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-1280/series.json` — series  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-rm/00-window-open.json` — 00-window-open  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-rm/60-minimised.json` — 60-minimised  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-rm/61-minimised-crop.json` — 61-minimised-crop  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-rm/62-measure-minimised.json` — 62-measure-minimised  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-rm/90-end-reward.json` — 90-end-reward  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-rm/91-end-reward-2500.json` — 91-end-reward-2500  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-rm/92-contrast-end.json` — 92-contrast-end  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-rm/manifest.json` — manifest  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-rm/n-gob-accampamento-choice.json` — n-gob-accampamento-choice  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-rm/n-gob-agguato-pending.json` — n-gob-agguato-pending  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-rm/n-gob-agguato-scelta-choice.json` — n-gob-agguato-scelta-choice  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-rm/n-gob-combattimento-choice.json` — n-gob-combattimento-choice  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-rm/n-gob-esplora-choice.json` — n-gob-esplora-choice  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-rm/n-gob-esplora-extra-choice.json` — n-gob-esplora-extra-choice  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-rm/n-gob-esplora-extra-pending.json` — n-gob-esplora-extra-pending  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-rm/n-gob-esplora-pending.json` — n-gob-esplora-pending  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-rm/n-gob-incalzare-choice.json` — n-gob-incalzare-choice  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-rm/notes.json` — notes  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/questwindow-f3-rm/series.json` — series  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/probe-inv/manifest.json` — manifest  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A01-map.json` — A01-map  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A01-map.lens.json` — A01-map.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A02-region-center.json` — A02-region-center  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A02-region-center.lens.json` — A02-region-center.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A02-region-east-badlands.json` — A02-region-east-badlands  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A02-region-east-badlands.lens.json` — A02-region-east-badlands.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A02-region-west-forest.json` — A02-region-west-forest  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A02-region-west-forest.lens.json` — A02-region-west-forest.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A03-poi-hover.json` — A03-poi-hover  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A03-poi-hover.lens.json` — A03-poi-hover.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A04-planner-empty.json` — A04-planner-empty  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A04-planner-empty.lens.json` — A04-planner-empty.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A05-planner-herosheet-hover.json` — A05-planner-herosheet-hover  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A05-planner-herosheet-hover.lens.json` — A05-planner-herosheet-hover.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A06-tray-items.json` — A06-tray-items  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A06-tray-items.lens.json` — A06-tray-items.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A07-tray-item-hover.json` — A07-tray-item-hover  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A07-tray-item-hover.lens.json` — A07-tray-item-hover.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A08-tray-item-picked.json` — A08-tray-item-picked  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A08-tray-item-picked.lens.json` — A08-tray-item-picked.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A09-tray-residents.json` — A09-tray-residents  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A09-tray-residents.lens.json` — A09-tray-residents.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A10-planner-stash.json` — A10-planner-stash  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A10-planner-stash.lens.json` — A10-planner-stash.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A11-planner-ready.json` — A11-planner-ready  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A11-planner-ready.lens.json` — A11-planner-ready.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A12-slot-hover.json` — A12-slot-hover  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A12-slot-hover.lens.json` — A12-slot-hover.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A13-roster.json` — A13-roster  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A13-roster.lens.json` — A13-roster.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A16-stash.json` — A16-stash  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A16-stash.lens.json` — A16-stash.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A17-merchant.json` — A17-merchant  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A17-merchant.lens.json` — A17-merchant.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A18-merchant-buy-hover.json` — A18-merchant-buy-hover  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A18-merchant-buy-hover.lens.json` — A18-merchant-buy-hover.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A19-events.json` — A19-events  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A19-events.lens.json` — A19-events.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A20-menu.json` — A20-menu  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A20-menu.lens.json` — A20-menu.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A23-village-enter-1800ms.json` — A23-village-enter-1800ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A23-village-enter-3000ms.json` — A23-village-enter-3000ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A23-village-enter-300ms.json` — A23-village-enter-300ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A23-village-enter-900ms.json` — A23-village-enter-900ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A24-village.json` — A24-village  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A24-village.lens.json` — A24-village.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A25-village-warehouse-tooltip.json` — A25-village-warehouse-tooltip  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A25-village-warehouse-tooltip.lens.json` — A25-village-warehouse-tooltip.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A26-registry.json` — A26-registry  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A26-registry.lens.json` — A26-registry.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A28-invasion-1200ms.json` — A28-invasion-1200ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A28-invasion-300ms.json` — A28-invasion-300ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A29-invasion-card.json` — A29-invasion-card  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A29-invasion-card.lens.json` — A29-invasion-card.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A30-invasion-peel-1500ms.json` — A30-invasion-peel-1500ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A30-invasion-peel-2400ms.json` — A30-invasion-peel-2400ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A30-invasion-peel-300ms.json` — A30-invasion-peel-300ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A30-invasion-peel-3600ms.json` — A30-invasion-peel-3600ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A30-invasion-peel-900ms.json` — A30-invasion-peel-900ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A31-invasion-after.json` — A31-invasion-after  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/A31-invasion-after.lens.json` — A31-invasion-after.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/index.json` — index  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1280x800-it/manifest.json` — manifest  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A01-map.json` — A01-map  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A01-map.lens.json` — A01-map.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A02-region-center.json` — A02-region-center  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A02-region-center.lens.json` — A02-region-center.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A02-region-east-badlands.json` — A02-region-east-badlands  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A02-region-east-badlands.lens.json` — A02-region-east-badlands.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A02-region-west-forest.json` — A02-region-west-forest  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A02-region-west-forest.lens.json` — A02-region-west-forest.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A03-poi-hover.json` — A03-poi-hover  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A03-poi-hover.lens.json` — A03-poi-hover.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A04-planner-empty.json` — A04-planner-empty  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A04-planner-empty.lens.json` — A04-planner-empty.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A05-planner-herosheet-hover.json` — A05-planner-herosheet-hover  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A05-planner-herosheet-hover.lens.json` — A05-planner-herosheet-hover.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A06-tray-items.json` — A06-tray-items  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A06-tray-items.lens.json` — A06-tray-items.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A07-tray-item-hover.json` — A07-tray-item-hover  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A07-tray-item-hover.lens.json` — A07-tray-item-hover.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A08-tray-item-picked.json` — A08-tray-item-picked  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A08-tray-item-picked.lens.json` — A08-tray-item-picked.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A09-tray-residents.json` — A09-tray-residents  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A09-tray-residents.lens.json` — A09-tray-residents.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A10-planner-stash.json` — A10-planner-stash  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A10-planner-stash.lens.json` — A10-planner-stash.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A11-planner-ready.json` — A11-planner-ready  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A11-planner-ready.lens.json` — A11-planner-ready.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A12-slot-hover.json` — A12-slot-hover  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A12-slot-hover.lens.json` — A12-slot-hover.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A13-roster.json` — A13-roster  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A13-roster.lens.json` — A13-roster.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A16-stash.json` — A16-stash  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A16-stash.lens.json` — A16-stash.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A17-merchant.json` — A17-merchant  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A17-merchant.lens.json` — A17-merchant.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A18-merchant-buy-hover.json` — A18-merchant-buy-hover  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A18-merchant-buy-hover.lens.json` — A18-merchant-buy-hover.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A19-events.json` — A19-events  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A19-events.lens.json` — A19-events.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A20-menu.json` — A20-menu  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A20-menu.lens.json` — A20-menu.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A23-village-enter-1800ms.json` — A23-village-enter-1800ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A23-village-enter-3000ms.json` — A23-village-enter-3000ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A23-village-enter-300ms.json` — A23-village-enter-300ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A23-village-enter-900ms.json` — A23-village-enter-900ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A24-village.json` — A24-village  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A24-village.lens.json` — A24-village.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A25-village-warehouse-tooltip.json` — A25-village-warehouse-tooltip  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A25-village-warehouse-tooltip.lens.json` — A25-village-warehouse-tooltip.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A26-registry.json` — A26-registry  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A26-registry.lens.json` — A26-registry.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A28-invasion-1200ms.json` — A28-invasion-1200ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A28-invasion-300ms.json` — A28-invasion-300ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A29-invasion-card.json` — A29-invasion-card  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A29-invasion-card.lens.json` — A29-invasion-card.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A30-invasion-peel-1500ms.json` — A30-invasion-peel-1500ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A30-invasion-peel-2400ms.json` — A30-invasion-peel-2400ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A30-invasion-peel-300ms.json` — A30-invasion-peel-300ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A30-invasion-peel-3600ms.json` — A30-invasion-peel-3600ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A30-invasion-peel-900ms.json` — A30-invasion-peel-900ms  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A31-invasion-after.json` — A31-invasion-after  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/A31-invasion-after.lens.json` — A31-invasion-after.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/index.json` — index  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourA-1440x900/manifest.json` — manifest  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B01-window-open.json` — B01-window-open  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B01-window-open.lens.json` — B01-window-open.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B02-travel-gob-esplora.json` — B02-travel-gob-esplora  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B02-travel-gob-esplora.lens.json` — B02-travel-gob-esplora.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B03-beat-gob-esplora.json` — B03-beat-gob-esplora  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B03-beat-gob-esplora.lens.json` — B03-beat-gob-esplora.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B04-choice-gob-esplora.json` — B04-choice-gob-esplora  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B04-choice-gob-esplora.lens.json` — B04-choice-gob-esplora.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B05-choice-hover-gob-esplora.json` — B05-choice-hover-gob-esplora  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B05-choice-hover-gob-esplora.lens.json` — B05-choice-hover-gob-esplora.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B06-check1-armed.json` — B06-check1-armed  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B06-check1-armed.lens.json` — B06-check1-armed.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B07-check1-verdict.json` — B07-check1-verdict  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B07-check1-verdict.lens.json` — B07-check1-verdict.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B08-beat-gob-accampamento.json` — B08-beat-gob-accampamento  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B08-beat-gob-accampamento.lens.json` — B08-beat-gob-accampamento.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B09-choice-gob-accampamento.json` — B09-choice-gob-accampamento  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B09-choice-gob-accampamento.lens.json` — B09-choice-gob-accampamento.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B10-choice-hover-gob-accampamento.json` — B10-choice-hover-gob-accampamento  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B10-choice-hover-gob-accampamento.lens.json` — B10-choice-hover-gob-accampamento.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B11-check2-armed.json` — B11-check2-armed  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B11-check2-armed.lens.json` — B11-check2-armed.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B12-check2-verdict.json` — B12-check2-verdict  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B12-check2-verdict.lens.json` — B12-check2-verdict.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B13-beat-gob-combattimento.json` — B13-beat-gob-combattimento  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B13-beat-gob-combattimento.lens.json` — B13-beat-gob-combattimento.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B14-choice-gob-combattimento.json` — B14-choice-gob-combattimento  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B14-choice-gob-combattimento.lens.json` — B14-choice-gob-combattimento.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B15-choice-hover-gob-combattimento.json` — B15-choice-hover-gob-combattimento  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B15-choice-hover-gob-combattimento.lens.json` — B15-choice-hover-gob-combattimento.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B16-beat-gob-incalzare.json` — B16-beat-gob-incalzare  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B16-beat-gob-incalzare.lens.json` — B16-beat-gob-incalzare.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B17-choice-gob-incalzare.json` — B17-choice-gob-incalzare  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B17-choice-gob-incalzare.lens.json` — B17-choice-gob-incalzare.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B18-choice-hover-gob-incalzare.json` — B18-choice-hover-gob-incalzare  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B18-choice-hover-gob-incalzare.lens.json` — B18-choice-hover-gob-incalzare.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B19-beat-gob-esplora-extra.json` — B19-beat-gob-esplora-extra  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B19-beat-gob-esplora-extra.lens.json` — B19-beat-gob-esplora-extra.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B20-choice-gob-esplora-extra.json` — B20-choice-gob-esplora-extra  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B20-choice-gob-esplora-extra.lens.json` — B20-choice-gob-esplora-extra.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B21-choice-hover-gob-esplora-extra.json` — B21-choice-hover-gob-esplora-extra  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B21-choice-hover-gob-esplora-extra.lens.json` — B21-choice-hover-gob-esplora-extra.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B22-beat-gob-cerca.json` — B22-beat-gob-cerca  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B22-beat-gob-cerca.lens.json` — B22-beat-gob-cerca.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B23-report-t0.json` — B23-report-t0  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B23-report-t0.lens.json` — B23-report-t0.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B24-report-t3s.json` — B24-report-t3s  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B24-report-t3s.lens.json` — B24-report-t3s.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B25-report-advanced.json` — B25-report-advanced  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B25-report-advanced.lens.json` — B25-report-advanced.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B26-after-report.json` — B26-after-report  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B26-after-report.lens.json` — B26-after-report.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B27-roster-after-run.json` — B27-roster-after-run  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/B27-roster-after-run.lens.json` — B27-roster-after-run.lens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/index.json` — index  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/round2/tourB-1440x900/manifest.json` — manifest  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-f1b/10-intro-t0.json` — 10-intro-t0  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-f1b/11-intro-t1500.json` — 11-intro-t1500  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-f1b/20-armed-throw-visible.json` — 20-armed-throw-visible  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-f1b/21-measure-armed.json` — 21-measure-armed  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-f1b/22-contrast-armed.json` — 22-contrast-armed  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-f1b/30-spin-t700.json` — 30-spin-t700  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-f1b/31-spin-t2200.json` — 31-spin-t2200  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-f1b/40-verdict-t0.json` — 40-verdict-t0  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-f1b/41-parked-t0.json` — 41-parked-t0  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-f1b/42-parked-t3000.json` — 42-parked-t3000  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-f1b/43-measure-parked.json` — 43-measure-parked  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-f1b/44-contrast-parked.json` — 44-contrast-parked  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-f1b/clock-log.json` — clock-log  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-f1b/manifest.json` — manifest  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-f1b/timeline.json` — timeline  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/90-report.json` — 90-report  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c01-a-armed.json` — c01-a-armed  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c01-b-spin.json` — c01-b-spin  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c01-c-verdict.json` — c01-c-verdict  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c01-contrast-armed.json` — c01-contrast-armed  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c01-contrast-parked.json` — c01-contrast-parked  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c01-d-parked3s.json` — c01-d-parked3s  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c01-measure-armed.json` — c01-measure-armed  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c02-a-armed.json` — c02-a-armed  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c02-b-spin.json` — c02-b-spin  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c02-c-verdict.json` — c02-c-verdict  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c02-contrast-parked.json` — c02-contrast-parked  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c02-d-parked3s.json` — c02-d-parked3s  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c03-a-armed.json` — c03-a-armed  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c03-b-spin.json` — c03-b-spin  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c03-c-verdict.json` — c03-c-verdict  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c03-contrast-parked.json` — c03-contrast-parked  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c03-d-parked3s.json` — c03-d-parked3s  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c04-a-armed.json` — c04-a-armed  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c04-b-spin.json` — c04-b-spin  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c04-c-verdict.json` — c04-c-verdict  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c04-contrast-parked.json` — c04-contrast-parked  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c04-d-parked3s.json` — c04-d-parked3s  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c05-a-armed.json` — c05-a-armed  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c05-b-spin.json` — c05-b-spin  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c05-c-verdict.json` — c05-c-verdict  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c05-contrast-parked.json` — c05-contrast-parked  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c05-d-parked3s.json` — c05-d-parked3s  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c06-a-armed.json` — c06-a-armed  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c06-b-spin.json` — c06-b-spin  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c06-c-verdict.json` — c06-c-verdict  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c06-contrast-parked.json` — c06-contrast-parked  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c06-d-parked3s.json` — c06-d-parked3s  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c07-a-armed.json` — c07-a-armed  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c07-b-spin.json` — c07-b-spin  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c07-c-verdict.json` — c07-c-verdict  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c07-contrast-parked.json` — c07-contrast-parked  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/c07-d-parked3s.json` — c07-d-parked3s  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/manifest.json` — manifest  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/n-gob-accampamento-beat.json` — n-gob-accampamento-beat  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/n-gob-accampamento-choice.json` — n-gob-accampamento-choice  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/n-gob-combattimento-beat.json` — n-gob-combattimento-beat  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/n-gob-combattimento-choice.json` — n-gob-combattimento-choice  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/n-gob-esplora-beat.json` — n-gob-esplora-beat  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/n-gob-esplora-choice.json` — n-gob-esplora-choice  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/n-gob-esplora-extra-beat.json` — n-gob-esplora-extra-beat  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/n-gob-esplora-extra-choice.json` — n-gob-esplora-extra-choice  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/n-gob-fine-beat.json` — n-gob-fine-beat  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/skillcheck-fullrun/run-log.json` — run-log  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/village-stash-f3/10-stash-via-v.json` — 10-stash-via-v  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/village-stash-f3/11-stash-crop.json` — 11-stash-crop  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/village-stash-f3/12-measure-stash.json` — 12-measure-stash  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/village-stash-f3/13-contrast-stash.json` — 13-contrast-stash  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/village-stash-f3/14-stash-row-hover.json` — 14-stash-row-hover  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/village-stash-f3/20-game-menu-open.json` — 20-game-menu-open  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/village-stash-f3/21-menu-stash-entry.json` — 21-menu-stash-entry  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/village-stash-f3/30-village-view.json` — 30-village-view  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/village-stash-f3/31-warehouse-tooltip.json` — 31-warehouse-tooltip  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/village-stash-f3/33-stash-via-village.json` — 33-stash-via-village  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/village-stash-f3/40-planner-plus-stash.json` — 40-planner-plus-stash  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/village-stash-f3/41-measure-integration.json` — 41-measure-integration  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/village-stash-f3/42-tray-with-stash-open.json` — 42-tray-with-stash-open  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/village-stash-f3/43-stash-after-pack.json` — 43-stash-after-pack  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/village-stash-f3/manifest.json` — manifest  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/village-stash-f3/notes.json` — notes  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/village-stash-f3-1280/10-stash-via-v.json` — 10-stash-via-v  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/village-stash-f3-1280/11-stash-crop.json` — 11-stash-crop  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/village-stash-f3-1280/14-stash-row-hover.json` — 14-stash-row-hover  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/village-stash-f3-1280/20-game-menu-open.json` — 20-game-menu-open  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/village-stash-f3-1280/21-menu-stash-entry.json` — 21-menu-stash-entry  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/village-stash-f3-1280/30-village-view.json` — 30-village-view  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/village-stash-f3-1280/31-warehouse-tooltip.json` — 31-warehouse-tooltip  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/village-stash-f3-1280/33-stash-via-village.json` — 33-stash-via-village  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/village-stash-f3-1280/40-planner-plus-stash.json` — 40-planner-plus-stash  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/village-stash-f3-1280/42-tray-with-stash-open.json` — 42-tray-with-stash-open  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/village-stash-f3-1280/43-stash-after-pack.json` — 43-stash-after-pack  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/village-stash-f3-1280/manifest.json` — manifest  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/game_surface_audit/shots/village-stash-f3-1280/notes.json` — notes  
   - reason: documentation, pending canonical review  
 - `src/docs/docs/guardian/evidence_archive_rotator.md` — Guardian Evidence Archive Rotator  
   - reason: documentation, pending canonical review  
@@ -543,9 +1767,6 @@
 - `src/docs/docs/idle_village/day_night_poi_spec.md` — DayNightPOI Spec  
   - markers: draft  
   - reason: draft/candidate/proposed marker, plan or prompt  
-- `src/docs/docs/idle_village/detail_spec.md` — POI Detail Spec  
-  - markers: draft  
-  - reason: draft/candidate/proposed marker, plan or prompt  
 - `src/docs/docs/idle_village/drag_diagnostics_cli.md` — Idle Village Drag Diagnostics CLI  
   - reason: documentation, pending canonical review  
 - `src/docs/docs/idle_village/drop_validation_playwright.md` — Idle Village Drop Validation Playwright Smoke Tests  
@@ -553,6 +1774,8 @@
 - `src/docs/docs/idle_village/floating_panel_spec.md` — FloatingPanel Spec  
   - markers: draft  
   - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/idle_village/game_surface_coverage.md` — Game Surface Coverage — `/game`  
+  - reason: documentation, pending canonical review  
 - `src/docs/docs/idle_village/gameplay_components_inventory.md` — Gameplay Components Inventory  
   - markers: draft  
   - reason: draft/candidate/proposed marker, plan or prompt  
@@ -563,7 +1786,6 @@
   - markers: todo  
   - reason: documentation, pending canonical review  
 - `src/docs/docs/idle_village/interaction_core_spec.md` — Interaction Core — Drag Outcome, Flight, Extraction & Bloom — Integration Spec  
-  - markers: historical  
   - reason: documentation, pending canonical review  
 - `src/docs/docs/idle_village/interaction_mode_accessibility.md` — Interaction Mode Accessibility Documentation  
   - reason: documentation, pending canonical review  
@@ -583,41 +1805,31 @@
   - reason: documentation, pending canonical review  
 - `src/docs/docs/idle_village/minimal_snapshot_schema.md` — Minimal Snapshot Schema  
   - reason: documentation, pending canonical review  
-- `src/docs/docs/idle_village/poi_cooldown_spec.md` — POI Cooldown / Expiration Spec  
-  - markers: draft  
-  - reason: draft/candidate/proposed marker, plan or prompt  
-- `src/docs/docs/idle_village/poi_detail_interaction_spec.md` — POI ↔ Detail Interaction  
-  - markers: draft  
-  - reason: draft/candidate/proposed marker, plan or prompt  
-- `src/docs/docs/idle_village/poi_family_spec.md` — POI Family Spec  
-  - markers: draft  
-  - reason: draft/candidate/proposed marker, plan or prompt  
-- `src/docs/docs/idle_village/poi_job_spec.md` — POI Job Spec  
-  - markers: draft  
-  - reason: draft/candidate/proposed marker, plan or prompt  
-- `src/docs/docs/idle_village/poi_maintenance_spec.md` — POI Maintenance Spec  
-  - markers: draft  
-  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/idle_village/mission_planner_data_model_fix.md` — Mission Planner — Data-Model Fix Specification  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/idle_village/mission_planner_math_spec.md` — Mission Planner — Mathematical Contract  
+  - reason: documentation, pending canonical review  
 - `src/docs/docs/idle_village/poi_quest_detail_roster_time_clock_error_registry.md` — Registro errori — `/poi-quest-detail-roster-time-clock`  
   - markers: draft  
   - reason: draft/candidate/proposed marker, plan or prompt  
 - `src/docs/docs/idle_village/poi_quest_detail_roster_time_clock_page_workflow.md` — Pagina `/poi-quest-detail-roster-time-clock` — Workflow completo  
   - markers: draft  
   - reason: draft/candidate/proposed marker, plan or prompt  
-- `src/docs/docs/idle_village/poi_quest_interaction_spec.md` — POI ↔ Quest Interaction  
-  - markers: draft  
-  - reason: draft/candidate/proposed marker, plan or prompt  
 - `src/docs/docs/idle_village/poi_spec.md` — POI Spec  
-  - markers: draft  
-  - reason: draft/candidate/proposed marker, plan or prompt  
-- `src/docs/docs/idle_village/poi_training_spec.md` — POI Training Spec  
   - markers: draft  
   - reason: draft/candidate/proposed marker, plan or prompt  
 - `src/docs/docs/idle_village/quest_failure_and_recovery_spec.md` — Quest Failure, Timeout and Recovery Spec  
   - reason: documentation, pending canonical review  
-- `src/docs/docs/idle_village/quest_spec.md` — Quest Spec  
-  - markers: draft  
-  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/idle_village/quest_rovine_scenario_spec.md` — Mockup quest — «Le Rovine sotto il Fiume»  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/idle_village/quest_simulation_preview_spec.md` — Prompt — Quest Simulation Preview  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/idle_village/quest_sterminio_goblin_spec.md` — Sterminio dei goblin — spec completa  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/idle_village/quest_theatre_spec.md` — QuestTheatre — Spec (requirements brief per S2)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/idle_village/quest_ui_component_guide.md` — Quest UI Component Guide  
+  - reason: documentation, pending canonical review  
 - `src/docs/docs/idle_village/roster_bundle_usage.md` — Roster Bundle Usage Guide  
   - reason: documentation, pending canonical review  
 - `src/docs/docs/idle_village/roster_slot_integration_spec.md` — Roster + PgCard + Slot + SlotRack — Integration Spec  
@@ -642,15 +1854,6 @@
   - reason: documentation, pending canonical review  
 - `src/docs/docs/idle_village/theater_overlay_accessibility.md` — Theater Overlay Accessibility Documentation  
   - reason: documentation, pending canonical review  
-- `src/docs/docs/idle_village/time_engine_day_night_poi_interaction_spec.md` — TimeEngine ↔ DayNightPOI Interaction  
-  - markers: draft  
-  - reason: draft/candidate/proposed marker, plan or prompt  
-- `src/docs/docs/idle_village/time_engine_quest_interaction_spec.md` — TimeEngine ↔ Quest Interaction  
-  - markers: draft  
-  - reason: draft/candidate/proposed marker, plan or prompt  
-- `src/docs/docs/idle_village/time_engine_roster_interaction_spec.md` — TimeEngine ↔ Roster Interaction  
-  - markers: draft  
-  - reason: draft/candidate/proposed marker, plan or prompt  
 - `src/docs/docs/idle_village/time_engine_spec.md` — TimeEngine Spec  
   - markers: draft  
   - reason: draft/candidate/proposed marker, plan or prompt  
@@ -702,6 +1905,11 @@
 - `src/docs/docs/plans/1v1_tasks.md` — 1v1 Combat System Polish - Task Checklist  
   - markers: todo  
   - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/PLAN-058_hud_roster_unification.md` — PLAN-058 — HUD unificata sul Roster: lastre, icone, Sigillo POI, cursori  
+  - markers: todo  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/PLAN-119-expedition-ui-mockup-absorption.md` — PLAN-119 — Expedition planning UI: assorbimento mockup ChatGPT (Subplan 1)  
+  - reason: documentation, pending canonical review  
 - `src/docs/docs/plans/ai_mockup_workflow.md` — AI Mockup → Component/Asset Protocol  
   - reason: documentation, pending canonical review  
 - `src/docs/docs/plans/alt_visuals_v6_rigged_throw_plan.md` — Alt Visuals V6 – Rigged Throw Plan  
@@ -712,7 +1920,7 @@
   - reason: documentation, pending canonical review  
 - `src/docs/docs/plans/archetype_tasks.md` — Archetype Balancing System - Task Checklist  
   - reason: documentation, pending canonical review  
-- `src/docs/docs/plans/art_direction_plan.md` — DNA PRISMATIC WANDERLUST – BIBBIA DI DIREZIONE ARTISTICA (v0.10)  
+- `src/docs/docs/plans/art_direction_plan.md` — DNA PRISMATIC WANDERLUST – BIBBIA DI DIREZIONE ARTISTICA (v0.15)  
   - reason: documentation, pending canonical review  
 - `src/docs/docs/plans/atomic_evolution_plan.md` — Project Architecture Refactoring - Modern Best Practices 2024  
   - reason: documentation, pending canonical review  
@@ -774,6 +1982,8 @@
   - reason: documentation, pending canonical review  
 - `src/docs/docs/plans/destiny_astrolabe_v3_implementation_plan.md` — Destiny Astrolabe V3 — Implementation Plan  
   - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/destiny_astrolabe_v63_semantic_cinematic_plan.md` — Destiny Astrolabe V6.3 — Piano di miglioramento semantico + cinematografico  
+  - reason: documentation, pending canonical review  
 - `src/docs/docs/plans/game_localization_implementation_plan.md` — Game Localization Implementation Plan  
   - reason: documentation, pending canonical review  
 - `src/docs/docs/plans/harness_automation_plan.md` — Executor Harness Automation Plan  
@@ -792,6 +2002,8 @@
 - `src/docs/docs/plans/idle_village_ftue_plan.md` — Idle Incremental RPG – FTUE & First 60 Minutes Plan  
   - reason: documentation, pending canonical review  
 - `src/docs/docs/plans/idle_village_hero_components_placeholder_plan.md` — Idle Village — Hero Components Placeholder Plan (Umbrella)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/idle_village_hero_sheet_dynamic_stats_plan.md` — Idle Village — Hero Sheet: statistiche dinamiche dal Balancer (Sub-Plan A2)  
   - reason: documentation, pending canonical review  
 - `src/docs/docs/plans/idle_village_map_plan.md` — Idle Village Map Plan - Maintenance Advisor (IV-Phase12-maintenance-ai)  
   - reason: documentation, pending canonical review  
@@ -855,6 +2067,8 @@
 - `src/docs/docs/plans/scenario_ui_plan.md` — Scenario Configuration UI - Implementation Plan  
   - reason: documentation, pending canonical review  
 - `src/docs/docs/plans/scenario_ui_tasks.md` — Scenario Configuration UI - Task Checklist  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/settlement_lost_event_plan.md` — Settlement Lost — evento run-ending (direzione C: verdetto a schermo)  
   - reason: documentation, pending canonical review  
 - `src/docs/docs/plans/skill_check_preview_lab_plan.md` — Skill Check Preview Lab Refactor – Implementation Plan  
   - reason: documentation, pending canonical review  
@@ -1006,6 +2220,8 @@
   - reason: documentation, pending canonical review  
 - `src/docs/docs/playtest/playtest_annotation_assistant.md` — Playtest Annotation Assistant  
   - reason: documentation, pending canonical review  
+- `src/docs/docs/poi-marker-v3-7-option-c.md` — POI Marker V3.7 — Option C Implementation  
+  - reason: documentation, pending canonical review  
 - `src/docs/docs/prompts/AUDITOR.md` — Prompt: The Code Auditor ("The Sentinel")  
   - reason: documentation, pending canonical review  
 - `src/docs/docs/prompts/prompt_library.md` — MASTER PROMPT: config-balancer-refactor  
@@ -1054,6 +2270,8 @@
 - `src/docs/docs/reports/weekly_review_template.md` — 🛡️ Weekly Code Health Check  
   - markers: todo  
   - reason: documentation, pending canonical review  
+- `src/docs/docs/sea_motion_measurement_contract.md` — Sea Motion Measurement Contract (PLAN-013 T1)  
+  - reason: documentation, pending canonical review  
 - `src/docs/docs/specs/village_sandbox_perf.md` — Village Sandbox Performance Analysis & Optimization Report  
   - reason: documentation, pending canonical review  
 - `src/docs/docs/storybook_accessibility_guide.md` — Storybook & Accessibility Testing Guide  
@@ -1083,9 +2301,13 @@
   - reason: documentation, pending canonical review  
 - `src/docs/docs/telemetry/phase10_router.md` — Phase 10 Telemetry Router Documentation - NP-057  
   - reason: documentation, pending canonical review  
+- `src/docs/docs/testing/e2e_game_quest_lifecycle_guide.md` — Guida E2E — ciclo di vita quest «Sterminio dei goblin» su `/game`  
+  - reason: documentation, pending canonical review  
 - `src/docs/docs/testing/persistence_chaos_monkey.md` — Persistence Chaos Monkey Guide  
   - reason: documentation, pending canonical review  
 - `src/docs/docs/testing/playwright_coverage_reporter.md` — Playwright Test Coverage Reporter – NP-123  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/testing/quest_full_flow_walkthrough.md` — La quest goblin su `/game`, passo per passo — cosa succede, quando e come  
   - reason: documentation, pending canonical review  
 - `src/docs/docs/tests/GT-3-mobile-playtest-checklist.md` — GT-3 Mobile Playtest Checklist: Punch Club  
   - reason: documentation, pending canonical review  
@@ -1119,6 +2341,50 @@
 - `context/APPROACH_CONSTRUCTIVE_CRITIQUE.md` — Constructive Critique: "One Page Per Entity + One Page Per Interaction Pair" Approach  
   - markers: proposed  
   - reason: draft/candidate/proposed marker, plan or prompt  
+- `context/QUEST_AUTHORING_PLAYBOOK.md` — QUEST AUTHORING PLAYBOOK  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `context/QUEST_GEN_LAB_CONTRACTS.md` — QUEST GEN LAB — Contracts audit  
+  - markers: proposed  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `context/QUEST_IMPRINTS.md` — QUEST_IMPRINTS — scheletri autoriali e istanziazioni  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `context/STEAM_PAGE_PLAN.md` — Steam Page Plan — pagina "Coming Soon" (r005)  
+  - markers: proposed  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `context/governance/invariant-enforcement-matrix.md` — Invariant → Enforcement Matrix (PLAN-122, T-1)  
+  - markers: proposed  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `context/ingestions/2026-10-05-progettare-quest-strategiche.md` — Knowledge Ingestion Report  
+  - markers: proposed  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `context/ingestions/2026-10-07-registro-narrativo-del-mondo.md` — Knowledge Ingestion Report — Registro narrativo del mondo  
+  - markers: proposed, historical  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `context/ingestions/2026-10-09-emotional-mechanics-quest/SYNTHESIS.md` — Sintesi comparativa — Emotional Mechanics per le quest  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `context/ingestions/2026-10-25-steam-capsule-critique.md` — Knowledge Ingestion Report  
+  - markers: proposed  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `context/request-triage-2026-10-12.md` — Triage richieste — recovery R-156  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `context/research/2026-10-24-agent-visual-calibration/BROADCAST.md` — Broadcast: broadcast-20261024-081222  
+  - markers: proposed  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `context/research/2026-10-24-agent-visual-calibration/metadata.json` — metadata  
+  - markers: proposed  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `context/research/2026-10-25-mood-keys/debate-responses/resp_chatgpt_t4.txt` — resp_chatgpt_t4  
+  - markers: proposed  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/ASSETS-mappa2.md` — Elenco asset `mappa2`  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/INDEX.md` — Plan Index  
+  - markers: proposed  
+  - reason: draft/candidate/proposed marker, plan or prompt  
 - `plans/PLAN-004-poi-quest-ui-regressions.md` — : Piano ridotto — POI Quest UI regressions ERR-028 e ERR-030  
   - reason: draft/candidate/proposed marker, plan or prompt  
 - `plans/PLAN-005-poi-family-ai-friendly.md` — PLAN-005 — POI Family AI-friendly docs and regression test suite  
@@ -1129,13 +2395,308 @@
 - `plans/PLAN-006-docs-and-code-alignment.md` — PLAN-006 — Align docs, code, and old minimal_slice docs  
   - markers: draft  
   - reason: draft/candidate/proposed marker, plan or prompt  
-- `plans/PLAN-007-observatory-primitives.md` — Goal  
-  - reason: draft/candidate/proposed marker, plan or prompt  
-- `plans/PLAN-008-resolution-chain.md` — Goal  
-  - reason: draft/candidate/proposed marker, plan or prompt  
 - `plans/PLAN-009-la-stella-copre-la-trama.md` — PLAN-009 — La stella copre la trama  
   - reason: draft/candidate/proposed marker, plan or prompt  
-- `plans/PLAN-010-astrolabe-v63.md` — PLAN-010 — Astrolabe V6.3  
+- `plans/PLAN-013-sea-marks.md` — : 'World Surface Sea Marks — quiet painted sea motion  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-014-land-breath.md` — PLAN-014 — Land Breath (terraferma che pulsa via displacement Pixi)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-015-sea-ripple-port-and-voronoi.md` — PLAN-015 — Coastal ripple in produzione, e retino cellulare nel lab  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-016-voronoi-sea-surface.md` — PLAN-016 — La superficie marina cellulare  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-017-stylized-sea-pattern-evaluation.md` — PLAN-017 — Stylized Sea Pattern Evaluation  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-018-mission-planner.md` — PLAN-018 — Mission Planner  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-019-S1-quest-interessante.md` — PLAN-019-S1 — La quest interessante  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-019-S2-quest-vera.md` — PLAN-019-S2 — Un paio di POI funzionanti con POI detail veri  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-019-S2.1-scenario-canonico.md` — PLAN-019-S2.1 — Scenario canonico  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-019-S2.2-party-reale.md` — PLAN-019-S2.2 — Party reale  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-019-S2.3-offerta-scaling.md` — PLAN-019-S2.3 — Offerta e world-scaling  
+  - markers: proposed  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-019-S2.4-planning-lancio.md` — PLAN-019-S2.4 — Planning surface + lancio  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-019-S2.5-settlement-e2e.md` — PLAN-019-S2.5 — Settlement + E2E + chiusura  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-019-S3-parte-precedente.md` — PLAN-019-S3 — La parte precedente  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-019-S4-integrazione.md` — PLAN-019-S4 — Integrazione  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-019-quest-macro-plan.md` — PLAN-019 — Macro plan Quest  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-020-quest-rules-canonical-doc.md` — PLAN-020 — Canonical Quest Rules Document  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-022-quest-sterminio-goblin.md` — PLAN-022 — «Sterminio dei goblin» nel lab S1  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-023-quest-s1-lab-ui-redesign.md` — PLAN-023 — Redesign UI del lab quest S1  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-024-quest-s1-lab-hud-restyle.md` — PLAN-024 — Restyle del lab S1 secondo la guida HUD  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-025-quest-theatre-convergence-cinema.md` — PLAN-025 — Frontiera v27 + teatro unico + beat + juice (v4 draft)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-026-quest-generation.md` — PLAN-026 — Quest Generation System (v2 ratificata)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-027-narration-quality.md` — PLAN-027 — Narration Quality (r001)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-028-gimmick-channels-v0.md` — PLAN-028 — Gimmick Channels v0  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-029-SP-1-contracts-audit.md` — SP-1 — Contracts audit + GimmickRegistry (artifact r003)  
+  - markers: proposed  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-029-SP-2-generation-panel.md` — SP-2 — Live generation panel (artifact r003)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-029-SP-3-validation-gates.md` — SP-3 — Validation orchestrator & gate (artifact r006)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-029-SP-4-mc-integration.md` — SP-4 — MC integration (single-run) — artifact r003  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-029-SP-5-authoring-drawers.md` — SP-5 — Authoring drawers — artifact r003  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-029-SP-6-persistence-export.md` — SP-6 — Persistence & export envelope — artifact r003  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-029-SP-7-test-hardening.md` — SP-7 — Test hardening & Playwright smoke — artifact r003  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-029-SP-8-ia-i18n-honesty.md` — SP-8 — IA / i18n / status-honesty pass — artifact r003  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-029-quest-gen-lab-operativa.md` — PLAN-029 — Quest Generation Lab operativa (master plan, artifact r003 converged)  
+  - markers: historical  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-030-meta-layer-gate1-harness.md` — PLAN-030 — Meta-Layer Gate 1  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-031-game-boot-preload-perf.md` — PLAN-031 — `/game` come schermata principale: preload totale + misurazione  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-032-SP-1-hero-sheet.md` — SP-1 Artifact r003 — HeroSheetPanel spec (finale, assorbe R2)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-032-SP-2-village-stash.md` — SP-2 Artifact r003 — VillageStashPanel + MapBuildingPoi (final)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-032-SP-3-merchant-panel.md` — SP-3 Artifact r003 — MerchantPanel (mock merchant screen)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-032-SP-4-bag-strip.md` — SP-4 — BagStrip (consumabili durante viaggio/beat) — artifact r004  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-032-SP-5-hero-levelup.md` — SP-5 — Hero level-up (presentazione mock) — artifact r009  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-032-teaser-game-components.md` — PLAN-032 — Componenti mancanti su `/game` per il teaser trailer  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-033-game-event-shroud-goblin-march.md` — PLAN-033 — /game: sequenza evento invasione  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-034-trailer-audit-fixes.md` — PLAN-034 — Trailer audit remediation  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-035-village-view-buildings.md` — PLAN-035 — Vista Villaggio (`Village` view mode) e Menu Edifici su `/game`  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-036-quest-planner-redesign.md` — PLAN-036 — Quest Planner redesign su `/game` (R-195)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-037-quest-poi-auto-reveal-goblin-repeatable.md` — PLAN-037 — Auto-reveal sfalsato delle offerte quest su `/game` + `repeatable` su goblin  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-038-village-lots-pin-language.md` — PLAN-038 — Villaggio vivo: pin come etichetta di stato + stato dipinto sul dipinto  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-039-replay-benchmark.md` — PLAN-039 — Replay benchmark: sequenziale vs dispatch a esecutori esterni  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-040-quest-window-skillcheck-outcomes.md` — PLAN-040 — QuestRunWindow rev.3: sei difetti osservati dal Director  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-041-model-arena.md` — PLAN-041 — Model Arena: misura per-modello e protocollo di dispatch  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-042-village-registry.md` — PLAN-042 — Registro dell’Insediamento  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-043-S0-baseline-audit.md` — PLAN-043-S0 — Baseline e audit  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-043-S1-slot-scambio-calamita.md` — PLAN-043-S1 — Scambio tra slot, calamita, estrazione col tasto premuto  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-043-S11-altri-componenti.md` — PLAN-043-S11 — Tutti gli altri componenti di /game  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-043-S12-riesame-chiusura.md` — PLAN-043-S12 — Riesame completo e chiusura  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-043-S2-pulizie-menu-bag-regioni.md` — PLAN-043-S2 — Pulizie: P/Q, bag, clic sulle regioni, colori, testo piccolo  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-043-S3-quest-mappa-stato-iniziale.md` — PLAN-043-S3 — Quest sulla mappa, «Stato iniziale» = partita nuova, nessuna scadenza  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-043-S4-goblin-senza-scena-iniziale.md` — PLAN-043-S4 — Quest goblin senza scena d'apertura, consumabili armati dal planner  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-043-S5-slot-incastonatura.md` — PLAN-043-S5 — Slot: scala d'oro, misura, bloom  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-043-S6-scheda-personaggio-posizione.md` — PLAN-043-S6 — Scheda personaggio che non copre i pannelli  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-043-S7-componenti-belli.md` — PLAN-043-S7 — Valorizzare i componenti belli: skill check, inventario, arte, asset  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-043-S8-preview-quest.md` — PLAN-043-S8 — Preview quest riscritta  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-043-S9-famiglia-quest-redesign.md` — PLAN-043-S9 — Famiglia della quest: finestra, skill check, esito, compagni, abbandono  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-043-WS2-three-zone-stage.md` — PLAN-043 · WS-2 — Three-Zone Stage (implementation handoff)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-043-game-quest-surface-pass.md` — PLAN-043 — `/game`, tutta la superficie (rev.4 — Architettura a 6 Workstream)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-044-bv-mechanical-gates.md` — PLAN-044: Verifica comportamentale meccanica S0–S5  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-045-intent-gate.md` — PLAN-045: Gate d'intento — plan e risultato contro desiderata + chiarimenti Director  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-046-quest-cinematics-depth-parallax.md` — PLAN-046: Cinematica scene quest — depth-parallax + regia dei beat (v34)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-047-visual-fork-gate.md` — PLAN-047: Visual Fork Gate — opzioni visive prima del plan, baseline congelata, verifica sul selezionato  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-048-workflow-forensics.md` — PLAN-048: Workflow forensics — ledger di fase da artefatti esistenti (R-217)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-049-plan-queue.md` — PLAN-049 — Plan Queue («quest board»)  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-050-cinematic-showcase-juice.md` — PLAN-050: Cinematic showcase — grammatica ingresso×posa + juice layer (v34)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-051-verify-slim.md` — PLAN-051: Verify Slim — evidence derivata, hash-lock, tiering per reach  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-052-quest-scene-depth-staging.md` — PLAN-052: Quest scene depth-staging authoring contract  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-053-quest-journey-legs.md` — PLAN-053: Quest journey — andata/svolgimento/ritorno come fasi temporali + tragitto riempito sulla mappa (R-226)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-054-living-component-contracts.md` — PLAN-054: Sistema vivo di contratti per-componente, integrazioni e test sincronizzati su `/game`  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-059-rework-metrics-taskclose.md` — PLAN-059: Rework metrics + task:close — misurare la sorpresa, non la lunghezza  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-060-questwindow-input-frontier.md` — PLAN-060: QuestRunWindow — coordinamento input e verify frontier (R-231 Plan A)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-061-questwindow-image-format.md` — PLAN-061: QuestRunWindow — formato immagine 2.4 via pipeline (R-231 Plan D1)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-062-questwindow-progress-semantics.md` — PLAN-062: QuestRunWindow — semantica progresso e checkpoint fasi (R-231 Plan C)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-063-questwindow-chrome-layout.md` — PLAN-063: QuestRunWindow — chrome & layout (R-231 Plan B)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-064-questwindow-idle-animation.md` — PLAN-064: QuestRunWindow — animazione idle post-entry immagine (R-231 Plan D2)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-065-quest-run-window-r231-deep.md` — PLAN-060: QuestRunWindow 9-Point Overhaul & Living Contract Sync (R-231)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-066-autonomous-workflow-no-director-queues.md` — PLAN-066: Workflow autonomo senza code Director  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-067-game-surface-audit-fixes.md` — PLAN-067: /game visto dal giocatore — difetti dell'audit, fork scelti, Director e mock del ciclo (R-234)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-068-director-review-round.md` — PLAN-068: Director review round — gate aggregato unico (R-235)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-069-chiusura-totale.md` — PLAN-069: chiusura totale — prima il review round, poi tutto ciò che resta aperto (R-235)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-070-dead-corrupted-files.md` — PLAN-070: ripulitura file morti corrotti (debito rilevato 2026-10-20)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-071-quest-workflow-video-audit.md` — PLAN-071: Fix del workflow quest end-to-end — audit video Director (R-239)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-072-game-first-interaction-bugs.md` — PLAN-072: /game first-interaction — medaglione drag tardivo + hit-area select roster (R-238)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-073-village-stash-ledger.md` — PLAN-073: Village Stash ledger — warehouse interattivo ↔ bisaccia quest (R-240)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-074-r250-journey-ux-evolution.md` — PLAN-074: Quest journey UX evolution — rotta nascosta in svolgimento, marker «!», pausa su decisione, vignette viaggio (R-250)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-075-r260-collect-commit-reward.md` — PLAN-075: Reward collect-commit — settlement al click «Collect» + delta chip HUD (R-260)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-076-dn7-game-menu-save-load-settings-title.md` — PLAN-076: Menu di gioco — Carica partita, Impostazioni, Esci al titolo, schermata titolo (DN-7 di PLAN-067)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-077-bug-closure-queue.md` — PLAN-077 — Flusso automatico di chiusura work-item e avanzamento della coda  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-078-quality-sentinel.md` — PLAN-078 — Quality Sentinel (converged artifact r004)  
+  - markers: proposed  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-079-r264-265-268-roster-villagers-planner-perf.md` — PLAN-079 — R-264/R-265/R-268: villager mancanti, rename+portrait, planner responsivo  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-080-scene-prompt-authoring.md` — PLAN-080 — R-272: authoring dei prompt di scena — regole, lint stilistico, kernel pittorico, compiler  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-081-gate-foreign-scope.md` — PLAN-081: Gate scopati allo scope del piano (R-273)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-082-astrolabe-family-glyph.md` — PLAN-082: Astrolabio V6.2 — famiglia uniforme per board (v37, R-275)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-083-mobile-fit-game-surface.md` — PLAN-083: Mobile fit della superficie /game (R-274)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-084-living-stills-reveal-variants.md` — PLAN-084 — Living stills: reveal narrativi + varianti di scena  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-085-amanuense-page.md` — PLAN-085 — Amanuense Page  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-086-quest-playground.md` — PLAN-086 — Quest Playground  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-086-ui-catalog-critique-pipeline.md` — PLAN-086 — UI Catalog & Critique Pipeline  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-086-visual-judgment-calibration.md` — PLAN-086 — Calibrazione del giudizio visivo dell'agente  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-087-two-plate-generation.md` — PLAN-087 — Two-Plate Generation Convention  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-088-scene-prompt-form-v2.md` — PLAN-088 — Scene Prompt Form v2 (4-job split + parallax contract)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-089-mappa2-living-world.md` — PLAN-089 — `mappa2` Living World Surface  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-090-deep-research-parity.md` — PLAN-090 — Deep-Research-grade context engineering per Mind Weaver  
+  - markers: proposed  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-091-mappa2-waterfall-prototype.md` — PLAN-091 — Cascata animata su `/mappa2-lab`  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-092-mappa2-waterfall-painted-scroll.md` — PLAN-092 — mappa2 Waterfall "Painted Scroll" (Mode A2)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-093-mappa2-ambient-land-life.md` — PLAN-093 — Ambient Land-Life su `/mappa2-lab`  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-094-mappa2-ambient-director.md` — PLAN-094 — AmbientDirector + prima vita schedulata su `/mappa2-lab`  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-095-mappa2-secondary-water.md` — PLAN-095 — Secondary Water Motion su `/mappa2-lab`  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-096-mappa2-max-zoom-aaa-detail.md` — PLAN-096 — `mappa2` qualità AAA allo zoom massimo  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-097-mappa2-land-fauna.md` — PLAN-097 — Fauna di terra su `/mappa2-lab`  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-098-mappa2-regional-weather.md` — PLAN-098 — Regional Weather & Atmospheric Accents su `/mappa2-lab`  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-099-mappa2-territories-and-biomes.md` — PLAN-099 — Territori e Biomi su `mappa2`  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-100-mappa2-map-audio-and-secrets.md` — PLAN-100 — Suono di zona e segreti cliccabili su `/mappa2-lab`  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-101-mappa2-sea-routes.md` — PLAN-101 — Sea Routes & Ambient Sea-Life su `/mappa2-lab`  
+  - markers: candidate  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-102-quest-editor.md` — PLAN-102 — Quest Editor  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-103-mappa2-animations-macro-plan.md` — PLAN-103 — Macro plan animazioni `mappa2`  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-104-mappa2-rare-wonders.md` — PLAN-104 — Rare Sea Wonders su `/mappa2-lab`  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-105-mappa2-peak-storm-crowns.md` — PLAN-105 — Corone temporalesche sulle cime nevose  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-106-mappa2-village-stages.md` — Village Upgrades on mappa2 — Pipeline + Runtime Plan (artifact r009)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-107-hud-zanara-real-components.md` — PLAN-107 — HUD Zanara: dai mockup ai componenti reali su /game — HUD Zanara → componenti reali /game  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-108-mappa2-stormo-flock.md` — PLAN-108 — Stormo su `/mappa2-lab` (fauna slice 1a)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-109-hud-zanara-kit-generation.md` — PLAN-109: HUD Zanara, generazione del kit completo (K2–K17)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-110-hud-mockup-to-real-components.md` — PLAN-110: dai mockup scelti ai componenti veri, uno alla volta  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-111-hud-generation-trials.md` — PLAN-111: HUD, prove ed errori fino a trovare il metodo di generazione  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-112-hud-aaa-blueprint-first.md` — PLAN-112 — HUD AAA: prima la pianta, poi i componenti  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-113-hud-zanara-surfaces.md` — PLAN-113 — HUD Zanara: tutte le superfici di `/game` in `/hud-compose`  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-114-componenti-zanara-multi-ai.md` — PLAN-114 — Pipeline componenti Zanara: descrizione → discussione layout multi-AI web → mockup → pagine presentazione  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-115-mappa2-hires-tier-tasselli.md` — PLAN-115 — mappa2 hi-res su `/game`: livelli per dispositivo + tasselli LOD  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-116-cassetto-colonna-ghiera.md` — PLAN-116 — Cassetto a colonna destra + ghiera Zanara + rack a N posti  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-117-F2-fan-luogo.md` — PLAN-117 F2 — Sub-plan: Ventaglio-carte del Luogo  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-117-poi-zanara-e-luogo.md` — PLAN-117 — Layer opportunità della mappa: POI Zanara, Luoghi fissi, Eventi strategici, Regioni  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-118-deploy-slim-mobile.md` — PLAN-118 — Deploy Vercel slim: solo le superfici navigabili da mobile  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-120-skill-catalog-slim.md` — PLAN-120 — Skill catalog slim: descrizioni ≤200 char + verifica telemetry  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-121-richeste-split.md` — PLAN-121 — RICHIESTE split attive/archivio: ledger 1.089k char → file attivo ≤cap  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-122-invariant-enforcement-matrix.md` — PLAN-122 — Invariant→enforcement matrix + `governance:check` + kernel slim  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-123-ledger-docs-split.md` — PLAN-123 — Ledger-docs split: DECISION_LOG + desiderata → file attivi ≤cap + archivio union-read  
+  - markers: decision  
   - reason: draft/candidate/proposed marker, plan or prompt  
 - `plans/PLAN-MOCKUP-TO-COMPONENT-v1.md` — PLAN-MOCKUP-TO-COMPONENT v1 — Da richiesta a mockup a componente React ottimizzato  
   - reason: draft/candidate/proposed marker, plan or prompt  
@@ -1145,6 +2706,15 @@
   - reason: draft/candidate/proposed marker, plan or prompt  
 - `.mw/bugs/2026-08-27-goblin-sticker/bug.md` — Goblin sticker behaviour lost in WorldSurfaceEventCard  
   - markers: proposed  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/bugs/20261023-double-vite-server-5173/pattern-candidate.md` — Pattern candidate — "double dev server" su porta condivisa  
+  - markers: candidate  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/plans/r186-settlement-convergence.md` — Plan R-186 (Revision r003 — Multi-AI Debate Final)  
+  - markers: candidate  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/plans/verification-false-pass-prevention.md` — BOZZA — architettura approvata dal Director il 2026-10-14 (R-189, D1–D6).  
+  - markers: candidate  
   - reason: draft/candidate/proposed marker, plan or prompt  
 - `.mw/specs/d100-pinball/design-intent.md` — D100 Pinball — Design Intent  
   - reason: draft/candidate/proposed marker, plan or prompt  
@@ -1163,6 +2733,26 @@
 - `.mw/specs/destiny-astrolabe/prompt.md` — Destiny Astrolabe — Generation Prompt  
   - reason: draft/candidate/proposed marker, plan or prompt  
 - `.mw/specs/destiny-astrolabe/provenance.md` — Destiny Astrolabe — Mockup Provenance  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/event-reminder/aaa-critique-prompt.txt` — aaa-critique-prompt  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/event-reminder/aaa-polish-prompt.txt` — aaa-polish-prompt  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/event-reminder/adaptation-spec.md` — Event Reminder — Adaptation Spec  
+  - markers: proposed  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/event-reminder/broadcast-prompt.txt` — Event Reminder — Adaptation Spec  
+  - markers: proposed  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/event-reminder/plan-prompt-v2.txt` — plan-prompt-v2  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/event-reminder/plan-prompt.txt` — plan-prompt  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/event-reminder/polish-plan-prompt.txt` — polish-plan-prompt  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/expedition-ui/artifact-r004.md` — Subplan 1 — Expedition Planning UI: mockup absorption (artifact r004)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/expedition-ui/refs/REGISTERED.md` — Registered references — expedition-ui (R-339 / PLAN-119)  
   - reason: draft/candidate/proposed marker, plan or prompt  
 - `.mw/specs/goblin-event-modal/MOCKUP.md` — Goblin Invasion Mockup Reference  
   - reason: draft/candidate/proposed marker, plan or prompt  
@@ -1236,6 +2826,616 @@
   - reason: draft/candidate/proposed marker, plan or prompt  
 - `.mw/specs/goblin-window-frame-2026-08-27/visual-inventory.md` — Visual Inventory — Goblin Invasion Window Frame  
   - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-living-atlas/design-intent.md` — HUD Living Atlas — Design Intent  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-living-atlas/identity.md` — HUD Living Atlas — Asset Identity  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-living-atlas/prompt.md` — HUD Living Atlas — Generation Prompt  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/AUTONOMY.md` — Modalità autonoma HUD (Director, 2026-11-03)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/C1/S1-fidelity.json` — S1-fidelity  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/C1/inventory.md` — C1 Roster: inventario visivo (S0)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/C1/reference.json` — reference  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/C1/zones/band-joint.zone.json` — band-joint.zone  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/C1/zones/plaque-tip.zone.json` — plaque-tip.zone  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/C1/zones/ring.zone.json` — ring.zone  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/C1/zones/ring.zone.prompt.txt` — ring.zone.prompt  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/COMPOSITION-SPEC.md` — COMPOSITION-SPEC — contratto di composizione a gruppi (PLAN-113 F1)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/CONTENT-CONTRACTS.md` — CONTENT-CONTRACTS — PLAN-112 F2 (2026-11-05)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/DECISIONI-APERTE.md` — Decisioni aperte per il Director (PLAN-110, 2026-11-04)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/DECISIONS.md` — Decisioni automatiche (modalità autonoma)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/G0/now/probe.json` — probe  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/G0/now2/probe.json` — probe  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/G0/now3/probe.json` — probe  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/G0/probe.json` — probe  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/G0/probe2.json` — probe2  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/G0/probe3.json` — probe3  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/G0/ring/defects.json` — defects  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/G0/ring/prompt-1.txt` — prompt-1  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/G0/ring/prompt-2-edit.txt` — prompt-2-edit  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/HUD-108-AUDIT.md` — HUD-108 — Audit visivo e funzionale della HUD nuova (2026-11-04)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/HUD-INVENTORY.md` — HUD-INVENTORY — F0 output (PLAN-112, 2026-11-05)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/LAYOUT-B1-quest-window.md` — LAYOUT SPEC — B1 QuestRunWindow (v2, completa — dalla cattura produzione)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/LAYOUT-SPEC.md` — LAYOUT-SPEC — pianta B1 (PLAN-112 F1) — **G1 FIRMATO il 2026-11-05 · amend #1 (toast) · amend #2 (modello di scala del gioco)**  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/LINGUAGGIO-v2.md` — Linguaggio HUD Wanderlust: v2 (Smeraldo e Oro)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/MOCKUP-TO-ASSET-GUIDE.md` — MOCKUP → ASSET — la pipeline canonica dei port Zanara  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/PANELS-INVENTORY.md` — PANELS-INVENTORY — tutte le superfici di `/game` (PLAN-113 F0)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/REVIEW-REPORT.md` — Esame finale della HUD (PLAN-110): rapporto  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/REVIEW.md` — Esame finale della HUD: protocollo  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/STATUS.md` — Stato (aggiornato a ogni passo importante)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/assets-test/g2/geometry.json` — geometry  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/assets-test/g3/geometry.json` — geometry  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/assets-test/g4/geometry.json` — geometry  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/assets-test/geometry.json` — geometry  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/assets-test/u2/geometry.json` — geometry  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/band/prompt-end.txt` — prompt-end  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/band/prompt-joint.txt` — prompt-joint  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/band/prompt-spine.txt` — prompt-spine  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/brand/prompt-brand.txt` — prompt-brand  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/bust/prompt-bust.txt` — prompt-bust  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/compass/prompt-compass.txt` — prompt-compass  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/crest/prompt-clock.txt` — prompt-clock  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/crest/prompt-orrery.txt` — prompt-orrery  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/crest-roman/prompt-aquila.txt` — prompt-aquila  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/crest-roman/prompt-galea.txt` — prompt-galea  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/crest-roman/prompt-sol.txt` — prompt-sol  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/crest2/prompt-arcana.txt` — prompt-arcana  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/crest2/prompt-chalice.txt` — prompt-chalice  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/crest2/prompt-crown.txt` — prompt-crown  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/crest2/prompt-dragon.txt` — prompt-dragon  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/crest2/prompt-eye.txt` — prompt-eye  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/crest2/prompt-phoenix.txt` — prompt-phoenix  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/defects.json` — defects  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/emblem/aaa/edit.txt` — edit  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/emblem/aaa/fresh.txt` — fresh  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/emblem/design.json` — design  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/emblem/prompt-guided.txt` — prompt-guided  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/emblem/prompt-unguided.txt` — prompt-unguided  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/emblem/zones/dial-prompt.txt` — dial-prompt  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/emblem/zones/finial-prompt.txt` — finial-prompt  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/emblem/zones/pendant-prompt.txt` — pendant-prompt  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/emblem/zones/wing-prompt.txt` — wing-prompt  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/emblem/zones/zones.json` — zones  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/f3/COLOR-TARGETS.md` — COLOR-TARGETS — PLAN-112 F3.1 (2026-11-05)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/f3/G2-PACKAGE.md` — G2 — pacchetto per il Director (PLAN-112 F3, 2026-11-05) — **G2 CHIUSO il 2026-11-05: G2-1 pf-3 · G2-2 slot 340×520 · G2-3 medaglione approvato · G2-4 oro A + smalto B · G2-5 nessun cimiero · G2-6 soglie per pezzo (vedi plans/PLAN-112 §25)**  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/f3/TRAITS-CARDS.md` — TRAITS-CARDS — PLAN-112 F3.2 (2026-11-05)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/f3/cand/pf1/frame-geometry.json` — frame-geometry  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/f3/cand/pf1-geometry.ts` — pf1-geometry  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/f3/cand/pf3/frame-geometry.json` — frame-geometry  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/f3/cand/pf3-geometry.ts` — pf3-geometry  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/f3/color-targets.json` — color-targets  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/f3/panelFrameGeometry-current.ts` — panelFrameGeometry-current  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/f3/prompt-medallion.txt` — prompt-medallion  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/f3/prompt-panel-frame.txt` — prompt-panel-frame  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/f3/rollback/panelFrameGeometry-before-pf3.ts` — panelFrameGeometry-before-pf3  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gemini-capabilities.md` — Gemini web: capacità misurate (G-0, 2026-11-02)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gen-budget.json` — gen-budget  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gen-jobs/A1-triad-frames.json` — A1-triad-frames  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gen-jobs/B1-quest-window.json` — B1-quest-window  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gen-jobs/B1b-quest-window-rich.json` — B1b-quest-window-rich  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gen-jobs/C10-voce.json` — C10-voce  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gen-jobs/C11-time.json` — C11-time  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gen-jobs/C1r-rail.json` — C1r-rail  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gen-jobs/C1w-rail2.json` — C1w-rail2  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gen-jobs/C2-bar3.json` — C2-bar3  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gen-jobs/C3-nav.json` — C3-nav  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gen-jobs/C3b-nav2.json` — C3b-nav2  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gen-jobs/C4-panel.json` — C4-panel  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gen-jobs/C4b-panelv2.json` — C4b-panelv2  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gen-jobs/C5-compass.json` — C5-compass  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gen-jobs/C6-globe.json` — C6-globe  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gen-jobs/C7-seal.json` — C7-seal  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gen-jobs/C7b-seal2.json` — C7b-seal2  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gen-jobs/C8-brand.json` — C8-brand  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gen-jobs/C9-bust.json` — C9-bust  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gen-jobs/F3m-medallion.json` — F3m-medallion  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gen-jobs/F3p-panel-frame.json` — F3p-panel-frame  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gen-jobs/K1-kit.json` — K1-kit  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gen-jobs/N1-brand.json` — N1-brand  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gen-jobs/N2-voce.json` — N2-voce  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gen-jobs/N3-panel.json` — N3-panel  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gen-jobs/N4-panel3.json` — N4-panel3  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gen-jobs/R1-crest-roman.json` — R1-crest-roman  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gen-jobs/R10-garland-tile.json` — R10-garland-tile  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gen-jobs/R2-roster-triad.json` — R2-roster-triad  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gen-jobs/R3-roster-stash.json` — R3-roster-stash  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gen-jobs/R4-roster-v3.json` — R4-roster-v3  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gen-jobs/R5-rail-forms.json` — R5-rail-forms  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gen-jobs/R6-rail-drape.json` — R6-rail-drape  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gen-jobs/R7-rail-drape2.json` — R7-rail-drape2  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gen-jobs/R8-drape-v3.json` — R8-drape-v3  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/gen-jobs/R9-drape-garland.json` — R9-drape-garland  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/generation-catalog.md` — Catalogo di generazione (PLAN-111)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/globe/prompt-globe.txt` — prompt-globe  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/kit/BASELINE.md` — Kit baselines — GC-KIT (provisorie, delega Director «procedi» 2026-11-06)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/kit/design-intent-v2.md` — Design intent v2 — base corretta (ruling Director 2026-11-06)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/kit/design-intent.md` — Kit Zanara condiviso — F1.5 (PLAN-113, E-01)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/kit/prompt-buttons.txt` — prompt-buttons  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/kit/prompt-divider.txt` — prompt-divider  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/kit/prompt-mobile-compagnia.txt` — prompt-mobile-compagnia  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/kit/prompt-planner-arredo.txt` — prompt-planner-arredo  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/kit/prompt-quest-window-rich.txt` — prompt-quest-window-rich  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/kit/prompt-quest-window.txt` — prompt-quest-window  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/kit/prompt-tab.txt` — prompt-tab  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/kit/prompt-tooltip.txt` — prompt-tooltip  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/library/library.src.json` — library.src  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/nav/prompt-nav.txt` — prompt-nav  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/nav/prompt-nav2.txt` — prompt-nav2  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/norose/backup/HudRealSeal-heavy.tsx` — HudRealSeal-heavy  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/norose/backup/brandPieceGeometry-star.ts` — brandPieceGeometry-star  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/norose/backup/navBarGeometry-6sockets.ts` — navBarGeometry-6sockets  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/norose/backup/panelFrameGeometry-compass.ts` — panelFrameGeometry-compass  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/norose/backup/panelFrameGeometry-ivy.ts` — panelFrameGeometry-ivy  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/norose/backup/vocePieceGeometry-compass.ts` — vocePieceGeometry-compass  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/norose/prompt-brand.txt` — prompt-brand  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/norose/prompt-panel.txt` — prompt-panel  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/norose/prompt-panel3.txt` — prompt-panel3  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/norose/prompt-voce.txt` — prompt-voce  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/panel/backup/panelFrameGeometry-panel2.ts` — panelFrameGeometry-panel2  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/panel/backup/panelFrameGeometry-panel3.ts` — panelFrameGeometry-panel3  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/panel/prompt-panel-v2.txt` — prompt-panel-v2  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/panel/prompt-panel.txt` — prompt-panel  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/plaque/design.json` — design  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/plaque/prompt-guided.txt` — prompt-guided  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/plaque/prompt-unguided.txt` — prompt-unguided  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/probe/STATUS.md` — Probe C1 ring — stato 2026-11-02 (run plan110-probe-c1, conv app/a43296edffe393b6)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/probe/canary-prompt.txt` — canary-prompt  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/probe/originals/harvest.json` — harvest  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/probe/ring-unguided.prompt.txt` — ring-unguided.prompt  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/probe2/prompt-guided.txt` — prompt-guided  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/probe2/prompt-unguided.txt` — prompt-unguided  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/queue.json` — queue  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/rail/backup-HudRealRoster-thin.tsx` — backup-HudRealRoster-thin  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/rail/backup-c1RailGeometry-thin.ts` — backup-c1RailGeometry-thin  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/rail/prompt-rail.txt` — prompt-rail  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/rail2/prompt-rail2.txt` — prompt-rail2  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/refs/REGISTERED.md` — Registered reference artifacts (rule 46-approved-references)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/resources/assets-test/bar-geometry.json` — bar-geometry  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/resources/prompt-bar3.txt` — prompt-bar3  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/resources/prompt-left.txt` — prompt-left  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/resources/prompt-mid.txt` — prompt-mid  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/resources/prompt-mid2.txt` — prompt-mid2  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/resources/prompt-right.txt` — prompt-right  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/review-measures.txt` — review-measures  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/roster/NOTES-rilievi-2026-11-10.md` — Roster gagliardetto — rilievi Director (2026-11-10, ACCANTONATO)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/roster/prompt-drape-cloth.txt` — prompt-drape-cloth  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/roster/prompt-drape-garland.txt` — prompt-drape-garland  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/roster/prompt-garland-tile.txt` — prompt-garland-tile  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/roster/prompt-rail-drape-v2.txt` — prompt-rail-drape-v2  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/roster/prompt-rail-drape-v3.txt` — prompt-rail-drape-v3  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/roster/prompt-rail-drape.txt` — prompt-rail-drape  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/roster/prompt-rail-fan.txt` — prompt-rail-fan  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/roster/prompt-rail-laurel.txt` — prompt-rail-laurel  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/roster/prompt-rail-seals.txt` — prompt-rail-seals  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/roster/prompt-rail-v3.txt` — prompt-rail-v3  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/roster/prompt-roster-alone.txt` — prompt-roster-alone  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/roster/prompt-roster-open-final.txt` — prompt-roster-open-final  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/roster/prompt-roster-open-v2a.txt` — prompt-roster-open-v2a  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/roster/prompt-roster-open-v2b.txt` — prompt-roster-open-v2b  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/roster/prompt-roster-open.txt` — prompt-roster-open  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/roster/prompt-stash-open.txt` — prompt-stash-open  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/roster/prompt-triad.txt` — prompt-triad  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/rowmod/assets-1/rowmod-geometry.json` — rowmod-geometry  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/rowmod/assets-2/rowmod-geometry.json` — rowmod-geometry  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/rowmod/assets-3/rowmod-geometry.json` — rowmod-geometry  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/rowmod/assets-4/rowmod-geometry.json` — rowmod-geometry  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/rowmod/prompt.txt` — prompt  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/seal/prompt-seal.txt` — prompt-seal  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/seal/prompt-seal2.txt` — prompt-seal2  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/time/prompt-time.txt` — prompt-time  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/tooling/CONTRACT.md` — R-311 — Tooling a zero generazioni (PLAN-110 §13, precondizioni E-02/E-03)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/trials.md` — Registro delle prove (PLAN-111)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/village-icon/prompt.txt` — prompt  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-real/voce/prompt-voce.txt` — prompt-voce  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-resource-icons/design-intent.md` — Design intent — hud-resource-icons  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-resource-icons/identity.md` — Identity — hud-resource-icons  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-resource-icons/prompt.md` — Prompt — hud-resource-icons  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/HANDOFF.md` — HUD Zanara — Handoff completo (2026-11-02)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/LINGUAGGIO-v1.md` — Linguaggio HUD Wanderlust: v1  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/asset-identity.md` — HUD Zanara — asset-identity (PLAN-107, T-002)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/asset-manifest.md` — HUD Zanara — asset-manifest (PLAN-107, T-002)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/component-reconstruction.md` — HUD Asset Reconstruction Protocol — r002 (converged)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/design-intent.md` — HUD Zanara — design-intent (PLAN-107, T-002)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/KIT-ROSTER.md` — Kit Zanara: pezzi per il roster (primo componente, anchor-first)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/approved/SELECTION.md` — Varianti approvate dal Director (2026-11-02)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/gen/K1/K1-compare.json` — K1-compare  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/gen/K10/K10-compare.json` — K10-compare  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/gen/K10/chats.txt` — chats  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/gen/K11/K11-compare.json` — K11-compare  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/gen/K11/chats.txt` — chats  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/gen/K12/K12-compare.json` — K12-compare  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/gen/K12/chats.txt` — chats  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/gen/K13/chats.txt` — chats  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/gen/K2/K2-compare.json` — K2-compare  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/gen/K2/chats.txt` — chats  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/gen/K3/K3-compare.json` — K3-compare  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/gen/K3/chats.txt` — chats  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/gen/K4/K4-compare.json` — K4-compare  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/gen/K4/chats.txt` — chats  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/gen/K5/K5-compare.json` — K5-compare  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/gen/K5/chats.txt` — chats  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/gen/K6/K6-compare.json` — K6-compare  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/gen/K6/chats.txt` — chats  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/gen/K7/K7-compare.json` — K7-compare  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/gen/K7/chats.txt` — chats  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/gen/K8/K8-compare.json` — K8-compare  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/gen/K8/chats.txt` — chats  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/gen/K9/K9-compare.json` — K9-compare  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/gen/K9/chats.txt` — chats  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/prompts/K1-ring.txt` — K1-ring  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/prompts/K10-foglio-alabastro.txt` — K10-foglio-alabastro  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/prompts/K11-smalto-tile.txt` — K11-smalto-tile  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/prompts/K12-alabastro-tile.txt` — K12-alabastro-tile  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/prompts/K13-sigillo.txt` — K13-sigillo  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/prompts/K14a-quadrante.txt` — K14a-quadrante  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/prompts/K14b-ago.txt` — K14b-ago  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/prompts/K15-icone-mondo.txt` — K15-icone-mondo  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/prompts/K16a-busto-sinistro.txt` — K16a-busto-sinistro  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/prompts/K16b-busto-destro.txt` — K16b-busto-destro  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/prompts/K17-voce-amanuense.txt` — K17-voce-amanuense  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/prompts/K2-plaque.txt` — K2-plaque  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/prompts/K3-band.txt` — K3-band  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/prompts/K4-gems.txt` — K4-gems  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/prompts/K5-emblem.txt` — K5-emblem  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/prompts/K6-band-end.txt` — K6-band-end  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/prompts/K7-lastra-9slice.txt` — K7-lastra-9slice  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/prompts/K8-cartiglio.txt` — K8-cartiglio  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/kit/prompts/K9-giunto.txt` — K9-giunto  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/overnight/OVERNIGHT-REPORT.md` — HUD recon overnight — 2026-11-01T23:14:39.884Z  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/overnight/brand-plaque/prompt.txt` — prompt  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/overnight/components-pass2.json` — components-pass2  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/overnight/components.json` — components  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/overnight/corner-bl/prompt.txt` — prompt  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/overnight/corner-br/prompt.txt` — prompt  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/overnight/cta-button/prompt.txt` — prompt  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/overnight/emblem-alato/prompt.txt` — prompt  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/overnight/nav-plinth/prompt.txt` — prompt  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/overnight/panel-alabastro/prompt.txt` — prompt  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/overnight/pillar-banda/prompt.txt` — prompt  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/overnight/resources-bar/prompt.txt` — prompt  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/overnight/seal/prompt.txt` — prompt  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/prompts/emerald-gem-v2.txt` — emerald-gem-v2  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/prompts/emerald-gem.txt` — emerald-gem  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/prompts/filigree-vine.txt` — filigree-vine  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/prompts/medallion-ring-v2.txt` — medallion-ring-v2  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/prompts/medallion-ring.txt` — medallion-ring  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/prompts/roster-pendant.txt` — roster-pendant  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/prompts/roster-pillar.txt` — roster-pillar  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/prompts/roster-plaque.txt` — roster-plaque  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/prompts/roster-sheet-repair.txt` — roster-sheet-repair  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/prompts/roster-sheet-v2.txt` — roster-sheet-v2  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/roster-crop/README.md` — Roster ritagliato da zanara-v2: test (2026-11-02)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/hud-zanara/target/slots.json` — slots  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/icons/ANCORE-gemini.md` — Prompt Gemini — ancore icone (aggiornato 2026-10-14, pane v3)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/icons/ANCORE-prompt-pack.md` — Ancore PLAN-058 T2.6 — prompt pronti da incollare  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/icons/MEDAGLIONI-prompt-pack.md` — Pacchetto prompt d'icona — 4 voci (kit v1)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/icons/SET-T3.1-prompt-pack.md` — Pacchetto prompt d'icona — 19 voci (kit v1)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/icons/item-healing-draught/prompt.md` — Prompt icona — item-healing-draught (kit v1)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/icons/offer-assault/prompt.md` — Prompt icona — offer-assault (kit v1)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/icons/offer-caravan/prompt.md` — Prompt icona — offer-caravan (kit v1)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/icons/offer-delve/prompt.md` — Prompt icona — offer-delve (kit v1)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/icons/offer-forage/prompt.md` — Prompt icona — offer-forage (kit v1)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/icons/offer-people/prompt.md` — Prompt icona — offer-people (kit v1)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/icons/offer-recon/prompt.md` — Prompt icona — offer-recon (kit v1)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/icons/poi-goblin-camp/prompt.md` — Prompt icona — poi-goblin-camp (kit v1)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/icons/poi-ruins/prompt.md` — Prompt icona — poi-ruins (kit v1)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/icons/res-food/prompt.md` — Prompt icona — res-food (kit v1)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/icons/res-gold/prompt.md` — Prompt icona — res-gold (kit v1)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/icons/res-wood/prompt.md` — Prompt icona — res-wood (kit v1)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/icons/stat-per/prompt.md` — Prompt icona — stat-per (kit v1)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/icons/stat-str/prompt.md` — Prompt icona — stat-str (kit v1)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/icons/threat-beasts/prompt.md` — Prompt icona — threat-beasts (kit v1)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/icons/threat-claws/prompt.md` — Prompt icona — threat-claws (kit v1)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/icons/threat-goblin-king/prompt.md` — Prompt icona — threat-goblin-king (kit v1)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/icons/threat-invasion/prompt.md` — Prompt icona — threat-invasion (kit v1)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/icons/time-dawn/prompt.md` — Prompt icona — time-dawn (kit v1)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/icons/time-day/prompt.md` — Prompt icona — time-day (kit v1)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/icons/time-dusk/prompt.md` — Prompt icona — time-dusk (kit v1)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/icons/time-night/prompt.md` — Prompt icona — time-night (kit v1)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/icons/ui-danger-skull/prompt.md` — Prompt icona — ui-danger-skull (kit v1)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/icons/ui-victory/prompt.md` — Prompt icona — ui-victory (kit v1)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
 - `.mw/specs/poi-quest-icons/design-intent.md` — Design Intent — POI Quest Icon Set  
   - reason: draft/candidate/proposed marker, plan or prompt  
 - `.mw/specs/poi-quest-icons/identity.md` — Identity — POI Quest Icon Set  
@@ -1244,12 +3444,164 @@
   - reason: draft/candidate/proposed marker, plan or prompt  
 - `.mw/specs/poi-quest-icons/provenance.md` — Provenance — POI Quest Icon Set  
   - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/poi-radial/NOTES.md` — poi-radial — kit materiali del menu radiale del Luogo (PLAN-117 F2)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/poi-radial/cards/prompt-plate.txt` — prompt-plate  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/poi-radial/diorama/prompt-final.txt` — prompt-final  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/poi-radial/prompts/prompt-disc-base.txt` — prompt-disc-base  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/poi-radial/prompts/prompt-disc-event.txt` — prompt-disc-event  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/poi-radial/prompts/prompt-disc-glass.txt` — prompt-disc-glass  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/poi-radial/prompts/prompt-disc-job.txt` — prompt-disc-job  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/poi-radial/prompts/prompt-disc-quest.txt` — prompt-disc-quest  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/poi-radial/prompts/prompt-hub.txt` — prompt-hub  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/poi-zanara/NOTES.md` — poi-zanara — fork visivo POI (PLAN-117 T1.1/T1.2)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/poi-zanara/prompts/prompt-A-emerald-enamel.txt` — prompt-A-emerald-enamel  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/poi-zanara/prompts/prompt-A2-dark-edge.txt` — prompt-A2-dark-edge  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/poi-zanara/prompts/prompt-B-engraved-gold.txt` — prompt-B-engraved-gold  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/poi-zanara/prompts/prompt-B2-dark-edge.txt` — prompt-B2-dark-edge  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/poi-zanara/prompts/prompt-C-gem-heart.txt` — prompt-C-gem-heart  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/poi-zanara/prompts/prompt-C2-dark-edge.txt` — prompt-C2-dark-edge  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-goblin-narration/contract-v1.json` — contract-v1  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-goblin-scenes/design-intent.md` — Quest «Sterminio dei goblin» — Scene Art — Design Intent  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-goblin-scenes/prompts-external.md` — Quest «Sterminio dei goblin» — Full Prompts (external generators)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-goblin-scenes/scenes/f0-mercante/prompt.md` — F0 — Evento di viaggio: il mercante (opzionale) → `mercante.png`  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-goblin-scenes/scenes/f0-viaggio/prompt.md` — F0 — Viaggio (`gob-inizio`) → `viaggio.png`  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-goblin-scenes/scenes/f1-albero/prompt.md` — F1 — Ti arrampichi sull'albero (`gob-tracce-perfor`) → `albero.png`  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-goblin-scenes/scenes/f1-esplorazione/prompt.md` — F1 — Esplorazione (`gob-esplora`) → `esplorazione.png`  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-goblin-scenes/scenes/f1-tracce/prompt.md` — F1 — Cercare tracce (`gob-tracce-per`) → `tracce.png`  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-goblin-scenes/scenes/f2-bottino/prompt.md` — F2 — Il bottino (`carro-nascosto`) → `bottino.jpg` — BRIEF v6 (fiction-true + canonical lint)  
+  - markers: canonical  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-goblin-scenes/scenes/f2-saccheggio/prompt.md` — FX — Spoglie (`gob-esplora-extra` / `gob-cerca`) → `saccheggio.jpg`  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-goblin-scenes/scenes/f3-accampamento/prompt.md` — F3 — L'accampamento (`gob-accampamento`) → `accampamento.png`  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-goblin-scenes/scenes/f3-accampamento-dusk/prompt.md` — F3-dusk — L'accampamento al crepuscolo → `accampamento-dusk.png` (showcase PLAN-052 v2)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-goblin-scenes/scenes/f3-assalto/prompt.md` — F3 — La carica (`gob-assalto`) → `assalto.png`  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-goblin-scenes/scenes/f3-gola-dusk/prompt.md` — F3-gola — La gola al crepuscolo → `gola-raider.png` (showcase PLAN-052 v2)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-goblin-scenes/scenes/f3-intrusi/prompt.md` — F3 — Gli intrusi (`intrusi`) → `intrusi.jpg` — BRIEF v2 (SHOULDER)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-goblin-scenes/scenes/f4-combattimento/prompt.md` — F4 — Il combattimento (`assalto-goblin`) → `assalto.jpg` — BRIEF v2 (CASCADE)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-goblin-scenes/scenes/f5-incalzare/prompt.md` — F5 — L'incalzare (`fuga-goblin`) → `incalzare.jpg` — BRIEF v4 (fiction-true: gob-incalzare)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-goblin-scenes/scenes/f6-spoglie-di-guerra/prompt.md` — CESTINATO 2026-10-24 — nessun nodo `gob-spoglie` esiste; il loot vive in `gob-bottino` e `gob-cerca`.  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-goblin-scenes/scenes/f7-agguato/prompt.md` — F7 — L'agguato (`gob-agguato`, `gob-agguato-scelta`) → `agguato.png` — BRIEF v2  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-goblin-scenes/scenes/f7-ultimo-scontro/prompt.md` — F7 — L'ultimo scontro (`gob-ultimo-scontro`) → `ultimo-scontro.png`  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-goblin-scenes/scenes/f8-ritorno/prompt.md` — F8 — Ritorno (`gob-ritorno`, `gob-fine`) → `ritorno.png`  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-goblin-scenes/scenes/quest-card/prompt.md` — Quest card — Il totem → `quest-card.png`  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-goblin-scenes/scenes.md` — Quest «Sterminio dei goblin» — Scene Index & NODE_ART mapping  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-journey-legs/design-intent.md` — Quest Journey Legs — Andata / Ritorno (R-250 punto 3, R-256 sessione)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-journey-legs/scenes/andata/prompt.md` — ANDATA — Viaggio di andata → `viaggio-andata.png`  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-journey-legs/scenes/ritorno/prompt.md` — RITORNO — Viaggio di ritorno → `viaggio-ritorno.png`  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-journey-legs/scenes.md` — Quest Journey Legs — scene index (SSoT dei set)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-rovine-scenes/design-intent.md` — Quest «Le rovine sotto il fiume» — Scene Art — Design Intent  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-rovine-scenes/scenes/r0-mercante/prompt.md` — R0 — Il mercante all'ingresso → `mercante.png`  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-rovine-scenes/scenes/r1-fiume/prompt.md` — R1 — Il fiume sotterraneo → `fiume.png`  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-rovine-scenes/scenes/r2-guardie/prompt.md` — R2 — Le guardie nella galleria → `guardie.png`  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-rovine-scenes/scenes/r3-tesoro/prompt.md` — R3 — La sala del tesoro → `tesoro.png`  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-rovine-scenes/scenes/r4-crollo/prompt.md` — R4 — La zona instabile → `crollo.png`  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-rovine-scenes/scenes/r5-camera/prompt.md` — R5 — La camera profonda → `camera.png`  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-rovine-scenes/scenes/r6-strada/prompt.md` — R6 — L'uomo ferito sulla strada → `strada.png`  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-rovine-scenes/scenes/r7-rovine-hero/prompt.md` — R7 — Le rovine sotto il fiume — copertina → `rovine-hero.png`  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/quest-rovine-scenes/scenes.md` — Indice scene — Le rovine sotto il fiume  
+  - reason: draft/candidate/proposed marker, plan or prompt  
 - `.mw/specs/skill-check-web-v1/critfail-beat-spec.md` — SPEC — Beat del Fallimento Critico (5%), Skill Check Web V1  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/v2-style-test/creature-a/design-intent.md` — V2 Style Test — Creature A (tutto impasto)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/v2-style-test/creature-a/identity.md` — Identity — Creature A test  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/v2-style-test/creature-a/prompt.md` — Creature A — Image Prompt (V2 style test, variante tutto-impasto)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/v2-style-test/creature-b/design-intent.md` — V2 Style Test — Creature B (focale pittorico)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/v2-style-test/creature-b/identity.md` — Identity — Creature B test  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/v2-style-test/creature-b/prompt.md` — Creature B — Image Prompt (V2 style test, variante focale-pittorico)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/v2-style-test/human-a/design-intent.md` — V2 Style Test — Human A (tutto impasto)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/v2-style-test/human-a/identity.md` — Identity — Human A test  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/v2-style-test/human-a/prompt.md` — Human A — Image Prompt (V2 style test, variante tutto-impasto)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/v2-style-test/human-b/design-intent.md` — V2 Style Test — Human B (volto pittorico classico)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/v2-style-test/human-b/identity.md` — Identity — Human B test  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/v2-style-test/human-b/prompt.md` — Human B — Image Prompt (V2 style test, variante volto-pittorico)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/villager-baldassarre/design-intent.md` — Villager Baldassarre — Portrait (R-256)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/villager-baldassarre/identity.md` — Identity — Manno (villager, warden) — ex «Baldassarre»  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/villager-baldassarre/prompt.md` — Baldassarre — Image Prompt (V2 §10.2 umani, compilato dal Motore di Unicità in identity.md)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/villager-lisetta/design-intent.md` — Villager Lisetta — Portrait (R-256)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/villager-lisetta/identity.md` — Identity — Lisetta (villager, precision)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/villager-lisetta/prompt.md` — Lisetta — Image Prompt (V2 §10.2 umani, compilato dal Motore di Unicità in identity.md)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/villager-mastro-beppe/design-intent.md` — Villager Mastro Beppe — Portrait (R-256)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/villager-mastro-beppe/identity.md` — Identity — Bertoldo (villager, fortitude) — ex «Mastro Beppe»  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/villager-mastro-beppe/prompt.md` — Mastro Beppe — Image Prompt (V2 §10.2 umani, compilato dal Motore di Unicità in identity.md)  
   - reason: draft/candidate/proposed marker, plan or prompt  
 - `.mw/templates/mockup-asset-spec/design-intent.md` — <Asset Name> — Design Intent  
   - markers: draft  
   - reason: draft/candidate/proposed marker, plan or prompt  
 - `.mw/templates/mockup-asset-spec/identity.md` — <Asset Name> — Asset Identity Card  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/templates/visual-fork/visual-fork-card.md` — Visual Fork Card — <nome decisione estetica>  
   - markers: draft  
   - reason: draft/candidate/proposed marker, plan or prompt  
 - `prompts/ADR001-T1.md` — ADR001-T1 — Canonical quest event schema (E1) + RngService  
@@ -1448,6 +3800,22 @@
   - reason: draft/candidate/proposed marker, plan or prompt  
 - `prompts/MG-IDLE-ALIGNMENT-001.md` — MG-IDLE-ALIGNMENT-001  
   - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/MP-00.md` — MP-00 — Mission Planner: contratto matematico + fix data model spec + analisi balance  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/MP-01.md` — MP-01 — Mission Planner: motore analitico rng-free  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/MP-02.md` — MP-02 — Mission Planner: schema item/loadout + fix data model fasi (config)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/MP-03.md` — MP-03 — Mission Planner: `applyLoadoutToResident` (equip → stat effettive)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/MP-04.md` — MP-04 — Mission Planner: stato bozza spedizione  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/MP-05.md` — MP-05 — Mission Planner: UI del pannello "Planner"  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/MP-06.md` — MP-06 — Mission Planner: integrazione pagina quest + risoluzione modello A  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/MP-07.md` — MP-07 — Mission Planner: documentazione, test E2E, evidence  
+  - reason: draft/candidate/proposed marker, plan or prompt  
 - `prompts/NP-106.spec.json` — NP-106.spec  
   - reason: draft/candidate/proposed marker, plan or prompt  
 - `prompts/OPS-SHUTDOWN-000.spec.json` — OPS-SHUTDOWN-000.spec  
@@ -1483,6 +3851,8 @@
 - `prompts/PANELS-STEP-06-populate-shell-section.spec.json` — PANELS-STEP-06-populate-shell-section.spec  
   - reason: draft/candidate/proposed marker, plan or prompt  
 - `prompts/PANELS-STEP-06.spec.json` — PANELS-STEP-06.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/PLAN-018-mission-planner.md` — PLAN-018 — Mission Planner (prompt master)  
   - reason: draft/candidate/proposed marker, plan or prompt  
 - `prompts/POI-DETAIL-VISUAL-IMPROVEMENTS.md` — POI-DETAIL-VISUAL-IMPROVEMENTS - POI Detail Visual Improvements  
   - reason: draft/candidate/proposed marker, plan or prompt  
@@ -1567,20 +3937,60 @@
 - `prompts/portrait-propagation-regression.spec.json` — portrait-propagation-regression.spec  
   - reason: draft/candidate/proposed marker, plan or prompt  
 
-## historical (9)
+## historical (261)
 - `src/docs/docs/minimal_slice/01_pgtoken.semantics.json` — 01_pgtoken.semantics  
   - reason: archive/legacy/session-handoff  
 - `src/docs/docs/plans/legacy_quarantine_plan.md` — Legacy Sandbox & UI Quarantine Plan  
   - reason: archive/legacy/session-handoff  
-- `context/DECISION_LOG.md` — RPG Project Decision Log  
+- `context/COMPETITIVE_LANDSCAPE.md` — Competitive Landscape — mappa concettuale dei competitor  
+  - reason: context register, may be superseded  
+- `context/DECISION_LOG-archive.md` — RPG Project Decision Log  
   - markers: decision  
   - reason: context register, may be superseded  
+- `context/DECISION_LOG.md` — RPG Project Decision Log  
+  - reason: context register, may be superseded  
+- `context/ESTIMATE_AGENT_PROMPT.md` — Prompt per gli agenti: dati per la stima di RPG Balancer (v2, ridotto)  
+  - markers: todo  
+  - reason: context register, may be superseded  
+- `context/GAME_INVASION_SEQUENCE.md` — /game — sequenza evento invasione  
+  - reason: context register, may be superseded  
+- `context/GOOD_QUEST_DEFINITION.md` — Definizione di buona quest — artefatto finale PLAN-019 (S1–S4)  
+  - reason: context register, may be superseded  
+- `context/HANDOFF-deploy-git.md` — HANDOFF — commit + push + deploy Vercel pulito  
+  - reason: archive/legacy/session-handoff  
 - `context/INDEX.md` — Context Index  
   - reason: context register, may be superseded  
 - `context/MIND_WEAVER_MULTI_AI_PROTOCOLS.md` — Protocolli multi-AI di Mind Weaver in RPG  
   - reason: context register, may be superseded  
+- `context/OPEN.md` — OPEN — Unresolved Questions Registry  
+  - markers: todo  
+  - reason: context register, may be superseded  
+- `context/QUEST_CAMPAIGN_MACRO.md` — QUEST_CAMPAIGN_MACRO — sistema macro di quest, ricompense e progressione  
+  - reason: context register, may be superseded  
+- `context/QUEST_ECONOMY_NOTES.md` — : Quest Economy & Village Strategy — design notes  
+  - reason: context register, may be superseded  
+- `context/QUEST_GAMEPLAY_SCIENCE.md` — Quest Gameplay Science  
+  - reason: context register, may be superseded  
+- `context/QUEST_GENERATION_ARCHITECTURE.md` — Quest Generation Architecture (proposta)  
+  - reason: context register, may be superseded  
+- `context/QUEST_GENERATION_CONTRACTS.md` — Quest Generation Contracts v0  
+  - reason: context register, may be superseded  
+- `context/QUEST_GENERATION_SPEC.md` — RpgBalancer — Quest Generation System  
+  - reason: context register, may be superseded  
+- `context/QUEST_GIMMICK_CHANNELS_RESEARCH.md` — Canali di check alternativi sulla core gimmick — rapporto consolidato  
+  - reason: context register, may be superseded  
+- `context/QUEST_GOBLIN_REWORK_PROPOSAL.md` — «Sterminio dei goblin» — rework narrativo, suspense, emozione  
+  - reason: context register, may be superseded  
+- `context/QUEST_OPPORTUNITY_LAYER.md` — Quest Opportunity Layer  
+  - reason: context register, may be superseded  
+- `context/QUEST_S1_DESIGN.md` — La cassa delle sementi — matrice  
+  - reason: context register, may be superseded  
+- `context/QUEST_V6_REDESIGN.md` — Quest v6 — "La cassa delle sementi" riscritta sulle evidenze  
+  - reason: context register, may be superseded  
 - `context/REAL_COMPONENTS_ONLY.md` — Real Components Only — Correct Inventory & True Interaction Pairs  
   - markers: todo  
+  - reason: context register, may be superseded  
+- `context/REJECTED.md` — REJECTED — Negative Knowledge Registry  
   - reason: context register, may be superseded  
 - `context/RPG_PROJECT_CONTEXT.md` — RPG Project Context — Personal Project Governance  
   - reason: context register, may be superseded  
@@ -1589,9 +3999,479 @@
   - reason: context register, may be superseded  
 - `context/VERTICAL_SLICE_REFERENCE.md` — Vertical Slice: Component Versioning & Governance (RPG Context)  
   - reason: context register, may be superseded  
+- `context/WORKFLOW_METRICS.md` — Workflow Metrics — forensics report (PLAN-048)  
+  - reason: context register, may be superseded  
+- `context/auto/veto-block.md` — ADVISORY — NOT CANON. On conflict, canonical files win.  
+  - reason: context register, may be superseded  
+- `context/fauna-animation-brief.md` — Brief — animazioni fauna su `mappa2` (da dare all'AI esterna)  
+  - reason: context register, may be superseded  
+- `context/governance/invariant-ledger.json` — invariant-ledger  
+  - reason: context register, may be superseded  
+- `context/handoff-poi-zanara-production.md` — Handoff — dal POI battezzato al POI di produzione  
+  - reason: archive/legacy/session-handoff  
+- `context/ingestions/2026-10-05-progettare-quest-strategiche-transcript-completo.md` — Knowledge Ingestion Report — transcript completo  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-06-quest-cross-direct.md` — Knowledge Ingestion Report — «Sistema di quest cross direct»  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-06-quest-strategiche-continuazione.md` — Knowledge Ingestion Report — continuazione «Progettare quest strategiche»  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-09-emotional-mechanics-quest/00-brief-chatgpt.md` — Premessa di ChatGPT  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-09-emotional-mechanics-quest/01-claude.md` — Risposta Claude (1/5)  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-09-emotional-mechanics-quest/02-deepseek.md` — Risposta DeepSeek (2/5) — CONTENUTO MANCANTE  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-09-emotional-mechanics-quest/03-gemini.md` — Emotional Mechanics per Quest in RpgBalancer: Framework di System Design, Psicologia Cognitiva e Prototipazione Applicata  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-09-emotional-mechanics-quest/04-grok.md` — Risposta Grok — Emotional Mechanics for RpgBalancer Quests  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-09-emotional-mechanics-quest/05-chatgpt.md` — Risposta ChatGPT — Emotional Mechanics for RpgBalancer Quests  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-09-emotional-mechanics-quest/06-devin-round2.md` — Round 2 — Risposta di Devin (unico partecipante con accesso al repository)  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-09-emotional-mechanics-quest/07-round3-f6-validation.md` — Round 3 — Validate Before Designing: F6 Push-Your-Luck  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-09-emotional-mechanics-quest/08-devin-feelings-research.md` — Quest Gameplay That Produces Strong Feelings  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-09-emotional-mechanics-quest/09-deepseek-feelings.md` — : "Gameplay Quest Design That Produces Strong Feelings — risposta DeepSeek  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-09-emotional-mechanics-quest/10-grok-feelings.md` — : "Quest Gameplay That Produces Strong Feelings — risposta Grok  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-09-emotional-mechanics-quest/11-claude-feelings.md` — : "Quest Gameplay That Produces Strong Feelings — risposta Claude (parziale)  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-09-emotional-mechanics-quest/12-gpt-feelings.md` — 1. Vincoli di progetto di RpgBalancer  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-09-emotional-mechanics-quest/13-gemini-feelings.md` — : "Quest Gameplay That Produces Strong Feelings — risposta Gemini (Deep Research)  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-09-emotional-mechanics-quest/BRIEFING.md` — Briefing aggregato — «Emotional Mechanics for RpgBalancer Quests»  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-09-emotional-mechanics-quest/FINAL-RESOCONTO.md` — Resoconto finale totale  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-09-emotional-mechanics-quest/README.md` — Raccolta risposte multi-AI — Emotional Mechanics per le quest  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-09-emotional-mechanics-quest/f6-pushluck-experiment.ts` — f6-pushluck-experiment  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-09-emotional-mechanics-quest/results-f6-be-ramp-n2000.txt` — results-f6-be-ramp-n2000  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-09-emotional-mechanics-quest/results-f6-main-n2000.txt` — results-f6-main-n2000  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-09-emotional-mechanics-quest/results-f6-regret-n2000.txt` — results-f6-regret-n2000  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-09-emotional-mechanics-quest/results-f6-sensitivity-n1000.txt` — results-f6-sensitivity-n1000  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-09-emotional-mechanics-quest/results-f6-sweep-ramp4-8-n2000.txt` — results-f6-sweep-ramp4-8-n2000  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-10-quest-colpi-di-scena.md` — Trascript archiviato — «Colpi di scena + siamo pronti a prototipare?»  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-10-quest-generation-deepening.md` — Trascript archiviato — «Completamento contratti, assi del testo, chain quest»  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-10-quest-generation-flavour-experiment.md` — Trascript archiviato — «Generazione quest: gimmick core, scene base, flavour»  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-10-quest-gimmick-approcci-alternativi.md` — Knowledge Ingestion Report — «Approcci alternativi alla core gimmick»  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-11-quest-opportunity-layer.md` — Knowledge Ingestion Report — «Grafo delle opportunità e layer meta-quest»  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-22-25-quest-generation-gimmick-transcript.md` — : "Transcript integrale — generazione quest, audit repo e gimmick investigativa  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-25-gimmick-indagine-e-acquisizione-info.md` — Knowledge Ingestion Report — «Gimmick indagine e raccolta informazioni»  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-25-transcript-integrale-gap-analysis.md` — Knowledge Ingestion Report — Gap analysis sul transcript integrale  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-28-deep-research-context-architecture/01-memoria-stratificata-e-dreaming.md` — : Deep Research — memoria stratificata, "Dreaming" e context injection  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-28-deep-research-context-architecture/02-architettura-loop-e-context-engineering.md` — : Deep Research — architettura, loop agentico e context engineering  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-28-deep-research-context-architecture/03-retrieval-agentico-formalismo.md` — Architettura dei Sistemi di Deep Research: Meccanismi di Retrieval Agentico e Ingegneria della Memoria di Contesto  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-10-28-deep-research-context-architecture/04-survey-rag-memoria-implementazioni.md` — Sommario esecutivo  
+  - reason: context register, may be superseded  
+- `context/ingestions/2026-11-11-poi-stati-hub-opportunita.md` — Knowledge Ingestion Report  
+  - reason: context register, may be superseded  
+- `context/prompt-kernel-calibration-2026-10-23.md` — Calibrazione lint kernel pittorico (PLAN-080, T-002)  
+  - reason: context register, may be superseded  
+- `context/r342-phase0-measurement.md` — R-342 / artifact-r002 — Phase-0 (Measure): context-budget inventory  
+  - reason: context register, may be superseded  
+- `context/recurring-traps.md` — Recurring Traps — regole preventive lette in pre-flight  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-22-animatable-scene-prompts/README.md` — Research bundle — 2026-10-22 — "animatable" quest-scene prompting  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-22-animatable-scene-prompts/chatgpt-deep-research-report.md` — chatgpt-deep-research-report  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-22-animatable-scene-prompts/claude-deep-research-report.md` — claude-deep-research-report  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-22-animatable-scene-prompts/deepseek-deep-research-report.md` — deepseek-deep-research-report  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-22-animatable-scene-prompts/final-deep-research-prompt.md` — Final Deep Research prompt — RPG quest-scene "animatable art" discipline  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-22-animatable-scene-prompts/gemini-deep-research-report.md` — gemini-deep-research-report  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-22-animatable-scene-prompts/grok-deep-research-report.md` — grok-deep-research-report  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-22-animatable-scene-prompts/response-claude.md` — response-claude  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-22-animatable-scene-prompts/response-deepseek-solicitation.md` — response-deepseek-solicitation  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-22-animatable-scene-prompts/response-gemini.md` — response-gemini  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-22-animatable-scene-prompts/response-grok.md` — response-grok  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-22-animatable-scene-prompts/solicitation-prompt.md` — solicitation-prompt  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-22-animatable-scene-prompts/solicitation-responses-raw.txt` — solicitation-responses-raw  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-22-animatable-scene-prompts/synthesis.md` — Convergent synthesis — single-plate 2.5D quest-scene prompt contract  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-24-agent-visual-calibration/PLAN-calibration-loop.md` — Piano — calibrazione del giudizio visivo dell'agente (draft v0)  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-24-agent-visual-calibration/calibration-log.md` — Calibration log — segnali di gusto del Director  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-24-agent-visual-calibration/corpus-labels.md` — Corpus etichettato — ground truth del Director  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-24-agent-visual-calibration/research-prompt.md` — research-prompt  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-24-agent-visual-calibration/synthesis.md` — Sintesi — calibrazione giudizio visivo agente (broadcast 2026-10-24, 4/4)  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-24-ambient-fx-catalog/BROADCAST.md` — Broadcast: broadcast-20261024-002347  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-24-ambient-fx-catalog/metadata.json` — metadata  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-24-ambient-fx-catalog/research-prompt.md` — research-prompt  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-24-ambient-fx-catalog/synthesis.md` — Synthesis — ambient FX catalog (broadcast 2026-10-24, 3/5 contenuto: deepseek, gemini, grok; chatgpt vuota, claude timeout)  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-24-composition-archetypes/BROADCAST.md` — Broadcast: broadcast-20261023-231759  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-24-composition-archetypes/metadata.json` — metadata  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-24-composition-archetypes/research-prompt.md` — research-prompt  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-24-composition-archetypes/synthesis.md` — Synthesis — composition archetypes (broadcast 2026-10-23, 3/5 voci utili)  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-24-prompt-success-failure/BROADCAST.md` — Broadcast: broadcast-20261024-075243  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-24-prompt-success-failure/forensic-analysis.md` — Analisi forense — perché i successi riescono e i fallimenti no  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-24-prompt-success-failure/forensic-pairs.md` — Forense prompt — successi vs fallimenti (2026-10-24)  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-24-prompt-success-failure/metadata.json` — metadata  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-24-prompt-success-failure/research-prompt.md` — research-prompt  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-24-prompt-success-failure/synthesis.md` — Sintesi — perché i prompt degradano (broadcast 2026-10-24, 4/4 provider)  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-24-scene-quest-data-contract-synthesis.md` — Sintesi dibattito — contratto dati scena dalla quest-gen  
+  - markers: decision  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-24-scene-variants-and-reveal/BROADCAST.md` — Broadcast: broadcast-20261023-233111  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-24-scene-variants-and-reveal/metadata.json` — metadata  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-24-scene-variants-and-reveal/research-prompt.md` — research-prompt  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-24-scene-variants-and-reveal/synthesis.md` — Synthesis — variants & reveals (broadcast 2026-10-24, 5/5 voci, protocollo R-278)  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/PROMPT_LEDGER.md` — PROMPT LEDGER — mood-keys batch (protocol v5 artifact-r004)  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/README.md` — Mood Keys — Batch 12 immagini (Gemini, 2026-10-25)  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/consult-parallax-broadcast.md` — Broadcast: broadcast-20261026-121334  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/critiques/chatgpt.md` — chatgpt  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/critiques/deepseek.md` — deepseek  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/critiques/gemini.md` — gemini  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/critiques/grok.md` — grok  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/debate-grounding-ledger.md` — Grounding ledger — prompt-authoring protocol debate (2026-10-25)  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/debate-responses/resp_chatgpt.txt` — resp_chatgpt  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/debate-responses/resp_chatgpt_t5.txt` — resp_chatgpt_t5  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/debate-responses/resp_deepseek.txt` — resp_deepseek  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/debate-responses/resp_deepseek_t5.txt` — resp_deepseek_t5  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/debate-responses/resp_gemini.txt` — resp_gemini  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/debate-responses/resp_grok.txt` — resp_grok  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/prompt-protocol-v5.md` — Wanderlust Prompt Protocol v5 — artifact r004  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/prompts-v4/dark-wasteland-banner-field.txt` — dark-wasteland-banner-field  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/prompts-v4/dark-wasteland-obsidian-fortress.txt` — dark-wasteland-obsidian-fortress  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/prompts-v4/dark-wasteland-siege-skeleton.txt` — dark-wasteland-siege-skeleton  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/prompts-v4/impero-solare-gold-aqueduct.txt` — impero-solare-gold-aqueduct  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/prompts-v4/impero-solare-processional-stair.txt` — impero-solare-processional-stair  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/prompts-v4/impero-solare-sun-forge.txt` — impero-solare-sun-forge  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/prompts-v4/log.txt` — log  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/prompts-v4/log_fix.txt` — log_fix  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/prompts-v4/log_v2.txt` — log_v2  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/prompts-v4/log_v3.txt` — log_v3  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/prompts-v4/log_v4.txt` — log_v4  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/prompts-v4/prismatic-frontier-beacon-tower.txt` — prismatic-frontier-beacon-tower  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/prompts-v4/prismatic-frontier-crystal-aqueduct.txt` — prismatic-frontier-crystal-aqueduct  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/prompts-v4/prismatic-frontier-crystal-aqueduct_FINAL.txt` — prismatic-frontier-crystal-aqueduct_FINAL  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/prompts-v4/prismatic-frontier-crystal-aqueduct_v5.txt` — prismatic-frontier-crystal-aqueduct_v5  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/prompts-v4/prismatic-frontier-crystal-aqueduct_v7.txt` — prismatic-frontier-crystal-aqueduct_v7  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/prompts-v4/prismatic-frontier-crystal-aqueduct_v8-anchored.txt` — prismatic-frontier-crystal-aqueduct_v8-anchored  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/prompts-v4/prismatic-frontier-crystal-aqueduct_v8.txt` — prismatic-frontier-crystal-aqueduct_v8  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/prompts-v4/prismatic-frontier-observatory-dome.txt` — prismatic-frontier-observatory-dome  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/prompts-v4/rude-beauty-gorge-bridge.txt` — rude-beauty-gorge-bridge  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/prompts-v4/rude-beauty-harvest-waystone.txt` — rude-beauty-harvest-waystone  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/prompts-v4/rude-beauty-marcia-crinale_FINAL.txt` — rude-beauty-marcia-crinale_FINAL  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-25-mood-keys/prompts-v4/rude-beauty-shepherd-shrine.txt` — rude-beauty-shepherd-shrine  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/GUIDE.md` — Guida — generare asset per mappa2 con Gemini (pipeline collaudata)  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/HANDOFF-village.md` — Handoff — Villaggio mappa2 (asset + pipeline + stato)  
+  - reason: archive/legacy/session-handoff  
+- `context/research/2026-10-29-mappa2-sprite-pilot/README.md` — Pilota di stile A2 — stormo su mappa2 (Gemini web, 2026-10-29)  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/_attachprobe.mjs` — _attachprobe  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/_esc.mjs` — _esc  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/_gameshot.mjs` — _gameshot  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/_grab.mjs` — _grab  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/_grab2.mjs` — _grab2  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/_grab3.mjs` — _grab3  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/_labshot.mjs` — _labshot  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/_labv2.mjs` — _labv2  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/_labv3.mjs` — _labv3  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/_menuprobe.mjs` — _menuprobe  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/_peek.mjs` — _peek  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/_state.mjs` — _state  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/_vdir2.mjs` — _vdir2  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/_vdir3.mjs` — _vdir3  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/_vdir4.mjs` — _vdir4  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/_vdirshot.mjs` — _vdirshot  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/_vel.mjs` — _vel  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/_vel2.mjs` — _vel2  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/_vel3.mjs` — _vel3  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/_vel4.mjs` — _vel4  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/_vel5.mjs` — _vel5  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/_vel6.mjs` — _vel6  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/_vel7.mjs` — _vel7  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/_villageshot.mjs` — _villageshot  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/_vshot.mjs` — _vshot  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/_vshot2.mjs` — _vshot2  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/_vshot3.mjs` — _vshot3  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a1-herd-deer.txt` — prompt-a1-herd-deer  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a1-herd-fork.txt` — prompt-a1-herd-fork  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a1-herd-mammoth.txt` — prompt-a1-herd-mammoth  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a1-herd-sauro.txt` — prompt-a1-herd-sauro  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a2-stormo-v1.txt` — prompt-a2-stormo-v1  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a2-stormo-v2-edit.txt` — prompt-a2-stormo-v2-edit  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a2-stormo-v3-single.txt` — prompt-a2-stormo-v3-single  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a2-stormo-v4-strip.txt` — prompt-a2-stormo-v4-strip  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a2-stormo-v5-strip.txt` — prompt-a2-stormo-v5-strip  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a3-whaletail-v1-single.txt` — prompt-a3-whaletail-v1-single  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a3-whaletail-v2-strip.txt` — prompt-a3-whaletail-v2-strip  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a3-whaletail-v3-spaced.txt` — prompt-a3-whaletail-v3-spaced  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a4-final-strip.txt` — prompt-a4-final-strip  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a4-mermaid-v1-single.txt` — prompt-a4-mermaid-v1-single  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a4-mermaid-v2-strip.txt` — prompt-a4-mermaid-v2-strip  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a4-mermaid-v3-variantB.txt` — prompt-a4-mermaid-v3-variantB  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a4-mermaid-v4-variantC.txt` — prompt-a4-mermaid-v4-variantC  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a4-mermaid-v5-harmony.txt` — prompt-a4-mermaid-v5-harmony  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a4-stripA.txt` — prompt-a4-stripA  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a4-stripA2.txt` — prompt-a4-stripA2  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a5-blow.txt` — prompt-a5-blow  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a5-blow2.txt` — prompt-a5-blow2  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a5-blow3.txt` — prompt-a5-blow3  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a5-blow4.txt` — prompt-a5-blow4  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a5-whale-v1.txt` — prompt-a5-whale-v1  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a5-whale-v2.txt` — prompt-a5-whale-v2  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a6-kraken-v1.txt` — prompt-a6-kraken-v1  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a7-ship-parts.txt` — prompt-a7-ship-parts  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a7-ship-parts2.txt` — prompt-a7-ship-parts2  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a7-ship-v1.txt` — prompt-a7-ship-v1  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a9-cluster1.txt` — prompt-a9-cluster1  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a9-nz.txt` — prompt-a9-nz  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a9-nzpal.txt` — prompt-a9-nzpal  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a9-nzs0.txt` — prompt-a9-nzs0  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a9-nzstone.txt` — prompt-a9-nzstone  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a9-pal2.txt` — prompt-a9-pal2  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a9-palisade.txt` — prompt-a9-palisade  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a9-parts-stone.txt` — prompt-a9-parts-stone  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a9-parts.txt` — prompt-a9-parts  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a9-s0.txt` — prompt-a9-s0  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a9-stage0.txt` — prompt-a9-stage0  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a9-stone.txt` — prompt-a9-stone  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a9-stonehouses.txt` — prompt-a9-stonehouses  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a9-v4-scale.txt` — prompt-a9-v4-scale  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a9-v5-scale.txt` — prompt-a9-v5-scale  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a9-v7-hires.txt` — prompt-a9-v7-hires  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a9-v7-small.txt` — prompt-a9-v7-small  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a9-v8.txt` — prompt-a9-v8  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a9-v9.txt` — prompt-a9-v9  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a9-village-v1.txt` — prompt-a9-village-v1  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a9-village-v2.txt` — prompt-a9-village-v2  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a9-village-v3.txt` — prompt-a9-village-v3  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-a9-zoneplate.txt` — prompt-a9-zoneplate  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-bldg-cottage.txt` — prompt-bldg-cottage  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-bldg-farm.txt` — prompt-bldg-farm  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-bldg-inn.txt` — prompt-bldg-inn  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-bldg-smithy.txt` — prompt-bldg-smithy  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-bldg-tower.txt` — prompt-bldg-tower  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-ring-pal.txt` — prompt-ring-pal  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-ring-wall.txt` — prompt-ring-wall  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-vbase-clean.txt` — prompt-vbase-clean  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-vbase-exact.txt` — prompt-vbase-exact  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-29-mappa2-sprite-pilot/prompt-village-baseplate.txt` — prompt-village-baseplate  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-30-foam-flipbook/BRIEF.md` — R-299/B — Painted foam flipbook for the west-rim arch (mappa2)  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-30-foam-flipbook/prompts/f1-surged.txt` — f1-surged  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-30-foam-flipbook/prompts/f2-drained.txt` — f2-drained  
+  - reason: context register, may be superseded  
+- `context/research/2026-10-30-foam-flipbook/prompts/f3-breaking.txt` — f3-breaking  
+  - reason: context register, may be superseded  
+- `context/research/2026-11-02-foam-surf/CONTEXT.md` — Handoff — animazione schiuma marina sugli scogli (mappa2, R-299)  
+  - reason: context register, may be superseded  
+- `context/village-towers-handoff-2026-11-02.md` — Handoff — village upgrade plates su mappa2 (stato 2026-11-02)  
+  - reason: archive/legacy/session-handoff  
+- `.mw/contracts/components/legacy-reliquary-panel.md` — legacy-reliquary-panel  
+  - markers: decision  
+  - reason: archive/legacy/session-handoff  
+- `.mw/ui-catalog/components/legacy-reliquary-panel/critiques/chatgpt.md` — chatgpt — DECLARED FAILURE (upload quota exhausted / no upload affordance)  
+  - reason: archive/legacy/session-handoff  
+- `.mw/ui-catalog/components/legacy-reliquary-panel/critiques/claude.md` — claude — legacy-reliquary-panel (T-002 refill, image-grounded)  
+  - reason: archive/legacy/session-handoff  
+- `.mw/ui-catalog/components/legacy-reliquary-panel/critiques/deepseek.md` — deepseek — legacy-reliquary-panel (T-001, image-grounded)  
+  - reason: archive/legacy/session-handoff  
+- `.mw/ui-catalog/components/legacy-reliquary-panel/critiques/digest.md` — Digest critiche — legacy-reliquary-panel (round 1, 2/3 image-grounded)  
+  - reason: archive/legacy/session-handoff  
+- `.mw/ui-catalog/components/legacy-reliquary-panel/page.md` — legacy-reliquary-panel — Legacy reliquary panel (equipment slots)  
+  - reason: archive/legacy/session-handoff  
+- `.mw/ui-catalog/components/legacy-reliquary-panel/shots/V1/default-ctx-a.json` — default-ctx-a  
+  - reason: archive/legacy/session-handoff  
+- `.mw/ui-catalog/components/legacy-reliquary-panel/shots/V1/default-ctx-b.json` — default-ctx-b  
+  - reason: archive/legacy/session-handoff  
+- `.mw/ui-catalog/components/legacy-reliquary-panel/shots/V1/default-iso-0.json` — default-iso-0  
+  - reason: archive/legacy/session-handoff  
+- `.mw/ui-catalog/components/legacy-reliquary-panel/shots/V1/manifestPatch.json` — manifestPatch  
+  - reason: archive/legacy/session-handoff  
+- `.mw/ui-catalog/components/legacy-reliquary-panel/shots/V1/meta.json` — meta  
+  - reason: archive/legacy/session-handoff  
 
-## transient (377)
+## transient (3313)
 - `.mw/INDEX.md` — `.mw/` index — RPG  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/archive/world-surface-event-shroud-unused/README.md` — Archiviati 2026-09-16 — non usati da alcun percorso di codice vivo  
   - reason: Mind Weaver workspace, not game canon  
 - `.mw/baselines/t000-baseline.json` — t000-baseline  
   - reason: run/session/pending context or transient register  
@@ -1607,15 +4487,1117 @@
   - reason: Mind Weaver workspace, not game canon  
 - `.mw/bugs/2026-08-27-goblin-forest-center/bug.md` — Bug: goblin hero does not move to the center of forest_1_top_left  
   - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/2026-08-31-astrolabe-ring-clip/bug.md` — Bug: pezzo di outer ring bronzeo mancante in alto a sinistra  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/2026-10-10-game-cloud-shadows/bug.md` — Bug — /game: nuvole senza ombre, ombre senza nuvole  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/2026-10-10-game-island-under-hud/bug.md` — Bug — /game: l'isola va sotto l'HUD in basso  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/2026-10-10-game-poi-halo-state/bug.md` — Bug — /game: POI sempre in mappa + halo che nasce pieno  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/2026-10-11-game-map-fit-seams/bug.md` — Bug — /game: mappa troppo grande, HUD su terra, linee tra mare vecchio e nuovo  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/2026-10-24-poi-roster-swap-bloccato/bug.md` — Bug — POI detail: residenti del roster mai assegnati diventano non-assegnabili  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/2026-10-30-mappa2-lab-hide-ui-grade/bug.md` — mappa2-lab: "Hide test UI" cambia i colori della mappa  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/2026-10-30-mappa2-lab-water-anim-dead/bug.md` — Bug: /mappa2-lab — animazioni acqua ferme (laghi, fiumi, cascata, foam coste)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/2026-11-02-mappa2-foam-on-cliff/bug.md` — Bug — schiuma/effetti di luce sulla scogliera (mappa2)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/2026-11-13-poi-radial-material/bug.md` — POI radial material defects (Director screenshot)  
+  - reason: Mind Weaver workspace, not game canon  
 - `.mw/bugs/20260818-v6-star-tips-stat/bug.md` — V6 — le punte della stella non arrivano alla stat del PG  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/20260830-devin-desktop-microfono/bug.md` — Devin Desktop: microfono non funziona su macOS  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/20260831-poi-misalignment/bug.md` — POI misalignment in ReminderComponentV2  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/20260909-sea-ripple-not-visible/bug.md` — Bug: Sea ripple/waves non visibile in `/world-surface`  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/20261013-poi-types-quest-marker/bug.md` — BUG — /game: «POI types» non mostra il POI quest dorato  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/20261014-game-invasion-event-choreography/bug.md` — BUG — /game: la coreografia dell'evento Invasione Goblin non regge (5 difetti)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/20261014-verification-false-pass/bug.md` — INCIDENTE — la verifica post-operazione ha dato «funziona» su un evento rotto  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/20261015-foreground-chrome-testing/bug.md` — BUG — Agente ha aperto Chrome for Testing in primo piano  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/20261018-devin-preview-white/bug.md` — BUG — Devin Desktop Preview: pagina bianca su localhost:5173/bezel-variants  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/20261018-quest-cinema-effects/bug.md` — Cinematic quest effects are not perceptible / degrade scene quality  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/20261018-quest-planner-drag-feedback/bug.md` — Quest planner slot feedback and flight bugs  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/20261018-r223-quest-ui-regressions/bug.md` — Quest planner and POI regressions  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/20261018-stage-rail-lines/bug.md` — BUG — Due righe gialle parallele verticali al centro di /game  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/20261019-game-ultrawide-safe-fit/bug.md` — Bug — `/game` ultrawide map-fit under HUD chrome  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/20261021-game-first-interaction/bug.md` — Bug — `/game` first-interaction: medaglione drag in ritardo, dropdown roster morta al primo click  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/20261021-quest-rack-slots-perf/bug.md` — Bug — `/game` quest POI detail: slot assign/extract jank, wing resize, no return flight  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/20261021-quest-run-window-five/bug.md` — R-241 — Quest `/game`: cinque difetti della run window  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/20261021-quest-window-reopen/bug.md` — R-242 — Quest `/game`: l'immagine del teatro va in conflitto coi cinematic fx a apertura/riapertura  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/20261021-skillcheck-jank/bug.md` — Bug — skill-check "scattoso" + spazio testo/pulsanti (R-241 follow-up)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/20261022-extract-medal-vanish-springback/bug.md` — Bug: extraction medallion vanishes, reappears, then springs back (R-269)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/20261022-prompt-deliverable-vs-generation/bug.md` — Bug — Generazione immagini eseguita quando il deliverable era il prompt  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/20261022-quest-audio-samples/bug.md` — R-254 — Quest `/game`: sostituire gli effetti sonori del teatro (synth → sample reali)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/20261022-quest-ui-r253/bug.md` — R-253 — Quest `/game`: skill check dati/icona, layout tutto-visibile, fasi adattive, eventi viaggio 25–75%  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/20261022-quest-ui-r259/bug.md` — R-259 — Quest `/game`: pulsanti a ridosso del testo, zero scrollbar di componente, auto-avanzamento verdetto, popup esito a destra  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/20261022-roster-medal-dupe-filter-resize/bug.md` — Bug — `/game` quest detail: medaglione duplicato allo spring-back + resize roster filtrato  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/20261023-double-vite-server-5173/bug.md` — Bug — `Failed to fetch dynamically imported module: /src/App.tsx` (doppio dev server su :5173)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/20261023-fold-straddle-planner/bug.md` — LAYOUT-fold-straddle-planner — riga residente a cavallo del fold (roster)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/20261023-fold-straddle-registry/bug.md` — LAYOUT-fold-straddle-registry — riga registry a cavallo del fold  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/20261023-hitarea-32px/bug.md` — LAYOUT-hitarea-below-32px — controlli HUD sotto il minimo interattivo  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/20261023-plaque-clearance-oracle/bug.md` — LAYOUT-plaque-clearance-systemic — RITIRATO (mis-calibrazione oracolo)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/20261023-registry-pin-intercept/bug.md` — LAYOUT-registry-pin-intercept — RITIRATO (falso positivo)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/20261023-stash-uniformity/bug.md` — CHANGE-stash-uniformity — vocabolario item-face condiviso villaggio ↔ planner  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/20261023-truncation-skillcheck/bug.md` — LAYOUT-truncation-skillcheck — titolo check troncato in quest-check-column  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/20261101-packroot-canvas-fallback/README.md` — 2026-11-01 — `pack.packRoot` crash su /game: invisibile ai probe senza GPU  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/CTR-game-001.md` — CTR-game-001 — Ticker Pixi vivo >10s dopo boot e wonder spawnabile via bump su `/game`  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/CTR-game-002.md` — CTR-game-002 — Clock freeze durante event theatre + ripristino esatto dello stato pre-trigger  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/CTR-game-003.md` — CTR-game-003 — HUD idle auto-hide / wake-on-input / wake-on-event  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/CTR-game-004.md` — CTR-game-004 — Coreografia evento invasione: un goblin alla volta, peel→marker, card ripiegata nel registro, camera ferma  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/CTR-game-005.md` — CTR-game-005 — Map fit & sea continuity: terra protetta mai sotto il chrome fisso, nessuna riga di stage-leak ai bound di pan  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/CTR-game-006.md` — CTR-game-006 — Stage a 3 zone: orchestrazione pannelli/planner/teatro + placement scheda eroe  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/CTR-game-007.md` — CTR-game-007 — RosterV2 ↔ ResidentSlotRack `hud64` ↔ QuestExpeditionDetail: verdetto guard-layer, gating, lifecycle condiviso  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/CTR-game-008.md` — CTR-game-008 — MapQuestPoi Sigillo ↔ QuestExpeditionDetail ↔ TimeEngine: offerta, halo-clock, gating e lifecycle del POI  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/CTR-game-009.md` — CTR-game-009 — QuestRunWindow ↔ DestinyAstrolabeV62 ↔ QuestRewardPopup ↔ Settlement/HUD: dalla spedizione al rapporto  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/CTR-game-010.md` — CTR-game-010 — arbitrato input QuestRunWindow ↔ binding globali  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/INDEX.md` — Contracts — INDEX  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/action-card.md` — action-card  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/action-zone.md` — action-zone  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/active-hud.md` — active-hud  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/activity-capsule-detail-skin-aware.md` — activity-capsule-detail-skin-aware  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/activity-log-panel-config.md` — activity-log-panel-config  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/activity-poi.md` — activity-poi  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/activity-slot-data.md` — activity-slot-data  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/amanuense-page.md` — amanuense-page  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/ambient-layer.md` — ambient-layer  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/astro-overlay.md` — astro-overlay  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/atmosphere-layer.md` — atmosphere-layer  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/atoms.md` — atoms  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/beat-sequencer.md` — beat-sequencer  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/bloom-effect.md` — bloom-effect  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/c1-medallion.md` — c1-medallion  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/canonical-data-bridge.md` — canonical-data-bridge  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/canonical-roster-bundle.md` — canonical-roster-bundle  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/carved-bar.md` — carved-bar  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/chronicle-drawer.md` — chronicle-drawer  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/cinema-fx.md` — cinema-fx  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/clock-widget.md` — clock-widget  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/consumable-belt.md` — consumable-belt  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/context-strip.md` — context-strip  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/crew-scheduler-hudcard.md` — crew-scheduler-hudcard  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/custom-drag-overlay.md` — custom-drag-overlay  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/damage-channel.md` — damage-channel  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/day-night-poi-skin.md` — day-night-poi-skin  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/day-night-poi.md` — day-night-poi  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/day-night-time-engine-strip.md` — day-night-time-engine-strip  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/demo-config.md` — demo-config  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/depth-scene.md` — depth-scene  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/destiny-astrolabe-v62-kit.md` — destiny-astrolabe-v62-kit  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/destiny-astrolabe-v62.md` — destiny-astrolabe-v62  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/destiny-astrolabe.md` — destiny-astrolabe  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/director-panel.md` — director-panel  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/drag-config.md` — drag-config  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/drag-context-store.md` — drag-context-store  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/drag-context.md` — drag-context  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/drag-outcome-flight.md` — drag-outcome-flight  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/drag-preview-instrumentation-config.md` — drag-preview-instrumentation-config  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/drag-sensors.md` — drag-sensors  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/drag-test-container-v2.md` — drag-test-container-v2  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/drag-test-container.md` — drag-test-container  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/drag-test-container.module.md` — drag-test-container.module  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/drop-feedback-config.md` — drop-feedback-config  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/drop-feedback-ui.md` — drop-feedback-ui  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/engraved-icons.md` — engraved-icons  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/expedition-drawer.md` — expedition-drawer  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/expedition-edge-tab.md` — expedition-edge-tab  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/expedition-layout-tokens.md` — expedition-layout-tokens  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/field-grain.md` — field-grain  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/flight-proxy.md` — flight-proxy  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/floating-panel.md` — floating-panel  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/game-boot-screen.md` — game-boot-screen  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/game-entry.md` — game-entry  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/game-frame-game-frame.md` — game-frame-game-frame  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/game-frame-pixi.md` — game-frame-pixi  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/game-frame.md` — game-frame  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/game-icons.md` — game-icons  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/game-intent.md` — game-intent  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/game-menu-confirm.md` — game-menu-confirm  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/game-menu-dialog.md` — game-menu-dialog  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/game-menu-screens.md` — game-menu-screens  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/game-save.md` — game-save  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/game-settings.md` — game-settings  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/game-top-chrome.md` — game-top-chrome  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/gameplay-store.md` — gameplay-store  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/generic-poi-skin.md` — generic-poi-skin  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/gilded-event-frame.md` — gilded-event-frame  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/glow-progress.md` — glow-progress  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/goblin-invasion-window.md` — goblin-invasion-window  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/hearthstone-card.md` — hearthstone-card  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/hero-level-ceremony.md` — hero-level-ceremony  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/hero-level-decor.md` — hero-level-decor  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/hero-level-mock.md` — hero-level-mock  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/hero-level-view-model.md` — hero-level-view-model  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/hero-sheet-panel.md` — hero-sheet-panel  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/hud-band.md` — hud-band  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/hud-event-ledger.md` — hud-event-ledger  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/hud-game-menu.md` — hud-game-menu  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/hud-hide-toggle.md` — hud-hide-toggle  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/hud-icons.md` — hud-icons  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/hud-panel.md` — hud-panel  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/hud-panels-menu.md` — hud-panels-menu  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/hud-plaque.md` — hud-plaque  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/hud-real-cassetto.md` — hud-real-cassetto  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/hud-recenter-button.md` — hud-recenter-button  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/hud-ribbon.md` — hud-ribbon  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/hud-scale.md` — hud-scale  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/hud-tones.md` — hud-tones  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/hud-tooltip.md` — hud-tooltip  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/index-primitives.md` — index-primitives  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/index.md` — index  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/inset-panel.md` — inset-panel  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/job-poi.md` — job-poi  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/kit-shell.md` — kit-shell  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/load-game-panel.md` — load-game-panel  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/location-drop-validators.md` — location-drop-validators  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/magic-circle-halo.md` — magic-circle-halo  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/map-building-poi.md` — map-building-poi  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/map-demo-poi.md` — map-demo-poi  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/map-place.md` — map-place  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/map-quest-poi.md` — map-quest-poi  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/material-presets.md` — material-presets  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/materic-ambient-field.md` — materic-ambient-field  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/materic-badge.md` — materic-badge  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/materic-button.md` — materic-button  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/materic-carved-bar.md` — materic-carved-bar  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/materic-close-button.md` — materic-close-button  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/materic-cloud-wall.md` — materic-cloud-wall  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/materic-divider.md` — materic-divider  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/materic-event-card.md` — materic-event-card  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/materic-field-group.md` — materic-field-group  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/materic-field.md` — materic-field  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/materic-frame.md` — materic-frame  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/materic-grain.md` — materic-grain  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/materic-heading.md` — materic-heading  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/materic-inset.md` — materic-inset  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/materic-plaque.md` — materic-plaque  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/materic-portrait.md` — materic-portrait  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/materic-record-list.md` — materic-record-list  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/materic-requirement-list.md` — materic-requirement-list  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/materic-roster-component-v2.md` — materic-roster-component-v2  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/materic-section-header.md` — materic-section-header  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/materic-skin-config.md` — materic-skin-config  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/materic-skin-context.md` — materic-skin-context  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/materic-skin-provider.md` — materic-skin-provider  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/materic-slot.md` — materic-slot  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/materic-stat-bar.md` — materic-stat-bar  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/materic-surface.md` — materic-surface  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/materic-threat-aura.md` — materic-threat-aura  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/materic-title-sep.md` — materic-title-sep  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/memorial-hall.md` — memorial-hall  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/memorial-panel.md` — memorial-panel  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/menu-flow.md` — menu-flow  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/merchant-offer-icons.md` — merchant-offer-icons  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/merchant-panel.md` — merchant-panel  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/milestone-check-modal.md` — milestone-check-modal  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/minimal-feedback-config.md` — minimal-feedback-config  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/mock-buy-control.md` — mock-buy-control  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/mock-upgrade-control.md` — mock-upgrade-control  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/next-event-tab.md` — next-event-tab  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/objective-cartouche.md` — objective-cartouche  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/orb-icon.md` — orb-icon  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/overlay-stack.md` — overlay-stack  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/oxidized-grade-filter.md` — oxidized-grade-filter  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/pg-card.md` — pg-card  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/physics-defaults.md` — physics-defaults  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/pixi-world-map.md` — pixi-world-map  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/place-fan-cards.md` — place-fan-cards  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/place-fan-geometry.md` — place-fan-geometry  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/place-fan.md` — place-fan  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/place-hover-card.md` — place-hover-card  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/place-radial.md` — place-radial  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/plate-variants.md` — plate-variants  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/poi-magic-circle.md` — poi-magic-circle  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/poi-marker.md` — poi-marker  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/poi-materic-v3-5.md` — poi-materic-v3-5  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/poi-particles.md` — poi-particles  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/poi-sigillo.md` — poi-sigillo  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/poi-zanara.md` — poi-zanara  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/portrait-decode-cache.md` — portrait-decode-cache  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/preset-screen.md` — preset-screen  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/quest-assignment-preview.md` — quest-assignment-preview  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/quest-availability.md` — quest-availability  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/quest-belt-plaque.md` — quest-belt-plaque  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/quest-check-options-panel.md` — quest-check-options-panel  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/quest-chronicle.md` — quest-chronicle  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/quest-engine-text.md` — quest-engine-text  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/quest-epilogue.md` — quest-epilogue  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/quest-expedition-detail.md` — quest-expedition-detail  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/quest-initial-state.md` — quest-initial-state  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/quest-journey-engine.md` — quest-journey-engine  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/quest-journey-phase-strip.md` — quest-journey-phase-strip  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/quest-journey-route.md` — quest-journey-route  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/quest-journey.md` — quest-journey  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/quest-lab-presets.md` — quest-lab-presets  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/quest-log-panel.md` — quest-log-panel  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/quest-outcome-toast.md` — quest-outcome-toast  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/quest-overlays.md` — quest-overlays  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/quest-party-roster-panel.md` — quest-party-roster-panel  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/quest-poi.md` — quest-poi  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/quest-returned-crew.md` — quest-returned-crew  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/quest-reward-panel.md` — quest-reward-panel  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/quest-reward-popup.md` — quest-reward-popup  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/quest-run-store.md` — quest-run-store  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/quest-run-window.md` — quest-run-window  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/quest-run.md` — quest-run  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/quest-scenario.md` — quest-scenario  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/quest-select-screen.md` — quest-select-screen  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/quest-settlement.md` — quest-settlement  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/quest-skill-check-column.md` — quest-skill-check-column  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/quest-skill-check-overlay.md` — quest-skill-check-overlay  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/quest-stage-cluster.md` — quest-stage-cluster  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/quest-verdict-card.md` — quest-verdict-card  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/region-tooltip.md` — region-tooltip  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/reminder-component.md` — reminder-component  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/renderer-stack-instrumentation.md` — renderer-stack-instrumentation  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/resident-drop-rules.md` — resident-drop-rules  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/resident-name.md` — resident-name  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/resident-roster-panel-v2.md` — resident-roster-panel-v2  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/resident-roster-panel.md` — resident-roster-panel  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/resident-roster-types.md` — resident-roster-types  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/resident-slot-rack.md` — resident-slot-rack  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/resident-slot-validators.md` — resident-slot-validators  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/resolve-slot-requirements.md` — resolve-slot-requirements  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/resource-readout-items.md` — resource-readout-items  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/resource-readout.md` — resource-readout  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/roster-draggable-v2.md` — roster-draggable-v2  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/roster-filter-config.md` — roster-filter-config  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/roster-kit.md` — roster-kit  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/roster-sort-config.md` — roster-sort-config  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/roster-sort-icon.md` — roster-sort-icon  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/sandbox-diagnostics.md` — sandbox-diagnostics  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/sandbox-timing-context.md` — sandbox-timing-context  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/settings-panel.md` — settings-panel  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/settlement-lost-overlay.md` — settlement-lost-overlay  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/settlement-tally.md` — settlement-tally  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/skill-check-legend.md` — skill-check-legend  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/skin-badge.md` — skin-badge  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/skin-button.md` — skin-button  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/skin-close-button.md` — skin-close-button  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/skin-config-registry.md` — skin-config-registry  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/skin-css-variables.md` — skin-css-variables  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/skin-manager.md` — skin-manager  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/skin-schema.md` — skin-schema  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/skin-schemas.md` — skin-schemas  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/skin-scope.md` — skin-scope  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/skin-title.md` — skin-title  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/slot-gem-pointer.md` — slot-gem-pointer  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/slot-rack-skin-config.md` — slot-rack-skin-config  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/slot-v12-renderer.md` — slot-v12-renderer  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/slot-wilderness-bronze-config.md` — slot-wilderness-bronze-config  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/slot.md` — slot  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/stage-band.md` — stage-band  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/stash-item-face.md` — stash-item-face  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/stash-picker.md` — stash-picker  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/stat-icon-utils.md` — stat-icon-utils  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/stat-icons.md` — stat-icons  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/sticker-frame.md` — sticker-frame  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/style-lab-surface.md` — style-lab-surface  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/tab-window.md` — tab-window  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/temporary-skin-config.md` — temporary-skin-config  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/time-engine-strip.md` — time-engine-strip  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/title-screen.md` — title-screen  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/transit-view.md` — transit-view  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/tuning-panel.md` — tuning-panel  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/types.md` — types  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/use-activity-scheduler.md` — use-activity-scheduler  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/use-drag-outcome.md` — use-drag-outcome  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/use-drag-preview-instrumentation.md` — use-drag-preview-instrumentation  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/use-game-menu-flow.md` — use-game-menu-flow  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/use-game-stage-zones.md` — use-game-stage-zones  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/use-hero-sheet.md` — use-hero-sheet  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/use-hud-panel-drag.md` — use-hud-panel-drag  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/use-poi-type-icon.md` — use-poi-type-icon  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/use-quest-expedition-session.md` — use-quest-expedition-session  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/use-quest-poi-session.md` — use-quest-poi-session  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/use-sandbox-timing-bridge.md` — use-sandbox-timing-bridge  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/use-sensory-audio.md` — use-sensory-audio  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/use-skin-binding.md` — use-skin-binding  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/use-skin-preferences.md` — use-skin-preferences  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/use-skin-system.md` — use-skin-system  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/use-style-lab-tokens.md` — use-style-lab-tokens  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/use-village-stash-store.md` — use-village-stash-store  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/v9-glass-layers-only.md` — v9-glass-layers-only  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/verb-card.md` — verb-card  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/verdict-card.md` — verdict-card  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/village-building-icons.md` — village-building-icons  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/village-building-layers.md` — village-building-layers  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/village-director-view.md` — village-director-view  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/village-registry.md` — village-registry  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/village-roster-section-v2.md` — village-roster-section-v2  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/village-roster-section.md` — village-roster-section  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/village-screen-view.md` — village-screen-view  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/village-slot-overlay.md` — village-slot-overlay  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/village-stash-item-icons.md` — village-stash-item-icons  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/village-stash-panel.md` — village-stash-panel  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/village-stash-view-model.md` — village-stash-view-model  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/wanderlust-ambient-field.md` — wanderlust-ambient-field  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/wanderlust-inner-surface.md` — wanderlust-inner-surface  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/wanderlust-layout.md` — wanderlust-layout  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/wanderlust-material-context.md` — wanderlust-material-context  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/wanderlust-medal-overlay.md` — wanderlust-medal-overlay  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/wanderlust-portrait.md` — wanderlust-portrait  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/wanderlust-roster-card-v2.md` — wanderlust-roster-card-v2  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/wanderlust-roster-card.md` — wanderlust-roster-card  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/wanderlust-stat-bar.md` — wanderlust-stat-bar  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/wanderlust-surface.md` — wanderlust-surface  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/when-where-cluster.md` — when-where-cluster  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/window.md` — window  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/worker-card.md` — worker-card  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/world-surface-atmosphere.md` — world-surface-atmosphere  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/world-surface-birds.md` — world-surface-birds  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/world-surface-cloud-shadows.md` — world-surface-cloud-shadows  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/world-surface-clouds.md` — world-surface-clouds  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/world-surface-coast-foam.md` — world-surface-coast-foam  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/world-surface-creatures.md` — world-surface-creatures  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/world-surface-event-card.md` — world-surface-event-card  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/world-surface-event-shroud.md` — world-surface-event-shroud  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/world-surface-foam.md` — world-surface-foam  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/world-surface-glass-overlay.md` — world-surface-glass-overlay  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/world-surface-kit.md` — world-surface-kit  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/world-surface-renderer.md` — world-surface-renderer  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/world-surface-river-glint.md` — world-surface-river-glint  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/world-surface-sea-margin.md` — world-surface-sea-margin  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/world-surface-sea-marks.md` — world-surface-sea-marks  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/world-surface-sea-pattern-overlay.md` — world-surface-sea-pattern-overlay  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/world-surface-sea-ripple.md` — world-surface-sea-ripple  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/world-surface-water-field.md` — world-surface-water-field  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/components/world-surface-waves.md` — world-surface-waves  
+  - markers: decision  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/contracts/research-prompt-protocol.md` — Contratto vivo a livello documento (PLAN-054): il gate parsa OGNI .md  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/deliberation-config-astrolabe-v6.3-explore.yaml` — Mind Weaver — Astrolabe V6.3 materiality exploration profile  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/deliberation-config-groq-explore.yaml` — deliberation-config-groq-explore  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/deliberation-config-web-cg.yaml` — Mind Weaver — Web multi-AI: Claude + Gemini (chatgpt session scaduta 2026-09-08)  
   - reason: Mind Weaver workspace, not game canon  
 - `.mw/deliberation-config-web-gg.yaml` — Mind Weaver — Web multi-AI: ChatGPT + Gemini  
   - reason: Mind Weaver workspace, not game canon  
 - `.mw/deliberation-config-web.yaml` — Mind Weaver — Web multi-AI cold read  
   - reason: Mind Weaver workspace, not game canon  
+- `.mw/desiderata-digest.md` — Desiderata — digest (PLAN-123)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/manual-dispatch/pending/intent-flags-20261007-073011.md` — Intent flags — cycle 1 (PLAN-057)  
+  - reason: run/session/pending context or transient register  
+- `.mw/manual-dispatch/pending/intent-flags-20261007-125209.md` — Intent flags — cycle 1 (PLAN-057)  
+  - reason: run/session/pending context or transient register  
+- `.mw/manual-dispatch/pending/intent-flags-20261007-135013.md` — Intent flags — cycle 1 (PLAN-057)  
+  - reason: run/session/pending context or transient register  
+- `.mw/manual-dispatch/pending/intent-flags-20261009-094133.md` — Intent flags — cycle 1 (PLAN-057)  
+  - reason: run/session/pending context or transient register  
+- `.mw/manual-dispatch/pending/intent-flags-20261009-095830.md` — Intent flags — cycle 1 (PLAN-057)  
+  - reason: run/session/pending context or transient register  
+- `.mw/manual-dispatch/pending/intent-flags-20261009-095903.md` — Intent flags — cycle 1 (PLAN-057)  
+  - reason: run/session/pending context or transient register  
+- `.mw/manual-dispatch/pending/intent-flags-20261014-094827.md` — Intent flags — cycle 1 (PLAN-057)  
+  - reason: run/session/pending context or transient register  
+- `.mw/manual-dispatch/pending/intent-flags-20261014-094828.md` — Intent flags — cycle 1 (PLAN-057)  
+  - reason: run/session/pending context or transient register  
+- `.mw/manual-dispatch/pending/intent-flags-20261014-095658.md` — Intent flags — cycle 1 (PLAN-057)  
+  - reason: run/session/pending context or transient register  
+- `.mw/manual-dispatch/pending/intent-flags-20261014-095714.md` — Intent flags — cycle 1 (PLAN-057)  
+  - reason: run/session/pending context or transient register  
+- `.mw/manual-dispatch/pending/intent-flags-20261015-171031.md` — Intent flags — cycle 1 (PLAN-057)  
+  - reason: run/session/pending context or transient register  
+- `.mw/manual-dispatch/pending/intent-flags-20261015-171135.md` — Intent flags — cycle 1 (PLAN-057)  
+  - reason: run/session/pending context or transient register  
+- `.mw/manual-dispatch/pending/intent-flags-20261015-171349.md` — Intent flags — cycle 1 (PLAN-057)  
+  - reason: run/session/pending context or transient register  
+- `.mw/manual-dispatch/pending/intent-flags-20261015-173050.md` — Intent flags — cycle 1 (PLAN-057)  
+  - reason: run/session/pending context or transient register  
+- `.mw/manual-dispatch/pending/intent-flags-20261015-174240.md` — Intent flags — cycle 1 (PLAN-057)  
+  - reason: run/session/pending context or transient register  
+- `.mw/manual-dispatch/pending/intent-flags-20261015-174342.md` — Intent flags — cycle 1 (PLAN-057)  
+  - reason: run/session/pending context or transient register  
+- `.mw/manual-dispatch/pending/intent-flags-20261015-215721.md` — Intent flags — cycle 1 (PLAN-057)  
+  - reason: run/session/pending context or transient register  
+- `.mw/manual-dispatch/pending/intent-flags-20261015-215727.md` — Intent flags — cycle 1 (PLAN-057)  
+  - reason: run/session/pending context or transient register  
+- `.mw/manual-dispatch/pending/intent-flags-20261018-112405.md` — Intent flags — cycle 1 (PLAN-057)  
+  - reason: run/session/pending context or transient register  
+- `.mw/manual-dispatch/pending/intent-flags-20261030-205715.md` — Intent flags — cycle 1 (PLAN-057)  
+  - reason: run/session/pending context or transient register  
+- `.mw/manual-dispatch/pending/intent-flags-20261030-225051.md` — Intent flags — cycle 1 (PLAN-057)  
+  - reason: run/session/pending context or transient register  
+- `.mw/manual-dispatch/pending/intent-flags-INDEX.md` — intent-flags-INDEX  
+  - reason: run/session/pending context or transient register  
 - `.mw/pattern-big-rewrite-without-authority.md` — Pattern: Big Rewrite Without Authority  
   - reason: Mind Weaver workspace, not game canon  
 - `.mw/plans/poi-quest-config-first-cleanup.md` — Sub-plan: POI Quest config-first cleanup  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/plans/r188-trailer-fixes.md` — Bozza piano — R-188: fix dei 7 problemi dell'audit trailer (R-187)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/plans/sea-motion-brief.md` — Brief — Making a painted sea move, on a baked full-canvas world map  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/regression/INDEX.md` — Regression Index  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/regression/REG-001.md` — REG-001 — Ticker Pixi morto a ~2.4s su renderer Canvas (mesh pipe mancante)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/regression/REG-002.md` — REG-002 — Terra sotto il chrome fisso a 3440×1440 quando la HUD usa CSS zoom  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/research/2026-10-24-amanuense-page/RESEARCH-BRIEF.md` — R-279 — "Pagina dell'Amanuense": research brief (pre-debate)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/research/2026-10-24-amanuense-page/artifact-r001.md` — Amanuense Page — design spec r001 (orchestrator synthesis)  
+  - markers: historical  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/research/2026-10-24-amanuense-page/artifact-r002.md` — Amanuense Page — design spec r002 (post round-2 amendments)  
+  - markers: historical  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/research/2026-10-24-amanuense-page/artifact-r003.md` — Amanuense Page — design spec r003 (post WITNESS-01 amendment)  
+  - markers: historical  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/research/2026-10-24-amanuense-page/grounding-ledger.md` — Grounding ledger — Amanuense Page debate (2026-10-24)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/research/2026-10-24-amanuense-page/report.md` — Run report — 20261024-amanuense-page  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/research-prompt-protocol.md` — Research Prompt Protocol (R-278, Director ruling 2026-10-24)  
   - reason: Mind Weaver workspace, not game canon  
 - `.mw/runs/2026-08-15/pattern-candidate-halo-stroke-linecap-dot.md` — pattern-candidate-halo-stroke-linecap-dot  
   - reason: run/session/pending context or transient register  
@@ -1763,6 +5745,324 @@
   - reason: run/session/pending context or transient register  
 - `.mw/runs/2026-08-30-knowledge-repo/prompt.txt` — prompt  
   - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-31-astrolabe-ring-clip/pattern-candidate.md` — pattern-candidate  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-05-astrolabe-bg-explore/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-05-astrolabe-bg-explore/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-05-astrolabe-bg-explore/caller_final.md` — caller_final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-05-astrolabe-bg-explore/final.md` — final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-05-astrolabe-bg-explore/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-192127-astrolabe-trajectory/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-192127-astrolabe-trajectory/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-192127-astrolabe-trajectory/answer_A.md` — answer_A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-192127-astrolabe-trajectory/answer_B.md` — answer_B  
+  - markers: proposed  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-192127-astrolabe-trajectory/answer_C.md` — answer_C  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-192127-astrolabe-trajectory/caller.md` — caller  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-192127-astrolabe-trajectory/caller_final.md` — **Destiny Astrolabe V6.3 – D100 Skill‑Check Ball Deceleration & Convergence Design**  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-192127-astrolabe-trajectory/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-192127-astrolabe-trajectory/prompt_A.txt` — prompt_A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-192127-astrolabe-trajectory/prompt_B.txt` — prompt_B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-192127-astrolabe-trajectory/prompt_C.txt` — prompt_C  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-astrolabe-terremoti/cycle-01/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-astrolabe-terremoti/cycle-01/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-astrolabe-terremoti/cycle-01/convergence.txt` — convergence  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-astrolabe-terremoti/cycle-01/critiques.txt` — critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-astrolabe-terremoti/cycle-01/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-astrolabe-terremoti/cycle-02/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-astrolabe-terremoti/cycle-02/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-astrolabe-terremoti/cycle-02/convergence.txt` — convergence  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-astrolabe-terremoti/cycle-02/critiques.txt` — critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-astrolabe-terremoti/cycle-02/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-astrolabe-terremoti/final.md` — final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/critique-round2/BROADCAST.md` — Broadcast: broadcast-20260908-110110  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/critique-round2/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/critique-round2/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/critique-round2/prompt.md` — Bozza piano v2 — Land Breath: la terraferma respira (desiderata v21 FROZEN)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/critique-round2/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/critique-round3/BROADCAST.md` — Broadcast: broadcast-20260908-111031  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/critique-round3/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/critique-round3/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/critique-round3/prompt.md` — Bozza piano v3 — Land Breath: la terraferma respira (desiderata v21 FROZEN)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/critique-round3/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/critique-round4/BROADCAST.md` — Broadcast: broadcast-20260908-112027  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/critique-round4/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/critique-round4/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/critique-round4/prompt.md` — Bozza piano v4 — Land Breath: la terraferma respira (desiderata v21 FROZEN)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/critique-round4/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/critique-round5/BROADCAST.md` — Broadcast: broadcast-20260908-113014  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/critique-round5/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/critique-round5/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/critique-round5/prompt.md` — Bozza piano v5 — Land Breath: la terraferma respira (desiderata v21 FROZEN)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/critique-round5/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/critique-round6/BROADCAST.md` — Broadcast: broadcast-20260908-114212  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/critique-round6/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/critique-round6/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/critique-round6/prompt.md` — Bozza piano v6 — Land Breath: la terraferma respira (desiderata v21 FROZEN)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/critique-round6/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/cycle-01/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/cycle-01/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/cycle-01/convergence.txt` — convergence  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/cycle-01/critiques.txt` — critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/cycle-01/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/final.md` — final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/plan-draft-v2.md` — Bozza piano v2 — Land Breath: la terraferma respira (desiderata v21 FROZEN)  
+  - markers: frozen  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/plan-draft-v3.md` — Bozza piano v3 — Land Breath: la terraferma respira (desiderata v21 FROZEN)  
+  - markers: frozen  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/plan-draft-v4.md` — Bozza piano v4 — Land Breath: la terraferma respira (desiderata v21 FROZEN)  
+  - markers: frozen  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/plan-draft-v5.md` — Bozza piano v5 — Land Breath: la terraferma respira (desiderata v21 FROZEN)  
+  - markers: frozen  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/plan-draft-v6.md` — Bozza piano v6 — Land Breath: la terraferma respira (desiderata v21 FROZEN)  
+  - markers: frozen  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/plan-draft-v7.md` — Piano v7 — Land Breath: la terraferma respira (desiderata v21 FROZEN)  
+  - markers: frozen  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-08-land-breath/plan-draft.md` — Bozza piano — Land Breath: la terraferma respira (desiderata v21 FROZEN)  
+  - markers: frozen  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-10-sea-pattern-world-surface-drift/desiderata-drift.md` — desiderata-drift  
+  - markers: frozen  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-10-sea-pattern-world-surface-overlay/pattern-candidate.md` — pattern-candidate  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-10-voronoi-multi-ai/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-10-voronoi-multi-ai/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-10-voronoi-multi-ai/C.md` — C  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-10-voronoi-multi-ai/D.md` — D  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-10-voronoi-multi-ai/E.md` — E  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-10-voronoi-multi-ai/caller_final.md` — caller_final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-10-voronoi-multi-ai/config.yaml` — config  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-10-voronoi-multi-ai/context.txt` — context  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-10-voronoi-multi-ai/final.md` — final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-10-voronoi-multi-ai/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-10-voronoi-multi-ai/prompt.txt` — prompt  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-10-voronoi-plan/context-short.txt` — context-short  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-10-voronoi-plan/context.txt` — context  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-10-voronoi-plan/desiderata-sea-flat.md` — desiderata-sea-flat  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-10-voronoi-plan/desiderata-sea-short.md` — desiderata-sea-short  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-10-voronoi-plan/desiderata-sea.md` — desiderata-sea  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-10-voronoi-plan/prompt.txt` — prompt  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-10-voronoi-plan-2/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-10-voronoi-plan-2/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-10-voronoi-plan-2/C.md` — C  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-10-voronoi-plan-2/D.md` — D  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-10-voronoi-plan-2/E.md` — E  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-10-voronoi-plan-2/SEA-SPIKE-01.md` — SEA-SPIKE-01 — Stylized Sea Pattern Evaluation  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-10-voronoi-plan-2/caller.md` — caller  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-10-voronoi-plan-2/caller_final.md` — caller_final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-10-voronoi-plan-2/final.md` — Final — Piano VOR-01..VOR-05 per `public/voronoi-sea-spike.html`  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-10-voronoi-plan-2/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-15-world-surface-perf/findings.md` — /world-surface — profilazione (2026-09-15 -> 2026-09-16)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-16-settlement-lost-critique/BROADCAST.md` — Broadcast: broadcast-20260916-140538  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-16-settlement-lost-critique/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-16-settlement-lost-critique/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-16-settlement-lost-critique/prompt.md` — Settlement Lost — evento run-ending (direzione C: verdetto a schermo)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-16-settlement-lost-critique/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-16-settlement-lost-event/A.md` — Artifact: Design Direction Proposal — "Settlement Lost" Consequence Event  
+  - markers: proposed  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-16-settlement-lost-event/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-16-settlement-lost-event/caller_final.md` — caller_final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-16-settlement-lost-event/context.md` — context  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-16-settlement-lost-event/final.md` — final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-16-settlement-lost-event/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-16-settlement-lost-event/prompt.md` — prompt  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-29-plan-018-critique/BROADCAST.md` — Broadcast: broadcast-20260929-191842  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-29-plan-018-critique/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-29-plan-018-critique/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-29-plan-018-critique/prompt.md` — PLAN-018 — Mission Planner  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-29-plan-018-critique/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-09-30-plan-018-hp-status-drift/desiderata-drift.md` — desiderata-drift  
+  - markers: frozen  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-10-09-dynamic-lighting-critique/BROADCAST.md` — Broadcast: broadcast-20261009-095029  
+  - markers: frozen  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-10-09-dynamic-lighting-critique/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-10-09-dynamic-lighting-critique/metadata.json` — metadata  
+  - markers: frozen  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-10-09-dynamic-lighting-critique/prompt.md` — Desiderata  
+  - markers: frozen  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-10-09-dynamic-lighting-critique/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-10-09-dynamic-lighting-explore/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-10-09-dynamic-lighting-explore/B.md` — B  
+  - markers: proposed  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-10-09-dynamic-lighting-explore/caller_final.md` — caller_final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-10-09-dynamic-lighting-explore/candidate-v28.md` — Candidate desiderata v28 — Dynamic 2D lighting for the painted world map (R-110)  
+  - markers: candidate, proposed  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-10-09-dynamic-lighting-explore/context.txt` — context  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-10-09-dynamic-lighting-explore/final.md` — final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-10-09-dynamic-lighting-explore/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-10-09-dynamic-lighting-plan/cycle-01/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-10-09-dynamic-lighting-plan/cycle-01/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-10-09-dynamic-lighting-plan/cycle-01/convergence.txt` — convergence  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-10-09-dynamic-lighting-plan/cycle-01/critiques.json` — critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-10-09-dynamic-lighting-plan/cycle-01/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-10-09-dynamic-lighting-plan/drift-report.md` — Drift report (PLAN-057)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-10-09-dynamic-lighting-plan/final.md` — Piano di Implementazione: Effetti di Luce Dinamica su PixiWorldMap (Desiderata v28)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-10-09-dynamic-lighting-plan/state.json` — state  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-10-09-dynamic-lighting-plan/vision-items.md` — Vision items (PLAN-057)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-10-11-hud-menu-scope/pattern-candidate.md` — Pattern candidate — «scope CSS a discendenti: il bordo invisibile»  
+  - markers: candidate  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-10-12-goblin-balance/aggregate.json` — aggregate  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-10-12-goblin-balance/analyze.mjs` — analyze  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-10-12-goblin-balance/deep.mjs` — deep  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-10-12-goblin-balance/runs.json` — runs  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-10-12-goblin-v02/harness.mjs` — harness  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-10-14T1900-learn-verification-gate/pattern-candidate.md` — Learn — dogfood del verification gate (R-185/R-189)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-10-24-amanuense-fork/visual-fork-amanuense.md` — Visual Fork Card — Amanuense Page: forma fisica della pagina  
+  - markers: draft  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-10-24-cloud-harmonization-provaA/README.md` — Cloud harmonization — prova A (2026-10-24)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-10-24T09-26-53/pattern-candidate.md` — Pattern: prompt-preflight-bibbia  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-10-24T14-14-07/pattern-candidate.md` — pattern-candidate  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-10-24T19-30-00-learn-goblin-scenes/pattern-candidate.md` — pattern-candidate  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-10-25-mood-keys-learn/pattern-candidate.md` — Pattern candidates — mood-keys image batch (2026-10-25)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-11-09-hud-real-f3/pattern-candidate.md` — pattern-candidate  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-11-10-village-building-layers/pattern-candidate.md` — pattern-candidate  
+  - reason: run/session/pending context or transient register  
 - `.mw/runs/20260821-145441-plan/cycle-01/A.md` — A  
   - reason: run/session/pending context or transient register  
 - `.mw/runs/20260821-145441-plan/cycle-01/B.md` — B  
@@ -1885,9 +6185,1242 @@
   - reason: run/session/pending context or transient register  
 - `.mw/runs/20260830-002801-v63-plan/final.md` — final  
   - reason: run/session/pending context or transient register  
+- `.mw/runs/20260831-astrolabe-materiality/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260831-astrolabe-materiality/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260831-astrolabe-materiality/caller_final.md` — caller_final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260831-astrolabe-materiality/final.md` — final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260831-astrolabe-materiality/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260922-hud-mockup-audit/A.md` — HUD Audit & Direction Brief  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260922-hud-mockup-audit/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260922-hud-mockup-audit/caller_final.md` — 1024×768 External HUD Audit — Final Ruling  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260922-hud-mockup-audit/final.md` — 1024×768 External HUD Audit — Final Ruling  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260922-hud-mockup-audit/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260930-171814-hud-aaa/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260930-171814-hud-aaa/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260930-171814-hud-aaa/caller_final.md` — caller_final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260930-171814-hud-aaa/final.md` — final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260930-171814-hud-aaa/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261001-plan-019-web-critique/BROADCAST.md` — Broadcast: broadcast-20261001-194352  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261001-plan-019-web-critique/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261001-plan-019-web-critique/prompt.md` — prompt  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261001-plan-019-web-critique-r2/BROADCAST.md` — Broadcast: broadcast-20261001-205955  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261001-plan-019-web-critique-r2/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261001-plan-019-web-critique-r2/prompt.md` — prompt  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261001-s1-reference-quest-draft/draft.md` — S1 — "La cassa delle sementi"  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-claude-retry/BROADCAST.md` — Broadcast: broadcast-20261002-112157  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-claude-retry/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-deliberation/cycle-01/A.md` — S1: Quest "La Cassa delle Sementi" — Playable Prototype (Lab)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-deliberation/cycle-01/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-deliberation/cycle-01/convergence.txt` — convergence  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-deliberation/cycle-01/critiques.txt` — critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-deliberation/cycle-01/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-deliberation/desiderata-drift.md` — desiderata-drift  
+  - markers: frozen  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-deliberation/draft-v3.md` — PLAN-019-S1 — La quest interessante  
+  - markers: draft  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-deliberation/draft-v4.md` — PLAN-019-S1 — La quest interessante  
+  - markers: draft  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-deliberation/draft.md` — PLAN-019-S1 — La quest interessante  
+  - markers: draft  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-deliberation/final.md` — final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-deliberation-r2/cycle-01/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-deliberation-r2/cycle-01/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-deliberation-r2/cycle-01/convergence.txt` — convergence  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-deliberation-r2/cycle-01/critiques.txt` — critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-deliberation-r2/cycle-01/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-deliberation-r2/cycle-02/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-deliberation-r2/cycle-02/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-deliberation-r2/cycle-02/convergence.txt` — convergence  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-deliberation-r2/cycle-02/critiques.txt` — critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-deliberation-r2/cycle-02/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-deliberation-r2/final.md` — PLAN-019-S1 — La quest interessante (bozza per critica multi-AI web, post rev.2)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-web-critique/BROADCAST.md` — Broadcast: broadcast-20261002-111127  
+  - markers: draft  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-web-critique/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-web-critique/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-web-critique/prompt.md` — PLAN-019-S1 — La quest interessante  
+  - markers: draft  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-web-critique/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-web-critique-r2/BROADCAST.md` — Broadcast: broadcast-20261002-111613  
+  - markers: draft  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-web-critique-r2/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-web-critique-r2/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-web-critique-r2/prompt.md` — PLAN-019-S1 — La quest interessante  
+  - markers: draft  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-web-critique-r2/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-web-critique-r3/BROADCAST.md` — Broadcast: broadcast-20261002-170112  
+  - markers: draft  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-web-critique-r3/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-web-critique-r3/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-web-critique-r3/prompt.md` — PLAN-019-S1 — La quest interessante  
+  - markers: draft  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-web-critique-r3/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-web-critique-r4/BROADCAST.md` — Broadcast: broadcast-20261002-175441  
+  - markers: draft  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-web-critique-r4/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-web-critique-r4/input-plan.md` — PLAN-019-S1 — La quest interessante  
+  - markers: draft  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-web-critique-r4/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-web-critique-r4/prompt.md` — PLAN-019-S1 — La quest interessante  
+  - markers: draft  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-web-critique-r4/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-web-critique-r4-grok-retry/BROADCAST.md` — Broadcast: broadcast-20261002-180119  
+  - markers: draft  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-plan-019-s1-web-critique-r4-grok-retry/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261002-s1-quest-design/quest-design.md` — La cassa delle sementi — matrice  
+  - markers: draft  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261003-quest-forza-design/quest-forza.md` — Quest FORZA — «La Vena del Colosso» — redesign science-based  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261003-quest-resolution-psychology/quest-resolution-psychology.md` — Risolvere una quest: logica, filosofia, juice, feeling, psicologia  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261003-quest-science-deepresearch/chatgpt-deepresearch-response.md` — chatgpt-deepresearch-response  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261003-quest-science-deepresearch/claude-response.md` — PARTE 1 — CONTESTO COMPLETO  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261003-quest-science-deepresearch/deepseek-response.md` — deepseek-response  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261003-quest-science-deepresearch/grok-response.md` — PARTE 1 — CONTESTO COMPLETO  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261003-quest-science-deepresearch/prompt.md` — PARTE 1 — CONTESTO COMPLETO  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261003-quest-v6-science/critique-consolidated.md` — Critica consolidata — "La cassa delle sementi" alla luce di tutto  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261003-quest-v6-science/playtest-seed1983.md` — Playtest live — seed 1983, Preset D (Vera/Kran/Ivo)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261003-quest-v6-science/quest-v6.md` — Quest v6 — "La cassa delle sementi" riscritta sulle evidenze  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261003-s1-change-plan/broadcast/BROADCAST.md` — Broadcast: broadcast-20261003-114038  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261003-s1-change-plan/broadcast/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261003-s1-change-plan/change-plan.md` — S1 — Piano di cambiamento "La cassa delle sementi" (v4)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261003-s1-change-plan/prompt.md` — CONTESTO  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261003-s1-change-plan/synthesis.md` — Change-plan v4 — critiche web AI: sintesi  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261003-s1-critique-v3/critique-and-v3.md` — S1 Quest — Critica spietata + proposta v3  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261003-s1-quest-critique-v5/design-brief-v5.md` — S1 Quest — Design Brief v5 (post-fix, pre-critica)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261003-s1-quest-design-doc/design-brief.md` — S1 Design Brief — «La cassa delle sementi» deve fare questo  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261003-s1-web-critique-gameplay/broadcast/BROADCAST.md` — Broadcast: broadcast-20261003-111629  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261003-s1-web-critique-gameplay/broadcast/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261003-s1-web-critique-gameplay/broadcast-retry/BROADCAST.md` — Broadcast: broadcast-20261003-112516  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261003-s1-web-critique-gameplay/broadcast-retry/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261003-s1-web-critique-gameplay/broadcast-retry2/BROADCAST.md` — Broadcast: broadcast-20261003-113132  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261003-s1-web-critique-gameplay/broadcast-retry2/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261003-s1-web-critique-gameplay/prompt.md` — «La cassa delle sementi» — descrizione gameplay letterale (quest S1, lab `/quest-s1-lab`)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261003-s1-web-critique-gameplay/quest-gameplay-description.md` — «La cassa delle sementi» — descrizione gameplay letterale (quest S1, lab `/quest-s1-lab`)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261003-s1-web-critique-gameplay/synthesis.md` — S1 Web-Critique Gameplay — sintesi comparativa  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261004-rovine-preview-chatgpt/README.md` — 2026-10-04 — Conversazione ChatGPT «Progettare quest strategiche»  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261004-rovine-preview-chatgpt/economy-notes.md` — Note di design — simulazione, economia umani, juice  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261004-rovine-preview-chatgpt/preview-prompt.md` — Prompt — Quest Simulation Preview  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261004-rovine-preview-chatgpt/rovine-mockup.md` — Mockup quest — «Le Rovine sotto il Fiume»  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261005-transcript-quest-strategiche/transcript.md` — 2. Il vero equivalente di LoW non è "fare le quest"  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-emergent-narrative-research/BROADCAST.md` — Broadcast: broadcast-20261006-175008  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-emergent-narrative-research/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-emergent-narrative-research/prompt.md` — prompt  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-cross-direct/transcript.md` — Transcript — ChatGPT share «Sistema di quest cross direct»  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-critique/BROADCAST.md` — Broadcast: broadcast-20261006-152725  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-critique/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-critique/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-critique/prompt.md` — Contesto progetto per critica — PLAN-021 QuestTheatre (RPG Balancer)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-critique/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-critique-v2/BROADCAST.md` — Broadcast: broadcast-20261006-153109  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-critique-v2/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-critique-v2/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-critique-v2/prompt.md` — Contesto progetto per critica — PLAN-021 QuestTheatre (RPG Balancer)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-critique-v2/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-critique-v3/BROADCAST.md` — Broadcast: broadcast-20261006-153456  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-critique-v3/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-critique-v3/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-critique-v3/prompt.md` — Contesto progetto per critica — PLAN-021 QuestTheatre (RPG Balancer)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-critique-v3/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-critique-v4/BROADCAST.md` — Broadcast: broadcast-20261006-153858  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-critique-v4/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-critique-v4/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-critique-v4/prompt.md` — Contesto progetto per critica — PLAN-021 QuestTheatre (RPG Balancer)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-critique-v4/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-critique-v5/BROADCAST.md` — Broadcast: broadcast-20261006-154329  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-critique-v5/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-critique-v5/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-critique-v5/prompt.md` — Contesto progetto per critica — PLAN-021 QuestTheatre (RPG Balancer)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-critique-v5/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-critique-v6/BROADCAST.md` — Broadcast: broadcast-20261006-154726  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-critique-v6/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-critique-v6/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-critique-v6/prompt.md` — Contesto progetto per critica — PLAN-021 QuestTheatre (RPG Balancer)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-critique-v6/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-critique-v7/BROADCAST.md` — Broadcast: broadcast-20261006-155151  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-critique-v7/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-critique-v7/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-critique-v7/prompt.md` — Contesto progetto per critica — PLAN-021 QuestTheatre (RPG Balancer)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-critique-v7/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-plan/context.md` — Contesto progetto per critica — PLAN-021 QuestTheatre (RPG Balancer)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261006-quest-theatre-plan/desiderata-v27.md` — desiderata-v27  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261007-learn-coverage-invariant/pattern-candidate.md` — pattern-candidate  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261007-quest-attrition-design/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261007-quest-attrition-design/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261007-quest-attrition-design/caller_final.md` — caller_final  
+  - markers: proposed  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261007-quest-attrition-design/final.md` — final  
+  - markers: proposed  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261007-quest-attrition-design/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261007-quest-vs-world-priority/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261007-quest-vs-world-priority/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261007-quest-vs-world-priority/caller_final.md` — Strategic Sequencing Decision: World Narrative Registry vs. Quest Composition  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261007-quest-vs-world-priority/final.md` — Strategic Sequencing Decision: World Narrative Registry vs. Quest Composition  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261007-quest-vs-world-priority/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261008-plan-025-theatre-convergence/context.md` — Context for the PLAN-025 critique (RPG project, 2026-10-08)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261008-plan-025-theatre-convergence/critique-r1/BROADCAST.md` — Broadcast: broadcast-20261008-144425  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261008-plan-025-theatre-convergence/critique-r1/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261008-plan-025-theatre-convergence/critique-r1/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261008-plan-025-theatre-convergence/critique-r1/prompt.md` — Context for the PLAN-025 critique (RPG project, 2026-10-08)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261008-plan-025-theatre-convergence/critique-r1/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261008-plan-025-theatre-convergence/critique-r2/BROADCAST.md` — Broadcast: broadcast-20261008-145401  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261008-plan-025-theatre-convergence/critique-r2/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261008-plan-025-theatre-convergence/critique-r2/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261008-plan-025-theatre-convergence/critique-r2/prompt.md` — Context for the PLAN-025 critique (RPG project, 2026-10-08)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261008-plan-025-theatre-convergence/critique-r2/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261008-plan-025-theatre-convergence/critique-r3/BROADCAST.md` — Broadcast: broadcast-20261008-145911  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261008-plan-025-theatre-convergence/critique-r3/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261008-plan-025-theatre-convergence/critique-r3/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261008-plan-025-theatre-convergence/critique-r3/prompt.md` — Context for the PLAN-025 critique (RPG project, 2026-10-08)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261008-plan-025-theatre-convergence/critique-r3/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261008-plan-025-theatre-convergence/desiderata-v27.md` — desiderata-v27  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261008-story-archetype-imprints/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261008-story-archetype-imprints/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261008-story-archetype-imprints/caller_final.md` — Strategic Review: Quest Generation Architecture (S5)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261008-story-archetype-imprints/final.md` — Strategic Review: Quest Generation Architecture (S5)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261008-story-archetype-imprints/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/context-s2-children.md` — Context for the PLAN-019-S2 children critique (RPG project, 2026-10-09)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/desiderata-extract.md` — desiderata-extract  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.1/context.md` — Context for the PLAN-019-S2 children critique (RPG project, 2026-10-09)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.1/desiderata-v24-v27.md` — desiderata-v24-v27  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.1/r1/BROADCAST.md` — Broadcast: broadcast-20261009-082109  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.1/r1/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.1/r1/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.1/r1/prompt.md` — prompt  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.1/r1/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.1/r2/BROADCAST.md` — Broadcast: broadcast-20261009-084034  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.1/r2/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.1/r2/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.1/r2/prompt.md` — prompt  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.1/r2/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.2/context.md` — Context for the PLAN-019-S2 children critique (RPG project, 2026-10-09)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.2/desiderata-v24-v27.md` — desiderata-v24-v27  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.2/r1/BROADCAST.md` — Broadcast: broadcast-20261009-082256  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.2/r1/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.2/r1/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.2/r1/prompt.md` — prompt  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.2/r1/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.2/r2/BROADCAST.md` — Broadcast: broadcast-20261009-084234  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.2/r2/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.2/r2/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.2/r2/prompt.md` — prompt  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.2/r2/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.3/context.md` — Context for the PLAN-019-S2 children critique (RPG project, 2026-10-09)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.3/desiderata-v24-v27.md` — desiderata-v24-v27  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.3/r1/BROADCAST.md` — Broadcast: broadcast-20261009-082515  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.3/r1/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.3/r1/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.3/r1/prompt.md` — prompt  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.3/r1/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.3/r2/BROADCAST.md` — Broadcast: broadcast-20261009-084442  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.3/r2/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.3/r2/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.3/r2/prompt.md` — prompt  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.3/r2/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.4/context.md` — Context for the PLAN-019-S2 children critique (RPG project, 2026-10-09)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.4/desiderata-v24-v27.md` — desiderata-v24-v27  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.4/r1/BROADCAST.md` — Broadcast: broadcast-20261009-083358  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.4/r1/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.4/r1/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.4/r1/prompt.md` — prompt  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.4/r1/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.4/r2/BROADCAST.md` — Broadcast: broadcast-20261009-084636  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.4/r2/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.4/r2/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.4/r2/prompt.md` — prompt  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.4/r2/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.5/context.md` — Context for the PLAN-019-S2 children critique (RPG project, 2026-10-09)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.5/desiderata-v24-v27.md` — desiderata-v24-v27  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.5/r1/BROADCAST.md` — Broadcast: broadcast-20261009-083402  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.5/r1/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.5/r1/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.5/r1/prompt.md` — prompt  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.5/r1/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.5/r2/BROADCAST.md` — Broadcast: broadcast-20261009-084902  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.5/r2/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.5/r2/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.5/r2/prompt.md` — prompt  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-children/s2.5/r2/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-web-critique/context.md` — Context for the PLAN-019-S2 critique (RPG project, 2026-10-09)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-web-critique/desiderata-v24-v27.md` — desiderata-v24-v27  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-web-critique/r1/BROADCAST.md` — Broadcast: broadcast-20261009-073328  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-web-critique/r1/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-web-critique/r1/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-web-critique/r1/prompt.md` — prompt  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-plan-s2-web-critique/r1/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-quest-generation-plan-critique/BROADCAST.md` — Broadcast: broadcast-20261009-140829  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-quest-generation-plan-critique/context.md` — CONTESTO DEL PROGETTO (fatti verificati sul branch, 2026-10-09)  
+  - markers: candidate, proposed  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-quest-generation-plan-critique/contract.md` — CONTRATTO — Desiderata v24 FROZEN + rev.1 + rev.2 (estratti rilevanti per il piano di generazione quest)  
+  - markers: frozen  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-quest-generation-plan-critique/critique-codex.md` — critique-codex  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-quest-generation-plan-critique/critique-gemini.md` — critique-gemini  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-quest-generation-plan-critique/critique-groq.md` — critique-groq  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-quest-generation-plan-critique/critique-mistral.md` — critique-mistral  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-quest-generation-plan-critique/critique-openrouter-ds.md` — critique-openrouter-ds  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-quest-generation-plan-critique/critique-openrouter-qwen.md` — critique-openrouter-qwen  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-quest-generation-plan-critique/critique-openrouter.md` — critique-openrouter  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-quest-generation-plan-critique/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-quest-generation-plan-critique/metadata.json` — metadata  
+  - markers: proposed  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-quest-generation-plan-critique/plan.md` — Implementation Plan — Quest Generation System  
+  - markers: proposed  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-quest-generation-plan-critique/prompt-lean.md` — CONTRATTO — Desiderata v24 FROZEN + rev.1 + rev.2 (estratti rilevanti per il piano di generazione quest)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-quest-generation-plan-critique/prompt.md` — CONTRATTO — Desiderata v24 FROZEN + rev.1 + rev.2 (estratti rilevanti per il piano di generazione quest)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-quest-generation-plan-critique/synthesis.md` — Cold Read — Implementation Plan «Quest Generation System» (R-115)  
+  - markers: proposed  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-quest-generation-plan-v2-critique/BROADCAST.md` — Broadcast: broadcast-20261009-145511  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-quest-generation-plan-v2-critique/context.md` — Contesto repo verificato (2026-10-10) — per la critica di plan-v2  
+  - markers: proposed  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-quest-generation-plan-v2-critique/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-quest-generation-plan-v2-critique/metadata.json` — metadata  
+  - markers: proposed  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-quest-generation-plan-v2-critique/plan-v2.md` — Implementation Plan — Quest Generation System (v2)  
+  - markers: proposed  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-quest-generation-plan-v2-critique/prompt.md` — CONTRATTO — Desiderata v24 FROZEN + rev.1 + rev.2 (estratti rilevanti per il piano di generazione quest)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-quest-generation-plan-v2-critique/synthesis-v2.md` — Sintesi cold read r2 — plan-v2 Quest Generation System  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-quest-generation-plan-v2-critique/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-s3-critique-r1/BROADCAST.md` — Broadcast: broadcast-20261009-175351  
+  - markers: frozen  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-s3-critique-r1/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-s3-critique-r1/metadata.json` — metadata  
+  - markers: frozen  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-s3-critique-r1/prompt.md` — Desiderata  
+  - markers: frozen  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-s3-critique-r1/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-s3-critique-r1-retry/BROADCAST.md` — Broadcast: broadcast-20261009-175925  
+  - markers: frozen  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-s3-critique-r1-retry/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-s3-critique-r1-retry/metadata.json` — metadata  
+  - markers: frozen  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-s3-critique-r1-retry/prompt.md` — Desiderata  
+  - markers: frozen  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261009-s3-critique-r1-retry/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261010-gimmick-channels-research/prompts/prompt-t1-precedents.md` — prompt-t1-precedents  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261010-gimmick-channels-research/prompts/prompt-t2-binding-models.md` — prompt-t2-binding-models  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261010-gimmick-channels-research/prompts/prompt-t3-balance.md` — prompt-t3-balance  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261010-gimmick-channels-research/prompts/prompt-t4-ui-preview.md` — prompt-t4-ui-preview  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261010-gimmick-channels-research/prompts/prompt-t5-psychology.md` — prompt-t5-psychology  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261010-gimmick-channels-research/prompts/prompt-t6-narrative.md` — prompt-t6-narrative  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261010-gimmick-channels-research/report-t1-precedents.md` — Report T1 — Precedenti di design: "stesso problema, più soluzioni"  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261010-gimmick-channels-research/report-t2-binding-models.md` — Report T2 — Modelli di binding: dove vive la scelta del canale  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261010-gimmick-channels-research/report-t3-balance.md` — Report T3 — Bilanciamento e validazione tra canali  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261010-gimmick-channels-research/report-t4-ui-preview.md` — Report T4 — UI e preview dei canali alternativi  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261010-gimmick-channels-research/report-t5-psychology.md` — Report T5 — Psicologia dei canali alternativi  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261010-gimmick-channels-research/report-t6-narrative.md` — Report T6 — Implicazioni narrative e pipeline testo  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261010-gimmick-channels-research/t1-precedents/BROADCAST.md` — Broadcast: broadcast-20261010-215851  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261010-gimmick-channels-research/t1-precedents/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261010-gimmick-channels-research/t2-binding-models/BROADCAST.md` — Broadcast: broadcast-20261010-220604  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261010-gimmick-channels-research/t2-binding-models/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261010-gimmick-channels-research/t3-balance/BROADCAST.md` — Broadcast: broadcast-20261010-221314  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261010-gimmick-channels-research/t3-balance/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261010-gimmick-channels-research/t4-ui-preview/BROADCAST.md` — Broadcast: broadcast-20261010-222024  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261010-gimmick-channels-research/t4-ui-preview/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261010-gimmick-channels-research/t5-psychology/BROADCAST.md` — Broadcast: broadcast-20261010-222734  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261010-gimmick-channels-research/t5-psychology/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261010-gimmick-channels-research/t6-narrative/BROADCAST.md` — Broadcast: broadcast-20261010-223444  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261010-gimmick-channels-research/t6-narrative/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261011-opportunity-layer-research/ERRATA.md` — ERRATA — 2026-10-11  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261011-opportunity-layer-research/README.md` — Run: Opportunity Layer Research — 2026-10-11  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261011-opportunity-layer-research/prompts/prompt-t1-opportunity-graph.md` — prompt-t1-opportunity-graph  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261011-opportunity-layer-research/prompts/prompt-t2-quest-families.md` — prompt-t2-quest-families  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261011-opportunity-layer-research/prompts/prompt-t3-requirements.md` — prompt-t3-requirements  
+  - markers: proposed  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261011-opportunity-layer-research/prompts/prompt-t4-rewards-capabilities.md` — prompt-t4-rewards-capabilities  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261011-opportunity-layer-research/prompts/prompt-t5-steering-intel.md` — prompt-t5-steering-intel  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261011-opportunity-layer-research/prompts/prompt-t6-time-concurrency.md` — prompt-t6-time-concurrency  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261011-opportunity-layer-research/prompts/prompt-t7-prototype-meta.md` — prompt-t7-prototype-meta  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261011-opportunity-layer-research/report-t1-opportunity-graph.md` — T1 — Grafo delle opportunità / quest webs: struttura dati e persistenza  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261011-opportunity-layer-research/report-t2-quest-families.md` — T2 — Famiglie di quest come mechanic kits: definizione, soluzioni compatibili, riuso  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261011-opportunity-layer-research/report-t3-requirements.md` — T3 — Tassonomia requisiti e hard vs soft gates  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261011-opportunity-layer-research/report-t4-rewards-capabilities.md` — T4 — Ricompense-porta e capacità che cambiano le regole  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261011-opportunity-layer-research/report-t5-steering-intel.md` — T5 — Steering della generazione e intel come risorsa trasversale  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261011-opportunity-layer-research/report-t6-time-concurrency.md` — T6 — Tempo, finestre di opportunità, offerte concorrenti e capacità parallela  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261011-opportunity-layer-research/report-t7-prototype-meta.md` — T7 — Metodologia di prototipo per il meta-layer (senza combattimento)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261011-opportunity-layer-research/t1-opportunity-graph/BROADCAST.md` — Broadcast: broadcast-20261011-210750  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261011-opportunity-layer-research/t1-opportunity-graph/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261011-opportunity-layer-research/t2-quest-families/BROADCAST.md` — Broadcast: broadcast-20261011-211037  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261011-opportunity-layer-research/t2-quest-families/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261011-opportunity-layer-research/t3-requirements/BROADCAST.md` — Broadcast: broadcast-20261011-211453  
+  - markers: proposed  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261011-opportunity-layer-research/t3-requirements/metadata.json` — metadata  
+  - markers: proposed  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261011-opportunity-layer-research/t4-rewards-capabilities/BROADCAST.md` — Broadcast: broadcast-20261011-212006  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261011-opportunity-layer-research/t4-rewards-capabilities/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261011-opportunity-layer-research/t4-rewards-capabilities-retry/BROADCAST.md` — Broadcast: broadcast-20261011-212734  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261011-opportunity-layer-research/t4-rewards-capabilities-retry/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261011-opportunity-layer-research/t5-steering-intel/BROADCAST.md` — Broadcast: broadcast-20261011-212627  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261011-opportunity-layer-research/t5-steering-intel/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261011-opportunity-layer-research/t6-time-concurrency/BROADCAST.md` — Broadcast: broadcast-20261011-212931  
+  - markers: proposed  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261011-opportunity-layer-research/t6-time-concurrency/metadata.json` — metadata  
+  - markers: proposed  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261011-opportunity-layer-research/t7-prototype-meta/BROADCAST.md` — Broadcast: broadcast-20261011-213146  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261011-opportunity-layer-research/t7-prototype-meta/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261013-1046-macrosim-plan/artifact-r003.md` — artifact-r003 — PLAN: Macro-Campaign Simulation Lab  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261013-1046-macrosim-plan/decision_memo.md` — Decision memo — 20261013-1046-macrosim-plan  
+  - markers: decision  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261013-1046-macrosim-plan/grounding-ledger.md` — Grounding ledger — 20261013-1046-macrosim-plan  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261014-094734-invasion-verification/pattern-candidate.md` — Pattern candidates — sessione 2026-10-13/14, evento Invasione Goblin su /game  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261014-114519/cycle-01/A.md` — Piano di Intervento Tecnico: Remediation Audit R-187 (`/game` & Trailer Stack)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261014-114519/cycle-01/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261014-114519/cycle-01/convergence.txt` — convergence  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261014-114519/cycle-01/critiques.json` — critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261014-114519/cycle-01/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261014-114519/drift-report.md` — Drift report (PLAN-057)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261014-114519/final.md` — PLAN-034: Trailer Audit R-187 Remediation Plan  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261014-114519/state.json` — state  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261014-114519/vision-items.md` — Vision items (PLAN-057)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261014-120000/cycle-01/A.md` — Piano di Intervento: Remediation Audit Trailer R-187 (RPG)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261014-120000/cycle-01/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261014-120000/cycle-01/convergence.txt` — convergence  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261014-120000/cycle-01/critiques.json` — critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261014-120000/cycle-01/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261014-120000/drift-report.md` — Drift report (PLAN-057)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261014-120000/final.md` — final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261014-120000/state.json` — state  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261014-120000/vision-items.md` — Vision items (PLAN-057)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-1915-r196-quest-window-plan/artifact-r006.md` — PLAN-035 — QuestRunWindow Cinematic Redesign, Icon Belt, Left Party Roster & Right Scroll Log (artifact r006)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-1915-r196-quest-window-plan/grounding-ledger.md` — Grounding Ledger — 20261015-1915-r196-quest-window-plan  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-1915-r196-quest-window-plan/report.md` — Run report — 20261015-1915-r196-quest-window-plan  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-ops-shutdown-plan/cycle-01/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-ops-shutdown-plan/cycle-01/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-ops-shutdown-plan/cycle-01/convergence.txt` — convergence  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-ops-shutdown-plan/cycle-01/critiques.json` — critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-ops-shutdown-plan/cycle-01/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-ops-shutdown-plan/desiderata-ops-shutdown.md` — Desiderata — OPS-SHUTDOWN completion  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-ops-shutdown-plan/drift-report.md` — Drift report (PLAN-057)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-ops-shutdown-plan/final.md` — Implementation Plan: OPS-SHUTDOWN v3 — Governed Overnight Session Shutdown  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-ops-shutdown-plan/planner-prompt.md` — planner-prompt  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-ops-shutdown-plan/state.json` — state  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-ops-shutdown-plan/vision-items.md` — Vision items (PLAN-057)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-plan-035-village-view/cycle-01/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-plan-035-village-view/cycle-01/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-plan-035-village-view/cycle-01/convergence.txt` — convergence  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-plan-035-village-view/cycle-01/critiques.json` — critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-plan-035-village-view/cycle-01/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-plan-035-village-view/drift-report.md` — Drift report (PLAN-057)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-plan-035-village-view/final.md` — final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-plan-035-village-view/state.json` — state  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-plan-035-village-view/vision-items.md` — Vision items (PLAN-057)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-r195-planner-redesign/cycle-01/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-r195-planner-redesign/cycle-01/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-r195-planner-redesign/cycle-01/convergence.txt` — convergence  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-r195-planner-redesign/cycle-01/critiques.json` — critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-r195-planner-redesign/cycle-01/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-r195-planner-redesign/drift-report.md` — Drift report (PLAN-057)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-r195-planner-redesign/final.md` — final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-r195-planner-redesign/state.json` — state  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-r195-planner-redesign/vision-items.md` — Vision items (PLAN-057)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-r195-quest-window-plan/cycle-01/A.md` — Structured Plan: QuestRunWindow Redesign on /game (R-195)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-r195-quest-window-plan/cycle-01/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-r195-quest-window-plan/cycle-01/convergence.txt` — convergence  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-r195-quest-window-plan/cycle-01/critiques.json` — critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-r195-quest-window-plan/cycle-01/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-r195-quest-window-plan/drift-report.md` — Drift report (PLAN-057)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-r195-quest-window-plan/final.md` — final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-r195-quest-window-plan/state.json` — state  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-r195-quest-window-plan/vision-items.md` — Vision items (PLAN-057)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-village-buildings-explore/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-village-buildings-explore/B.md` — B  
+  - markers: proposed  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-village-buildings-explore/caller_final.md` — caller_final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-village-buildings-explore/final.md` — final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261015-village-buildings-explore/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261016-r204-parallel-execution/BROADCAST.md` — Broadcast: broadcast-20261015-222146  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261016-r204-parallel-execution/broadcast-prompt.md` — broadcast-prompt  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261016-r204-parallel-execution/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261017-learn-ws0ws1-slot-drag-evidence/pattern-candidate.md` — Pattern candidates — PLAN-043 WS-0+WS-1 (slot swap / re-bite evidence)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261017-plan043-ws0ws1-foundation-slots/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261017-plan043-ws2-three-zone-stage/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261017-plan043-ws2-three-zone-stage/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261017-plan043-ws2-three-zone-stage/director-signoff.json` — director-signoff  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261017-plan043-ws2-three-zone-stage/frames/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261017-plan043-ws2-three-zone-stage/gen-verifier.ts` — gen-verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261017-plan043-ws2-three-zone-stage/pattern-candidate.md` — Pattern candidates — PLAN-043 WS-2 three-zone-stage  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261017-plan043-ws2-three-zone-stage/probe/dumps.json` — dumps  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261017-plan043-ws2-three-zone-stage/probe/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261017-plan043-ws2-three-zone-stage/r210-intent-check.md` — R-210 — Validazione intento→risultato: WS-2 Three-Zone Stage  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261017-plan043-ws2-three-zone-stage/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261017-plan043-ws2-three-zone-stage/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261018-learn-goblin-v3/pattern-candidate.md` — pattern-candidate  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261018-plan-047-visual-fork-gate/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261018-plan-047-visual-fork-gate/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261018-plan-047-visual-fork-gate/director-signoff.json` — director-signoff  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261018-plan-047-visual-fork-gate/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261018-quest-planner-drag-feedback/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261018-quest-planner-drag-feedback/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261018-quest-planner-drag-feedback/drag-metrics.json` — drag-metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261018-quest-planner-drag-feedback/env-attestation.json` — env-attestation  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261018-quest-planner-drag-feedback/flight-center-alignment.json` — flight-center-alignment  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261018-quest-planner-drag-feedback/pattern-candidate.md` — Pattern candidates — 20261018-quest-planner-drag-feedback  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261018-quest-planner-drag-feedback/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261018-quest-planner-drag-feedback/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261018-v36-living-component-contracts-drift/desiderata-drift.md` — desiderata-drift  
+  - markers: frozen  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261018-v36-living-component-contracts-drift/desiderata-slice.md` — desiderata-slice  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261018-visual-fork-dryrun-r214/visual-fork-bezel-hud64.md` — Visual Fork Card — bezel ottico hud64 dello slot residente (T-007 dry-run)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261018122310-goblin-refine/contract.json` — contract  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261018122310-goblin-refine/copy-after.en.json` — copy-after.en  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261018122310-goblin-refine/copy-after.it.json` — copy-after.it  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261018122310-goblin-refine/copy-before.en.json` — copy-before.en  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261018122310-goblin-refine/findings.json` — findings  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261018122310-goblin-refine/report.md` — questRefine — goblin (2026-10-18T12:58:09.125Z)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261019-learn-goblin-v3-sync/pattern-candidate.md` — Learn — R-219 sync v3 (manoscritto → runtime/contratto) — 2026-10-19  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261020-poi-explorer/evidence/mock-cap.mjs` — mock-cap  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261020-poi-explorer/evidence/poi-five.mjs` — poi-five  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261020-poi-explorer/evidence/poi-halo2.mjs` — poi-halo2  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261020-poi-explorer/evidence/poi-route.mjs` — poi-route  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261020-poi-explorer/evidence/poi-stage1.mjs` — poi-stage1  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261020-poi-explorer/evidence/poi-stage2b.mjs` — poi-stage2b  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261020-poi-explorer/evidence/poi-stage3.mjs` — poi-stage3  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261020-poi-explorer/evidence/sha256.txt` — sha256  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261020-poi-explorer/visual-fork-poi-sigillo.md` — Visual Fork Card — POI Sigillo: dove sta il rischio  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261022-learn-carrier-continuity/pattern-candidate.md` — Pattern candidate — carrier-continuity invariant (R-269)  
+  - markers: candidate  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261022-learn-prompt-deliverable/pattern-candidate.md` — Pattern candidate — deliverable prompt vs deliverable immagini  
+  - markers: candidate  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261023-astrolabe-family-glyph/desiderata-slice.md` — desiderata-slice  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261023-astrolabe-family-glyph/dispositions.json` — dispositions  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261023-astrolabe-family-glyph/intent.md` — intent ledger — task PLAN-082 run 20261023-astrolabe-family-glyph  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261025-learn-moodkeys/pattern-candidate.md` — Pattern candidate — mood-key image-edit loop (2026-10-25)  
+  - markers: candidate  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261026-learn-parallax-plate/pattern-candidate.md` — Pattern candidate — piastra parallasse "vissuta" (ridge P1 → user i3)  
+  - markers: candidate  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261026-nav-corner-remock/shot.mjs` — shot  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261026-topbar-remock/shot.mjs` — shot  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261026-visual-fork-brushwork/shot.mjs` — shot  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261026-visual-fork-brushwork/visual-fork-brushwork.md` — Visual Fork Card — Pennellata: dove vive la materia dipinta (HUD vs racconto)  
+  - markers: draft  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261026-visual-fork-d1-d4-d6/film.mjs` — film  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261026-visual-fork-d1-d4-d6/shot.mjs` — shot  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261026-visual-fork-d1-d4-d6/shot6.mjs` — shot6  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261027-planner-remock/capAnim.mjs` — capAnim  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261027-planner-remock/eng.tsx` — eng  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261027-planner-remock/icons/engraved.json` — engraved  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261027-planner-remock/icons/lucide.json` — lucide  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261027-planner-remock/shot.mjs` — shot  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261027-planner-remock/shotB10.mjs` — shotB10  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261027-planner-remock/shotB2.mjs` — shotB2  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261027-planner-remock/shotB3.mjs` — shotB3  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261027-planner-remock/shotB4.mjs` — shotB4  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261027-planner-remock/shotB5.mjs` — shotB5  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261027-planner-remock/shotB6.mjs` — shotB6  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261027-planner-remock/shotB7.mjs` — shotB7  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261027-planner-remock/shotB8.mjs` — shotB8  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261027-planner-remock/shotB8b.mjs` — shotB8b  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261027-planner-remock/shotB9.mjs` — shotB9  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261027-planner-remock/shotLab.mjs` — shotLab  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261027-planner-remock/shotSeq.mjs` — shotSeq  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261027-planner-remock/shotSlots.mjs` — shotSlots  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261027-planner-remock/slotlab/main.tsx` — main  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261028-hud-mockup1-v2/log-gemini-teal.txt` — log-gemini-teal  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261028-hud-mockup1-v2/log-gemini-violet.txt` — log-gemini-violet  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261028-hud-mockup1-v2/log-gpt-teal.txt` — log-gpt-teal  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261028-hud-mockup1-v2/log-gpt-violet.txt` — log-gpt-violet  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261028-hud-mockup1-v2/prompt-base.txt` — prompt-base  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261028-hud-mockup1-v2/prompt-teal.txt` — prompt-teal  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261028-hud-mockup1-v2/prompt-violet.txt` — prompt-violet  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261028-learn-close/pattern-candidate.md` — Pattern candidates — sessione 2026-10-28 (director-knowledge + bulk push/deploy)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261029-mappa2-grade-fork/gallery/meta.json` — meta  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261029-mappa2-grade-fork/gallery-look/meta.json` — meta  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261029-mappa2-grade-fork/paintover-brief.md` — Paintover mirato di mappa2 — brief per il generatore  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261029-mappa2-grade-fork/visual-fork.md` — Visual Fork Card — mappa2: grading colore / contrasto locale / nitidezza  
+  - markers: draft  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261029-quest-editor-visual-fork/visual-fork-editor-layout.md` — Visual Fork Card — Quest Editor layout  
+  - markers: draft  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261030-learn-chrome-localstorage-probe/pattern-candidate.md` — Pattern candidates — learn 2026-10-30  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261030-peak-clouds-fork/visual-fork-peak-clouds.md` — Visual Fork Card — nuvole sui picchi innevati (mountainStorm, mappa2)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261030-upscale-learn/pattern-candidate.md` — Pattern candidates — sessione mappa2 upscale (2026-10-30)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261101-deploy-verify-learn/pattern-candidate.md` — Learn 2026-11-01 — deploy verify gap (headless-no-GPU) + packRoot unguarded  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261102-hud-zanara/visual-fork-hud-zanara.md` — Visual Fork Card — HUD Zanara: dai mockup ai componenti reali  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261102-quest-editor-lingua/pattern-candidate.md` — Pattern candidate — vite dev server: transform servito da snapshot inter-edit che non invalida più  
+  - markers: candidate  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261107-hud-cassetto-learn/pattern-candidate.md` — Pattern candidates — port HUD Zanara cassetto (PLAN-113/114, R-319)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-cassetto-explore/capture.mjs` — capture  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-cassetto-explore/column/capture-game.mjs` — capture-game  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-cassetto-explore/column/render.mjs` — render  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-cassetto-explore/column/render_g.mjs` — render_g  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-cassetto-explore/column/render_v2.mjs` — render_v2  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-cassetto-explore/exploration.md` — Cassetto (planner) — esplorazione AAA (2026-11-10)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-cassetto-explore/text-sizes.mjs` — text-sizes  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-cassetto-explore/visual-fork-cassetto-colonna.md` — Visual Fork Card — cassetto a colonna: come si lega la testata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-chatgpt-ghiera/prompt.txt` — prompt  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-chatgpt-ghiera/prompt4-gemini.txt` — prompt4-gemini  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-chatgpt-ghiera/prompt4.txt` — prompt4  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-chatgpt-ghiera/prompt5.txt` — prompt5  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-chatgpt-ghiera/prompt6.txt` — prompt6  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-chatgpt-ghiera/prompt7-gemini-dentini.txt` — prompt7-gemini-dentini  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-chatgpt-ghiera/prompt8-gemini-fix.txt` — prompt8-gemini-fix  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-game-mappa2/ab-grade.mjs` — ab-grade  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-game-mappa2/capture-game.mjs` — capture-game  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-game-mappa2/grade-ab.md` — /game — grade combinato: prova A/B (2026-11-10)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-game-mappa2/hires/ab-hires.mjs` — ab-hires  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-hud-check/hud-functional.mjs` — hud-functional  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-hud-check/hud-layout.mjs` — hud-layout  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-hud-check/nav-labels.mjs` — nav-labels  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-plan115/F0-budget.md` — PLAN-115 F0 — misura per profilo e proposta di budget (2026-11-10)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-plan115/F4-tiers.md` — PLAN-115 F4 — profili per dispositivo (2026-11-10)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-plan115/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-plan115/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-plan115/d4-probe.mjs` — d4-probe  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-plan115/d4-settings.mjs` — d4-settings  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-plan115/f0-breakdown.json` — f0-breakdown  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-plan115/f0-breakdown.mjs` — f0-breakdown  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-plan115/f0-download.mjs` — f0-download  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-plan115/f0-measure.mjs` — f0-measure  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-plan115/f0-raw.json` — f0-raw  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-plan115/f0-urls.json` — f0-urls  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-plan115/f0-urls.mjs` — f0-urls  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-plan115/f1/invented-regions.json` — invented-regions  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-plan115/f1-clean.mjs` — f1-clean  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-plan115/f1-sea.mjs` — f1-sea  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-plan115/f1-seabed-drag.mjs` — f1-seabed-drag  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-plan115/f1-variants.mjs` — f1-variants  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-plan115/f3-seam.mjs` — f3-seam  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-plan115/f3-tiles.mjs` — f3-tiles  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-plan115/f4/f4-raw.json` — f4-raw  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-plan115/f4-measure.mjs` — f4-measure  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-plan115/f4-mobile-ab.mjs` — f4-mobile-ab  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-plan115/v8-camera.json` — v8-camera  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-plan115/v8-camera.mjs` — v8-camera  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-plan115/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-plan115/visual-fork-F1.md` — Visual Fork Cards — PLAN-115 F1: terra hi-res (D1), mare (D2), dettaglio montagne (D3)  
+  - markers: draft  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-plan116-f0/cap-bezel.mjs` — cap-bezel  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261110-plan116-f0/cap-c1.mjs` — cap-c1  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261111-game-controls/probe.mjs` — probe  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261111-game-controls/probe2.mjs` — probe2  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261111-game-controls/probe3.mjs` — probe3  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261111-menus/notes.md` — Menu in basso a destra + alba/tramonto (2026-11-11)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261111-menus/probe-dialogs.mjs` — probe-dialogs  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261111-menus/probe-game.mjs` — probe-game  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261111-menus/probe.mjs` — probe  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261111-night-explore/cap-anim.mjs` — cap-anim  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261111-night-explore/cap-new.mjs` — cap-new  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261111-night-explore/cap.mjs` — cap  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261111-night-explore/cycle.mjs` — cycle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261111-night-explore/exploration.md` — Notte sulla mappa — esplorazione (2026-11-11)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261111-night-explore/time-ui.md` — Barra del tempo: sole/luna, velocità e notte, tick o ore (2026-11-11)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261111-poi-zanara/critique.md` — POI singolo — critica del Sigillo attuale sulla mappa2 + direzioni Zanara (2026-11-11)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261111-poi-zanara/piece/layers/arc-geometry.json` — arc-geometry  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261111-poi-zanara/prompt-A-medaglione.txt` — prompt-A-medaglione  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261111-poi-zanara/prompt-B-gemma.txt` — prompt-B-gemma  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261111-poi-zanara/prompt-C-diorama.txt` — prompt-C-diorama  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261111-poi-zanara/prompt-brief-v3-concept.txt` — prompt-brief-v3-concept  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261111-poi-zanara/prompt-brief-v3-pieces.txt` — prompt-brief-v3-pieces  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261111-poi-zanara/prompt-open-v2.txt` — prompt-open-v2  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261111-time-icons/cap.mjs` — cap  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261112-r326-village-layer-recut/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261112-r326-village-layer-recut/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261112-r326-village-layer-recut/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20261112-r326-village-layer-recut/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
 - `.mw/runs/PLAN-007-observatory-primitives/inventory.md` — Inventario — The New Observatory (Prototype)  
   - reason: run/session/pending context or transient register  
 - `.mw/runs/PLAN-007-observatory-primitives/primitive-catalog.md` — Catalogo delle primitive — Piano 007  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/PLAN-033/bv/record.md` — BV record — PLAN-033 — 2026-10-12 (aggiornato 2026-10-19)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/R-208/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/R-208/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/R-208/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/bezel-variants-lab/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/bezel-variants-lab/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/bezel-variants-lab/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/bv-r169-2026-10-12/bv/COVERAGE-RECORD.md` — BV R-169 — Interaction Coverage Record — 2026-10-12  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/bv-r169-2026-10-12/bv/DECISION-REPORT.md` — Decision Report — BV R-169 (PLAN-033 T-009 + mesh-pipe fix) — 2026-10-12  
+  - markers: decision  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/bv-r169-2026-10-12/bv/FINDINGS.md` — BV R-169 — Findings — 2026-10-12  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/bv-r169-2026-10-12/bv/pw-ticker-wonder-idle.json` — pw-ticker-wonder-idle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/bv-r169-2026-10-12/bv/pw-ticker-wonder-idle.mjs` — pw-ticker-wonder-idle  
   - reason: run/session/pending context or transient register  
 - `.mw/runs/cold-read-prompt.txt` — Bozza piano — “The New Observatory” → Canonical Design-System Primitives (Dual-track)  
   - reason: run/session/pending context or transient register  
@@ -1979,6 +7512,61 @@
   - reason: run/session/pending context or transient register  
 - `.mw/runs/event-card-cta-title-critique-2026-08-27/synthesis.md` — Synthesis of Critiques  
   - reason: run/session/pending context or transient register  
+- `.mw/runs/event-reminder-aaa-polish/cycle-01/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/event-reminder-aaa-polish/cycle-01/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/event-reminder-aaa-polish/cycle-01/convergence.txt` — convergence  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/event-reminder-aaa-polish/cycle-01/critiques.txt` — critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/event-reminder-aaa-polish/cycle-01/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/event-reminder-aaa-polish/final.md` — 1. Goal  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/event-reminder-critique/BROADCAST.md` — Broadcast: broadcast-20260831-144621  
+  - markers: proposed  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/event-reminder-critique/metadata.json` — metadata  
+  - markers: proposed  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/event-reminder-plan/cycle-01/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/event-reminder-plan/cycle-01/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/event-reminder-plan/cycle-01/convergence.txt` — convergence  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/event-reminder-plan/cycle-01/critiques.txt` — critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/event-reminder-plan/cycle-01/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/event-reminder-plan/final.md` — final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/event-reminder-plan-v2/cycle-01/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/event-reminder-plan-v2/cycle-01/B.md` — B  
+  - markers: proposed  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/event-reminder-plan-v2/cycle-01/convergence.txt` — convergence  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/event-reminder-plan-v2/cycle-01/critiques.txt` — critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/event-reminder-plan-v2/cycle-01/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/event-reminder-plan-v2/final.md` — final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/event-reminder-polish-plan/cycle-01/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/event-reminder-polish-plan/cycle-01/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/event-reminder-polish-plan/cycle-01/convergence.txt` — convergence  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/event-reminder-polish-plan/cycle-01/critiques.txt` — critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/event-reminder-polish-plan/cycle-01/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/event-reminder-polish-plan/final.md` — final  
+  - reason: run/session/pending context or transient register  
 - `.mw/runs/explore-goblin-sticker-frame/prompt.txt` — prompt  
   - reason: run/session/pending context or transient register  
 - `.mw/runs/explore-mockup-to-component/BROADCAST.md` — Broadcast: broadcast-20260814-172259  
@@ -2057,6 +7645,1506 @@
   - reason: run/session/pending context or transient register  
 - `.mw/runs/explore-solutions-mockup-20260815/prompt.md` — Director's exploratory question  
   - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-visual-options-workflow-20261018/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-visual-options-workflow-20261018/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-visual-options-workflow-20261018/caller_final.md` — caller_final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-visual-options-workflow-20261018/context.md` — context  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-visual-options-workflow-20261018/desiderata-slice.md` — desiderata-slice  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-visual-options-workflow-20261018/final.md` — final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-visual-options-workflow-20261018/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-visual-options-workflow-20261018/prompt.md` — prompt  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-demo-live/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-demo-live/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-53-10-665Z/case-1mu9Kf/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-53-10-665Z/case-1mu9Kf/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-53-10-665Z/case-G3E7mA/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-53-10-665Z/case-G3E7mA/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-53-10-665Z/case-GA2zRz/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-53-10-665Z/case-GA2zRz/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-53-10-665Z/case-Rhbaul/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-53-10-665Z/case-Rhbaul/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-53-10-665Z/case-Rhbaul/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-53-10-665Z/case-Rhbaul/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-53-10-665Z/case-U2BCpp/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-53-10-665Z/case-U2BCpp/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-53-10-665Z/case-U2BCpp/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-53-10-665Z/case-U2BCpp/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-53-10-665Z/case-b7fUst/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-53-10-665Z/case-b7fUst/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-53-10-665Z/case-bdkTjP/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-53-10-665Z/case-bdkTjP/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-53-10-665Z/case-dCsEYl/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-53-10-665Z/case-dCsEYl/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-53-10-665Z/case-dCsEYl/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-53-10-665Z/case-dCsEYl/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-53-10-665Z/case-iFzjI5/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-53-10-665Z/case-iFzjI5/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-53-10-665Z/case-iFzjI5/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-53-10-665Z/case-iFzjI5/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-53-10-665Z/case-jVqyvx/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-53-10-665Z/case-jVqyvx/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-53-10-665Z/case-jVqyvx/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-53-10-665Z/case-jVqyvx/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-53-10-665Z/case-oYJ7OU/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-53-10-665Z/case-oYJ7OU/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-53-10-665Z/selftest-results.json` — selftest-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-54-15-126Z/case-84NMaX/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-54-15-126Z/case-84NMaX/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-54-15-126Z/case-84NMaX/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-54-15-126Z/case-84NMaX/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-54-15-126Z/case-8OIfgZ/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-54-15-126Z/case-8OIfgZ/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-54-15-126Z/case-8OIfgZ/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-54-15-126Z/case-8OIfgZ/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-54-15-126Z/case-BXp73P/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-54-15-126Z/case-BXp73P/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-54-15-126Z/case-R5BINu/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-54-15-126Z/case-R5BINu/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-54-15-126Z/case-R5BINu/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-54-15-126Z/case-R5BINu/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-54-15-126Z/case-Xwtyz3/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-54-15-126Z/case-Xwtyz3/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-54-15-126Z/case-Xwtyz3/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-54-15-126Z/case-Xwtyz3/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-54-15-126Z/case-ifxTd3/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-54-15-126Z/case-ifxTd3/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-54-15-126Z/case-m6Mumi/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-54-15-126Z/case-m6Mumi/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-54-15-126Z/case-s4IL18/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-54-15-126Z/case-s4IL18/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-54-15-126Z/case-s4IL18/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-54-15-126Z/case-s4IL18/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-54-15-126Z/case-sN2hkY/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-54-15-126Z/case-sN2hkY/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-54-15-126Z/case-uPjitd/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-54-15-126Z/case-uPjitd/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-54-15-126Z/case-zXNZ6c/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-54-15-126Z/case-zXNZ6c/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-54-15-126Z/selftest-results.json` — selftest-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-59-09-464Z/case-Ewy1q6/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-59-09-464Z/case-Ewy1q6/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-59-09-464Z/case-Ewy1q6/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-59-09-464Z/case-Ewy1q6/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-59-09-464Z/case-HGHjXT/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-59-09-464Z/case-HGHjXT/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-59-09-464Z/case-KJIkLm/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-59-09-464Z/case-KJIkLm/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-59-09-464Z/case-KJIkLm/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-59-09-464Z/case-KJIkLm/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-59-09-464Z/case-KWnNHR/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-59-09-464Z/case-KWnNHR/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-59-09-464Z/case-NN5B9X/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-59-09-464Z/case-NN5B9X/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-59-09-464Z/case-QfHT48/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-59-09-464Z/case-QfHT48/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-59-09-464Z/case-QfHT48/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-59-09-464Z/case-QfHT48/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-59-09-464Z/case-ZAGW3W/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-59-09-464Z/case-ZAGW3W/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-59-09-464Z/case-bm0IFf/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-59-09-464Z/case-bm0IFf/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-59-09-464Z/case-bm0IFf/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-59-09-464Z/case-bm0IFf/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-59-09-464Z/case-nfwClb/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-59-09-464Z/case-nfwClb/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-59-09-464Z/case-s8HQkN/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-59-09-464Z/case-s8HQkN/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-59-09-464Z/case-s8HQkN/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-59-09-464Z/case-s8HQkN/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-59-09-464Z/case-zf1UKh/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-59-09-464Z/case-zf1UKh/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T10-59-09-464Z/selftest-results.json` — selftest-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-01-23-977Z/case-5w0LLZ/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-01-23-977Z/case-5w0LLZ/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-01-23-977Z/case-5w0LLZ/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-01-23-977Z/case-5w0LLZ/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-01-23-977Z/case-Bkm8mh/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-01-23-977Z/case-Bkm8mh/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-01-23-977Z/case-CjPdhp/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-01-23-977Z/case-CjPdhp/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-01-23-977Z/case-LBEa63/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-01-23-977Z/case-LBEa63/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-01-23-977Z/case-LBEa63/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-01-23-977Z/case-LBEa63/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-01-23-977Z/case-LBexGU/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-01-23-977Z/case-LBexGU/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-01-23-977Z/case-NAFXly/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-01-23-977Z/case-NAFXly/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-01-23-977Z/case-OO4Ef7/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-01-23-977Z/case-OO4Ef7/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-01-23-977Z/case-OO4Ef7/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-01-23-977Z/case-OO4Ef7/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-01-23-977Z/case-Pcje2q/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-01-23-977Z/case-Pcje2q/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-01-23-977Z/case-PlOLJc/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-01-23-977Z/case-PlOLJc/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-01-23-977Z/case-PzOauq/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-01-23-977Z/case-PzOauq/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-01-23-977Z/case-PzOauq/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-01-23-977Z/case-PzOauq/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-01-23-977Z/case-TCztSW/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-01-23-977Z/case-TCztSW/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-01-23-977Z/case-TCztSW/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-01-23-977Z/case-TCztSW/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-01-23-977Z/selftest-results.json` — selftest-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-04-52-675Z/case-2PpuOy/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-04-52-675Z/case-2PpuOy/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-04-52-675Z/case-2PpuOy/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-04-52-675Z/case-2PpuOy/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-04-52-675Z/case-2qmXPT/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-04-52-675Z/case-2qmXPT/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-04-52-675Z/case-2qmXPT/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-04-52-675Z/case-2qmXPT/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-04-52-675Z/case-KhuHsH/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-04-52-675Z/case-KhuHsH/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-04-52-675Z/case-L85Bj1/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-04-52-675Z/case-L85Bj1/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-04-52-675Z/case-OCW0hX/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-04-52-675Z/case-OCW0hX/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-04-52-675Z/case-OCW0hX/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-04-52-675Z/case-OCW0hX/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-04-52-675Z/case-cgNzZ3/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-04-52-675Z/case-cgNzZ3/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-04-52-675Z/case-hBunPO/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-04-52-675Z/case-hBunPO/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-04-52-675Z/case-hqK2mD/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-04-52-675Z/case-hqK2mD/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-04-52-675Z/case-sDkXko/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-04-52-675Z/case-sDkXko/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-04-52-675Z/case-sDkXko/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-04-52-675Z/case-sDkXko/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-04-52-675Z/case-u0vLKP/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-04-52-675Z/case-u0vLKP/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-04-52-675Z/case-u0vLKP/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-04-52-675Z/case-u0vLKP/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-04-52-675Z/case-wRLQy6/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-04-52-675Z/case-wRLQy6/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-04-52-675Z/selftest-results.json` — selftest-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-06-51-375Z/case-3NaNT9/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-06-51-375Z/case-3NaNT9/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-06-51-375Z/case-8GdluF/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-06-51-375Z/case-8GdluF/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-06-51-375Z/case-8GdluF/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-06-51-375Z/case-8GdluF/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-06-51-375Z/case-9DB5cm/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-06-51-375Z/case-9DB5cm/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-06-51-375Z/case-9DB5cm/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-06-51-375Z/case-9DB5cm/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-06-51-375Z/case-QUK1lW/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-06-51-375Z/case-QUK1lW/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-06-51-375Z/case-R4fJz4/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-06-51-375Z/case-R4fJz4/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-06-51-375Z/case-RZBd6r/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-06-51-375Z/case-RZBd6r/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-06-51-375Z/case-RZBd6r/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-06-51-375Z/case-RZBd6r/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-06-51-375Z/case-UunVgU/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-06-51-375Z/case-UunVgU/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-06-51-375Z/case-UunVgU/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-06-51-375Z/case-UunVgU/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-06-51-375Z/case-YzZvWt/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-06-51-375Z/case-YzZvWt/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-06-51-375Z/case-h9TS6F/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-06-51-375Z/case-h9TS6F/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-06-51-375Z/case-m2eItt/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-06-51-375Z/case-m2eItt/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-06-51-375Z/case-tIhGxE/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-06-51-375Z/case-tIhGxE/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-06-51-375Z/case-tIhGxE/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-06-51-375Z/case-tIhGxE/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T11-06-51-375Z/selftest-results.json` — selftest-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-42-10-299Z/case-HnYiFQ/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-42-10-299Z/case-HnYiFQ/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-42-10-299Z/case-M57Pz6/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-42-10-299Z/case-M57Pz6/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-42-10-299Z/case-Xfc50M/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-42-10-299Z/case-Xfc50M/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-42-10-299Z/case-Xfc50M/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-42-10-299Z/case-Xfc50M/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-42-10-299Z/case-dHzNFY/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-42-10-299Z/case-dHzNFY/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-42-10-299Z/case-ddX3ZW/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-42-10-299Z/case-ddX3ZW/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-42-10-299Z/case-ddX3ZW/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-42-10-299Z/case-ddX3ZW/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-42-10-299Z/case-hdgrax/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-42-10-299Z/case-hdgrax/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-42-10-299Z/case-hdgrax/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-42-10-299Z/case-hdgrax/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-42-10-299Z/case-pZ3Xmr/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-42-10-299Z/case-pZ3Xmr/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-42-10-299Z/case-pZ3Xmr/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-42-10-299Z/case-pZ3Xmr/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-42-10-299Z/case-uHvdGT/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-42-10-299Z/case-uHvdGT/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-42-10-299Z/case-uo55UW/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-42-10-299Z/case-uo55UW/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-42-10-299Z/case-xcJvdH/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-42-10-299Z/case-xcJvdH/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-42-10-299Z/case-xcJvdH/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-42-10-299Z/case-xcJvdH/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-42-10-299Z/case-zJSwHA/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-42-10-299Z/case-zJSwHA/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-42-10-299Z/selftest-results.json` — selftest-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-46-58-593Z/case-08nq4C/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-46-58-593Z/case-08nq4C/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-46-58-593Z/case-08nq4C/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-46-58-593Z/case-08nq4C/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-46-58-593Z/case-0fxPBs/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-46-58-593Z/case-0fxPBs/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-46-58-593Z/case-0fxPBs/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-46-58-593Z/case-0fxPBs/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-46-58-593Z/case-3awPPF/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-46-58-593Z/case-3awPPF/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-46-58-593Z/case-Cyae63/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-46-58-593Z/case-Cyae63/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-46-58-593Z/case-OugiAP/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-46-58-593Z/case-OugiAP/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-46-58-593Z/case-Ta4Xti/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-46-58-593Z/case-Ta4Xti/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-46-58-593Z/case-Ta4Xti/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-46-58-593Z/case-Ta4Xti/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-46-58-593Z/case-XJaRdR/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-46-58-593Z/case-XJaRdR/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-46-58-593Z/case-XJaRdR/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-46-58-593Z/case-XJaRdR/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-46-58-593Z/case-gXad7i/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-46-58-593Z/case-gXad7i/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-46-58-593Z/case-jh9l4H/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-46-58-593Z/case-jh9l4H/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-46-58-593Z/case-kl2bWE/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-46-58-593Z/case-kl2bWE/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-46-58-593Z/case-kl2bWE/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-46-58-593Z/case-kl2bWE/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-46-58-593Z/case-zyi88u/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-46-58-593Z/case-zyi88u/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T14-46-58-593Z/selftest-results.json` — selftest-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-08-35-250Z/case-1BtfA7/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-08-35-250Z/case-1BtfA7/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-08-35-250Z/case-38kuoM/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-08-35-250Z/case-38kuoM/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-08-35-250Z/case-3Krxtr/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-08-35-250Z/case-3Krxtr/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-08-35-250Z/case-3Krxtr/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-08-35-250Z/case-3Krxtr/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-08-35-250Z/case-T38Hyz/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-08-35-250Z/case-T38Hyz/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-08-35-250Z/case-T38Hyz/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-08-35-250Z/case-T38Hyz/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-08-35-250Z/case-Uw9xVQ/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-08-35-250Z/case-Uw9xVQ/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-08-35-250Z/case-Uw9xVQ/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-08-35-250Z/case-Uw9xVQ/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-08-35-250Z/case-W85joR/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-08-35-250Z/case-W85joR/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-08-35-250Z/case-sfxxgp/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-08-35-250Z/case-sfxxgp/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-08-35-250Z/case-v9zF6y/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-08-35-250Z/case-v9zF6y/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-08-35-250Z/case-v9zF6y/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-08-35-250Z/case-v9zF6y/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-08-35-250Z/case-wa9wjb/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-08-35-250Z/case-wa9wjb/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-08-35-250Z/case-xOE59G/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-08-35-250Z/case-xOE59G/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-08-35-250Z/case-xOE59G/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-08-35-250Z/case-xOE59G/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-08-35-250Z/case-yq3zMh/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-08-35-250Z/case-yq3zMh/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-08-35-250Z/selftest-results.json` — selftest-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-40-023Z/case-1l8qwZ/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-40-023Z/case-1l8qwZ/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-40-023Z/case-1l8qwZ/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-40-023Z/case-1l8qwZ/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-40-023Z/case-8VkNwD/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-40-023Z/case-8VkNwD/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-40-023Z/case-FHsBCr/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-40-023Z/case-FHsBCr/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-40-023Z/case-L8Bv7P/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-40-023Z/case-L8Bv7P/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-40-023Z/case-L8Bv7P/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-40-023Z/case-L8Bv7P/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-40-023Z/case-Q7WMlw/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-40-023Z/case-Q7WMlw/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-40-023Z/case-Xmx9ab/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-40-023Z/case-Xmx9ab/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-40-023Z/case-Xmx9ab/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-40-023Z/case-Xmx9ab/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-40-023Z/case-cXHuKq/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-40-023Z/case-cXHuKq/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-40-023Z/case-eERfYL/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-40-023Z/case-eERfYL/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-40-023Z/case-eERfYL/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-40-023Z/case-eERfYL/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-40-023Z/case-j8sTVT/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-40-023Z/case-j8sTVT/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-40-023Z/case-nKfnFC/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-40-023Z/case-nKfnFC/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-40-023Z/case-wvvPh8/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-40-023Z/case-wvvPh8/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-40-023Z/case-wvvPh8/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-40-023Z/case-wvvPh8/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-40-023Z/selftest-results.json` — selftest-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-46-487Z/case-2nqR9M/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-46-487Z/case-2nqR9M/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-46-487Z/case-3u9f4P/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-46-487Z/case-3u9f4P/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-46-487Z/case-Hwohal/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-46-487Z/case-Hwohal/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-46-487Z/case-Hwohal/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-46-487Z/case-Hwohal/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-46-487Z/case-Id5PMM/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-46-487Z/case-Id5PMM/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-46-487Z/case-UgP6FN/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-46-487Z/case-UgP6FN/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-46-487Z/case-UgP6FN/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-46-487Z/case-UgP6FN/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-46-487Z/case-hXMuZf/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-46-487Z/case-hXMuZf/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-46-487Z/case-hXMuZf/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-46-487Z/case-hXMuZf/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-46-487Z/case-liAfSJ/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-46-487Z/case-liAfSJ/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-46-487Z/case-n6AQos/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-46-487Z/case-n6AQos/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-46-487Z/case-n6AQos/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-46-487Z/case-n6AQos/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-46-487Z/case-qqCtsk/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-46-487Z/case-qqCtsk/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-46-487Z/case-tIanyY/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-46-487Z/case-tIanyY/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-46-487Z/case-tIanyY/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-46-487Z/case-tIanyY/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-46-487Z/case-vJhhPP/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-46-487Z/case-vJhhPP/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-44-46-487Z/selftest-results.json` — selftest-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-06-733Z/case-aHaSiT/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-06-733Z/case-aHaSiT/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-06-733Z/case-lxjBRI/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-06-733Z/case-lxjBRI/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-22-470Z/case-9Vsf00/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-22-470Z/case-9Vsf00/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-22-470Z/case-AFv4fw/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-22-470Z/case-AFv4fw/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-22-470Z/case-AFv4fw/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-22-470Z/case-AFv4fw/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-22-470Z/case-HTH0Ox/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-22-470Z/case-HTH0Ox/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-22-470Z/case-HTH0Ox/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-22-470Z/case-HTH0Ox/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-22-470Z/case-Kge2eN/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-22-470Z/case-Kge2eN/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-22-470Z/case-PipsDH/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-22-470Z/case-PipsDH/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-22-470Z/case-PipsDH/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-22-470Z/case-PipsDH/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-22-470Z/case-VzyR4Q/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-22-470Z/case-VzyR4Q/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-22-470Z/case-VzyR4Q/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-22-470Z/case-VzyR4Q/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-22-470Z/case-X75t6R/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-22-470Z/case-X75t6R/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-22-470Z/case-cRf27j/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-22-470Z/case-cRf27j/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-22-470Z/case-hen7vq/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-22-470Z/case-hen7vq/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-22-470Z/case-jg5Kj4/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-22-470Z/case-jg5Kj4/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-22-470Z/case-tlm13u/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-22-470Z/case-tlm13u/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-22-470Z/case-tlm13u/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-22-470Z/case-tlm13u/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-22-470Z/selftest-results.json` — selftest-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-38-384Z/case-HW1fYw/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-38-384Z/case-HW1fYw/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-38-384Z/case-Id5OTE/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-38-384Z/case-Id5OTE/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-38-384Z/case-NcmW23/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-38-384Z/case-NcmW23/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-38-384Z/case-RQ1jZb/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-38-384Z/case-RQ1jZb/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-38-384Z/case-RQ1jZb/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-38-384Z/case-RQ1jZb/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-38-384Z/case-Syv6TB/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-38-384Z/case-Syv6TB/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-38-384Z/case-Syv6TB/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-38-384Z/case-Syv6TB/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-38-384Z/case-adhNgx/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-38-384Z/case-adhNgx/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-38-384Z/case-kKSwyY/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-38-384Z/case-kKSwyY/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-38-384Z/case-nTYa37/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-38-384Z/case-nTYa37/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-38-384Z/case-nZJkMX/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-38-384Z/case-nZJkMX/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-38-384Z/case-nZJkMX/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-38-384Z/case-nZJkMX/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-38-384Z/case-qtbEGj/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-38-384Z/case-qtbEGj/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-38-384Z/case-qtbEGj/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-38-384Z/case-qtbEGj/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-38-384Z/case-yl3Lwr/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-38-384Z/case-yl3Lwr/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-38-384Z/case-yl3Lwr/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-38-384Z/case-yl3Lwr/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T15-45-38-384Z/selftest-results.json` — selftest-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T16-13-33-232Z/case-3LCaC5/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T16-13-33-232Z/case-3LCaC5/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T16-13-33-232Z/case-3LCaC5/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T16-13-33-232Z/case-3LCaC5/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T16-13-33-232Z/case-BRvhWj/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T16-13-33-232Z/case-BRvhWj/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T16-13-33-232Z/case-BRvhWj/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T16-13-33-232Z/case-BRvhWj/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T16-13-33-232Z/case-GySshs/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T16-13-33-232Z/case-GySshs/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T16-13-33-232Z/case-HA3irk/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T16-13-33-232Z/case-HA3irk/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T16-13-33-232Z/case-HA3irk/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T16-13-33-232Z/case-HA3irk/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T16-13-33-232Z/case-Is9tKb/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T16-13-33-232Z/case-Is9tKb/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T16-13-33-232Z/case-Is9tKb/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T16-13-33-232Z/case-Is9tKb/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T16-13-33-232Z/case-LGtcO7/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T16-13-33-232Z/case-LGtcO7/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T16-13-33-232Z/case-NpnFR8/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T16-13-33-232Z/case-NpnFR8/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T16-13-33-232Z/case-Vd2lTV/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T16-13-33-232Z/case-Vd2lTV/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T16-13-33-232Z/case-kNmTtn/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T16-13-33-232Z/case-kNmTtn/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T16-13-33-232Z/case-tf6bFN/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T16-13-33-232Z/case-tf6bFN/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T16-13-33-232Z/case-x8zPA4/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T16-13-33-232Z/case-x8zPA4/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T16-13-33-232Z/case-x8zPA4/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T16-13-33-232Z/case-x8zPA4/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-14T16-13-33-232Z/selftest-results.json` — selftest-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-02-235Z/case-1KP2y1/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-02-235Z/case-1KP2y1/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-02-235Z/case-1KP2y1/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-02-235Z/case-1KP2y1/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-02-235Z/case-7tfvhF/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-02-235Z/case-7tfvhF/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-02-235Z/case-BJFSTM/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-02-235Z/case-BJFSTM/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-02-235Z/case-DroYna/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-02-235Z/case-DroYna/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-02-235Z/case-DroYna/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-02-235Z/case-DroYna/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-02-235Z/case-DtEz4f/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-02-235Z/case-DtEz4f/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-02-235Z/case-OjZaBM/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-02-235Z/case-OjZaBM/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-02-235Z/case-jNLCVQ/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-02-235Z/case-jNLCVQ/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-02-235Z/case-ovcYp6/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-02-235Z/case-ovcYp6/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-02-235Z/case-qhV7FL/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-02-235Z/case-qhV7FL/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-02-235Z/case-qhV7FL/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-02-235Z/case-qhV7FL/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-02-235Z/case-uX3NTR/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-02-235Z/case-uX3NTR/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-02-235Z/case-uX3NTR/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-02-235Z/case-uX3NTR/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-02-235Z/case-vL3ta7/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-02-235Z/case-vL3ta7/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-02-235Z/case-vL3ta7/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-02-235Z/case-vL3ta7/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-02-235Z/selftest-results.json` — selftest-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-35-914Z/case-7H6EdZ/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-35-914Z/case-7H6EdZ/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-35-914Z/case-GpAGMm/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-35-914Z/case-GpAGMm/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-35-914Z/case-IAyY9Y/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-35-914Z/case-IAyY9Y/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-35-914Z/case-QTrsyO/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-35-914Z/case-QTrsyO/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-35-914Z/case-QTrsyO/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-35-914Z/case-QTrsyO/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-35-914Z/case-RSXiiN/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-35-914Z/case-RSXiiN/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-35-914Z/case-TicVxb/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-35-914Z/case-TicVxb/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-35-914Z/case-TicVxb/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-35-914Z/case-TicVxb/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-35-914Z/case-YDe7y6/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-35-914Z/case-YDe7y6/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-35-914Z/case-cVJqiz/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-35-914Z/case-cVJqiz/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-35-914Z/case-cVJqiz/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-35-914Z/case-cVJqiz/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-35-914Z/case-gw6P3z/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-35-914Z/case-gw6P3z/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-35-914Z/case-gw6P3z/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-35-914Z/case-gw6P3z/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-35-914Z/case-w4MOG1/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-35-914Z/case-w4MOG1/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-35-914Z/case-w4MOG1/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-35-914Z/case-w4MOG1/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-35-914Z/case-ygzAmY/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-35-914Z/case-ygzAmY/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-15T20-43-35-914Z/selftest-results.json` — selftest-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/case-5TYZmK/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/case-5TYZmK/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/case-AtUP2p/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/case-AtUP2p/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/case-AtUP2p/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/case-AtUP2p/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/case-HwBSu4/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/case-HwBSu4/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/case-LjS9PD/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/case-LjS9PD/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/case-PQ2xpe/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/case-PQ2xpe/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/case-PQ2xpe/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/case-PQ2xpe/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/case-WiPGuj/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/case-WiPGuj/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/case-WiPGuj/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/case-WiPGuj/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/case-e5O2ay/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/case-e5O2ay/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/case-e5O2ay/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/case-e5O2ay/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/case-fQYgGT/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/case-fQYgGT/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/case-k7eiF4/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/case-k7eiF4/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/case-nhGozM/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/case-nhGozM/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/case-nhGozM/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/case-nhGozM/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/case-qfEufS/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/case-qfEufS/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/case-qfEufS/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/case-qfEufS/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/case-wycEXR/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/case-wycEXR/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-19-55-814Z/selftest-results.json` — selftest-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/case-1TIx9C/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/case-1TIx9C/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/case-1TIx9C/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/case-1TIx9C/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/case-4hFu8k/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/case-4hFu8k/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/case-8AmDCo/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/case-8AmDCo/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/case-8AmDCo/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/case-8AmDCo/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/case-EDpByE/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/case-EDpByE/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/case-Q2Ql4J/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/case-Q2Ql4J/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/case-Q2Ql4J/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/case-Q2Ql4J/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/case-VDqHNv/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/case-VDqHNv/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/case-VDqHNv/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/case-VDqHNv/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/case-WcalCk/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/case-WcalCk/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/case-aboaaX/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/case-aboaaX/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/case-aboaaX/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/case-aboaaX/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/case-kYAMiW/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/case-kYAMiW/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/case-uA4ebY/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/case-uA4ebY/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/case-uUIfCD/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/case-uUIfCD/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/case-uUIfCD/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/case-uUIfCD/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/case-zsT2xu/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/case-zsT2xu/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-43-35-336Z/selftest-results.json` — selftest-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/case-4Sz0IK/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/case-4Sz0IK/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/case-5OOYVo/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/case-5OOYVo/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/case-5OOYVo/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/case-5OOYVo/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/case-8GE8ZG/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/case-8GE8ZG/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/case-8GE8ZG/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/case-8GE8ZG/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/case-FJc6FX/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/case-FJc6FX/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/case-FJspHW/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/case-FJspHW/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/case-GpHVDj/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/case-GpHVDj/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/case-GpHVDj/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/case-GpHVDj/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/case-M6lBPD/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/case-M6lBPD/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/case-bRUPiu/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/case-bRUPiu/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/case-czkGEq/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/case-czkGEq/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/case-czkGEq/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/case-czkGEq/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/case-qAiHiO/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/case-qAiHiO/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/case-se4GjI/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/case-se4GjI/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/case-se4GjI/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/case-se4GjI/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/case-yxePHf/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/case-yxePHf/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/case-yxePHf/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/case-yxePHf/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T12-52-14-064Z/selftest-results.json` — selftest-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/case-9ijtfM/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/case-9ijtfM/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/case-D3Jins/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/case-D3Jins/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/case-D3Jins/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/case-D3Jins/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/case-HwBNof/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/case-HwBNof/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/case-JVZgdq/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/case-JVZgdq/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/case-JVZgdq/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/case-JVZgdq/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/case-O6s50R/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/case-O6s50R/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/case-QBbwrV/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/case-QBbwrV/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/case-SuEXXc/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/case-SuEXXc/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/case-YRPPuJ/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/case-YRPPuJ/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/case-YRPPuJ/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/case-YRPPuJ/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/case-ZSwUqt/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/case-ZSwUqt/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/case-ZSwUqt/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/case-ZSwUqt/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/case-k1yDds/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/case-k1yDds/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/case-vXI5iP/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/case-vXI5iP/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/case-vXI5iP/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/case-vXI5iP/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/case-yf2ecM/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/case-yf2ecM/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/case-yf2ecM/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/case-yf2ecM/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-05-06-777Z/selftest-results.json` — selftest-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/case-AvvRrk/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/case-AvvRrk/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/case-AvvRrk/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/case-AvvRrk/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/case-Cgw3Rh/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/case-Cgw3Rh/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/case-JZ410E/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/case-JZ410E/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/case-JZ410E/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/case-JZ410E/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/case-KTv0Ks/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/case-KTv0Ks/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/case-KTv0Ks/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/case-KTv0Ks/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/case-OokMkR/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/case-OokMkR/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/case-SqX4qA/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/case-SqX4qA/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/case-T8p5aJ/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/case-T8p5aJ/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/case-U4umUu/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/case-U4umUu/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/case-fsdagS/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/case-fsdagS/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/case-fsdagS/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/case-fsdagS/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/case-nlp25n/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/case-nlp25n/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/case-nlp25n/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/case-nlp25n/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/case-tCj3NT/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/case-tCj3NT/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/case-zHR9WS/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/case-zHR9WS/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/case-zHR9WS/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/case-zHR9WS/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/gate-selftest-2026-10-18T13-43-13-694Z/selftest-results.json` — selftest-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-refine-final/contract.json` — contract  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-refine-final/copy-after.en.json` — copy-after.en  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-refine-final/copy-after.it.json` — copy-after.it  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-refine-final/copy-before.en.json` — copy-before.en  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-refine-final/report.md` — Goblin refine — artefatto finale (R-219)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-refine-v2-esplora/contract.json` — contract  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-refine-v2-esplora/copy-after.en.json` — copy-after.en  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-refine-v2-esplora/copy-after.it.json` — copy-after.it  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-refine-v2-esplora/copy-before.en.json` — copy-before.en  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-refine-v2-esplora/findings.json` — findings  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-refine-v2-esplora/report.md` — questRefine — goblin (2026-10-18T16:00:15.619Z)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-refine-v2-head/contract.json` — contract  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-refine-v2-head/copy-after.en.json` — copy-after.en  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-refine-v2-head/copy-after.it.json` — copy-after.it  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-refine-v2-head/copy-before.en.json` — copy-before.en  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-refine-v2-head/findings.json` — findings  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-refine-v2-head/report.md` — questRefine — goblin (2026-10-18T15:59:24.856Z)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-refine-v2-rest/contract.json` — contract  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-refine-v2-rest/copy-after.en.json` — copy-after.en  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-refine-v2-rest/copy-after.it.json` — copy-after.it  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-refine-v2-rest/copy-before.en.json` — copy-before.en  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-refine-v2-rest/findings.json` — findings  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-refine-v2-rest/report.md` — questRefine — goblin (2026-10-18T15:19:18.224Z)  
+  - reason: run/session/pending context or transient register  
 - `.mw/runs/goblin-window-aaa-critique-2026-08-27/BROADCAST.md` — Broadcast: broadcast-20260827-163401  
   - reason: run/session/pending context or transient register  
 - `.mw/runs/goblin-window-aaa-critique-2026-08-27/critique-report.md` — Structured Critique Report  
@@ -2105,23 +9193,1177 @@
   - reason: run/session/pending context or transient register  
 - `.mw/runs/goblin-window-v2-critique-2026-08-27/synthesis.md` — Synthesis of Critiques  
   - reason: run/session/pending context or transient register  
+- `.mw/runs/handoff-mappa2-ambient-director-20261028.md` — Handoff — dibattito multi-AI web: `mappa2` AmbientDirector + vita ambientale (PLAN-089 T-009)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/handoff-mappa2-ambient-land-life-20261028.md` — Handoff — PLAN-092: `mappa2` Ambient Land-Life Layer  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/handoff-mappa2-rare-wonders-20261029.md` — Handoff — PLAN-098 (provvisorio): `mappa2` Rare Sea Wonders  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/handoff-mappa2-regional-weather-20261029.md` — Handoff — PLAN-095: `mappa2` Regional Weather & Atmospheric Accents  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/handoff-mappa2-sea-routes-ambient-sea-life-20261028.md` — Handoff — PLAN-094: `mappa2` Sea Routes & Ambient Sea-Life  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/handoff-mappa2-water-motion-20261028.md` — Handoff — dibattito multi-AI web: prossimo sistema acqua di `mappa2`  
+  - reason: run/session/pending context or transient register  
 - `.mw/runs/handoff-mockup-to-component-20260814.md` — Handoff — Mockup AI → componente React + asset ad hoc  
   - reason: run/session/pending context or transient register  
-- `.mw/runs/iterative-deliberation/A.md` — Plan: “The New Observatory” → Canonical Design‑System Primitives  
-  - markers: canonical  
+- `.mw/runs/iterative-deliberation/A.md` — A  
   - reason: run/session/pending context or transient register  
 - `.mw/runs/iterative-deliberation/B.md` — B  
   - reason: run/session/pending context or transient register  
-- `.mw/runs/iterative-deliberation/caller_final.md` — Plan: “The New Observatory” → Canonical Design‑System Primitives  
-  - markers: canonical  
+- `.mw/runs/iterative-deliberation/caller_final.md` — caller_final  
+  - markers: proposed  
   - reason: run/session/pending context or transient register  
-- `.mw/runs/iterative-deliberation/final.md` — Plan: “The New Observatory” → Canonical Design‑System Primitives  
-  - markers: canonical  
+- `.mw/runs/iterative-deliberation/final.md` — final  
+  - markers: proposed  
   - reason: run/session/pending context or transient register  
 - `.mw/runs/iterative-deliberation/metadata.json` — metadata  
   - reason: run/session/pending context or transient register  
+- `.mw/runs/latest-broadcast/BROADCAST.md` — Broadcast: broadcast-20261024-141356  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/latest-broadcast/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/learn-20261020-2115/pattern-candidate.md` — Pattern candidates — learn post sessione 2026-10-20 (review surfaces + serving)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/learn-20261021-1404/pattern-candidate.md` — Pattern candidates — learn post R-238 (2026-10-21)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/learn-20261022-portraits-parallax/pattern-candidate.md` — Pattern candidate — learn post-R-256/R-263/R-268 (villager portraits + journey legs)  
+  - markers: candidate  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/learn-20261022-r260/pattern-candidate.md` — pattern-candidate — learn post-R-260 (PLAN-075 collect-commit reward)  
+  - markers: candidate  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/learn-20261022-stash-strip/pattern-candidate.md` — Pattern candidates — learn post R-246/R-251 (2026-10-22)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/learn-20261023-dynamic-import-latch/pattern-candidate.md` — Pattern candidate — 2026-10-23  
+  - markers: candidate  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/learn-20261024-sprite-occlusion/pattern-candidate.md` — Learn — 2026-10-24 — ambient FX authoring (quest theatre)  
+  - reason: run/session/pending context or transient register  
 - `.mw/runs/learn-mockup-to-component-20260814-224334/pattern-candidate.md` — Pattern Candidate — Mockup AI → Component / Asset  
   - markers: candidate  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/learn-plan027-r008-20261019/pattern-candidate.md` — pattern-candidate  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/learn-plan040-20261016-145000/pattern-candidate.md` — Learn — PLAN-040 (quest window rev.3 + verification bundle)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/learn-plan044-20261018-1457/pattern-candidate.md` — Learn — PLAN-044 T-005..T-007 (2026-10-18)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/learn-plan045-20261018-1710/pattern-candidate.md` — Pattern candidates — learn post-PLAN-045 (Q2, 2026-10-18)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/learn-plan047-preview-20261018/pattern-candidate.md` — Learn — PLAN-047 + bug devin-preview-white (2026-10-18)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/learn-plan051-20261018-1715/pattern-candidate.md` — Learn — PLAN-051 Verify Slim (2026-10-18)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/learn-plan060-20261019-1310/pattern-candidate.md` — Pattern candidates — learn post-PLAN-060 (Q15, 2026-10-19)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/learn-r194-20261015-185408/pattern-candidate.md` — pattern-candidate  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/learn-r199-20261016-092815/pattern-candidate.md` — Pattern candidates — learn post R-199 (QuestRunWindow rev.2) + chiusure R-196/R-198  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/learn-r200-20261016-114500/pattern-candidate.md` — Pattern candidates — R-200 / PLAN-037 wrap-up + E2E driver hardening  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/pattern-commission-vs-specification.md` — pattern-commission-vs-specification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/pattern-prompt-sovereignty.md` — Pattern candidate — prompt sovereignty (R-282, 2026-10-24)  
+  - markers: candidate  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-016-r1-20260910-090953/context.md` — Contesto per PLAN-016 — Mare non geometrico con Voronoi  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-016-r1-20260910-090953/cycle-01/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-016-r1-20260910-090953/cycle-01/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-016-r1-20260910-090953/cycle-01/convergence.txt` — convergence  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-016-r1-20260910-090953/cycle-01/critiques.txt` — critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-016-r1-20260910-090953/cycle-01/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-016-r1-20260910-090953/final.md` — final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-016-r1-20260910-090953/prompt.md` — Ruolo  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-035-village-view/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-035-village-view/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-035-village-view/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-038-village-lots/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-038-village-lots/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-038-village-lots/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-040-quest-window/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-040-quest-window/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-040-quest-window/metrics-1280.json` — metrics-1280  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-040-quest-window/phase-shots/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-040-quest-window/phase-shots/outside.json` — outside  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-040-quest-window/phase-shots/transcript.json` — transcript  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-040-quest-window/phase-shots/vanished.json` — vanished  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-040-quest-window/phase-shots-1280x400/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-040-quest-window/phase-shots-1280x400/outside.json` — outside  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-040-quest-window/phase-shots-1280x400/transcript.json` — transcript  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-040-quest-window/phase-shots-1440x900/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-040-quest-window/phase-shots-1440x900/outside.json` — outside  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-040-quest-window/phase-shots-1440x900/transcript.json` — transcript  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-040-quest-window/phase-shots-1440x900/vanished.json` — vanished  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-040-quest-window/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-040-quest-window/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-040-quest-window/warm-verdict.json` — warm-verdict  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-042-village-registry/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-042-village-registry/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-042-village-registry/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-050-cinematic-showcase/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-050-cinematic-showcase/cine-showcase/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-050-cinematic-showcase/cine-showcase/perf.json` — perf  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-050-cinematic-showcase/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-050-cinematic-showcase/perf.json` — perf  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-050-cinematic-showcase/signoff.json` — signoff  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-050-cinematic-showcase/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-050-cinematic-showcase/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-052-depth-staging/dispositions-provisional.json` — dispositions-provisional  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-052-depth-staging/intent-review/BROADCAST.md` — Broadcast: broadcast-20261018-174913  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-052-depth-staging/intent-review/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-052-depth-staging/intent-review/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-052-depth-staging/intent-review/prompt.md` — PLAN-050: Cinematic showcase — grammatica ingresso×posa + juice layer (v34)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-052-depth-staging/intent-review/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-052-depth-staging/p8-preview.json` — p8-preview  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan-052-depth-staging/slice-v34.md` — slice-v34  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan013-sea-marks/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan013-sea-marks/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan013-sea-marks/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan027-r008-impl/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan027-r008-impl/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan027-r008-impl/verification.json` — verification  
+  - markers: todo  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan032-sp1-2026-10-14/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan032-sp1-2026-10-14/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan032-sp2-2026-10-14/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan032-sp2-2026-10-14/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan032-sp3-2026-10-14/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan032-sp3-2026-10-14/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan032-sp3-2026-10-14/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan032-sp4-2026-10-14/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan032-sp4-2026-10-14/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan032-sp4-2026-10-14/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan032-sp5-2026-10-14/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan032-sp5-2026-10-14/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan032-sp5-2026-10-14/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan033-bv36/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan033-bv36/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan033-bv36/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan036-quest-planner-2026-10-15/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan036-quest-planner-2026-10-15/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan036-quest-planner-2026-10-15/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan037-quest-reveal-2026-10-15/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan037-quest-reveal-2026-10-15/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan037-quest-reveal-2026-10-15/metrics-repeatable.json` — metrics-repeatable  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan037-quest-reveal-2026-10-15/metrics-reveal.json` — metrics-reveal  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan037-quest-reveal-2026-10-15/repeatable-metrics.cjs` — repeatable-metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan037-quest-reveal-2026-10-15/reveal-witness.mjs` — reveal-witness  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan037-quest-reveal-2026-10-15/signoff-ob7.json` — signoff-ob7  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan037-quest-reveal-2026-10-15/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan037-quest-reveal-2026-10-15/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan037-quest-reveal-2026-10-15/videos/record-repeatable.mjs` — record-repeatable  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan037-quest-reveal-2026-10-15/videos/record-reveal.mjs` — record-reveal  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan037-quest-reveal-2026-10-15/write-verifier.cjs` — write-verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan043-s11-b4-poi-fork/capture.mjs` — capture  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan043-s4-e2e/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan043-s4-e2e/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan043-s4-e2e/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan043-ws3-quest-planner/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan043-ws3-quest-planner/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan043-ws3-quest-planner/gen-verifier.ts` — gen-verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan043-ws3-quest-planner/metrics-ws3-layout.json` — metrics-ws3-layout  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan043-ws3-quest-planner/metrics-ws3-swap-rebite.json` — metrics-ws3-swap-rebite  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan043-ws3-quest-planner/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan043-ws3-quest-planner/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan043-ws4-quest-theatre/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan043-ws4-quest-theatre/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan043-ws4-quest-theatre/gen-verifier.ts` — gen-verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan043-ws4-quest-theatre/metrics-bv01.json` — metrics-bv01  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan043-ws4-quest-theatre/metrics-bv02.json` — metrics-bv02  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan043-ws4-quest-theatre/metrics-bv03.json` — metrics-bv03  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan043-ws4-quest-theatre/metrics-bv04.json` — metrics-bv04  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan043-ws4-quest-theatre/metrics-bv05.json` — metrics-bv05  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan043-ws4-quest-theatre/metrics-bv07.json` — metrics-bv07  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan043-ws4-quest-theatre/metrics-bv08.json` — metrics-bv08  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan043-ws4-quest-theatre/metrics-bv09.json` — metrics-bv09  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan043-ws4-quest-theatre/metrics-bv11.json` — metrics-bv11  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan043-ws4-quest-theatre/metrics-bv12.json` — metrics-bv12  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan043-ws4-quest-theatre/metrics-bv14.json` — metrics-bv14  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan043-ws4-quest-theatre/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan043-ws4-quest-theatre/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan044-t001-agents-hygiene/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan044-t001-agents-hygiene/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan044-t001-agents-hygiene/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan044-t002-contracts-check/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan044-t002-contracts-check/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan044-t002-contracts-check/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan044-t003-awaiting-director/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan044-t003-awaiting-director/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan044-t003-awaiting-director/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan044-t004-red-first-lock/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan044-t004-red-first-lock/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan044-t004-red-first-lock/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan044-t005-verifier-receipt/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan044-t005-verifier-receipt/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan044-t005-verifier-receipt/decision-report.json` — decision-report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan044-t005-verifier-receipt/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan044-t005-verifier-receipt/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan044-t006-bv-skills/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan044-t006-bv-skills/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan044-t006-bv-skills/decision-report.json` — decision-report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan044-t006-bv-skills/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan044-t006-bv-skills/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan044-t007-dogfood-metrics/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan044-t007-dogfood-metrics/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan044-t007-dogfood-metrics/decision-report.json` — decision-report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan044-t007-dogfood-metrics/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan044-t007-dogfood-metrics/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t001/slice-v33.md` — slice-v33  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t003-ledger/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t003-ledger/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t003-ledger/decision-report.json` — decision-report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t003-ledger/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t003-ledger/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t004b-intent-json/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t004b-intent-json/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t004b-intent-json/decision-report.json` — decision-report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t004b-intent-json/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t004b-intent-json/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t005a-registry/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t005a-registry/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t005a-registry/decision-report.json` — decision-report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t005a-registry/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t005a-registry/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t005b-closure-gate/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t005b-closure-gate/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t005b-closure-gate/decision-report.json` — decision-report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t005b-closure-gate/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t005b-closure-gate/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t005b-dogfood-green/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t005b-dogfood-green/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t005b-dogfood-green/intent.json` — intent  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t005b-dogfood-green/intent.md` — intent ledger — task dogfood run dogfood  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t005b-dogfood-green/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t005b-dogfood-red/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t005b-dogfood-red/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t005b-dogfood-red/intent.json` — intent  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t005b-dogfood-red/intent.md` — intent ledger — task dogfood run dogfood  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t005b-dogfood-red/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t006-prebaptism/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t006-prebaptism/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t006-prebaptism/decision-report.json` — decision-report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t006-prebaptism/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t006-prebaptism/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t007-skills/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t007-skills/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t007-skills/decision-report.json` — decision-report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t007-skills/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t007-skills/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t008-dogfood/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t008-dogfood/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t008-dogfood/decision-report.json` — decision-report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t008-dogfood/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t008-dogfood/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t008-dogfood-green/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t008-dogfood-green/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t008-dogfood-green/intent.json` — intent  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t008-dogfood-green/intent.md` — intent ledger — task t008-dogfood run t008  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t008-dogfood-green/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t008-dogfood-red/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t008-dogfood-red/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t008-dogfood-red/intent.json` — intent  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t008-dogfood-red/intent.md` — intent ledger — task t008-dogfood run t008  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan045-t008-dogfood-red/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan048-forensics/backfill-count.txt` — backfill-count  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan048-forensics/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan048-forensics/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan048-forensics/dogcheck.txt` — dogcheck  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan048-forensics/forensics.json` — forensics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan048-forensics/ob6-diff.txt` — ob6-diff  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan048-forensics/report-a.md` — Workflow Metrics — forensics report (PLAN-048)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan048-forensics/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan050-t011-runtime-invariants/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan050-t011-runtime-invariants/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan050-t011-runtime-invariants/decision-report.json` — decision-report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan050-t011-runtime-invariants/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan050-t011-runtime-invariants/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan050-t013-atmosphere-kit/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan050-t013-atmosphere-kit/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan050-t013-atmosphere-kit/decision-report.json` — decision-report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan050-t013-atmosphere-kit/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan050-t013-atmosphere-kit/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan050-t013-fog-revision/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan050-t013-fog-revision/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan050-t013-fog-revision/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan050-t013-fog-revision-3/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan050-t013-fog-revision-3/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan050-t013-fog-revision-3/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan051-t001-bundle/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan051-t001-bundle/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan051-t001-bundle/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan053-t001-journey-model/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan053-t001-quest-journey-model/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan053-t001-quest-journey-model/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan053-t001-quest-journey-model/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan053-t002-legacy-characterization/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan053-t002-legacy-characterization/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan053-t002-legacy-characterization/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan053-t003-journey-engine/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan053-t003-journey-engine/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan053-t003-journey-engine/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan053-t004-journey-authoring/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan053-t004-journey-authoring/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan053-t004-journey-authoring/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan053-t005-route-fill/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan053-t005-route-fill/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan053-t005-route-fill/pattern-candidate.md` — pattern-candidate  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan053-t005-route-fill/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan053-t005-route-fill/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan053-t005-route-visual-fork/visual-fork-quest-route.md` — Visual Fork Card — Journey Route Fill on the World Map  
+  - markers: draft, proposed  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan053-t006-journey-detail/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan053-t006-journey-detail/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan053-t006-journey-detail/pattern-candidate.md` — pattern-candidate — PLAN-053 T-006  
+  - markers: candidate  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan053-t006-journey-detail/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan053-t006-journey-detail/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan054-t001-mapfit-contract/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan054-t001-mapfit-contract/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan054-t001-mapfit-contract/decision-report.json` — decision-report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan054-t001-mapfit-contract/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan054-t001-mapfit-contract/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan054-t002-contract-schema/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan054-t002-contract-schema/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan054-t002-contract-schema/decision-report.json` — decision-report  
+  - markers: todo  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan054-t002-contract-schema/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan054-t003-integration-contracts/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan054-t003-integration-contracts/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan054-t003-integration-contracts/decision-report.json` — decision-report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan054-t003-integration-contracts/metrics-ws3-layout.json` — metrics-ws3-layout  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan054-t003-integration-contracts/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan054-t004-component-contracts/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan054-t004-component-contracts/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan054-t004-component-contracts/decision-report.json` — decision-report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan054-t004-component-contracts/inv-mapping.json` — inv-mapping  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan054-t004-component-contracts/ob2-vitest.json` — ob2-vitest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan054-t004-component-contracts/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan054-t005-living-sync-gate/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan054-t005-living-sync-gate/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan054-t005-living-sync-gate/decision-report.json` — decision-report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan054-t005-living-sync-gate/ob2-vitest.json` — ob2-vitest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan054-t005-living-sync-gate/pattern-candidate.md` — Pattern candidates — PLAN-054 T-005 (living sync gate)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan054-t005-living-sync-gate/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan060-input-frontier/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan060-input-frontier/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan060-input-frontier/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan061-image-format/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan061-image-format/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan061-image-format/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-baptism/records.json` — records  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-baptism/slice-v36.md` — slice-v36  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-baptism/verdict.json` — verdict  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a10/after-lens-1280.json` — after-lens-1280  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a10/after-lens-1440.json` — after-lens-1440  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a10/before-lens-1440.json` — before-lens-1440  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a10/evidence.md` — PLAN-067 T-A10 — Registro del villaggio: 10 collisioni + 8 troncamenti (R-234, T-03)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a10/probe-registry.mjs.txt` — probe-registry.mjs  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a11/after-run-failure.txt` — after-run-failure  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a11/evidence.md` — PLAN-067 T-A11 — rapporto di fine run: lastra, titolo doppio, chip (R-234)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a11/plate-measure.txt` — plate-measure  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a12/evidence.md` — PLAN-067 T-A12 (parziale) — invasione (R-234)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a12/probe-invasion.mjs.txt` — probe-invasion.mjs  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a12/timeline.json` — timeline  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a13/evidence.md` — PLAN-067 T-A13 — contenuti della quest in it-IT (R-234)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a13/run-it-IT-log.json` — run-it-IT-log  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a13/run-ta13.mjs.txt` — run-ta13.mjs  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a13b/evidence.md` — PLAN-067 T-A13b — righe scritte dal motore in it-IT (R-234)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a13b/run-it-IT-log.json` — run-it-IT-log  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a14/evidence.md` — PLAN-067 T-A14 (parziale) — anello di focus, ordine di Tab (R-234)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a14/probe-tab.mjs.txt` — probe-tab.mjs  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a14/tab-after.json` — tab-after  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a14/tab-before.json` — tab-before  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a14b/evidence.md` — PLAN-067 T-A14 (seconda parte) — tooltip della HUD (R-234)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a14b/probe-tooltips.mjs.txt` — probe-tooltips.mjs  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a14b/tooltips.json` — tooltips  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a2/evidence.md` — PLAN-067 T-A2 — riga duplicata nella Verdict Card, HP in prosa (R-234)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a2/run-log.json` — run-log  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a2/run-ta2.mjs.txt` — run-ta2.mjs  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a3/after-dial-1280x720.json` — after-dial-1280x720  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a3/after-dial-1280x800.json` — after-dial-1280x800  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a3/after-dial-1440x900.json` — after-dial-1440x900  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a3/before-dial-1440.json` — before-dial-1440  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a3/evidence.md` — PLAN-067 T-A3 — quadrante tagliato su 4 lati (R-234)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a3/probe-dial.mjs.txt` — probe-dial.mjs  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a4/evidence.md` — PLAN-067 T-A4 — verdetto mostrato due volte (R-234, guida quest §1)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a4/run-log.json` — run-log  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a4/run-ta4.mjs.txt` — run-ta4.mjs  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a5/evidence.md` — PLAN-067 T-A5 — ID grezzo `slot-token:` nel fantasma dello swap (R-234)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a5/run-ta5.mjs.txt` — run-ta5.mjs  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a6/evidence.md` — PLAN-067 T-A6 — badge LV sopra il nome, nomi spariti a 1280, testata roster (R-234)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a6/run-ta6.mjs.txt` — run-ta6.mjs  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a7/evidence.md` — PLAN-067 T-A7 — capienza 12 vs 24, stash fuori schermo a 1280 (R-234, DN-1)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a9/evidence.md` — PLAN-067 T-A9 — tooltip del vassoio che esce dal planner (R-234, T-03)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t-a9/run-ta9b.mjs.txt` — run-ta9b.mjs  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan067-t000/evidence.md` — PLAN-067 T-000 — evidenza (2026-10-20)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/contrast-report-2.json` — contrast-report-2  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/contrast-report.json` — contrast-report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/a-1418x627/hud-1418x627.json` — hud-1418x627  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/a-1440x900/hud-1440x900.json` — hud-1440x900  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/a-2836x1254/hud-2836x1254.json` — hud-2836x1254  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/b-paused/paused-marker.json` — paused-marker  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/b2-paused/b2-paused-mid.json` — b2-paused-mid  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/c-check-closed/check-window-closed.json` — check-window-closed  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/c-check-closed/check-window-open.json` — check-window-open  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/c2-check-closed/c2-closed.json` — c2-closed  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/c2-check-closed/c2-open.json` — c2-open  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/c3-check-spin/c3-closed-1750ms.json` — c3-closed-1750ms  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/c3-check-spin/c3-closed-250ms.json` — c3-closed-250ms  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/c3-check-spin/c3-closed-4250ms.json` — c3-closed-4250ms  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/c3-check-spin/c3-spin-open.json` — c3-spin-open  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/c4-check-no-window/c4-check-fires-window-closed.json` — c4-check-fires-window-closed  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/c4-check-no-window/c4-later.json` — c4-later  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/c5-minimised/c5-minimised-check.json` — c5-minimised-check  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/c5-minimised/c5-open.json` — c5-open  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-00.json` — d-entry-00  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-01.json` — d-entry-01  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-02.json` — d-entry-02  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-03.json` — d-entry-03  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-04.json` — d-entry-04  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-05.json` — d-entry-05  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-06.json` — d-entry-06  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-07.json` — d-entry-07  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-08.json` — d-entry-08  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-09.json` — d-entry-09  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-10.json` — d-entry-10  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-11.json` — d-entry-11  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-12.json` — d-entry-12  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-13.json` — d-entry-13  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-14.json` — d-entry-14  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-15.json` — d-entry-15  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-16.json` — d-entry-16  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-17.json` — d-entry-17  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-18.json` — d-entry-18  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-19.json` — d-entry-19  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-20.json` — d-entry-20  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-21.json` — d-entry-21  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-22.json` — d-entry-22  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-23.json` — d-entry-23  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-24.json` — d-entry-24  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-25.json` — d-entry-25  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-26.json` — d-entry-26  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-27.json` — d-entry-27  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-28.json` — d-entry-28  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-29.json` — d-entry-29  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-30.json` — d-entry-30  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-31.json` — d-entry-31  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-32.json` — d-entry-32  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-33.json` — d-entry-33  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-34.json` — d-entry-34  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-35.json` — d-entry-35  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-36.json` — d-entry-36  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-37.json` — d-entry-37  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-38.json` — d-entry-38  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/d-entry/d-entry-39.json` — d-entry-39  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/e6-2836/e6-wing-open.json` — e6-wing-open  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/e7-middrag/e7-after.json` — e7-after  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/t-a5-1280/choices-1280.json` — choices-1280  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/t-a5-1440/choices-1440.json` — choices-1440  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/t-a5-2836/choices-2836.json` — choices-2836  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/t-a5-overflow/choices-overflow.json` — choices-overflow  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/t-a7/planner-open.json` — planner-open  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/t-a7-1280/planner-1280.json` — planner-1280  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/t-a7-1440/planner-1440.json` — planner-1440  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/t-b2/duration-seal.json` — duration-seal  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/ta8-minimised/ta8-minimised-check.json` — ta8-minimised-check  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence/ta8-minimised/ta8-open.json` — ta8-open  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/evidence.md` — PLAN-071 T-001 — Diagnostica runtime (evidenze)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/harness.mjs` — harness  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/probe.mjs` — probe  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/probe10-report.json` — probe10-report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/probe10.mjs` — probe10  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/probe11-report.json` — probe11-report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/probe11.mjs` — probe11  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/probe12-report.json` — probe12-report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/probe12.mjs` — probe12  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/probe13-report.json` — probe13-report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/probe13.mjs` — probe13  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/probe14.mjs` — probe14  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/probe15.mjs` — probe15  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/probe16.mjs` — probe16  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/probe17.mjs` — probe17  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/probe2.mjs` — probe2  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/probe3.mjs` — probe3  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/probe4.mjs` — probe4  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/probe5.mjs` — title: titleRect,  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/probe6.mjs` — probe6  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/probe7.mjs` — probe7  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/probe8.mjs` — probe8  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/probe9-report.json` — probe9-report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/probe9.mjs` — probe9  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/report.json` — report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/report2.json` — report2  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/report3.json` — report3  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/report4.json` — report4  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/report5.json` — report5  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/report7.json` — report7  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-t001/report8.json` — report8  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-ta1/evidence.md` — T-A1 — QuestRewardPopup viewport containment (R-239)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan071-ta8/evidence.md` — T-A8 — check senza finestra: niente orfani, niente evaporazione (R-239)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan076-closure/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan076-closure/check-witness.cjs` — check-witness  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan076-closure/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan076-closure/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan076-closure/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan076-fork/visual-fork-load.md` — Visual Fork Card — LOAD-1 elenco dei salvataggi  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan076-fork/visual-fork-quit.md` — Visual Fork Card — QUIT-1 conferma di uscita (e di Nuova partita, O-2)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan076-fork/visual-fork-settings.md` — Visual Fork Card — SET-1 forma delle impostazioni  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan076-fork/visual-fork-title.md` — Visual Fork Card — TITLE-1 schermata titolo  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan076-witness/results.json` — results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan076-witness/witness.mjs` — witness  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan077-t001-ledger/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan077-t001-ledger/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan077-t001-ledger/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan077-t001-ledger/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan077-t002-fsm/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan077-t002-fsm/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan077-t002-fsm/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan077-t002-fsm/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan077-t003-locks/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan077-t003-locks/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan077-t003-locks/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan077-t004-verification/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan077-t004-verification/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan077-t004-verification/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan077-t005-queue/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan077-t005-queue/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan077-t005-queue/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan077-t006-cli/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan077-t006-cli/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan077-t006-cli/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan077-t007-pilot/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan077-t007-pilot/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan077-t007-pilot/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan078-quality-sentinel/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan078-quality-sentinel/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan078-quality-sentinel/decision-report.json` — decision-report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan078-quality-sentinel/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan078-quality-sentinel/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan080-prompt-authoring/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan080-prompt-authoring/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan080-prompt-authoring/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan081-gate-foreign-scope/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan081-gate-foreign-scope/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan081-gate-foreign-scope/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan081-gate-foreign-scope/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan082-family-glyph/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan082-family-glyph/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan082-family-glyph/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan084-reveal-slice/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan084-reveal-slice/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan084-reveal-slice/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan084-reveal-slice/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan091-mappa2-waterfall-prototype/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan091-mappa2-waterfall-prototype/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan091-mappa2-waterfall-prototype/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan093-mappa2-ambient-land-life/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan093-mappa2-ambient-land-life/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan093-mappa2-ambient-land-life/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan102-t0/fork-fidelity-manifest.md` — T-0 — Fork-fidelity manifest + spike outcomes (PLAN-102)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan112-f1/visual-fork-pianta-B.md` — Visual Fork Card — Pianta B: tre varianti della disposizione (F1.5)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan118-deploy-slim/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan118-deploy-slim/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan118-deploy-slim/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan118-deploy-slim/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan120-catalog-slim/baseline.json` — baseline  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan120-catalog-slim/phase0-context-inventory.md` — Phase-0: Fixed Context-Injection Inventory — RPG environment  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan120-catalog-slim/phase4-remeasure.md` — Phase-4: Context-Injection Re-measure — RPG environment  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan120-catalog-slim/report.json` — report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan120-catalog-slim/report.md` — PLAN-120 catalog slim — report (2026-11-15)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan121-richeste-split/inventory.json` — inventory  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan121-richeste-split/report.md` — PLAN-121 — Report esecuzione split RICHIESTE (2026-11-15)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan121-richeste-split/split-manifest.json` — split-manifest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan122-glob-activation/report.md` — PLAN-122 T-5 — glob-activation report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan123-ledger-split/inventory.json` — inventory  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan123-ledger-split/report.md` — PLAN-123 — Report: ledger-docs split (DECISION_LOG + desiderata digest)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/plan123-ledger-split/split-manifest.json` — split-manifest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/probe-clearance/manifest.json` — manifest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/probe-clearance2/manifest.json` — manifest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/probe-hitarea/manifest.json` — manifest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/probe-layout-bugs/manifest.json` — manifest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/probe-pin-intercept/manifest.json` — manifest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/probe-registry-row/manifest.json` — manifest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/probe-s4-via-row/manifest.json` — manifest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/probe-s6-fold/manifest.json` — manifest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/probe-s6-reload/manifest.json` — manifest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/probe-s7-reload/manifest.json` — manifest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/probe-stash-tip/manifest.json` — manifest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/probe-stash-uniform/manifest.json` — manifest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/quest-cinematics-research/INDEX.md` — quest-cinematics-research — 2026-10-18  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/quest-cinematics-research/film-theory.md` — Film theory for the quest theater — deep research (2026-10-18)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/quest-cinematics-research/final.md` — Quest Cinematics — game-feel research synthesis (2026-10-18)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/quest-cinematics-research/game-grammar-codex.md` — game-grammar-codex  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/quest-cinematics-research/game-grammar-groq.md` — game-grammar-groq  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/quest-cinematics-research/letterbox-codex.md` — letterbox-codex  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/quest-cinematics-research/letterbox-groq.md` — letterbox-groq  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/quest-cinematics-research/plan-showcase-codex.md` — plan-showcase-codex  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/quest-cinematics-research/plan-showcase-gemini.md` — plan-showcase-gemini  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/quest-cinematics-research/plan-showcase-groq.md` — plan-showcase-groq  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/quest-cinematics-research/q-game-grammar.md` — Q: GAME juice vs FILM grammar — what cinema steals, what it must invent  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/quest-cinematics-research/q-letterbox.md` — Q: LETTERBOX / cinematic framing in a text-first narrative game  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/quest-cinematics-research/q-plan-showcase.md` — q-plan-showcase  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/quest-cinematics-research/q-semantic-mapping.md` — q-semantic-mapping  
+  - markers: proposed  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/quest-cinematics-research/q-shake.md` — Q: SCREEN SHAKE + impact feedback over still art  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/quest-cinematics-research/q-sound.md` — Q: SOUND DESIGN synchronized to visual beats — with ZERO current audio in the quest theater  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/quest-cinematics-research/q-text-fx.md` — Q: TEXT + UI effects that complete the scene grammar  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/quest-cinematics-research/semantic-mapping-codex.md` — semantic-mapping-codex  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/quest-cinematics-research/semantic-mapping-gemini.md` — semantic-mapping-gemini  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/quest-cinematics-research/semantic-mapping-groq.md` — semantic-mapping-groq  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/quest-cinematics-research/semantic-mapping-synthesis.md` — Semantic cue mapping — multi-AI debate synthesis (gemini / codex / groq)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/quest-cinematics-research/shake-gemini.md` — shake-gemini  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/quest-cinematics-research/shake-groq.md` — shake-groq  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/quest-cinematics-research/sound-codex.md` — sound-codex  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/quest-cinematics-research/sound-gemini.md` — sound-gemini  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/quest-cinematics-research/text-fx-codex.md` — text-fx-codex  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/quest-cinematics-research/text-fx-gemini.md` — text-fx-gemini  
   - reason: run/session/pending context or transient register  
 - `.mw/runs/r056-breathing/A.md` — A  
   - reason: run/session/pending context or transient register  
@@ -2132,6 +10374,495 @@
 - `.mw/runs/r056-breathing/final.md` — final  
   - reason: run/session/pending context or transient register  
 - `.mw/runs/r056-breathing/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r185-closure/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r185-closure/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r185-closure/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r185-closure/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r185-closure/verifier-input.md` — Verificatore indipendente — R-185 (chiusura scena invasione)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r185-closure/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r185-closure-2026-10-14/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r185-closure-2026-10-14/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r188-closure-2026-10-14/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r188-closure-2026-10-14/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r189-closure/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r189-closure/selftest-results.json` — selftest-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r189-closure/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r189-closure/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r190-macro-gameplay-2026-10-14/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r190-macro-gameplay-2026-10-14/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r190-macro-gameplay-2026-10-14/smoke.mjs` — smoke  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r190-macro-gameplay-2026-10-14/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r192-pixi-render-target/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r192-pixi-render-target/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r192-pixi-render-target/diag.mjs` — diag  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r192-pixi-render-target/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r192-pixi-render-target/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r192-pixi-render-target/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r193-icu-2026-10-14/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r193-icu-2026-10-14/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r193-icu-2026-10-14/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r196-quest-window/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r196-quest-window/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r196-quest-window/metrics-dom.json` — metrics-dom  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r196-quest-window/signoff-bv1.json` — signoff-bv1  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r196-quest-window/smoke-metrics.cjs` — smoke-metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r196-quest-window/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r196-quest-window/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r198-foreground-windows/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r198-foreground-windows/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r198-foreground-windows/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r199-quest-window-rev2/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r199-quest-window-rev2/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r199-quest-window-rev2/diag.cjs` — diag  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r199-quest-window-rev2/metrics-dom.json` — metrics-dom  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r199-quest-window-rev2/plan.md` — R-199 — QuestRunWindow rev.2 (13 punti del Director)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r199-quest-window-rev2/probe-repro.cjs` — probe-repro  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r199-quest-window-rev2/probe-run.cjs` — probe-run  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r199-quest-window-rev2/probe-send.cjs` — probe-send  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r199-quest-window-rev2/signoff-rv8.json` — signoff-rv8  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r199-quest-window-rev2/smoke-metrics.cjs` — smoke-metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r199-quest-window-rev2/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r199-quest-window-rev2/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r211-quiet-window-weekdays/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r211-quiet-window-weekdays/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r211-quiet-window-weekdays/shutdown-status.txt` — shutdown-status  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r211-quiet-window-weekdays/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r212-orphan-processes/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r212-orphan-processes/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r212-orphan-processes/repro-status.txt` — repro-status  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r212-orphan-processes/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r213-cinematic-effects-regression/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r213-cinematic-effects-regression/capture-notes.json` — capture-notes  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r213-cinematic-effects-regression/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r213-cinematic-effects-regression/e2e-temporal/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r213-cinematic-effects-regression/pattern-candidate.md` — pattern-candidate  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r213-cinematic-effects-regression/signoff.json` — signoff  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r213-cinematic-effects-regression/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r213-cinematic-effects-regression/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r213-quest-cinematics-spike/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r213-quest-cinematics-spike/cine-spike/metrics.json` — metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r213-quest-cinematics-spike/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r213-quest-cinematics-spike/ob3-metrics.json` — ob3-metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r213-quest-cinematics-spike/signoff.json` — signoff  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r213-quest-cinematics-spike/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r213-quest-cinematics-spike/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r215-stage-rail-lines/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r215-stage-rail-lines/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r215-stage-rail-lines/probe-game.cjs` — probe-game  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r215-stage-rail-lines/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r223-quest-ui-regressions/bag-stash-metrics.json` — bag-stash-metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r223-quest-ui-regressions/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r223-quest-ui-regressions/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r223-quest-ui-regressions/drag-medal-decode.json` — drag-medal-decode  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r223-quest-ui-regressions/drag-medal-visibility.json` — drag-medal-visibility  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r223-quest-ui-regressions/drag-metrics.json` — drag-metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r223-quest-ui-regressions/env-attestation.json` — env-attestation  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r223-quest-ui-regressions/extraction-visibility.json` — extraction-visibility  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r223-quest-ui-regressions/flight-center-alignment.json` — flight-center-alignment  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r223-quest-ui-regressions/forecast-metrics.json` — forecast-metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r223-quest-ui-regressions/forecast-production-after-no-debounce.json` — forecast-production-after-no-debounce  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r223-quest-ui-regressions/forecast-production-after-raf.json` — forecast-production-after-raf  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r223-quest-ui-regressions/forecast-production-latency.json` — forecast-production-latency  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r223-quest-ui-regressions/forecast-production-metrics.json` — forecast-production-metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r223-quest-ui-regressions/forecast-production-profile.json` — forecast-production-profile  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r223-quest-ui-regressions/forecast-profile-inclusive.json` — forecast-profile-inclusive  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r223-quest-ui-regressions/forecast-profile.json` — forecast-profile  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r223-quest-ui-regressions/invalid-return-latest.json` — invalid-return-latest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r223-quest-ui-regressions/invalid-return-visible.json` — invalid-return-visible  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r223-quest-ui-regressions/metrics-ws3-layout.json` — metrics-ws3-layout  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r223-quest-ui-regressions/minimized-layout.json` — minimized-layout  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r223-quest-ui-regressions/minimized-metrics.json` — minimized-metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r223-quest-ui-regressions/return-metrics.json` — return-metrics  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r223-quest-ui-regressions/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r223-quest-ui-regressions/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r225-ultrawide-map-fit/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r225-ultrawide-map-fit/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r225-ultrawide-map-fit/decision-report.json` — decision-report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r225-ultrawide-map-fit/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r225-ultrawide-map-fit/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r229-bg-watermark-removal/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r229-bg-watermark-removal/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r229-bg-watermark-removal/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r231-quest-run-window/visual-fork-abandon-control.md` — Visual Fork Card — VF-2: Abandon Quest Icon & Placement (`R-231` #6)  
+  - markers: draft  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r231-quest-run-window/visual-fork-post-settle-motion.md` — Visual Fork Card — VF-3: Post-Entrance Scene Motion Profile (`R-231` #9)  
+  - markers: draft  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r231-quest-run-window/visual-fork-theatre-sidebars.md` — Visual Fork Card — VF-4: Compressed-Viewport Theatre Framing (`R-231` #5, #8)  
+  - markers: draft  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r231-quest-run-window/visual-fork-timebar-checkpoints.md` — Visual Fork Card — VF-1: TimeBar Phase Checkpoints & Terminal State (`R-231` #4)  
+  - markers: draft  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r231-visual-verification/visual-witness.json` — visual-witness  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r232-game-surface-coverage/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r232-game-surface-coverage/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r232-game-surface-coverage/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r240-village-stash-ledger/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r240-village-stash-ledger/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r240-village-stash-ledger/t04-note.md` — T-04 note — R-240 / PLAN-073 (village stash ledger)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r240-village-stash-ledger/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r240-village-stash-ledger/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r241-quest-run-window-five/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r241-quest-run-window-five/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r241-quest-run-window-five/metrics-ob6.json` — metrics-ob6  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r241-quest-run-window-five/t04-note.md` — T-04 — witness note (R-241)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r241-quest-run-window-five/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r241-quest-run-window-five/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r241-quest-run-window-five/visual-fork-r241-bugfix.md` — Visual Fork — R-241: cinque bugfix della quest run window  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r242-quest-window-reopen/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r242-quest-window-reopen/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r242-quest-window-reopen/t04-note.md` — T-04 — human-eye note (R-242)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r242-quest-window-reopen/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r242-quest-window-reopen/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r247-regression-test-obligation/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r247-regression-test-obligation/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r247-regression-test-obligation/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r248-quest-planner-perf/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r248-quest-planner-perf/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r248-quest-planner-perf/t04-note.md` — T-04 note — R-248  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r248-quest-planner-perf/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r248-quest-planner-perf/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r253-r259-quest-ui/visual-fork-r253-r259.md` — Visual Fork — R-253/R-259: quest UI fix su ruling Director  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r257-medal-dupe-roster-scroll/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r257-medal-dupe-roster-scroll/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r257-medal-dupe-roster-scroll/t04-note.md` — T-04 — eye-check Director (R-257)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r257-medal-dupe-roster-scroll/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r257-medal-dupe-roster-scroll/verifier.json` — verifier  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r258-quest-forecast-why/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r258-quest-forecast-why/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r258-quest-forecast-why/evidence/witness-result.json` — witness-result  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r258-quest-forecast-why/signoff.json` — signoff  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r258-quest-forecast-why/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r258-quest-forecast-why/witness.mjs` — witness  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r260-collect-commit-reward/artifacts/delta-witness.cjs` — delta-witness  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r260-collect-commit-reward/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r260-collect-commit-reward/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r260-collect-commit-reward/signoff.json` — signoff  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r260-collect-commit-reward/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r263-journey-leg-art/visual-fork-r263.md` — Visual Fork — R-263: journey leg art (andata/ritorno) nel teatro quest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r270-sentinel-layout-fixes/visual-fork-r270.md` — Visual Fork — R-270: fix difetti layout della Sentinel + stash-uniformity  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r271-quest-ambient-fx/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r271-quest-ambient-fx/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r271-quest-ambient-fx/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r281-roster-slot-swap/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r281-roster-slot-swap/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r281-roster-slot-swap/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r282-swap-block-icon/visual-fork.md` — Visual Fork — R-282: indicatore "drop rifiutato" sul castone  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r297-mobile-landing-mappa2-lab/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r297-mobile-landing-mappa2-lab/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r297-mobile-landing-mappa2-lab/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r299-sea-arch-foam/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r299-sea-arch-foam/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r299-sea-arch-foam/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r300-peak-storm-crowns/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r300-peak-storm-crowns/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r300-peak-storm-crowns/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r307-foam-cliff-leak/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r307-foam-cliff-leak/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r307-foam-cliff-leak/pattern-candidate.md` — pattern-candidate — leak visivi su superfici mascherate: misura ON/OFF + classificazione per semantica della maschera  
+  - markers: candidate  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r307-foam-cliff-leak/probe/verify-archbay-T1.5-whiteleaks.json` — verify-archbay-T1.5-whiteleaks  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r307-foam-cliff-leak/probe/verify-westcliff-T1.5-whiteleaks.json` — verify-westcliff-T1.5-whiteleaks  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r307-foam-cliff-leak/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r308-mountain-shade-grey-only/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r308-mountain-shade-grey-only/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r308-mountain-shade-grey-only/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r309-village-plates/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r309-village-plates/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r309-village-plates/pattern-candidate.md` — Pattern candidates — R-309 village plates (2026-11-02)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r309-village-plates/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r317-plan112-debate/artifacts/artifact-r002.md` — PLAN-112 — HUD AAA: prima la pianta, poi i componenti  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r317-plan112-debate/artifacts/findings-r1-digest.md` — Round-1 findings digest (compressed, orchestrator-condensed). IDs: P=chatgpt, L=claude, M=gemini, K=grok, D=deepseek.  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r317-plan112-debate/artifacts/grounding-ledger.md` — Grounding ledger — run 20261105-plan112-hud-aaa  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r317-plan112-debate/artifacts/report.md` — Run report — 20261105-plan112-hud-aaa  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r317-plan112-debate/artifacts/state.json` — state  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r317-plan112-debate/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r317-plan112-debate/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r325-game-restore/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r325-game-restore/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r325-game-restore/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r325-game-restore/visual-fork-game-asset-warmup.md` — Visual-fork — gameAssetWarmup.ts (R-325)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r331-game-zoom-out/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r331-game-zoom-out/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r331-game-zoom-out/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r335-cassetto-vero/visual-fork-r335.md` — Visual-fork — R-335 (medaglione mozzato + risorse dentro il cassetto)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r338-voce-su-game/bundle.json` — bundle  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r338-voce-su-game/command-results.json` — command-results  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r338-voce-su-game/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r338-voce-su-game/visual-fork-skip.md` — Visual Fork — R-338 skip  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r339-expedition-ui/verification.json` — verification  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sentinel-2026-10-22T2231/cells/1280x720@1x_en/manifest.json` — manifest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sentinel-2026-10-22T2233/cells/1280x720@1x_en/manifest.json` — manifest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sentinel-2026-10-22T2233/cells/1280x720@1x_it-IT/manifest.json` — manifest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sentinel-2026-10-22T2233/manifest.json` — manifest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sentinel-2026-10-22T2233/morning-digest.md` — Sentinel Morning Digest — sentinel-2026-10-22T2233  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sentinel-2026-10-22T2233/run-manifest.json` — run-manifest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sentinel-2026-10-23T0750/cells/1280x720@1x_en/manifest.json` — manifest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sentinel-2026-10-23T0755/cells/1280x720@1x_en/manifest.json` — manifest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sentinel-2026-10-23T0800/cells/1280x720@1x_en/manifest.json` — manifest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sentinel-2026-10-23T0800/manifest.json` — manifest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sentinel-2026-10-23T0800/morning-digest.md` — Sentinel Morning Digest — sentinel-2026-10-23T0800  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sentinel-2026-10-23T0800/run-manifest.json` — run-manifest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sentinel-2026-10-23T0829/cells/1280x720@1x_en/manifest.json` — manifest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sentinel-2026-10-23T0829/ingest-dryrun.json` — ingest-dryrun  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sentinel-2026-10-23T0829/manifest.json` — manifest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sentinel-2026-10-23T0829/morning-digest.md` — Sentinel Morning Digest — sentinel-2026-10-23T0829  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sentinel-2026-10-23T0829/reproducers/L2|quest-check-c.spec.ts` — L2|quest-check-c.spec  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sentinel-2026-10-23T0829/run-manifest.json` — run-manifest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sentinel-pilot/cells/1280x720@1x_en/manifest.json` — manifest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sentinel-pilot/manifest.json` — manifest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sentinel-pilot/morning-digest.md` — Sentinel Morning Digest — sentinel-2026-10-22T2240  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sentinel-pilot/run-manifest.json` — run-manifest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sentinel-pilot-verify/cells/1280x720@1x_en/manifest.json` — manifest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sentinel-pilot-verify/manifest.json` — manifest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sentinel-pilot-verify/morning-digest.md` — Sentinel Morning Digest — sentinel-2026-10-22T2305  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sentinel-pilot-verify/run-manifest.json` — run-manifest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sentinel-s6-repro/cells/1280x720@1x_en/manifest.json` — manifest  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sterminio-goblin-critique-2026-10-06/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sterminio-goblin-critique-2026-10-06/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sterminio-goblin-critique-2026-10-06/caller.md` — caller  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sterminio-goblin-critique-2026-10-06/caller_final.md` — CRITICA AVVERSARIALE: Quest «Sterminio dei goblin»  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sterminio-goblin-critique-2026-10-06/metadata.json` — metadata  
   - reason: run/session/pending context or transient register  
 - `.mw/runs/sticker-peel-2026-08-27/BROADCAST.md` — Broadcast: broadcast-20260827-142950  
   - reason: run/session/pending context or transient register  
@@ -2169,11 +10900,399 @@
   - reason: run/session/pending context or transient register  
 - `.mw/runs/window-critique-2026-08-27/synthesis.md` — Synthesis of Critiques  
   - reason: run/session/pending context or transient register  
+- `.mw/runs/world-surface-breath-plan/cycle-01/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/world-surface-breath-plan/cycle-01/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/world-surface-breath-plan/cycle-01/convergence.txt` — convergence  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/world-surface-breath-plan/cycle-01/critiques.txt` — critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/world-surface-breath-plan/cycle-01/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/world-surface-breath-plan/final.md` — final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/world-surface-breath-research/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/world-surface-breath-research/B.md` — B  
+  - markers: proposed  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/world-surface-breath-research/caller_final.md` — caller_final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/world-surface-breath-research/final.md` — final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/world-surface-breath-research/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
 - `.mw/telegram-state/authorized-chats.yaml` — authorized-chats  
   - reason: Mind Weaver workspace, not game canon  
 - `.mw/templates/ai-friendly-spec.md` — AI-Friendly Spec Template  
   - reason: Mind Weaver workspace, not game canon  
 - `.mw/templates/mockup-asset-spec/prompt.md` — <Asset Name> — Image Prompt  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/ART-DIRECTION.md` — ART-DIRECTION — rubrica condivisa (PLAN-086, rev 4 — BOZZA)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/DEMO-PATH.md` — Percorso demo — ordine di lavoro del catalogo (bozza 2026-10-26)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/INDEX.md` — UI Catalog Index — /game  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/RESOCONTO.md` — UI Catalog — resoconto per handoff (2026-10-26)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/amanuense-page/page.md` — amanuense-page — Amanuense folio — extended phase description  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/director-panel/critiques/chatgpt.md` — chatgpt — director-panel critique (DECLARED FAILURE)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/director-panel/critiques/claude.md` — claude — director-panel (T-003 refill, image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/director-panel/critiques/deepseek.md` — deepseek  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/director-panel/critiques/digest.md` — Digest critiche — director-panel (round 1, 2/3 image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/director-panel/page.md` — director-panel — Director panel (staging actions)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/error-boundary/fixes.md` — fixes — error-boundary  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/error-boundary/page.md` — error-boundary — ErrorBoundary fallback (crash screen)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/game-boot-screen/critiques/chatgpt.md` — DECLARED FAILURE — chatgpt  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/game-boot-screen/critiques/claude.md` — claude — game-boot-screen (T-001 refill, image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/game-boot-screen/critiques/deepseek.md` — deepseek  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/game-boot-screen/critiques/digest.md` — Digest critiche — game-boot-screen (round 1, 2/3 image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/game-boot-screen/page.md` — game-boot-screen — Boot veil / loading screen  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/hero-level-ceremony/critiques/chatgpt.md` — DECLARED FAILURE — chatgpt  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/hero-level-ceremony/critiques/claude.md` — claude — hero-level-ceremony (T-001 refill, image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/hero-level-ceremony/critiques/deepseek.md` — deepseek  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/hero-level-ceremony/critiques/digest.md` — Digest critiche — hero-level-ceremony (round 1, 2/3 image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/hero-level-ceremony/page.md` — hero-level-ceremony — Hero level-up ceremony layer  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/hero-sheet-panel/critiques/chatgpt.md` — chatgpt — hero-sheet-panel critique (DECLARED FAILURE)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/hero-sheet-panel/critiques/claude.md` — claude  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/hero-sheet-panel/critiques/deepseek.md` — deepseek  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/hero-sheet-panel/critiques/digest.md` — Digest critiche — hero-sheet-panel (round 1, 2/3 image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/hero-sheet-panel/page.md` — hero-sheet-panel — Hero sheet (resident detail)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/hud-corner/critiques/chatgpt.md` — chatgpt — hud-corner critique (PARTIAL FAILURE)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/hud-corner/critiques/claude.md` — claude  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/hud-corner/critiques/deepseek.md` — deepseek  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/hud-corner/critiques/digest.md` — hud-corner — critique digest (run `20261024-critique-hud-corner`)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/hud-corner/page.md` — hud-corner — Bottom-right control cluster  
+  - markers: historical  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/hud-event-ledger/critiques/chatgpt.md` — DECLARED FAILURE — chatgpt  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/hud-event-ledger/critiques/claude.md` — claude — hud-event-ledger (T-002 refill, image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/hud-event-ledger/critiques/deepseek.md` — deepseek  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/hud-event-ledger/critiques/digest.md` — Digest critiche — hud-event-ledger (round 1, 2/3 image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/hud-event-ledger/page.md` — hud-event-ledger — Event ledger panel  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/hud-tooltip/critiques/chatgpt.md` — DECLARED FAILURE — chatgpt  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/hud-tooltip/critiques/claude.md` — claude — hud-tooltip (T-001 refill, image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/hud-tooltip/critiques/deepseek.md` — deepseek  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/hud-tooltip/critiques/digest.md` — Digest critiche — hud-tooltip (round 1, 2/3 image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/hud-tooltip/page.md` — hud-tooltip — HUD control tooltip plate (radix)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/hud-top-tabs/critiques/chatgpt.md` — chatgpt  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/hud-top-tabs/critiques/claude.md` — claude  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/hud-top-tabs/critiques/deepseek.md` — deepseek  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/hud-top-tabs/critiques/digest.md` — Digest critiche — hud-top-tabs (round 1, 3/3 image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/hud-top-tabs/mockups/rank-chatgpt.md` — rank-chatgpt  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/hud-top-tabs/mockups/rank-claude.md` — rank-claude  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/hud-top-tabs/mockups/rank-deepseek.md` — rank-deepseek  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/hud-top-tabs/mockups/ranking.md` — AI ranking — hud-top-tabs (anonymous A/B/C, 2/3 image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/hud-top-tabs/page.md` — hud-top-tabs — Top HUD tab cluster  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/load-game-panel/critiques/chatgpt.md` — chatgpt — load-game-panel critique (DECLARED FAILURE)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/load-game-panel/critiques/claude.md` — claude — load-game-panel (T-001 refill su run -r2, image-grounded, SCOPE PARZIALE)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/load-game-panel/critiques/deepseek.md` — deepseek  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/load-game-panel/critiques/digest.md` — Digest critiche — load-game-panel (round 1, 2/3 image-grounded, claude scope parziale)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/load-game-panel/fixes.md` — load-game-panel — documenter fixes (PLAN-086 worker)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/load-game-panel/page.md` — load-game-panel — Load game dialog («Carica partita»)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/map-quest-poi/fixes.md` — map-quest-poi — documenter fixes (PLAN-086 worker)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/map-quest-poi/page.md` — map-quest-poi — Quest POI sigilli on the continent map  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/materic-roster-component-v2/critiques/chatgpt.md` — DECLARED FAILURE — chatgpt  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/materic-roster-component-v2/critiques/claude.md` — claude — materic-roster-component-v2 (T-001 refill su run -r2, image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/materic-roster-component-v2/critiques/deepseek.md` — deepseek  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/materic-roster-component-v2/critiques/digest.md` — Digest critiche — materic-roster-component-v2 (round 1, 2/3 image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/materic-roster-component-v2/page.md` — materic-roster-component-v2 — Roster stage panel (V2)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/memorial-panel/critiques/chatgpt.md` — chatgpt — memorial-panel critique (DECLARED FAILURE)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/memorial-panel/critiques/claude.md` — claude — memorial-panel (T-002 refill, image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/memorial-panel/critiques/deepseek.md` — deepseek — memorial-panel critique (DECLARED FAILURE)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/memorial-panel/critiques/digest.md` — Digest critiche — memorial-panel (round 1, 1/3 image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/memorial-panel/fixes.md` — memorial-panel — documenter fixes (PLAN-086 worker)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/memorial-panel/page.md` — memorial-panel — Memoriale (fallen residents)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/merchant-panel/critiques/chatgpt.md` — DECLARED FAILURE — chatgpt  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/merchant-panel/critiques/claude.md` — claude — merchant-panel (T-001 refill, image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/merchant-panel/critiques/deepseek.md` — deepseek  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/merchant-panel/critiques/digest.md` — Digest critiche — merchant-panel (round 1, 2/3 image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/merchant-panel/page.md` — merchant-panel — Trader Rowen mock storefront  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/nav-bar/critiques/chatgpt.md` — chatgpt — PROVIDER FAILURE (images not perceived)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/nav-bar/critiques/claude.md` — claude  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/nav-bar/critiques/deepseek.md` — deepseek  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/nav-bar/critiques/digest.md` — Digest critiche — nav-bar (round 1, 2/3 image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/nav-bar/page.md` — nav-bar — Bottom navigation plinth  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/new-game-confirm/critiques/chatgpt.md` — chatgpt — DECLARED FAILURE (upload quota exhausted / no upload affordance)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/new-game-confirm/critiques/claude.md` — claude — new-game-confirm (T-002 refill, image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/new-game-confirm/critiques/deepseek.md` — deepseek — new-game-confirm (T-001, image-grounded ma MISREAD del componente)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/new-game-confirm/critiques/digest.md` — Digest critiche — new-game-confirm (round 1, 1/3 grounded sul componente + claude)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/new-game-confirm/page.md` — new-game-confirm — New-game confirm dialog (title screen)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/objective-cartouche/fixes.md` — fixes — objective-cartouche  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/objective-cartouche/page.md` — objective-cartouche — Current-objective cartouche (top-left)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/pixi-world-map/critiques/chatgpt.md` — chatgpt — DECLARED FAILURE (upload quota exhausted / images not perceived)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/pixi-world-map/critiques/claude.md` — claude  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/pixi-world-map/critiques/deepseek.md` — deepseek  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/pixi-world-map/critiques/digest.md` — Digest critiche — pixi-world-map (round 1, 3/3 transport, 2/3 in-scope)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/pixi-world-map/page.md` — pixi-world-map — Pixi world map canvas + anchors layer  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/quest-belt/page.md` — quest-belt — Quest bag / belt (run window companion plaque)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/quest-chronicle/page.md` — quest-chronicle — Quest chronicle / log (run window companion plaque)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/quest-epilogue/page.md` — quest-epilogue — Quest epilogue — end-of-run report inside the run window  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/quest-expedition-detail/ASSET-LIST.md` — Planner «Dispatch Table» — elenco degli asset da produrre  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/quest-expedition-detail/critiques/chatgpt.md` — DECLARED FAILURE — chatgpt  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/quest-expedition-detail/critiques/claude.md` — claude — quest-expedition-detail (T-001 refill, image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/quest-expedition-detail/critiques/deepseek.md` — deepseek  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/quest-expedition-detail/critiques/digest.md` — Digest critiche — quest-expedition-detail (round 1, 2/3 image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/quest-expedition-detail/page.md` — quest-expedition-detail — «Dispatch Table» expedition planner  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/quest-journey-route/fixes.md` — quest-journey-route — fixes  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/quest-journey-route/page.md` — quest-journey-route — On-map expedition route with progress glint  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/quest-outcome-toast/fixes.md` — quest-outcome-toast — fixes  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/quest-outcome-toast/page.md` — quest-outcome-toast — Post-check outcome toast  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/quest-party-roster/page.md` — quest-party-roster — Quest party in the field (run window companion plaque)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/quest-returned-crew/page.md` — quest-returned-crew — Who came back — end-of-run crew niches  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/quest-reward-popup/fixes.md` — quest-reward-popup — fixes  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/quest-reward-popup/page.md` — quest-reward-popup — Quest reward popup / expedition report  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/quest-run-window/fixes.md` — quest-run-window — fixes  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/quest-run-window/page.md` — quest-run-window — Quest run window (theatre, beats, choices, belt, log)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/quest-stage-cluster/fixes.md` — quest-stage-cluster — fixes  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/quest-stage-cluster/page.md` — quest-stage-cluster — Quest stage cluster: run window + skill-check column/wings  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/region-tooltip/critiques/chatgpt.md` — DECLARED FAILURE — chatgpt  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/region-tooltip/critiques/claude.md` — claude — region-tooltip (T-001 refill, image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/region-tooltip/critiques/deepseek.md` — deepseek  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/region-tooltip/critiques/digest.md` — Digest critiche — region-tooltip (round 1, 2/3 image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/region-tooltip/page.md` — region-tooltip — Map region name plate on hover  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/settings-panel/critiques/chatgpt.md` — chatgpt — settings-panel critique (DECLARED FAILURE)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/settings-panel/critiques/claude.md` — claude — settings-panel (T-002 refill, image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/settings-panel/critiques/deepseek.md` — deepseek  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/settings-panel/critiques/digest.md` — Digest critiche — settings-panel (round 1, 2/3 image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/settings-panel/fixes.md` — settings-panel — documenter fixes (PLAN-086 worker)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/settings-panel/page.md` — settings-panel — Settings dialog («Impostazioni»)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/settlement-lost-overlay/critiques/chatgpt.md` — DECLARED FAILURE — chatgpt  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/settlement-lost-overlay/critiques/claude.md` — claude — settlement-lost-overlay (T-001 refill, image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/settlement-lost-overlay/critiques/deepseek.md` — deepseek  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/settlement-lost-overlay/critiques/digest.md` — Digest critiche — settlement-lost-overlay (round 1, 2/3 image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/settlement-lost-overlay/page.md` — settlement-lost-overlay — Settlement-lost takeover overlay  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/stage-edge-strips/critiques/chatgpt.md` — DECLARED FAILURE — chatgpt  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/stage-edge-strips/critiques/claude.md` — DECLARED FAILURE — claude  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/stage-edge-strips/critiques/deepseek.md` — deepseek  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/stage-edge-strips/critiques/digest.md` — Digest critiche — stage-edge-strips (round 1, 1/3 raccolta ma OFF-TARGET)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/stage-edge-strips/fixes.md` — fixes — stage-edge-strips  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/stage-edge-strips/page.md` — stage-edge-strips — Stage edge strips: collapsed-panel tabs and wing rails  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/title-screen/critiques/chatgpt.md` — DECLARED FAILURE — chatgpt  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/title-screen/critiques/claude.md` — claude — title-screen (T-003 refill, image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/title-screen/critiques/deepseek.md` — deepseek  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/title-screen/critiques/digest.md` — Digest critiche — title-screen (round 1, 2/3 image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/title-screen/page.md` — title-screen — Title screen (continue/new/load/settings)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/tuning-panel/critiques/chatgpt.md` — chatgpt — tuning-panel critique (DECLARED FAILURE)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/tuning-panel/critiques/claude.md` — claude — tuning-panel (T-003 refill, image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/tuning-panel/critiques/deepseek.md` — deepseek  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/tuning-panel/critiques/digest.md` — Digest critiche — tuning-panel (round 1, 2/3 image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/tuning-panel/page.md` — tuning-panel — Tuning panel (live config sliders)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/village-building-pins/critiques/chatgpt.md` — chatgpt — DECLARED FAILURE (upload quota exhausted / no upload affordance)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/village-building-pins/critiques/claude.md` — claude — village-building-pins (T-001 refill, image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/village-building-pins/critiques/deepseek.md` — deepseek — village-building-pins (T-001, image-grounded sul pin singolo, scope parziale)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/village-building-pins/critiques/digest.md` — Digest critiche — village-building-pins (round 1, 2/3 raccolto, scope parziale+claude)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/village-building-pins/page.md` — village-building-pins — Building pins on the village stage  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/village-building-tooltip/critiques/chatgpt.md` — DECLARED FAILURE — chatgpt  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/village-building-tooltip/critiques/claude.md` — claude — village-building-tooltip (T-002 refill, image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/village-building-tooltip/critiques/deepseek.md` — deepseek  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/village-building-tooltip/critiques/digest.md` — Digest critiche — village-building-tooltip (round 1, 2/3 image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/village-building-tooltip/page.md` — village-building-tooltip — Pinned building tooltip  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/village-registry/critiques/chatgpt.md` — chatgpt — village-registry (T-002 refill, image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/village-registry/critiques/claude.md` — claude  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/village-registry/critiques/deepseek.md` — deepseek  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/village-registry/critiques/digest.md` — Digest critiche — village-registry (round 1, 3/3 image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/village-registry/page.md` — village-registry — Settlement Registry drawer  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/village-screen-view/critiques/chatgpt.md` — DECLARED FAILURE — chatgpt  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/village-screen-view/critiques/claude.md` — claude — village-screen-view (T-002 refill, image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/village-screen-view/critiques/deepseek.md` — deepseek  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/village-screen-view/critiques/digest.md` — Digest critiche — village-screen-view (round 1, 2/3 image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/village-screen-view/fixes.md` — village-screen-view — documenter fixes (PLAN-086 worker)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/village-screen-view/page.md` — village-screen-view — Village view (stage, plaque, legend, registry chip)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/village-slot-overlay/critiques/chatgpt.md` — chatgpt — PROVIDER FAILURE (images not perceived / attach broken)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/village-slot-overlay/critiques/claude.md` — claude — village-slot-overlay (T-002 retry, image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/village-slot-overlay/critiques/deepseek.md` — deepseek — village-slot-overlay (T-001, image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/village-slot-overlay/critiques/digest.md` — Digest critiche — village-slot-overlay (round 1, 2/3 image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/village-slot-overlay/page.md` — village-slot-overlay — Worker slot overlay on village buildings  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/village-stash-panel/critiques/chatgpt.md` — DECLARED FAILURE — chatgpt  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/village-stash-panel/critiques/claude.md` — claude  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/village-stash-panel/critiques/deepseek.md` — deepseek  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/village-stash-panel/critiques/digest.md` — Digest critiche — village-stash-panel (round 1, 2/3 image-grounded)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/village-stash-panel/page.md` — village-stash-panel — Village stash / warehouse shelf  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/world-surface-event-card/fixes.md` — fixes — world-surface-event-card  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/world-surface-event-card/page.md` — world-surface-event-card — World event card + goblin invasion sticker/marker  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/world-surface-event-shroud/fixes.md` — fixes — world-surface-event-shroud  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/components/world-surface-event-shroud/page.md` — world-surface-event-shroud — Fullscreen event shroud veil  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/ui-catalog/critiques-external-2026-10-25.md` — Critiche esterne trasportate dal Director — gemini (2026-10-25)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/web-ai-prompt-protocol.md` — Web-AI Prompt Protocol (R-284, Director ruling 2026-10-24)  
   - reason: Mind Weaver workspace, not game canon  
 - `coordinator/manual-dispatch/completed/DOC-CHARACTER-RESIDENT-RECONCILIATION-001.md` — Manual Task: DOC-CHARACTER-RESIDENT-RECONCILIATION-001  
   - reason: run/session/pending context or transient register  
@@ -2201,6 +11320,16 @@
   - markers: historical  
   - reason: run/session/pending context or transient register  
 - `coordinator/manual-dispatch/completed/OPS-SHUTDOWN-002.md` — Manual Task: OPS-SHUTDOWN-002  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/completed/PLAN-032-SP1.md` — Manual Task: PLAN-032-SP1  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/completed/PLAN-032-SP2.md` — Manual Task: PLAN-032-SP2  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/completed/PLAN-032-SP3.md` — Manual Task: PLAN-032-SP3  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/completed/PLAN-032-SP4.md` — Manual Task: PLAN-032-SP4  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/completed/PLAN-032-SP5.md` — Manual Task: PLAN-032-SP5  
   - reason: run/session/pending context or transient register  
 - `coordinator/manual-dispatch/completed/POI-MEDALLION-MATERIAL-PREVIEW-00E669.md` — Manual Task: POI-MEDALLION-MATERIAL-PREVIEW-00E669  
   - reason: run/session/pending context or transient register  
@@ -2367,13 +11496,23 @@
 - `coordinator/manual-dispatch/queue.json` — queue  
   - reason: run/session/pending context or transient register  
 - `RICHIESTE.md` — Richieste esplicite  
-  - markers: todo  
   - reason: run/session/pending context or transient register  
-- `SESSION_HANDOFF.md` — Session handoff  
-  - markers: historical  
+- `SESSION_HANDOFF.md` — Session Handoff — 2026-10-14  
   - reason: run/session/pending context or transient register  
 
-## superseded (6)
+## superseded (31)
+- `src/docs/docs/ARCHITECTURE_BIBLE.md` — RPG Balancer — Architecture & Strategy Bible  
+  - markers: superseded  
+  - reason: superseded-by or superseded status  
+- `src/docs/docs/ARCHITECTURE_REFERENCE.md` — Single Source of Truth - Architecture Reference  
+  - markers: superseded  
+  - reason: superseded-by or superseded status  
+- `src/docs/docs/DEVELOPMENT_GUIDELINES.md` — RPG Balancer – Development Guidelines  
+  - markers: superseded  
+  - reason: superseded-by or superseded status  
+- `src/docs/docs/MASTER_PLAN.md` — 🎯 RPG Balancer - MASTER PLAN  
+  - markers: superseded, historical  
+  - reason: superseded-by or superseded status  
 - `src/docs/docs/archive/2026-Q1/IMPLEMENTED_PLAN.md` — IMPLEMENTED PLAN – Stato Attuale del Progetto  
   - markers: superseded  
   - reason: superseded-by or superseded status  
@@ -2383,8 +11522,68 @@
 - `src/docs/docs/archive/2026-Q1/idle_village_action_cards.md` — Idle Village – ActionCard Architecture  
   - markers: superseded  
   - reason: superseded-by or superseded status  
+- `src/docs/docs/idle_village/detail_spec.md` — POI Detail Spec  
+  - markers: superseded  
+  - reason: superseded-by or superseded status  
+- `src/docs/docs/idle_village/mission_planner_spec.md` — Mission Planner Spec (v7)  
+  - markers: candidate, superseded  
+  - reason: superseded-by or superseded status  
+- `src/docs/docs/idle_village/poi_cooldown_spec.md` — POI Cooldown / Expiration Spec  
+  - markers: superseded  
+  - reason: superseded-by or superseded status  
+- `src/docs/docs/idle_village/poi_detail_interaction_spec.md` — POI ↔ Detail Interaction  
+  - markers: superseded  
+  - reason: superseded-by or superseded status  
+- `src/docs/docs/idle_village/poi_family_spec.md` — POI Family Spec  
+  - markers: superseded  
+  - reason: superseded-by or superseded status  
+- `src/docs/docs/idle_village/poi_job_spec.md` — POI Job Spec  
+  - markers: superseded  
+  - reason: superseded-by or superseded status  
+- `src/docs/docs/idle_village/poi_maintenance_spec.md` — POI Maintenance Spec  
+  - markers: superseded  
+  - reason: superseded-by or superseded status  
+- `src/docs/docs/idle_village/poi_quest_interaction_spec.md` — POI ↔ Quest Interaction  
+  - markers: superseded  
+  - reason: superseded-by or superseded status  
+- `src/docs/docs/idle_village/poi_training_spec.md` — POI Training Spec  
+  - markers: superseded  
+  - reason: superseded-by or superseded status  
+- `src/docs/docs/idle_village/quest_spec.md` — Quest Spec  
+  - markers: superseded  
+  - reason: superseded-by or superseded status  
+- `src/docs/docs/idle_village/time_engine_day_night_poi_interaction_spec.md` — TimeEngine ↔ DayNightPOI Interaction  
+  - markers: superseded  
+  - reason: superseded-by or superseded status  
+- `src/docs/docs/idle_village/time_engine_quest_interaction_spec.md` — TimeEngine ↔ Quest Interaction  
+  - markers: superseded  
+  - reason: superseded-by or superseded status  
+- `src/docs/docs/idle_village/time_engine_roster_interaction_spec.md` — TimeEngine ↔ Roster Interaction  
+  - markers: superseded  
+  - reason: superseded-by or superseded status  
+- `plans/PLAN-007-observatory-primitives.md` — Goal  
+  - markers: superseded  
+  - reason: superseded-by or superseded status  
+- `plans/PLAN-008-resolution-chain.md` — Goal  
+  - markers: superseded  
+  - reason: superseded-by or superseded status  
+- `plans/PLAN-010-astrolabe-v63.md` — PLAN-010 — Astrolabe V6.3  
+  - markers: superseded  
+  - reason: superseded-by or superseded status  
 - `plans/PLAN-011-knowledge-repository-inventory.md` — PLAN-011 — Knowledge & Design Repository Inventory  
   - markers: superseded, todo, historical  
+  - reason: superseded-by or superseded status  
+- `plans/PLAN-012-event-reminder-aaa-v2.md` — : 'Event Reminder AAA v2 — polish round 3  
+  - markers: superseded  
+  - reason: superseded-by or superseded status  
+- `plans/PLAN-021-quest-theatre.md` — PLAN-021 — QuestTheatre (v8)  
+  - markers: superseded  
+  - reason: superseded-by or superseded status  
+- `plans/PLAN-043-S10-oro-e-bloom-hud.md` — PLAN-043-S10 — Oro e bloom nel resto del HUD  
+  - markers: superseded  
+  - reason: superseded-by or superseded status  
+- `.mw/archive/world-surface-event-shroud-superseded-by-webp/README.md` — PNG sorgenti, superseded 2026-09-16 dal re-encode .webp  
+  - markers: superseded  
   - reason: superseded-by or superseded status  
 - `.mw/runs/2026-08-30-knowledge-plan/final.md` — final  
   - markers: superseded, adr, todo, historical  
@@ -2392,25 +11591,591 @@
 - `coordinator/strategy_tasks.md` — Strategy Tasks - RPG Balancer  
   - markers: superseded  
   - reason: superseded-by or superseded status  
+- `ROADMAP.md` — Roadmap  
+  - markers: superseded  
+  - reason: superseded-by or superseded status  
 
 ## conflicting (0)
 _Nessun file in questa classificazione._
 
-## uncategorized (37)
+## uncategorized (334)
 - `.mw/bugs/2026-08-15-poi-quest-tp1-schema/result.json` — result  
+  - reason: no strong signal  
+- `.mw/bugs/2026-10-30-mappa2-lab-water-anim-dead/tests/attach-director.mjs` — attach-director  
+  - reason: no strong signal  
+- `.mw/bugs/2026-10-30-mappa2-lab-water-anim-dead/tests/probe.mjs` — probe  
+  - reason: no strong signal  
+- `.mw/bugs/2026-10-30-mappa2-lab-water-anim-dead/tests/probe2.mjs` — probe2  
+  - reason: no strong signal  
+- `.mw/bugs/2026-10-30-mappa2-lab-water-anim-dead/tests/probe3.mjs` — probe3  
+  - reason: no strong signal  
+- `.mw/bugs/2026-10-30-mappa2-lab-water-anim-dead/tests/repro-frozen.mjs` — repro-frozen  
   - reason: no strong signal  
 - `.mw/bugs/20260818-v6-star-tips-stat/tests/measure.mjs` — measure  
   - reason: no strong signal  
 - `.mw/bugs/20260818-v6-star-tips-stat/tests/verify.mjs` — verify  
   - reason: no strong signal  
+- `.mw/bugs/20261018-devin-preview-white/preview-redirect.mjs` — preview-redirect  
+  - reason: no strong signal  
+- `.mw/bugs/20261021-quest-rack-slots-perf/evidence/probe-result.json` — probe-result  
+  - reason: no strong signal  
+- `.mw/bugs/20261021-quest-rack-slots-perf/probe.mjs` — probe  
+  - reason: no strong signal  
+- `.mw/bugs/20261021-quest-window-reopen/evidence/report.json` — report  
+  - reason: no strong signal  
+- `.mw/bugs/20261021-quest-window-reopen/evidence-resize/report.json` — report  
+  - reason: no strong signal  
+- `.mw/bugs/20261021-quest-window-reopen/probe-resize.mjs` — probe-resize  
+  - reason: no strong signal  
+- `.mw/bugs/20261021-quest-window-reopen/probe.mjs` — probe  
+  - reason: no strong signal  
+- `.mw/bugs/20261021-quest-window-reopen/run-probe.mjs` — run-probe  
+  - reason: no strong signal  
+- `.mw/bugs/20261021-skillcheck-jank/ablation-probe.mjs` — ablation-probe  
+  - reason: no strong signal  
+- `.mw/bugs/20261021-skillcheck-jank/clock-ablation.mjs` — clock-ablation  
+  - reason: no strong signal  
+- `.mw/bugs/20261021-skillcheck-jank/evidence/ablation.json` — ablation  
+  - reason: no strong signal  
+- `.mw/bugs/20261021-skillcheck-jank/evidence/clock-ablation.json` — clock-ablation  
+  - reason: no strong signal  
+- `.mw/bugs/20261021-skillcheck-jank/evidence/cpu-reveal.json` — cpu-reveal  
+  - reason: no strong signal  
+- `.mw/bugs/20261021-skillcheck-jank/evidence/cpu-spin.json` — cpu-spin  
+  - reason: no strong signal  
+- `.mw/bugs/20261021-skillcheck-jank/evidence/jank-report.json` — jank-report  
+  - reason: no strong signal  
+- `.mw/bugs/20261021-skillcheck-jank/evidence/mutations.json` — mutations  
+  - reason: no strong signal  
+- `.mw/bugs/20261021-skillcheck-jank/mutation-probe.mjs` — mutation-probe  
+  - reason: no strong signal  
+- `.mw/bugs/20261021-skillcheck-jank/probe.mjs` — probe  
+  - reason: no strong signal  
+- `.mw/bugs/20261021-skillcheck-jank/profile-probe.mjs` — profile-probe  
+  - reason: no strong signal  
+- `.mw/bugs/20261022-quest-audio-samples/evidence/report.json` — report  
+  - reason: no strong signal  
+- `.mw/bugs/20261022-quest-audio-samples/probe.mjs` — probe  
+  - reason: no strong signal  
+- `.mw/bugs/20261022-quest-audio-samples/run-probe.mjs` — run-probe  
+  - reason: no strong signal  
+- `.mw/bugs/20261022-quest-ui-r253/evidence/geometry.json` — geometry  
+  - reason: no strong signal  
+- `.mw/bugs/20261022-quest-ui-r253/evidence/post-click.json` — post-click  
+  - reason: no strong signal  
+- `.mw/bugs/20261022-quest-ui-r253/evidence/r253-layout-waiting.json` — r253-layout-waiting  
+  - reason: no strong signal  
+- `.mw/bugs/20261022-quest-ui-r253/evidence/r253-skillcheck-armed.json` — r253-skillcheck-armed  
+  - reason: no strong signal  
+- `.mw/bugs/20261022-quest-ui-r253/evidence/r253-skillcheck-spin.json` — r253-skillcheck-spin  
+  - reason: no strong signal  
+- `.mw/bugs/20261022-quest-ui-r253/evidence/skillcheck.json` — skillcheck  
+  - reason: no strong signal  
+- `.mw/bugs/20261022-quest-ui-r253/probe.mjs` — probe  
+  - reason: no strong signal  
+- `.mw/bugs/20261022-quest-ui-r259/evidence/r259-after-auto.json` — r259-after-auto  
+  - reason: no strong signal  
+- `.mw/bugs/20261022-quest-ui-r259/evidence/r259-auto.json` — r259-auto  
+  - reason: no strong signal  
+- `.mw/bugs/20261022-quest-ui-r259/evidence/r259-layout.json` — r259-layout  
+  - reason: no strong signal  
+- `.mw/bugs/20261022-quest-ui-r259/evidence/r259-toast.json` — r259-toast  
+  - reason: no strong signal  
+- `.mw/bugs/20261022-quest-ui-r259/evidence/r259-waiting.json` — r259-waiting  
+  - reason: no strong signal  
+- `.mw/bugs/20261022-quest-ui-r259/probe.mjs` — probe  
+  - reason: no strong signal  
+- `.mw/bugs/20261022-roster-medal-dupe-filter-resize/evidence/probe-result.json` — probe-result  
+  - reason: no strong signal  
+- `.mw/bugs/20261022-roster-medal-dupe-filter-resize/probe.mjs` — probe  
+  - reason: no strong signal  
+- `.mw/bv-metrics.json` — bv-metrics  
+  - reason: no strong signal  
+- `.mw/contracts/components/coverage.generated.json` — coverage.generated  
+  - reason: no strong signal  
+- `.mw/contracts/components/inventory.json` — inventory  
+  - reason: no strong signal  
+- `.mw/dream-state.json` — dream-state  
+  - reason: no strong signal  
+- `.mw/mapping-proposals/proposal-2026-10-17T20-15-30-500Z.json` — proposal-2026-10-17T20-15-30-500Z  
+  - reason: no strong signal  
+- `.mw/mapping-proposals/proposal-2026-10-17T20-47-48-898Z.json` — proposal-2026-10-17T20-47-48-898Z  
+  - reason: no strong signal  
+- `.mw/mapping-proposals/proposal-2026-10-17T22-21-51-201Z.json` — proposal-2026-10-17T22-21-51-201Z  
+  - reason: no strong signal  
+- `.mw/mapping-proposals/proposal-2026-10-18T06-28-59-666Z.json` — proposal-2026-10-18T06-28-59-666Z  
+  - reason: no strong signal  
+- `.mw/mapping-proposals/proposal-2026-10-18T12-12-15-573Z.json` — proposal-2026-10-18T12-12-15-573Z  
+  - reason: no strong signal  
+- `.mw/mapping-proposals/proposal-2026-10-18T21-26-24-479Z.json` — proposal-2026-10-18T21-26-24-479Z  
+  - reason: no strong signal  
+- `.mw/mapping-proposals/proposal-2026-10-19T07-56-56-863Z.json` — proposal-2026-10-19T07-56-56-863Z  
+  - reason: no strong signal  
+- `.mw/mapping-proposals/proposal-2026-10-19T07-57-41-929Z.json` — proposal-2026-10-19T07-57-41-929Z  
+  - reason: no strong signal  
+- `.mw/mapping-proposals/proposal-2026-10-19T08-02-36-933Z.json` — proposal-2026-10-19T08-02-36-933Z  
+  - reason: no strong signal  
+- `.mw/mapping-proposals/proposal-2026-10-19T09-39-55-467Z.json` — proposal-2026-10-19T09-39-55-467Z  
+  - reason: no strong signal  
+- `.mw/mapping-proposals/proposal-2026-10-19T09-50-42-049Z.json` — proposal-2026-10-19T09-50-42-049Z  
+  - reason: no strong signal  
+- `.mw/mapping-proposals/proposal-2026-10-19T09-56-14-565Z.json` — proposal-2026-10-19T09-56-14-565Z  
+  - reason: no strong signal  
+- `.mw/mapping-proposals/proposal-2026-10-19T10-28-59-879Z.json` — proposal-2026-10-19T10-28-59-879Z  
+  - reason: no strong signal  
+- `.mw/mapping-proposals/proposal-2026-10-19T11-36-35-942Z.json` — proposal-2026-10-19T11-36-35-942Z  
+  - reason: no strong signal  
+- `.mw/mapping-proposals/proposal-2026-10-19T15-50-40-337Z.json` — proposal-2026-10-19T15-50-40-337Z  
+  - reason: no strong signal  
+- `.mw/mapping-proposals/proposal-2026-10-19T15-51-48-200Z.json` — proposal-2026-10-19T15-51-48-200Z  
+  - reason: no strong signal  
+- `.mw/mapping-proposals/proposal-2026-10-19T17-44-09-673Z.json` — proposal-2026-10-19T17-44-09-673Z  
+  - reason: no strong signal  
+- `.mw/mapping-proposals/proposal-2026-10-24T17-30-00-000Z.json` — proposal-2026-10-24T17-30-00-000Z  
+  - reason: no strong signal  
+- `.mw/mapping-proposals/proposal-2026-11-02T11-41-47-801Z.json` — proposal-2026-11-02T11-41-47-801Z  
+  - reason: no strong signal  
+- `.mw/review/_shot.mjs` — _shot  
+  - reason: no strong signal  
+- `.mw/review/_shot2.mjs` — _shot2  
+  - reason: no strong signal  
+- `.mw/sentinel/domain-text-allow.json` — domain-text-allow  
+  - reason: no strong signal  
+- `.mw/surface-map.json` — surface-map  
+  - reason: no strong signal  
+- `.mw/templates/scene-prompt/brief.template.json` — brief.template  
+  - reason: no strong signal  
+- `.mw/trusted.lock.json` — trusted.lock  
+  - reason: no strong signal  
+- `.mw/ui-catalog/_critique/prompt.txt` — prompt  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/amanuense-page/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/director-panel/shots/V1/default-ctx-a.json` — default-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/director-panel/shots/V1/default-ctx-b.json` — default-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/director-panel/shots/V1/default-iso-0.json` — default-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/director-panel/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/error-boundary/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/game-boot-screen/shots/V1/default-ctx-a.json` — default-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/game-boot-screen/shots/V1/default-ctx-b.json` — default-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/game-boot-screen/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hero-level-ceremony/shots/V1/default-ctx-a.json` — default-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hero-level-ceremony/shots/V1/default-ctx-b.json` — default-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hero-level-ceremony/shots/V1/default-iso-0.json` — default-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hero-level-ceremony/shots/V1/default-iso-1.json` — default-iso-1  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hero-level-ceremony/shots/V1/manifestPatch.json` — manifestPatch  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hero-level-ceremony/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hero-sheet-panel/shots/V1/default-ctx-a.json` — default-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hero-sheet-panel/shots/V1/default-ctx-b.json` — default-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hero-sheet-panel/shots/V1/default-iso-0.json` — default-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hero-sheet-panel/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hud-corner/shots/V1/default-ctx-a.json` — default-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hud-corner/shots/V1/default-ctx-b.json` — default-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hud-corner/shots/V1/default-iso-0.json` — default-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hud-corner/shots/V1/hud-hidden-ctx-a.json` — hud-hidden-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hud-corner/shots/V1/hud-hidden-ctx-b.json` — hud-hidden-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hud-corner/shots/V1/hud-hidden-iso-0.json` — hud-hidden-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hud-corner/shots/V1/menu-open-ctx-a.json` — menu-open-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hud-corner/shots/V1/menu-open-ctx-b.json` — menu-open-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hud-corner/shots/V1/menu-open-iso-0.json` — menu-open-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hud-corner/shots/V1/menu-open-iso-1.json` — menu-open-iso-1  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hud-corner/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hud-corner/shots/V1/panels-open-ctx-a.json` — panels-open-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hud-corner/shots/V1/panels-open-ctx-b.json` — panels-open-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hud-corner/shots/V1/panels-open-iso-0.json` — panels-open-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hud-corner/shots/V1/panels-open-iso-1.json` — panels-open-iso-1  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hud-event-ledger/shots/V1/default-ctx-a.json` — default-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hud-event-ledger/shots/V1/default-ctx-b.json` — default-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hud-event-ledger/shots/V1/default-iso-0.json` — default-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hud-event-ledger/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hud-tooltip/shots/V1/default-ctx-a.json` — default-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hud-tooltip/shots/V1/default-ctx-b.json` — default-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hud-tooltip/shots/V1/default-iso-0.json` — default-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hud-tooltip/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hud-top-tabs/shots/V1/default-ctx-a.json` — default-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hud-top-tabs/shots/V1/default-ctx-b.json` — default-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hud-top-tabs/shots/V1/default-iso-0.json` — default-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hud-top-tabs/shots/V1/default-iso-1.json` — default-iso-1  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hud-top-tabs/shots/V1/hud-hidden-ctx-a.json` — hud-hidden-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hud-top-tabs/shots/V1/hud-hidden-ctx-b.json` — hud-hidden-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hud-top-tabs/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hud-top-tabs/shots/V1/resource-low-ctx-a.json` — resource-low-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hud-top-tabs/shots/V1/resource-low-ctx-b.json` — resource-low-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hud-top-tabs/shots/V1/resource-low-iso-0.json` — resource-low-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/hud-top-tabs/shots/V1/resource-low-iso-1.json` — resource-low-iso-1  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/load-game-panel/shots/V1/in-game-menu-ctx-a.json` — in-game-menu-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/load-game-panel/shots/V1/in-game-menu-ctx-b.json` — in-game-menu-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/load-game-panel/shots/V1/in-game-menu-iso-0.json` — in-game-menu-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/load-game-panel/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/load-game-panel/shots/V1/title-ctx-a.json` — title-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/load-game-panel/shots/V1/title-ctx-b.json` — title-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/load-game-panel/shots/V1/title-iso-0.json` — title-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/map-quest-poi/shots/V1/manifestPatch.json` — manifestPatch  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/map-quest-poi/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/map-quest-poi/shots/V1/planner-context-ctx-a.json` — planner-context-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/map-quest-poi/shots/V1/planner-context-ctx-b.json` — planner-context-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/map-quest-poi/shots/V1/planner-context-iso-0.json` — planner-context-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/map-quest-poi/shots/V1/planner-context-iso-1.json` — planner-context-iso-1  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/materic-roster-component-v2/shots/V1/default-ctx-a.json` — default-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/materic-roster-component-v2/shots/V1/default-ctx-b.json` — default-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/materic-roster-component-v2/shots/V1/default-iso-0.json` — default-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/materic-roster-component-v2/shots/V1/default-iso-1.json` — default-iso-1  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/materic-roster-component-v2/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/materic-roster-component-v2/shots/V1/party-pick-ctx-a.json` — party-pick-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/materic-roster-component-v2/shots/V1/party-pick-ctx-b.json` — party-pick-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/materic-roster-component-v2/shots/V1/party-pick-iso-0.json` — party-pick-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/materic-roster-component-v2/shots/V1/party-pick-iso-1.json` — party-pick-iso-1  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/memorial-panel/shots/V1/default-ctx-a.json` — default-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/memorial-panel/shots/V1/default-ctx-b.json` — default-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/memorial-panel/shots/V1/default-iso-0.json` — default-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/memorial-panel/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/merchant-panel/shots/V1/default-ctx-a.json` — default-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/merchant-panel/shots/V1/default-ctx-b.json` — default-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/merchant-panel/shots/V1/default-iso-0.json` — default-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/merchant-panel/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/nav-bar/shots/V1/default-ctx-a.json` — default-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/nav-bar/shots/V1/default-ctx-b.json` — default-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/nav-bar/shots/V1/default-iso-0.json` — default-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/nav-bar/shots/V1/default-iso-1.json` — default-iso-1  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/nav-bar/shots/V1/hud-hidden-ctx-a.json` — hud-hidden-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/nav-bar/shots/V1/hud-hidden-ctx-b.json` — hud-hidden-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/nav-bar/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/nav-bar/shots/V1/village-active-ctx-a.json` — village-active-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/nav-bar/shots/V1/village-active-ctx-b.json` — village-active-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/nav-bar/shots/V1/village-active-iso-0.json` — village-active-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/nav-bar/shots/V1/village-active-iso-1.json` — village-active-iso-1  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/new-game-confirm/shots/V1/default-ctx-a.json` — default-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/new-game-confirm/shots/V1/default-ctx-b.json` — default-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/new-game-confirm/shots/V1/default-iso-0.json` — default-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/new-game-confirm/shots/V1/manifestPatch.json` — manifestPatch  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/new-game-confirm/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/objective-cartouche/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/pixi-world-map/shots/V1/default-ctx-a.json` — default-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/pixi-world-map/shots/V1/default-ctx-b.json` — default-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/pixi-world-map/shots/V1/default-iso-0.json` — default-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/pixi-world-map/shots/V1/default-iso-1.json` — default-iso-1  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/pixi-world-map/shots/V1/manifestPatch.json` — manifestPatch  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/pixi-world-map/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/quest-belt/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/quest-belt/shots/V1/open-ctx-a.json` — open-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/quest-belt/shots/V1/open-ctx-b.json` — open-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/quest-belt/shots/V1/open-iso-0.json` — open-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/quest-chronicle/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/quest-chronicle/shots/V1/open-ctx-a.json` — open-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/quest-chronicle/shots/V1/open-ctx-b.json` — open-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/quest-chronicle/shots/V1/open-iso-0.json` — open-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/quest-epilogue/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/quest-expedition-detail/mockups/v8-slotlab/main.tsx` — main  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/quest-expedition-detail/shots/V1/default-ctx-a.json` — default-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/quest-expedition-detail/shots/V1/default-ctx-b.json` — default-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/quest-expedition-detail/shots/V1/default-iso-0.json` — default-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/quest-expedition-detail/shots/V1/default-iso-1.json` — default-iso-1  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/quest-expedition-detail/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/quest-journey-route/shots/V1/default-ctx-a.json` — default-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/quest-journey-route/shots/V1/default-ctx-b.json` — default-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/quest-journey-route/shots/V1/default-iso-0.json` — default-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/quest-journey-route/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/quest-outcome-toast/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/quest-party-roster/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/quest-party-roster/shots/V1/open-ctx-a.json` — open-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/quest-party-roster/shots/V1/open-ctx-b.json` — open-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/quest-party-roster/shots/V1/open-iso-0.json` — open-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/quest-returned-crew/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/quest-reward-popup/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/quest-run-window/shots/V1/default-ctx-a.json` — default-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/quest-run-window/shots/V1/default-ctx-b.json` — default-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/quest-run-window/shots/V1/default-iso-0.json` — default-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/quest-run-window/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/quest-run-window/shots/V1/stage-choice-ctx-a.json` — stage-choice-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/quest-run-window/shots/V1/stage-choice-ctx-b.json` — stage-choice-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/quest-run-window/shots/V1/stage-choice-iso-0.json` — stage-choice-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/quest-stage-cluster/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/region-tooltip/shots/V1/default-ctx-a.json` — default-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/region-tooltip/shots/V1/default-ctx-b.json` — default-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/region-tooltip/shots/V1/default-iso-0.json` — default-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/region-tooltip/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/settings-panel/shots/V1/in-game-menu-ctx-a.json` — in-game-menu-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/settings-panel/shots/V1/in-game-menu-ctx-b.json` — in-game-menu-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/settings-panel/shots/V1/in-game-menu-iso-0.json` — in-game-menu-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/settings-panel/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/settings-panel/shots/V1/title-ctx-a.json` — title-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/settings-panel/shots/V1/title-ctx-b.json` — title-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/settings-panel/shots/V1/title-iso-0.json` — title-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/settlement-lost-overlay/shots/V1/default-ctx-a.json` — default-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/settlement-lost-overlay/shots/V1/default-ctx-b.json` — default-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/settlement-lost-overlay/shots/V1/default-iso-0.json` — default-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/settlement-lost-overlay/shots/V1/manifestPatch.json` — manifestPatch  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/settlement-lost-overlay/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/stage-edge-strips/shots/V1/default-ctx-a.json` — default-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/stage-edge-strips/shots/V1/default-ctx-b.json` — default-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/stage-edge-strips/shots/V1/default-iso-0.json` — default-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/stage-edge-strips/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/title-screen/shots/V1/default-ctx-a.json` — default-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/title-screen/shots/V1/default-ctx-b.json` — default-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/title-screen/shots/V1/default-iso-0.json` — default-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/title-screen/shots/V1/manifestPatch.json` — manifestPatch  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/title-screen/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/tuning-panel/shots/V1/default-ctx-a.json` — default-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/tuning-panel/shots/V1/default-ctx-b.json` — default-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/tuning-panel/shots/V1/default-iso-0.json` — default-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/tuning-panel/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/village-building-pins/shots/V1/default-ctx-a.json` — default-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/village-building-pins/shots/V1/default-ctx-b.json` — default-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/village-building-pins/shots/V1/default-iso-0.json` — default-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/village-building-pins/shots/V1/manifestPatch.json` — manifestPatch  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/village-building-pins/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/village-building-tooltip/shots/V1/default-ctx-a.json` — default-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/village-building-tooltip/shots/V1/default-ctx-b.json` — default-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/village-building-tooltip/shots/V1/default-iso-0.json` — default-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/village-building-tooltip/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/village-registry/shots/V1/default-ctx-a.json` — default-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/village-registry/shots/V1/default-ctx-b.json` — default-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/village-registry/shots/V1/default-iso-0.json` — default-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/village-registry/shots/V1/default-iso-1.json` — default-iso-1  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/village-registry/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/village-screen-view/shots/V1/default-ctx-a.json` — default-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/village-screen-view/shots/V1/default-ctx-b.json` — default-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/village-screen-view/shots/V1/default-iso-0.json` — default-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/village-screen-view/shots/V1/default-iso-1.json` — default-iso-1  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/village-screen-view/shots/V1/manifestPatch.json` — manifestPatch  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/village-screen-view/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/village-slot-overlay/shots/V1/default-ctx-a.json` — default-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/village-slot-overlay/shots/V1/default-ctx-b.json` — default-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/village-slot-overlay/shots/V1/default-iso-0.json` — default-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/village-slot-overlay/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/village-stash-panel/shots/V1/default-ctx-a.json` — default-ctx-a  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/village-stash-panel/shots/V1/default-ctx-b.json` — default-ctx-b  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/village-stash-panel/shots/V1/default-iso-0.json` — default-iso-0  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/village-stash-panel/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/world-surface-event-card/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/components/world-surface-event-shroud/shots/V1/meta.json` — meta  
+  - reason: no strong signal  
+- `.mw/ui-catalog/critique-prompt.txt` — critique-prompt  
+  - reason: no strong signal  
+- `.mw/ui-catalog/flows/quest/manifest.json` — manifest  
+  - reason: no strong signal  
+- `.mw/ui-catalog/flows/quest/storyboard.json` — storyboard  
+  - reason: no strong signal  
+- `.mw/ui-catalog/flows/quest-planner/estimate.json` — estimate  
+  - reason: no strong signal  
+- `.mw/ui-catalog/flows/quest-planner/manifest.json` — manifest  
+  - reason: no strong signal  
+- `.mw/ui-catalog/flows/quest-planner/measure.json` — measure  
+  - reason: no strong signal  
+- `.mw/ui-catalog/flows/quest-planner/storyboard.json` — storyboard  
+  - reason: no strong signal  
+- `.mw/ui-catalog/manifest.json` — manifest  
+  - reason: no strong signal  
+- `.mw/verify-tiers.json` — verify-tiers  
+  - reason: no strong signal  
 - `.windsurf/rules/00-project-invariants.md` — Project Invariants (ALWAYS ON)  
   - reason: no strong signal  
 - `.windsurf/rules/10-canonical-dev-port.md` — Canonical Dev Server Port for Agent Testing  
-  - markers: canonical  
   - reason: no strong signal  
 - `.windsurf/rules/10-ui-invariants.md` — UI Invariants (skin, i18n, theme, perf)  
   - reason: no strong signal  
 - `.windsurf/rules/15-browser-preview-guard.md` — Browser Preview Guard (ALL SKILLS)  
+  - reason: no strong signal  
+- `.windsurf/rules/16-no-foreground-windows.md` — No Foreground Windows (ALL SKILLS)  
+  - reason: no strong signal  
+- `.windsurf/rules/17-resource-lifecycle.md` — R-LIFECYCLE — resource lifecycle for agent-spawned resources (MW PLAN-071)  
   - reason: no strong signal  
 - `.windsurf/rules/20-config-persistence.md` — Config & Persistence Invariants  
   - reason: no strong signal  
@@ -2420,9 +12185,22 @@ _Nessun file in questa classificazione._
   - reason: no strong signal  
 - `.windsurf/rules/45-director-intent-to-spec.md` — Director Intent → Spec  
   - reason: no strong signal  
+- `.windsurf/rules/46-approved-references.md` — Approved References Preservation (Director ruling 2026-11-14)  
+  - reason: no strong signal  
 - `.windsurf/rules/50-interaction-patterns.md` — Interaction Patterns System  
   - reason: no strong signal  
 - `.windsurf/rules/50-shutdown-governance.md` — Global Session Shutdown Governance  
+  - reason: no strong signal  
+- `.windsurf/rules/55-delegation-context-budget.md` — Context Budget & Delegation (ALWAYS ON)  
+  - reason: no strong signal  
+- `.windsurf/rules/60-guardian-deploy.md` — Guardian Mandate — Deploy Sicuro e Build Leggera  
+  - reason: no strong signal  
+- `.windsurf/rules/70-state-docs-sync.md` — State Docs Sync  
+  - markers: historical  
+  - reason: no strong signal  
+- `.windsurf/rules/80-quest-rules-maintenance.md` — Quest Rules Maintenance  
+  - reason: no strong signal  
+- `.windsurf/rules/85-documentation-impact.md` — Documentation Impact Contract (R-085)  
   - reason: no strong signal  
 - `.windsurf/rules/mw-rpg-bridge.md` — Mind Weaver → RPG Skill Bridge  
   - reason: no strong signal  
@@ -2443,16 +12221,27 @@ _Nessun file in questa classificazione._
   - reason: no strong signal  
 - `coordinator/live_registry.json` — live_registry  
   - reason: no strong signal  
+- `coordinator/registry-events/R-186-end.json` — R-186-end  
+  - reason: no strong signal  
 - `coordinator/registry-events/processed/AI-SMOKE-TEST-001-end.json` — AI-SMOKE-TEST-001-end  
+  - reason: no strong signal  
+- `coordinator/registry-events/processed/MP-00-end.json` — MP-00-end  
+  - reason: no strong signal  
+- `coordinator/registry-events/processed/R-186-end.json` — R-186-end  
   - reason: no strong signal  
 - `coordinator/skills/README.md` — Agent Skills Governance  
   - reason: no strong signal  
 - `coordinator/skills/agent-execution-mandate/SKILL.md` — Agent Execution Mandate  
   - markers: todo  
   - reason: no strong signal  
-- `coordinator/skills/coordinator-mandate/SKILL.md` — Coordinator Mandate  
+- `coordinator/skills/auditor-sentinel/SKILL.md` — Sentinel Auditor Skill  
   - reason: no strong signal  
-- `coordinator/skills/idle-village-task/SKILL.md` — Idle Village Task Mandate  
+- `coordinator/skills/fixer-task/SKILL.md` — Fixer Task Skill  
+  - reason: no strong signal  
+- `coordinator/skills/guardian-mandate/SKILL.md` — Guardian Mandate  
+  - reason: no strong signal  
+- `coordinator/skills/idle-village-task/SKILL.md` — Idle Village / Game Surface Task Mandate  
+  - markers: historical  
   - reason: no strong signal  
 - `coordinator/skills/mockup-generator/SKILL.md` — mockup-generator  
   - reason: no strong signal  
@@ -2466,11 +12255,20 @@ _Nessun file in questa classificazione._
   - reason: no strong signal  
 - `coordinator/skills/painter/SKILL.md` — painter  
   - reason: no strong signal  
-- `coordinator/skills/strategist-mandate/SKILL.md` — Strategist Mandate  
+- `coordinator/skills/scene-author/SKILL.md` — Scene Author — pipeline obbligatoria (NON negoziabile)  
+  - reason: no strong signal  
+- `coordinator/skills/strategist/SKILL.md` — Strategist — layer di direzione  
+  - reason: no strong signal  
+- `coordinator/skills-archive/coordinator-mandate/SKILL.md` — Coordinator Mandate  
+  - reason: no strong signal  
+- `coordinator/skills-archive/strategist-mandate/SKILL.md` — Strategist Mandate  
+  - reason: no strong signal  
+- `RICHIESTE-backlog.md` — Richieste esplicite  
+  - markers: todo  
+  - reason: no strong signal  
+- `RICHIESTE-archive.md` — Richieste esplicite  
   - reason: no strong signal  
 - `AGENTS.md` — AGENTS  
   - reason: no strong signal  
 - `DESIGN_PILLARS.md` — Design Pillars — Riferimenti d'ispirazione e raffinamenti  
-  - reason: no strong signal  
-- `ROADMAP.md` — Roadmap  
   - reason: no strong signal  

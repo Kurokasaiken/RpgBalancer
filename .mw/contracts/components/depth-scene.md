@@ -8,6 +8,8 @@ scope_files:
   - src/ui/idleVillage/questS1Lab/render/DepthScene.tsx
   - src/ui/idleVillage/questS1Lab/render/atmosphereOverlay.ts
   - src/ui/idleVillage/questS1Lab/render/depthShader.ts
+  - src/ui/idleVillage/questS1Lab/render/depthTransform.ts
+  - src/ui/idleVillage/questS1Lab/render/trauma.ts
 fast_checks:
   - tests/unit/idleVillage/questCinematics/atmosphereLayer.test.tsx
   - tests/unit/idleVillage/questCinematics/depthShader.test.ts
@@ -46,6 +48,8 @@ Root: `src/ui/idleVillage/questS1Lab/render/DepthScene.tsx`.
 - `src/ui/idleVillage/questS1Lab/render/DepthScene.tsx`
 - `src/ui/idleVillage/questS1Lab/render/atmosphereOverlay.ts`
 - `src/ui/idleVillage/questS1Lab/render/depthShader.ts`
+- `src/ui/idleVillage/questS1Lab/render/depthTransform.ts`
+- `src/ui/idleVillage/questS1Lab/render/trauma.ts`
 
 ## Decision history
 

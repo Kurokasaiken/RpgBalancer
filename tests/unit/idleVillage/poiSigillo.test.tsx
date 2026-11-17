@@ -103,6 +103,7 @@ describe('PoiMatericV3_5 sigillo — halo tone (vermilion = urgency only)', () =
 });
 
 describe('poiSizePx — S/M/L (threat magnitude, main quest = L)', () => {
+  // INV:poi-sigillo.INV-1 — size classes map the authored base to the --skin-poi-size-s/-m/-l tokens.
   it('maps the 55 px base to 44 / 55 / 69, the --skin-poi-size-* tokens', () => {
     expect(poiSizePx(55, 'S')).toBe(44);
     expect(poiSizePx(55, 'M')).toBe(55);

@@ -560,3 +560,57 @@ sostituzione nel cassetto alla dimensione esistente. Decisioni incorporate:
 - **Verificato:** Playwright — picker assente con rail espansa (topmost
   sulla prima riga = la riga stessa), picker presente con rail a chip,
   errors:0 entrambe le run. Safeguard tutti verdi.
+
+## 2026-11-16 — Victory/reward popup: baseline battezzata = V5 pergamena Gemini-clean
+
+**Da:** il reward path vittoria (`QuestRewardPopup`) era l'ultima superficie /game
+stock senza controparte firmata; fork visivo R-348 con 4 opzioni AI (ChatGPT) +
+2 fork HTML. Famiglia scelta «B pergamena».
+**A:** la B patchata a mano (V4) è stata bocciata 4 volte dal Director per
+texture sintetica, cuciture, tipografia — il raster 660px non reggeva il
+patching. Soluzione: **rigenerazione AI del frame senza scritte** via Gemini
+web (CDP, image-editing sulla B originale, +30% alto, anello→medaglione) → V5
+approvata «approvato, battezza».
+**Motivo:** la rigenerazione AI produce pergamena organica uniforme che nessun
+compositing a mano raggiunge; ogni zona DOM si siede su affordance dipinta
+(placca CTA, divisore echoes, anello medaglione). Lezione duratura: **frame
+vuoto rigenerato > patching raster** — stessa tecnica da usare per le prossime
+superfici firmate (QuestRunWindow, Chronicle drawer).
+**Fonte:** `.mw/runs/20261116-r348-victory-ruling/visual-fork-victory-reward.md`,
+`.mw/specs/hud-real/refs/REGISTERED.md`.
+
+**Learn post-porting (R-356, 2026-11-16; osservazione, non nuovo ruling):**
+la rigenerazione del frame risolve il problema dell'asset ma non basta a
+chiudere il port. Il percorso riutilizzabile comprende anche il contratto
+dati/azioni sulla route vera, il witness confrontato con la baseline e il
+bundle. Il componente R-348 monta su `/game` con OB-1..OB-5 PASS, mentre
+`closure:lint` mantiene il bundle BLOCKED (OB-6); gli stati non osservati nel
+witness restano da verificare. Guida:
+`context/MOCKUP-TO-PRODUCTION-PIPELINE.md`; evidenza:
+`.mw/runs/20261116-r348-victory-porting/pattern-candidate.md`.
+
+**Learn post-restyle (R-353, 2026-11-16; osservazione, non nuovo ruling):**
+la guida mockup→produzione guadagna il **caso C**: quando il mockup riveste una
+superficie DOM già in produzione non serve arte nuova — si riscrive il look del
+componente con primitive firmate (`C1Medallion` > anello generico del mockup),
+si preservano gli anchor dati (`data-wanderlust-portrait`, `data-roster-name`)
+su cui misurano decoratori e drag, la geometria nuova si dirama dietro
+`data-density` lasciando intatte le INV testate, e i colori del mockup che
+contraddicono la semantica config NON si portano (stamina ambrata > teal AI).
+**Fonte:** `context/MOCKUP-TO-PRODUCTION-PIPELINE.md` (sezione caso C),
+`.mw/runs/20261116-learn-mockup-to-component/pattern-candidate.md`.
+
+## 2026-11-17 — R-357 / PLAN-125: ruling sulle decisioni HUD D-1..D-7
+
+**Da:** PLAN-125 (fix HUD `/game`, esclusi i POI) con 7 decisioni aperte.
+**A (verbatim Director 2026-11-17, sintesi per voce):**
+- **D-1 risorse:** *"abbiamo deciso di mettere le risorse al centro"* → la barra centrale resta; nel cassetto (planner) le risorse **non servono più** (supera la parte «risorse nella testata» di R-323). In alto a destra va il **componente Eventi** (PLAN-117 F5, oggi inesistente): va creato, con mockup; il cassetto aperto **lo copre** e il design lo deve prevedere.
+- **Upgrade di tutti i componenti:** *"tutti i componenti vanno migliorati, upgradati, rifatto un mock? direi di sì"* → nuovi mockup per tutti i componenti HUD, inclusa la barra risorse ripensata come componente centrale.
+- **D-2 clessidra sul cibo:** significa «a zero»; non deve esserci sempre; **rinviata**.
+- **D-3 pulsante:** *"va bene il pulsante launch expedition"* → la placca verde del mockup è ammessa come azione primaria del cassetto. **Eccezione** al veto placca CTA del 2026-10-20 limitata a questo pulsante, non revoca generale.
+- **D-4 tipografia:** provare **3 stili** e decidere dal risultato.
+- **D-5 illustrazione cassetto:** **rigenerare** (non ritagliare dal mockup).
+- **D-6 icone:** *"dobbiamo creare tutte le icone da capo, sia per stash che per POI, che per qualsiasi altra cosa"* → programma icone unico, trasversale (stash, POI, nav, risorse…).
+- **D-7 sole:** deve **uscire** dalla barra; il componente del tempo deve essere importante.
+**D-8 (stesso giorno, «1 · Sì, così»):** banda alta = **tempo a sinistra, risorse al centro, Eventi a destra**. Motivo: il cassetto copre la colonna destra, il tempo non deve mai essere coperto, e le risorse a destra avevano generato la duplicazione nel cassetto (R-323).
+**Fonte:** `RICHIESTE.md` R-357; `plans/PLAN-125-hud-fix-r357.md` rev. 2.

@@ -3,7 +3,8 @@
  * (R-339 / PLAN-119 T2, mw-debate `20261115-wanderlust-ui-plan`
  * artifact-r004: drawer docked flush-right, collapse chip as its only
  * folded form while a quest is selected; the no-quest resting form is
- * `ExpeditionEdgeTab`, mounted by the page — not this component's mode).
+ * NOTHING — `ExpeditionEdgeTab` was deleted (R-351, Director ruling
+ * 2026-11-15: the page mounts no expedition surface without a quest).
  *
  * Expanded, the surface is the signed `HudRealCassetto` column (docked
  * flush right, `aspect × viewportHeight` capped at `drawer.widthMaxPx`,

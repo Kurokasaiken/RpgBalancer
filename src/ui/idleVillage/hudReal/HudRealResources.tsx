@@ -91,10 +91,13 @@ export interface HudRealResourcesProps {
   asset?: string;
   /** Compact chip sizes for the slim bar's narrower slots. */
   compact?: boolean;
+  /** Centre icon+text inside each slot glass instead of left-aligned
+   *  (R-352 top chrome: the specular bar reads centred end-to-end). */
+  centerContent?: boolean;
 }
 
 /** Resource bar: one generated image, one chip per slot. */
-export function HudRealResources({ items, bar: BAR_LOCAL = BAR, asset: ASSET_LOCAL = ASSET, compact = false }: HudRealResourcesProps) {
+export function HudRealResources({ items, bar: BAR_LOCAL = BAR, asset: ASSET_LOCAL = ASSET, compact = false, centerContent = false }: HudRealResourcesProps) {
   const S = compact ? G_COMPACT : G;
   return (
     <section data-hudreal-resources="" style={{ position: 'relative', userSelect: 'none', width: BAR_LOCAL.w, height: BAR_LOCAL.h }}>
@@ -112,7 +115,7 @@ export function HudRealResources({ items, bar: BAR_LOCAL = BAR, asset: ASSET_LOC
             <div role="group" aria-label={description} tabIndex={0} data-hr-res={item.id} data-tone={item.tone}
               style={{
                 position: 'absolute', left: slot.x, top: slot.y, width: slot.w, height: slot.h, boxSizing: 'border-box',
-                padding: `0 ${S.pad}px`, display: 'flex', alignItems: 'center', gap: S.gap, cursor: 'default',
+                padding: `0 ${S.pad}px`, display: 'flex', alignItems: 'center', justifyContent: centerContent ? 'center' : undefined, gap: S.gap, cursor: 'default',
                 borderRadius: 10,
                 /* Danger: vermilion enamel rim on the slice itself — the slot glows,
                  *  the hourglass sits at the right edge as an emblem. No hairline. */

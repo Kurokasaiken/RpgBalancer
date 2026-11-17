@@ -1,3 +1,8 @@
+---
+trigger: model_decision
+description: "Mind Weaver to RPG skill bridge: maps the Director's request type to the RPG Mind Weaver skill to load (explorer, planner, executor, regression, strategist)."
+---
+
 # Mind Weaver → RPG Skill Bridge
 
 When working on the RPG project, this rule determines which Mind Weaver skill to load based on the Director's request.

@@ -462,9 +462,6 @@ export default interface Resources {
         "demo": {
           "subtitle": "Plan the expedition"
         },
-        "edgeTab": {
-          "hint": "Select a quest marker"
-        },
         "expand": "Open the expedition planner",
         "journey": "Journey",
         "journeyTotal": "Total: {count, plural, one {# day} other {# days}}",
@@ -968,11 +965,20 @@ export default interface Resources {
         "bagFull": "The expedition bag is full",
         "bagFullHint": "Bag full — release an item to pack another",
         "capacity": "{count} of {max} goods in store",
+        "detailLabel": "Item details",
         "elsewhere": "{count} packed or committed elsewhere",
         "empty": "The shelf is empty — every copy is packed or away",
+        "filterEmpty": "Nothing of this kind in store",
+        "filterLabel": "Filter goods",
         "notReady": "Store unavailable — ledger could not load",
         "openHint": "Open a quest planner to pack items into its bag",
+        "pack": "Pack",
         "qty": "{qty} in store",
+        "tabs": {
+          "all": "All",
+          "consumable": "Consumables",
+          "equipment": "Equipment"
+        },
         "title": "Village stash",
         "unavailable": "No copies left in the store"
       },

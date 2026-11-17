@@ -20,8 +20,8 @@ invariants:
       `HudRealCassetto` docked flush-right (espansa) oppure il chip sottile docked sullo stesso bordo
       destro (ripiegata). Il fold chip siede sul bordo sinistro vivo della colonna — offset
       `min(aspect × 100vh, drawer.widthMaxPx)`, la stessa regola di larghezza della colonna.
-      La forma di riposo senza quest resta `ExpeditionEdgeTab` (superficie diversa, contratto
-      `expedition-edge-tab`), non un modo del drawer.
+      La forma di riposo senza quest est ABSENTE (R-351 : l'ancien `ExpeditionEdgeTab` a été
+      supprimé — aucune surface expedition ne monte sans quest sélectionnée), non un modo du drawer.
     test_refs:
       - tests/unit/idleVillage/r339ExpeditionDrawer.test.tsx
   - id: expedition-drawer.INV-2

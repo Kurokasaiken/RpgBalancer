@@ -8,9 +8,18 @@ scope_files:
   - src/ui/idleVillage/settlement/settlementTally.ts
 fast_checks:
   - tests/unit/idleVillage/settlementLostSet.test.ts
+  - tests/unit/idleVillage/settlementTally.wipe.test.ts
 e2e_checks: []
 e2e_trigger_globs: []
-invariants: []
+invariants:
+  - id: settlement-tally.INV-1
+    source: plan
+    source_ref: PLAN-067
+    statement: >-
+      Una run wipe non aggiunge nessuna quest completata al tally — solo una run vinta contribuisce
+      oro del villaggio e quest completata, una sola volta per run.
+    test_refs:
+      - tests/unit/idleVillage/settlementTally.wipe.test.ts
 ---
 
 # settlement-tally

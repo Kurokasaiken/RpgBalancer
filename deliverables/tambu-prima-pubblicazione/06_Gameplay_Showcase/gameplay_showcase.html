@@ -1,0 +1,141 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{font-family:Georgia,'Times New Roman',serif;max-width:760px;margin:40px auto;color:#1a1a1a;line-height:1.5;font-size:11pt}h1{font-size:20pt;border-bottom:2px solid #7a5c2e;padding-bottom:6px}h2{font-size:14pt;color:#7a5c2e;margin-top:22px}h3{font-size:12pt}table{border-collapse:collapse;width:100%;font-size:9.5pt}td,th{border:1px solid #999;padding:4px 8px;text-align:left}th{background:#efe6d2}code{background:#f4f4f4;padding:1px 4px;font-size:9.5pt}blockquote{border-left:3px solid #7a5c2e;margin-left:0;padding-left:12px;color:#444}hr{border:none;border-top:1px solid #bbb}</style></head><body><h1>Gameplay Showcase — scaletta video commentato + materiali aggiuntivi</h1>
+<h2>A. Video di gameplay commentato <code>[DA PRODURRE — max 500 MB, link non in elenco]</code></h2>
+<p><strong>Durata consigliata:</strong> 3–5 minuti. Registrazione dalla build pubblica <code>/game</code> con voiceover o sottotitoli IT. Registrare in 1440p o 1080p, landscape.</p>
+<h3>Scaletta (storyboard)</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Scena</th>
+<th>Cosa mostrare</th>
+<th>Voce/testo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Boot → mappa</td>
+<td>Schermata titolo, caricamento, reveal del continente dipinto</td>
+<td>«Wanderlust: Triumph — un roguelite strategico-gestionale fantasy»</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Mappa viva</td>
+<td>Pan, zoom hi-res, ciclo giorno/notte, vita ambientale</td>
+<td>«La mappa è dipinta a mano e viva: tempo reale, zoom, giorno e notte»</td>
+</tr>
+<tr>
+<td>3</td>
+<td>HUD e tempo</td>
+<td>Controlli ×1/×2/×4, pausa, risorse, navigazione</td>
+<td>«Il giocatore controlla il flusso del tempo e legge lo stato del mondo»</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Villaggio</td>
+<td>Vista insediamento dipinto, edifici, magazzino</td>
+<td>«L'insediamento si sviluppa: edifici, magazzino, produzione»</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Roster</td>
+<td>Eroi, livelli, statistiche, vita/fatica</td>
+<td>«Gli abitanti diventano eroi: attributi, livelli, ferite»</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Quest POI</td>
+<td>Drawer quest: requisiti, party slot, viaggio, rischi/ricompense</td>
+<td>«Ogni missione dichiara requisiti e rischi prima dell'impegno»</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Spedizione</td>
+<td>Composizione party, bisaccia, conferma</td>
+<td>«La spedizione è una scommessa calcolata»</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Risoluzione</td>
+<td>Finestra quest: fasi narrative, scelte, skill check, rapporto</td>
+<td>«Le quest sono storie a nodi: scelte e conseguenze permanenti»</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Eredità</td>
+<td>Memoriale, reliquiario, menu salvataggi</td>
+<td>«La morte è design: ogni caduto resta nella storia del mondo»</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Chiusura</td>
+<td>Mappa notte + logo/titolo</td>
+<td>«Prepare. Endure. Triumph.»</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Da dichiarare nel video:</strong> cosa è già giocabile (tutto quanto sopra) vs cosa è in prototipazione (economia reale degli edifici, ondate di minacce complete, loop run→eredità end-to-end). Non presentare elementi mock come implementati.</p>
+<h2>B. Build dimostrativa</h2>
+<ul>
+<li>Link build web giocabile: <code>https://rpg-balancer.vercel.app/game</code> <code>[DA CONFERMARE: verificare build pubblica aggiornata prima dell'invio]</code></li>
+<li>Il campo del form chiede «prototipo giocabile su PC Windows»: una build web è utilizzabile su qualsiasi PC con browser; valutare eseguibile Windows via Tauri come plus <code>[DA VALUTARE]</code>.</li>
+</ul>
+<h2>C. Cartella «Altri materiali» (link)</h2>
+<p>Contenuto proposto della cartella cloud da linkare:</p>
+<p><code>additional-materials/
+├── screenshots/            (le 6 immagini di 07_Screenshots + extra)
+├── gdd-summary.pdf
+├── gameplay-video.mp4      (o link YouTube non in elenco)
+└── README.txt              (link build, contatti, indice materiali)</code></p>
+<h2>D. Screenshot selezionati (in <code>07_Screenshots/</code>)</h2>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Rappresenta</th>
+<th>Fonte</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>01-mappa-mondo.jpg</td>
+<td>Mappa del mondo + HUD (giorno)</td>
+<td>screenshot reale <code>/game</code></td>
+<td>pulito</td>
+</tr>
+<tr>
+<td>02-villaggio.jpg</td>
+<td>Vista insediamento + HUD</td>
+<td>screenshot reale <code>/game</code></td>
+<td>⚠ pannello dev «DIRECTOR» visibile a destra → <strong>ricatturare</strong> prima dell'invio</td>
+</tr>
+<tr>
+<td>03-spedizione-planner.jpg</td>
+<td>Planner quest: roster, party slot, rischi</td>
+<td>screenshot reale <code>/game</code></td>
+<td>⚠ barra staging «SUPERFICI» in basso a sx → <strong>ricatturare</strong></td>
+</tr>
+<tr>
+<td>04-quest-rapporto.jpg</td>
+<td>Quest + rapporto spedizione (vittoria)</td>
+<td>screenshot reale <code>/game</code></td>
+<td>⚠ tab «SELECT A TEST MARKER» sul bordo → <strong>ricatturare</strong></td>
+</tr>
+<tr>
+<td>05-mappa-notte.jpg</td>
+<td>Mappa di notte con illuminazione</td>
+<td>screenshot reale <code>/game</code></td>
+<td>pulito</td>
+</tr>
+<tr>
+<td>06-menu-sessione.jpg</td>
+<td>Menu sessione + lingua EN/IT</td>
+<td>screenshot reale <code>/game</code></td>
+<td>pulito</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>I tre screenshot con elementi dev-only andrebbero ricatturati dalla build di produzione (gli overlay di staging non esistono in prod) o con staging nascosto. Nessuno è un mockup: sono tutti runtime reali.</p>
+</blockquote></body></html>

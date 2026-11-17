@@ -6,7 +6,6 @@ tier: 2
 root_file: src/ui/idleVillage/components/gameFrame/GameTopChrome.tsx
 scope_files:
   - src/ui/idleVillage/components/gameFrame/GameTopChrome.tsx
-  - src/balancing/config/idleVillage/cassettoLayoutConfig.ts
 fast_checks:
   - tests/unit/idleVillage/r339TopChrome.test.tsx
 e2e_checks: []
@@ -26,9 +25,12 @@ invariants:
     source: plan
     source_ref: PLAN-119
     statement: >-
-      Due elementi snelli separati (day banner + resource bar, arte `bar-slim.webp` firmata) disposti
-      left/center: il bordo sinistro del cluster siede a `insets.left/scale + topChrome.marginPx` —
-      segue il fold della colonna sinistra — e il bordo destro non entra mai nella zona top-right
+      Due elementi snelli disaccoppiati (day banner + resource bar, arte `bar-slim.webp` firmata):
+      la resource bar è centrata sul centro orizzontale assoluto del frame (`frame.W / 2`, R-350) e
+      il day banner siede al proprio dock sinistro `bannerDock = max(topChrome.bannerMarginPx,
+      insets.left/scale + topChrome.marginPx)` (R-352 iter.6, ruling Director: «distanza tempo↔bordo
+      sinistro», pick live 40px) — il banner respira al bordo sinistro, con almeno `gapPx` prima del
+      bordo sinistro della barra; il bordo destro della barra non entra nella zona top-right
       riservata alla futura Chronicle docked (D10, niente tab pendente) finché il fit resta ≥
       `topChrome.minFitScale`.
     test_refs:
@@ -46,9 +48,11 @@ invariants:
     source: plan
     source_ref: PLAN-119
     statement: >-
-      Il cluster non scala mai oltre 1 e si restringe solo per stare nella fascia libera: sotto
-      `topChrome.minFitScale` la riserva Chronicle cede e il bound duro resta il bordo finestra
-      (`frame.W - topChrome.marginPx`) — il chrome non esce mai dallo schermo.
+      Le due barre non scalano mai oltre 1 e si restringono solo per stare nei loro bound (bordo
+      destro banner + `gapPx` a sinistra del bordo sinistro della barra; bordo destro della barra
+      dentro la riserva Chronicle): sotto `topChrome.minFitScale` la riserva cede e i bound duri
+      restano il bound sinistro e il bordo finestra (`frame.W - topChrome.marginPx`) — il chrome
+      non esce mai dallo schermo e banner e barra non si sovrappongono mai finché il fit regge.
     test_refs:
       - tests/unit/idleVillage/r339TopChrome.test.tsx
   - id: game-top-chrome.INV-5
@@ -60,12 +64,29 @@ invariants:
       stretti, un chip per item del readout.
     test_refs:
       - tests/unit/idleVillage/r339TopChrome.test.tsx
+  - id: game-top-chrome.INV-6
+    source: ruling
+    source_ref: R-352
+    statement: >-
+      La resource bar è speculare da capo a capo, con sedi capo SIMMETRICHE, e pareggiata in altezza
+      di capsula (R-352, ruling Director): il cap sinistro è UN solo pezzo capovolto — la fetta di
+      coda `topChrome.resCapMirror` (rettangolo scelto dal Director nel cap-mirror lab sull'arte
+      firmata `bar-slim.webp`) disegnata orizzontalmente flippata sul bordo sinistro, tagliata a
+      `resCapMirror.seatPx` così la sede sinistra eguaglia quella destra (~ornamento+bezel); arte e
+      slot scorrono a sinistra sotto il cap (`RES_SHIFT = seatPx − slots[0].x`, medaglione tagliato
+      dal clip interno, non solo coperto) — e la barra renderizza scalata di
+      `topChrome.capsulePx.time / topChrome.capsulePx.resources` così la sua banda parallela
+      pareggia quella del banner (orpelli esclusi dalla misura).
+    test_refs:
+      - tests/unit/idleVillage/r339TopChrome.test.tsx
 ---
 # game-top-chrome
 
 Top chrome docked di /game (R-339/PLAN-119 T6, artifact-r004 D3 + ruling
-Director D10): slim day banner + resource bar left/center, zona top-right
-riservata alla futura Chronicle, occupancy pubblicata nel ledger
-`useGameLayoutInsets`. Solo blueprint mode — phone/landscape mantengono il
-chrome firmato full-size. Riutilizza `HudRealTime`/`HudRealResources` con
-geometrie e arte slim generate (PLAN-112 F4) — nessuna superficie duplicata.
+Director D10; R-350: resource bar centrata sul centro assoluto del frame,
+con il day banner seduto a filo alla sua sinistra — una coppia adiacente):
+slim day banner + resource bar, zona top-right riservata alla futura
+Chronicle, occupancy pubblicata nel ledger `useGameLayoutInsets`. Solo
+blueprint mode — phone/landscape mantengono il chrome firmato full-size.
+Riutilizza `HudRealTime`/`HudRealResources` con geometrie e arte slim
+generate (PLAN-112 F4) — nessuna superficie duplicata.

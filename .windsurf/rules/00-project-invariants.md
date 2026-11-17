@@ -61,6 +61,13 @@ follow the invariant and flag the conflict instead of silently breaking it.
 - Update the relevant plan/changelog before marking a task complete.
 - Plans are living documents: the Strategist and every Agent must reference the master plan and the relevant implementation plans, cite useful information from them, and update them when the implementation diverges or advances.
 
+## Artifact links in agent output (Director ruling 2026-11-16)
+- When an agent references a produced artifact — screenshot, image, witness PNG,
+  mockup, generated file — it MUST output a clickable link that opens it in the
+  Devin desktop UI: absolute `file:///…` markdown link AND/OR the
+  `<ref_file file="/abs/path" />` tag. Bare filenames or repo-relative paths are
+  NOT acceptable — the Director must be able to click and see the image.
+
 ## Node / tooling
 - Use the pinned Node version from `.nvmrc` (`source ~/.nvm/nvm.sh && nvm use`).
 - Never mutate the global Node version.

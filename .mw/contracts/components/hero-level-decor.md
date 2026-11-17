@@ -19,6 +19,16 @@ invariants:
       ritratto (PLAN-067 T-A6)
     test_refs:
       - tests/unit/idleVillage/heroLevelDecor.nameClear.test.tsx
+  - id: R-353-compact-badge-corner
+    source: plan
+    source_ref: R-353
+    statement: >-
+      R-353 mockup row: in densità `compact` il badge di livello si ancora sul bordo bottom-LEFT del
+      medaglione (right edge = portrait.left + 10, top = portrait.bottom − 14, sagoma shield
+      clip-path) — mai vicino al nome; fuori densità compact vale il contratto top-right
+      (R-234-level-badge-clear-of-name).
+    test_refs:
+      - tests/unit/idleVillage/r353RosterRow.test.tsx
   - id: R-234-levelup-rises
     source: director-bug
     source_ref: R-234

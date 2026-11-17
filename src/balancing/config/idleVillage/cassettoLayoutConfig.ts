@@ -11,9 +11,10 @@
  * `chipWidthPx` (T2) is the collapsed edge-chip width — what the fold
  * publishes to `insets.right` while the drawer rests as a chip.
  *
- * `rail` and `bottomSheet` are the T5/T8 sizing contract (persistent left
- * Roster|Stash column; non-modal mobile sheet detents) declared here so the
- * surfaces read one source of truth. `topChrome` is the T6 contract (D3/D10):
+ * `bottomSheet` is the T8 sizing contract (non-modal mobile sheet detents).
+ * The T5 docked Roster|Stash column was reverted — Director ruling
+ * 2026-11-15: roster e stash restano superfici sempre separate, nessuna
+ * colonna/tab unificata. `topChrome` is the T6 contract (D3/D10):
  * the slim day banner + resource bar docked left/center, and the top-right
  * zone reserved for the future docked Chronicle surface. `cta` is the T1
  * enabled/muted contract: it declares the skin-token names the CONFIRM
@@ -21,6 +22,7 @@
  * traces config → registry, never a literal in the component.
  */
 import { z } from 'zod';
+import cassettoExtractedEdgeSpec from './cassettoExtractedEdge.json';
 
 export const cassettoLayoutSchema = z
   .object({
@@ -32,42 +34,65 @@ export const cassettoLayoutSchema = z
       /** Hard cap on the docked width (px) — binds above `widthMaxPx / aspect`. */
       widthMaxPx: z.number().positive(),
       /** T2: width of the collapsed edge chip (px) — the drawer's only folded
-       *  form while a quest is selected (mirrors `rail.chipWidthPx`). */
+       *  form while a quest is selected. */
       chipWidthPx: z.number().positive(),
-    }),
-    rail: z.object({
-      /** Persistent left Roster|Stash column width (px). */
-      widthPx: z.number().positive(),
-      /** Width below which only one side surface may be open (mutual exclusion). */
-      mutualExclusionBelowPx: z.number().positive(),
-      /** Screen-edge margin above/beside the rail (px). */
-      marginPx: z.number().nonnegative(),
-      /** D8: the rail's max-height ends this far above the viewport bottom —
-       *  the reserved zone of the bottom-left medallion/narrator (voce). */
-      bottomInsetPx: z.number().nonnegative(),
-      /** Width of the collapsed edge chip (px) — the rail's only folded form. */
-      chipWidthPx: z.number().positive(),
-      /** Bars each roster row shows, in order — config-driven (T5): which
-       *  metric, its i18n label, and the skin-token pair the fill reads. */
-      bars: z
-        .array(
-          z.object({
-            id: z.string(),
-            /** Resident metric the bar renders: `hp` = currentHp/maxHp,
-             *  `stamina` = 1 − fatigue/100 (same derivation as the roster). */
-            value: z.enum(['hp', 'stamina']),
-            labelKey: z.string(),
-            /** CSS variables (or values) the gradient fill reads, [start, end]. */
-            fill: z.tuple([z.string(), z.string()]),
-          }),
-        )
-        .min(1),
+      /** R-353 (Director ruling): which right-edge treatment the column wears.
+       *  'framed' = the signed R-323 art, frame on all four sides.
+       *  'extracted' = the drawer pulled from off-screen — the right band
+       *  clipped flush to the screen edge (no frame, no map sliver) with the
+       *  rescued particulars re-composited into the baked `-extracted` assets
+       *  (spec: cassettoExtractedEdge.json, build-cassetto-extracted.mjs). */
+      edgeMode: z.enum(['framed', 'extracted']),
+      /** R-353 (Director pick in cassetto-edge-lab, design px on the artW×artH
+       *  grid): how much art exits the right screen edge per variant in
+       *  'extracted' mode. Single source: cassettoExtractedEdge.json — the
+       *  same file the bake script reads, so the rendered width and the asset
+       *  crop can never drift apart. */
+      edgeClipPx: z.object({
+        '1440': z.number().nonnegative(),
+        '1280': z.number().nonnegative(),
+      }),
+      /** R-353 (Director ruling "elimina il pezzo a sinistra … lascia sol il
+       *  frame/bordo"): design px cut off the LEFT of the source art — the
+       *  filigree/emerald/pendants band. Single source:
+       *  cassettoExtractedEdge.json, same file the bake script reads. */
+      leftCutPx: z.object({
+        '1440': z.number().nonnegative(),
+        '1280': z.number().nonnegative(),
+      }),
+      /** R-353 (Director ruling "stretchiamo a sinistra del 33%"): the
+       *  extracted column's artW is `(artW - leftCut - clip) × wideFactor` —
+       *  the whole surviving art (frame bar included) stretches horizontally
+       *  so every inner area gains real writing space. */
+      wideFactor: z.number().positive(),
+      /** R-353 (Director 2026-11-16): zones that stay 1:1 — "il componente
+       *  delle risorse deve essere proporzionato", "hai strettchato davvero
+       *  il teschio e il reward, ripristinalo", "il pulsante in basso che
+       *  tocca il frame". These zones keep their original w, re-centered on
+       *  the stretched position of their original center — matching the
+       *  pictorial elements the bake restores unstretched. */
+      unstretchedZones: z.array(z.string()),
+      /** Hard cap for the extracted (widened) column — the framed R-323 cap
+       *  `widthMaxPx` stays untouched; this is `widthMaxPx × wideFactor`. */
+      widthMaxPxExtracted: z.number().positive(),
     }),
     bottomSheet: z.object({
       /** Non-modal sheet detents (T8): peek height, half/full viewport fractions. */
       peekPx: z.number().positive(),
       halfFraction: z.number().positive().max(1),
       fullFraction: z.number().positive().max(1),
+      /** T8/D5: at or below this viewport width the expedition surface exists
+       *  ONLY as the bottom sheet — the docked column and its chips never
+       *  mount (mutual exclusion of the lateral surface, AC10: tested at
+       *  1024 and 1100, boundary inclusive). */
+      maxWidthPx: z.number().positive(),
+      /** T8/D5: the drag affordance — the sheet's handle+header strip height
+       *  (px) and its minimum interactive target (AC10 ≥44px). */
+      handlePx: z.number().positive(),
+      /** AC10: body text floor (px) inside the sheet. */
+      minTextPx: z.number().positive(),
+      /** Touch-target size (px) for party/bag slots inside the sheet. */
+      slotPx: z.number().positive(),
     }),
     cta: z.object({
       /** T1 (AC8 traceability — grep check): the NAMES of the skin tokens the
@@ -98,8 +123,13 @@ export const cassettoLayoutSchema = z
       /** Design-px margin: distance from the top edge and from the boundary the
        *  left inset (`insets.left`) leaves — the cluster hugs the free-map band. */
       marginPx: z.number().nonnegative(),
-      /** Design-px gap between the day banner and the resource bar. */
+      /** Design-px gap between the day banner and the resource bar when the
+       *  pair can't breathe (fit-clamped); below this they may overlap-bound. */
       gapPx: z.number().nonnegative(),
+      /** R-352 (Director ruling): the day banner docks at this design-px left
+       *  margin, decoupled from the centred resource bar — the bar's absolute
+       *  centre rules, the banner breathes at the left edge (picked live: 40). */
+      bannerMarginPx: z.number().nonnegative(),
       /** D10 (Director ruling 2026-11-15): width in REAL px of the top-right zone
        *  reserved for the future docked Chronicle surface. The chrome cluster
        *  never enters it while it can stay at or above `minFitScale`. */
@@ -107,6 +137,30 @@ export const cassettoLayoutSchema = z
       /** Below this fit scale the Chronicle reserve yields to the screen edge —
        *  the cluster may shrink past the reserve but never leaves the window. */
       minFitScale: z.number().positive().max(1),
+      /** R-352: capsule heights measured on the signed slim art (design px —
+       *  the plain parallel band only, medallions/filigree/pendant ignored).
+       *  The resource bar renders scaled by `capsulePx.time /
+       *  capsulePx.resources` so the pair's bands read as one height. */
+      capsulePx: z.object({
+        time: z.number().positive(),
+        resources: z.number().positive(),
+      }),
+      /** R-352: the left cap is ONE flipped slice of the same bar — the
+       *  Director picked the exact rect in the cap-mirror lab (design px):
+       *  source `srcX..srcX+w` at `srcY` (h tall) on the signed 360×62 art,
+       *  drawn horizontally flipped at `destX`,`destY` on the left edge. */
+      resCapMirror: z.object({
+        srcX: z.number().nonnegative(),
+        srcY: z.number().nonnegative(),
+        w: z.number().positive(),
+        h: z.number().positive(),
+        destX: z.number().nonnegative(),
+        destY: z.number().nonnegative(),
+        /** How much of the pick shows on the left edge — the cap "seat",
+         *  matched to the right cap's ornament width so the bar reads
+         *  specular end-to-end (Director ruling: same seat both sides). */
+        seatPx: z.number().positive(),
+      }),
     }),
   })
   .strict();
@@ -114,29 +168,8 @@ export const cassettoLayoutSchema = z
 export type CassettoLayoutConfig = z.infer<typeof cassettoLayoutSchema>;
 
 const RAW_CASSETTO_LAYOUT_CONFIG: CassettoLayoutConfig = {
-  drawer: { widthMinPx: 360, widthVwFraction: 0.23, widthMaxPx: 460, chipWidthPx: 40 },
-  rail: {
-    widthPx: 320,
-    mutualExclusionBelowPx: 1100,
-    marginPx: 24,
-    bottomInsetPx: 240,
-    chipWidthPx: 40,
-    bars: [
-      {
-        id: 'hp',
-        value: 'hp',
-        labelKey: 'gameFrame.heroLevel.hp',
-        fill: ['var(--skin-statbar-hp-start)', 'var(--skin-statbar-hp-end)'],
-      },
-      {
-        id: 'stamina',
-        value: 'stamina',
-        labelKey: 'gameFrame.roster.zanara.stamina',
-        fill: ['var(--skin-statbar-stamina-start)', 'var(--skin-statbar-stamina-end)'],
-      },
-    ],
-  },
-  bottomSheet: { peekPx: 56, halfFraction: 0.5, fullFraction: 0.92 },
+  drawer: { widthMinPx: 360, widthVwFraction: 0.23, widthMaxPx: 460, chipWidthPx: 40, edgeMode: 'extracted', edgeClipPx: cassettoExtractedEdgeSpec.edgeClipPx, leftCutPx: cassettoExtractedEdgeSpec.leftCutPx, wideFactor: cassettoExtractedEdgeSpec.wideFactor, unstretchedZones: cassettoExtractedEdgeSpec.unstretchedZones, widthMaxPxExtracted: 613 },
+  bottomSheet: { peekPx: 56, halfFraction: 0.5, fullFraction: 0.92, maxWidthPx: 1100, handlePx: 44, minTextPx: 16, slotPx: 48 },
   cta: {
     vars: {
       text: 'var(--skin-cassetto-cta-text)',
@@ -151,7 +184,20 @@ const RAW_CASSETTO_LAYOUT_CONFIG: CassettoLayoutConfig = {
       focusRing: 'var(--skin-cassetto-cta-focus-ring)',
     },
   },
-  topChrome: { marginPx: 12, gapPx: 10, chronicleReservePx: 360, minFitScale: 0.55 },
+  topChrome: {
+    marginPx: 12,
+    gapPx: 10,
+    bannerMarginPx: 40,
+    chronicleReservePx: 360,
+    minFitScale: 0.55,
+    /* Measured on the signed `bar-slim.webp` art (solid-band rows): time
+     * 105/2 = 52.5, resources 112/2 = 56.0 — resources scales by 0.9375. */
+    capsulePx: { time: 52.5, resources: 56.0 },
+    /* Cap-mirror lab pick (Director, R-352): the last 61 design px of the
+     *  bar (asset px x=596, w=122, y=5, h=114 on the 720×124 art) flipped
+     *  onto the left edge at x=1.5 — one specular cap, medallion covered. */
+    resCapMirror: { srcX: 298, srcY: 2.5, w: 61, h: 57, destX: 1.5, destY: 2.5, seatPx: 38 },
+  },
 };
 
 export const CASSETTO_LAYOUT_CONFIG = cassettoLayoutSchema.parse(RAW_CASSETTO_LAYOUT_CONFIG);

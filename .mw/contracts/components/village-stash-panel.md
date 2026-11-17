@@ -67,6 +67,38 @@ invariants:
       localizzato `stash-bag-full-hint` (`gameFrame.stash.bagFullHint`); read-only ⇒ nessun marker.
     test_refs:
       - tests/unit/idleVillage/r339BagAssign.test.tsx
+  - id: village-stash-panel.INV-3
+    source: plan
+    source_ref: R-353
+    statement: >-
+      R-353 mockup (mockup-stash-grid.jpg, ruling Director: restyle estetico, pannelli flottanti): la
+      shelf è una GRIGLIA di celle tile — ogni `listitem` porta la StashItemTile condivisa (lacca +
+      badge angolare ×N) e nome/descrizione come testo sr-only, stesso vocabolario su entrambe le
+      modalità. Sopra la griglia un `radiogroup` di tab kind derivato dai `kind` presenti in config
+      (`stash-tab-all`/`stash-tab-{kind}`, role=radio, filtro view-only: mai una mutation).
+    test_refs:
+      - tests/unit/idleVillage/r353StashGrid.test.tsx
+  - id: village-stash-panel.INV-4
+    source: plan
+    source_ref: R-353
+    statement: >-
+      Detail card (`stash-detail`): preview dell'ultimo item hover/focus (sticky, fallback alla prima
+      riga visibile) nel vocabolario tooltip condiviso (nome, effetto, covers, stock). L'affordance
+      `stash-pack-detail` esiste SOLO in modo bound e passa per la stessa autorità `store.assign`
+      delle celle (reject via lastEvent); in read-only la card è informativa senza bottoni extra.
+    test_refs:
+      - tests/unit/idleVillage/r353StashGrid.test.tsx
+  - id: village-stash-panel.INV-5
+    source: plan
+    source_ref: R-353
+    statement: >-
+      Cornice ornata del mockup (ruling Director «anche la cornice del mockup x entrambi»): la
+      plaque del pannello monta `PanelFrameOrnaments` (`data-panel-frame="ornate"`) — quattro
+      angoli in filigrana ottone/smeraldo firmati (famiglia cassetto R-323) sopra il bordo +
+      filetto interno. Puro decoro (aria-hidden, pointer-events none): non tocca header, tab,
+      griglia, detail né alcun anchor di contratto.
+    test_refs:
+      - tests/unit/idleVillage/r353StashGrid.test.tsx
 ---
 # village-stash-panel
 

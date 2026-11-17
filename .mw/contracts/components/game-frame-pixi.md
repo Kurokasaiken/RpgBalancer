@@ -13,32 +13,25 @@ scope_files:
   - src/ui/idleVillage/components/gameFrame/heroSheetMachine.ts
   - src/ui/idleVillage/components/gameFrame/heroSheetViewModel.ts
   - src/ui/idleVillage/components/gameFrame/hudPanelRegistry.ts
-  - src/ui/idleVillage/components/gameFrame/hudTones.ts
   - src/ui/idleVillage/components/gameFrame/index.ts
   - src/ui/idleVillage/components/gameFrame/nextEvent.ts
-  - src/ui/idleVillage/components/gameFrame/poiSigillo.ts
-  - src/ui/idleVillage/components/gameFrame/questAvailability.ts
   - src/ui/idleVillage/components/gameFrame/questRevealSchedule.ts
   - src/ui/idleVillage/components/gameFrame/questShellLayout.ts
   - src/ui/idleVillage/components/gameFrame/questSkillCheckWarm.ts
   - src/ui/idleVillage/components/gameFrame/resolveWorldManifest.ts
   - src/ui/idleVillage/components/gameFrame/stageZones/solveStageLayout.ts
-  - src/ui/idleVillage/components/gameFrame/useCompactTop.ts
   - src/ui/idleVillage/components/gameFrame/useHudMaterial.ts
   - src/ui/idleVillage/components/gameFrame/useHudPanels.ts
   - src/ui/idleVillage/components/gameFrame/useHudScale.ts
   - src/ui/idleVillage/components/gameFrame/usePanelWhileOpen.ts
-  - src/ui/idleVillage/components/gameFrame/usePoiTypeIcon.ts
-  - src/ui/idleVillage/components/gameFrame/villageStashViewModel.ts
   - src/ui/idleVillage/config/gamePerfBudgets.ts
   - src/ui/idleVillage/config/worldSurfaceConfig.ts
-  - src/ui/idleVillage/frozen/_infra/CanonicalDataBridge.ts
   - src/ui/idleVillage/hooks/useFrameMetrics.ts
+  - src/ui/idleVillage/hooks/useQuestLoreDrop.ts
   - src/ui/idleVillage/hooks/useReducedMotion.ts
+  - src/ui/idleVillage/hooks/useSettlementLostGrade.ts
   - src/ui/idleVillage/hooks/useThrottledValue.ts
-  - src/ui/idleVillage/interaction/dragSensors.ts
   - src/ui/idleVillage/interaction/magneticCollision.ts
-  - src/ui/idleVillage/interaction/useDragOutcome.ts
   - src/ui/idleVillage/pixiSpike/pixiDestroy.ts
   - src/ui/idleVillage/questS1Lab/questArt.ts
   - src/ui/idleVillage/questS1Lab/questForecast.worker.ts
@@ -50,17 +43,15 @@ scope_files:
   - src/ui/idleVillage/questS1Lab/useQuestRun.ts
   - src/ui/idleVillage/quests/rosterCompatibility.ts
   - src/ui/idleVillage/rosterV2/heroLevelCue.ts
-  - src/ui/idleVillage/rosterV2/heroLevelMock.ts
   - src/ui/idleVillage/rosterV2/heroLevelUpEvents.ts
-  - src/ui/idleVillage/rosterV2/heroLevelViewModel.ts
   - src/ui/idleVillage/rosterV2/index.ts
   - src/ui/idleVillage/rosterV2/mountedCardRegistry.ts
   - src/ui/idleVillage/rosterV2/runHeroLevelUpStaging.ts
   - src/ui/idleVillage/rosterV2/runStagingOpeningRoster.ts
+  - src/ui/idleVillage/skins/amanuenseSkinConfig.ts
   - src/ui/idleVillage/skins/dayNightPoiSkinConfig.ts
   - src/ui/idleVillage/skins/resolveInitialSkin.ts
   - src/ui/idleVillage/slots/useResidentSlotController.ts
-  - src/ui/idleVillage/store/useVillageStashStore.ts
   - src/ui/idleVillage/utils/gameAssetWarmup.ts
   - src/ui/idleVillage/utils/gamePerfProbe.ts
 fast_checks:
@@ -191,6 +182,15 @@ invariants:
       route for legacy runs or retain it after settlement/wipe.
     test_refs:
       - tests/e2e/idleVillage/questJourneyRoute.spec.ts
+  - id: game-frame-pixi.INV-3
+    source: director-bug
+    source_ref: R-241
+    statement: >-
+      Il resolver di compatibilità roster composto della pagina torna `undefined` appena UNA sessione
+      segnala il proprio quest context live, così il fallback POI non può più stampare «Nessuno slot
+      compatibile» sulle card durante una expedition run.
+    test_refs:
+      - tests/unit/idleVillage/useQuestPoiSession.compatibilityGuard.test.tsx
   - id: R-234-phase-hp-once
     source: director-bug
     source_ref: R-234
@@ -253,36 +253,32 @@ Menu dei pannelli floating + shortcut; fonte di verità A-set.
 - `src/ui/designSystem/primitives/index.ts`
 - `src/ui/idleVillage/archetypeDirectory.ts`
 - `src/ui/idleVillage/components/gameFrame/GameFrameDragCursor.tsx`
+- `src/ui/idleVillage/components/gameFrame/expeditionLostStaging.ts`
 - `src/ui/idleVillage/components/gameFrame/heroSheetMachine.ts`
 - `src/ui/idleVillage/components/gameFrame/heroSheetViewModel.ts`
 - `src/ui/idleVillage/components/gameFrame/hudPanelRegistry.ts`
-- `src/ui/idleVillage/components/gameFrame/hudTones.ts`
 - `src/ui/idleVillage/components/gameFrame/index.ts`
-- `src/ui/idleVillage/components/gameFrame/poiSigillo.ts`
-- `src/ui/idleVillage/components/gameFrame/questAvailability.ts`
+- `src/ui/idleVillage/components/gameFrame/nextEvent.ts`
 - `src/ui/idleVillage/components/gameFrame/questRevealSchedule.ts`
 - `src/ui/idleVillage/components/gameFrame/questShellLayout.ts`
 - `src/ui/idleVillage/components/gameFrame/questSkillCheckWarm.ts`
 - `src/ui/idleVillage/components/gameFrame/resolveWorldManifest.ts`
 - `src/ui/idleVillage/components/gameFrame/stageZones/solveStageLayout.ts`
-- `src/ui/idleVillage/components/gameFrame/useCompactTop.ts`
 - `src/ui/idleVillage/components/gameFrame/useHudMaterial.ts`
 - `src/ui/idleVillage/components/gameFrame/useHudPanels.ts`
 - `src/ui/idleVillage/components/gameFrame/useHudScale.ts`
 - `src/ui/idleVillage/components/gameFrame/usePanelWhileOpen.ts`
-- `src/ui/idleVillage/components/gameFrame/usePoiTypeIcon.ts`
-- `src/ui/idleVillage/components/gameFrame/villageStashViewModel.ts`
 - `src/ui/idleVillage/config/gamePerfBudgets.ts`
 - `src/ui/idleVillage/config/worldSurfaceConfig.ts`
-- `src/ui/idleVillage/frozen/_infra/CanonicalDataBridge.ts`
 - `src/ui/idleVillage/hooks/useFrameMetrics.ts`
+- `src/ui/idleVillage/hooks/useQuestLoreDrop.ts`
 - `src/ui/idleVillage/hooks/useReducedMotion.ts`
+- `src/ui/idleVillage/hooks/useSettlementLostGrade.ts`
 - `src/ui/idleVillage/hooks/useThrottledValue.ts`
-- `src/ui/idleVillage/interaction/dragSensors.ts`
 - `src/ui/idleVillage/interaction/magneticCollision.ts`
-- `src/ui/idleVillage/interaction/useDragOutcome.ts`
 - `src/ui/idleVillage/pixiSpike/pixiDestroy.ts`
 - `src/ui/idleVillage/questS1Lab/questArt.ts`
+- `src/ui/idleVillage/questS1Lab/questForecast.worker.ts`
 - `src/ui/idleVillage/questS1Lab/questOffer.ts`
 - `src/ui/idleVillage/questS1Lab/questPhaseRecord.ts`
 - `src/ui/idleVillage/questS1Lab/questSchedule.ts`
@@ -292,14 +288,14 @@ Menu dei pannelli floating + shortcut; fonte di verità A-set.
 - `src/ui/idleVillage/quests/rosterCompatibility.ts`
 - `src/ui/idleVillage/rosterV2/heroLevelCue.ts`
 - `src/ui/idleVillage/rosterV2/heroLevelUpEvents.ts`
-- `src/ui/idleVillage/rosterV2/heroLevelViewModel.ts`
 - `src/ui/idleVillage/rosterV2/index.ts`
 - `src/ui/idleVillage/rosterV2/mountedCardRegistry.ts`
 - `src/ui/idleVillage/rosterV2/runHeroLevelUpStaging.ts`
+- `src/ui/idleVillage/rosterV2/runStagingOpeningRoster.ts`
+- `src/ui/idleVillage/skins/amanuenseSkinConfig.ts`
 - `src/ui/idleVillage/skins/dayNightPoiSkinConfig.ts`
 - `src/ui/idleVillage/skins/resolveInitialSkin.ts`
 - `src/ui/idleVillage/slots/useResidentSlotController.ts`
-- `src/ui/idleVillage/store/useVillageStashStore.ts`
 - `src/ui/idleVillage/utils/gameAssetWarmup.ts`
 - `src/ui/idleVillage/utils/gamePerfProbe.ts`
 

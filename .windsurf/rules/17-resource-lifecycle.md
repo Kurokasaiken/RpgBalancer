@@ -1,3 +1,8 @@
+---
+trigger: model_decision
+description: "Resource lifecycle contract (R-LIFECYCLE/MW PLAN-071): every agent-spawned process, server, browser or temp file must be scoped, leased or kept-registered; mw-run tooling. Load when spawning long-lived resources."
+---
+
 # R-LIFECYCLE — resource lifecycle for agent-spawned resources (MW PLAN-071)
 
 Every resource an agent creates (process, server, browser, temp file,

@@ -36,8 +36,59 @@ const SPECS: Record<'1440' | '1280', CassettoColumnSpec> = {
   },
 };
 
+/**
+ * R-353 "estratta": the baked `-extracted` assets are the signed art cropped
+ * by `drawer.edgeClipPx` on the right (rescued corner clusters composited in)
+ * AND by `drawer.leftCutPx` on the left — the ornament band (pendants + big
+ * emerald) is removed, only the frame/bordo survives — then the surviving
+ * art is stretched horizontally by `drawer.wideFactor` (build script:
+ * build-cassetto-extracted.mjs, Director 2026-11-16). Zones shift left by
+ * the cut and scale by the stretch to stay on their wells; `insets.right`
+ * stays honest.
+ */
+const EXTRACTED_SPECS: Record<'1440' | '1280', CassettoColumnSpec> = (
+  ['1440', '1280'] as const
+).reduce((acc, key) => {
+  const geo = CASSETTO_COLUMN_GEO[key];
+  const clip = CASSETTO_LAYOUT_CONFIG.drawer.edgeClipPx[key];
+  const leftCut = CASSETTO_LAYOUT_CONFIG.drawer.leftCutPx[key];
+  const wide = CASSETTO_LAYOUT_CONFIG.drawer.wideFactor;
+  const artW = (geo.artW - leftCut - clip) * wide;
+  /* The baked art drops `leftCut` design px on the left (ornament band —
+   * Director: "lascia sol il frame/bordo") and is then horizontally
+   * STRETCHED by `wide` ("stretchare — tutte le aree anche all'interno si
+   * fanno piu' grandi"), so zone rects shift left by the cut and scale by
+   * the same factor to stay on their painted wells — EXCEPT zones in
+   * `unstretchedZones`, which keep their original size re-centered on the
+   * stretched position of their center: the bake restores the matching
+   * pictorial elements (skull, chest, CONFIRM plaque, resource wells) at
+   * 1:1, and their DOM overlays must not distort or drift ("il componente
+   * delle risorse deve essere proporzionato"). Zones are clamped to the
+   * visible art so no content is ever amputated. */
+  const unstretched = new Set(CASSETTO_LAYOUT_CONFIG.drawer.unstretchedZones);
+  const zones = Object.fromEntries(
+    Object.entries(geo.zones).map(([name, z]) => {
+      if (unstretched.has(name)) {
+        const x = (z.x + z.w / 2 - leftCut) * wide - z.w / 2;
+        return [name, { ...z, x: Math.max(0, Math.min(x, artW - z.w)) }];
+      }
+      const x = Math.max(0, (z.x - leftCut) * wide);
+      const w = Math.min((z.x + z.w - leftCut) * wide, artW) - x;
+      return [name, { ...z, x, w: Math.max(0, w) }];
+    }),
+  );
+  acc[key] = {
+    key,
+    src: `/assets/ui/hud-real/cassetto/column-${key}-extracted.webp`,
+    geo: { artW, artH: geo.artH, zones },
+    aspect: artW / geo.artH,
+  };
+  return acc;
+}, {} as Record<'1440' | '1280', CassettoColumnSpec>);
+
 export function cassettoColumnSpec(viewportWidth: number): CassettoColumnSpec {
-  return SPECS[viewportWidth >= CASSETTO_WIDE_BREAKPOINT ? '1440' : '1280'];
+  const key = viewportWidth >= CASSETTO_WIDE_BREAKPOINT ? '1440' : '1280';
+  return CASSETTO_LAYOUT_CONFIG.drawer.edgeMode === 'extracted' ? EXTRACTED_SPECS[key] : SPECS[key];
 }
 
 /**
@@ -48,7 +99,10 @@ export function cassettoColumnSpec(viewportWidth: number): CassettoColumnSpec {
  * not width stretch).
  */
 export function cassettoColumnWidthFor(spec: CassettoColumnSpec, viewportHeight: number): number {
-  return Math.min(spec.aspect * viewportHeight, CASSETTO_LAYOUT_CONFIG.drawer.widthMaxPx);
+  const cap = CASSETTO_LAYOUT_CONFIG.drawer.edgeMode === 'extracted'
+    ? CASSETTO_LAYOUT_CONFIG.drawer.widthMaxPxExtracted
+    : CASSETTO_LAYOUT_CONFIG.drawer.widthMaxPx;
+  return Math.min(spec.aspect * viewportHeight, cap);
 }
 
 /** The height the column may occupy (≤ viewport) once the width cap binds. */

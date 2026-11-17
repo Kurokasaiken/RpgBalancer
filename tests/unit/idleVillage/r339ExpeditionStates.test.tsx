@@ -7,16 +7,16 @@
  * pin the PLAN-119 fixes:
  *   legs read "N days" (ICU) + an explicit total;
  *   a disabled CONFIRM shows the inline reason (stock-detail parity);
- *   tapping an EMPTY party seat opens the docked Roster|Stash rail (T5);
+ *   tapping an EMPTY party seat opens the floating roster panel;
  *   the drawer publishes its docked width to the shared insets ledger;
- *   with no quest the surface collapses to a docked edge tab (no modal).
+ *   with no quest the surface mounts NOTHING (R-351 — the old right-edge
+ *   "SELECT A QUEST MARKER" tab was deleted by Director ruling).
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import type { CassettoQuest } from '@/ui/idleVillage/hudReal/HudRealCassetto';
 import { HudRealCassetto } from '@/ui/idleVillage/hudReal/HudRealCassetto';
-import { ExpeditionEdgeTab } from '@/ui/idleVillage/components/gameFrame/ExpeditionEdgeTab';
 import { useGameLayoutInsets, freeMapShare } from '@/ui/idleVillage/store/useGameLayoutInsets';
 
 vi.mock('react-i18next', () => ({
@@ -90,7 +90,7 @@ describe('R-339 — disabled CONFIRM states its reason inline', () => {
   });
 });
 
-describe('R-339 — the empty party seat opens the roster rail', () => {
+describe('R-339 — the empty party seat opens the roster panel', () => {
   // INV:hud-real-cassetto.INV-3
   it('onSlotClick is wired through to the rack (the only emit on an empty seat)', () => {
     const onOpenRoster = vi.fn();
@@ -100,7 +100,7 @@ describe('R-339 — the empty party seat opens the roster rail', () => {
   });
 
   // INV:hud-real-cassetto.INV-3
-  it('wiring: Detail forwards onOpenRoster to onSlotClick; the page opens the rail on the Roster tab (T5)', () => {
+  it('wiring: Detail forwards onOpenRoster to onSlotClick; the page opens the roster panel', () => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const read = (p: string) =>
       // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -108,7 +108,7 @@ describe('R-339 — the empty party seat opens the roster rail', () => {
     const detail = read('src/ui/idleVillage/hudReal/HudRealCassettoDetail.tsx');
     expect(detail).toMatch(/onSlotClick=\{p\.onOpenRoster/);
     const page = read('src/pages/game-mappa2.tsx');
-    expect(page).toMatch(/onOpenRoster=\{\(\)\s*=>\s*useExpeditionRail\.getState\(\)\.open\('roster'\)\}/);
+    expect(page).toMatch(/onOpenRoster=\{\(\)\s*=>\s*panels\.set\('roster', true\)\}/);
   });
 });
 
@@ -130,26 +130,27 @@ describe('R-339 — the drawer publishes its docked width to the insets ledger',
   });
 
   // INV:hud-real-cassetto.INV-4
-  it('freeMapShare computes the AC share (≥65% rail-closed / ≥50% both-open)', () => {
+  it('freeMapShare computes the AC share (≥65% one docked surface / ≥50% two)', () => {
     expect(freeMapShare({ top: 0, right: 441, bottom: 0, left: 0 }, 1920)).toBeCloseTo(0.77, 1);
     expect(freeMapShare({ top: 0, right: 420, bottom: 0, left: 300 }, 1440)).toBeCloseTo(0.5, 1);
     expect(freeMapShare({ top: 0, right: 0, bottom: 0, left: 0 }, 0)).toBe(0);
   });
 });
 
-describe('R-339 — no quest: the surface rests as a docked edge tab', () => {
-  // INV:expedition-edge-tab.INV-1
-  it('visible → the tab renders the mechanism hint on the right edge', () => {
-    render(<ExpeditionEdgeTab visible />);
-    const tab = screen.getByTestId('expedition-edge-tab');
-    expect(tab).toBeInTheDocument();
-    expect(tab).toHaveStyle({ right: '0px' });
-    expect(tab).toHaveTextContent('gameFrame.cassetto.edgeTab.hint');
-  });
-
-  // INV:expedition-edge-tab.INV-1
-  it('hidden → nothing renders (quest open / HUD hidden / village view)', () => {
-    const { container } = render(<ExpeditionEdgeTab visible={false} />);
-    expect(container).toBeEmptyDOMElement();
+describe('R-351 — no quest: the surface mounts nothing (edge tab deleted)', () => {
+  // INV:expedition-drawer.INV-1
+  it('the page no longer imports nor mounts ExpeditionEdgeTab / expedition-edge-tab', () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const read = (p: string) =>
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      require('node:fs').readFileSync(require('node:path').resolve(__dirname, '../../../', p), 'utf8') as string;
+    const page = read('src/pages/game-mappa2.tsx');
+    expect(page).not.toMatch(/ExpeditionEdgeTab|expedition-edge-tab/);
+    /* And the component file itself is gone. */
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const exists = require('node:fs').existsSync(
+      require('node:path').resolve(__dirname, '../../../src/ui/idleVillage/components/gameFrame/ExpeditionEdgeTab.tsx'),
+    );
+    expect(exists).toBe(false);
   });
 });

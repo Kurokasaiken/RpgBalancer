@@ -12,19 +12,19 @@ fast_checks:
 e2e_checks: []
 e2e_trigger_globs: []
 invariants:
-  - id: INV-1
+  - id: game-settings.INV-1
     source: director-bug
     source_ref: PLAN-076
     statement: I livelli audio restano tra 0 e 1; un valore senza senso torna al predefinito
     test_refs:
       - tests/unit/idleVillage/gameSettings.test.ts
-  - id: INV-2
+  - id: game-settings.INV-2
     source: director-bug
     source_ref: PLAN-076
     statement: Le impostazioni persistono e tornano dopo un ricaricamento; un record danneggiato torna ai predefiniti
     test_refs:
       - tests/unit/idleVillage/gameSettings.test.ts
-  - id: INV-3
+  - id: game-settings.INV-3
     source: director-bug
     source_ref: PLAN-076
     statement: >-
@@ -32,13 +32,13 @@ invariants:
       senza creare un contesto in più
     test_refs:
       - tests/unit/idleVillage/gameSettings.test.ts
-  - id: INV-4
+  - id: game-settings.INV-4
     source: director-bug
     source_ref: PLAN-076
     statement: Il movimento ridotto è un attributo del documento a cui risponde il foglio di stile
     test_refs:
       - tests/unit/idleVillage/gameSettings.test.ts
-  - id: INV-5
+  - id: game-settings.INV-5
     source: director-spec
     source_ref: R-322
     statement: >-
