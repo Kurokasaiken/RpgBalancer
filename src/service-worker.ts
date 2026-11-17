@@ -21,7 +21,7 @@ precacheAndRoute(self.__WB_MANIFEST);
  */
 
 // Service Worker version for update tracking
-const SW_VERSION = '1.1.1';
+const SW_VERSION = '1.2.0';
 const CACHE_VERSION_PREFIX = 'punch-club-v';
 const STATIC_CACHE = `${CACHE_VERSION_PREFIX}${SW_VERSION.replace(/\./g, '-')}`;
 const DYNAMIC_CACHE = `${CACHE_VERSION_PREFIX}${SW_VERSION.replace(/\./g, '-')}-dynamic`;
@@ -31,7 +31,7 @@ const DYNAMIC_CACHE = `${CACHE_VERSION_PREFIX}${SW_VERSION.replace(/\./g, '-')}-
  * niente ExpirationPlugin). Senza bound, il cache-first-everything riempie
  * la quota su mobile → QuotaExceeded → SW update fallito → client stuck.
  */
-const RUNTIME_CACHE_MAX_ENTRIES = 200;
+const RUNTIME_CACHE_MAX_ENTRIES = 800;
 const RUNTIME_CACHE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 
 /**
@@ -607,6 +607,16 @@ self.addEventListener('fetch', (event: FetchEvent) => {
     return;
   }
 
+  // World/game assets (/assets/**): stale-while-revalidate — serve cache
+  // instantly and refresh in background. Boot preloads ~450 textures/JSONs
+  // (R-166 total preload); filenames are not content-hashed, so cache-first
+  // would pin stale bakes while network-only revalidates every one of them
+  // on every visit.
+  if (url.pathname.startsWith('/assets/')) {
+    event.respondWith(staleWhileRevalidateStrategy(request, event));
+    return;
+  }
+
   // Handle static assets with cache-first strategy
   if (STATIC_ASSETS.some(asset => url.pathname === asset) ||
       url.pathname.match(/\.(js|css|png|jpg|jpeg|svg|ico|woff|woff2)$/)) {
@@ -728,6 +738,38 @@ async function cacheFirstStrategy(request: Request): Promise<Response> {
 
     throw error;
   }
+}
+
+/**
+ * Stale-while-revalidate: serve the cached copy immediately (or the network on
+ * a miss), and always refresh the cache in the background so the next load is
+ * fresh. Used for `/assets/**` where names are not content-hashed.
+ */
+async function staleWhileRevalidateStrategy(request: Request, event: FetchEvent): Promise<Response> {
+  const cache = await caches.open(STATIC_CACHE);
+  const cachedResponse = await caches.match(request);
+
+  const refresh = fetch(request)
+    .then(async (networkResponse) => {
+      if (networkResponse.ok) {
+        await putWithCap(cache, request, networkResponse.clone());
+      }
+      return networkResponse;
+    })
+    .catch((error) => {
+      diagnostics.warn('SWR background fetch failed', {
+        url: request.url,
+        error: error instanceof Error ? error.message : String(error)
+      });
+      return cachedResponse ?? Promise.reject(error);
+    });
+
+  if (cachedResponse) {
+    diagnostics.info('SWR served stale, revalidating', { url: request.url });
+    event.waitUntil(refresh);
+    return cachedResponse;
+  }
+  return refresh;
 }
 
 // Listen for messages from the main thread
