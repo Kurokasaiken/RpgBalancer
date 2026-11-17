@@ -1269,6 +1269,11 @@ export function PixiWorldMap({
         wantAsset(packAssetUrl(manifest.pack.packRoot, manifest.pack.fxAtlases.waterfallFlow));
         if (manifest.pack.fxAtlases.waterfallMist) wantAsset(packAssetUrl(manifest.pack.packRoot, manifest.pack.fxAtlases.waterfallMist));
         if (manifest.pack.fxAtlases.waterfallRipple) wantAsset(packAssetUrl(manifest.pack.packRoot, manifest.pack.fxAtlases.waterfallRipple));
+        // Painted flipbook poses (PLAN-092): names are already in the manifest —
+        // join the parallel phase instead of the mid-build Promise.all at :1535.
+        for (const f of manifest.pack.waterfall.paintedFlowFrames ?? []) {
+          wantAsset(packAssetUrl(manifest.pack.packRoot, f));
+        }
       }
       if (manifest.pack?.landLife) {
         const llFx = manifest.pack.fxAtlases;
@@ -1299,6 +1304,67 @@ export function PixiWorldMap({
         void fetchJson<{ size: [number, number]; regions: PixiRegion[] }>(`${regionsBase}/regions.json`);
         bootTotal += 1;
       }
+      if (manifest.pack) {
+        // Leaf JSONs the sequential build awaits mid-flight (secondary-water,
+        // ambient-director, fauna, sea-life, weather-anchors, village): warming
+        // pendingJson now removes their serialized round-trips later — misses
+        // fall back to the same lazy fetch the build already does.
+        for (const leaf of ['ambient-director.json', 'fauna.json', 'sea-life.json', 'weather-anchors.json']) {
+          void fetchJson(packAssetUrl(manifest.pack.packRoot, leaf)).catch(() => null);
+          bootTotal += 1;
+        }
+      }
+      // Painted water poses (PLAN-095): ~100 frame files named by secondary-water.json
+      // were fetched deep inside the sequential build. Chain them into the parallel
+      // swarm as soon as the leaf lands — same pattern as canopyReady.
+      const secondaryWaterReady = manifest.pack && manifest.world === 'mappa2'
+        ? fetchJson<Mappa2SecondaryWater>(packAssetUrl(manifest.pack.packRoot, 'secondary-water.json'))
+            .catch(() => null)
+            .then((swData) => {
+              bootTotal += 1;
+              if (!swData) return null;
+              const late: Promise<unknown>[] = [];
+              const add = (f: string | undefined) => {
+                if (!f) return;
+                const url = packAssetUrl(manifest.pack!.packRoot, f);
+                if (bootUrls.has(url)) return;
+                bootUrls.add(url);
+                bootTotal += 1;
+                late.push(trackBootLoad(url));
+              };
+              add(swData.riverFlowTile);
+              add(swData.riverFlowMask);
+              add(swData.lakeShimmerMask);
+              for (const r of swData.rivers ?? []) for (const f of r.flowPoses?.frames ?? []) add(f);
+              for (const l of swData.lakes ?? []) for (const f of l.flowPoses?.frames ?? []) add(f);
+              for (const f of swData.basin?.flowPoses?.frames ?? []) add(f);
+              for (const p of swData.seaPatches ?? []) for (const f of p.flowPoses?.frames ?? []) add(f);
+              return Promise.all(late);
+            })
+        : Promise.resolve();
+      // Village plates (PLAN-089): village.json names the shipped plates; the bake
+      // stamp goes on the URL, so enumerate them only once the leaf resolves.
+      const villageReady = manifest.pack
+        ? fetchJson<{ version?: string; bake?: string; plates?: { shipped?: boolean; src?: string }[] }>(
+            packAssetUrl(manifest.pack.packRoot, 'fx/village/village.json'),
+          )
+            .catch(() => null)
+            .then((raw) => {
+              bootTotal += 1;
+              if (!raw) return null;
+              const late: Promise<unknown>[] = [];
+              const stamp = raw.bake ?? raw.version;
+              for (const p of raw.plates ?? []) {
+                if (!p.shipped || !p.src) continue;
+                const url = packAssetUrl(manifest.pack!.packRoot, `fx/village/${p.src}?v=${stamp}`);
+                if (bootUrls.has(url)) continue;
+                bootUrls.add(url);
+                bootTotal += 1;
+                late.push(trackBootLoad(url));
+              }
+              return Promise.all(late);
+            })
+        : Promise.resolve();
       // Canopy texture names are known only once the variant sub-manifest resolves; they join the
       // same budget late so the bar keeps moving honestly.
       const canopyReady = canopyOn
@@ -1320,7 +1386,7 @@ export function PixiWorldMap({
           })
         : Promise.resolve();
       bootTotal += bootUrls.size;
-      await Promise.all([...bootUrls].map(trackBootLoad), canopyReady);
+      await Promise.all([...bootUrls].map(trackBootLoad), canopyReady, secondaryWaterReady, villageReady);
       emitBootProgress('build');
       if (disposed) return;
 

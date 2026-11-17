@@ -10,6 +10,9 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="RPG Balancer" />
     <link rel="apple-touch-icon" href="/vite.svg" />
+    <!-- Start the world manifest fetch at HTML parse time instead of after the
+         main bundle mounts (R-166 total preload: same assets, earlier start). -->
+    <link rel="preload" href="/assets/world/mappa2/base/manifest.json" as="fetch" crossorigin />
     <title>RPG Balancer - Idle Village Sandbox</title>
   </head>
   <body>
