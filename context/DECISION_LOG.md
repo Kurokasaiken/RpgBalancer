@@ -614,3 +614,24 @@ contraddicono la semantica config NON si portano (stamina ambrata > teal AI).
 - **D-7 sole:** deve **uscire** dalla barra; il componente del tempo deve essere importante.
 **D-8 (stesso giorno, «1 · Sì, così»):** banda alta = **tempo a sinistra, risorse al centro, Eventi a destra**. Motivo: il cassetto copre la colonna destra, il tempo non deve mai essere coperto, e le risorse a destra avevano generato la duplicazione nel cassetto (R-323).
 **Fonte:** `RICHIESTE.md` R-357; `plans/PLAN-125-hud-fix-r357.md` rev. 2.
+
+## 2026-11-17 — R-358 / PLAN-126: battesimo del piano cold-boot bytes (D-2)
+**Da:** PLAN-126 in stato `proposta` (artifact-r003 del dibattito MW `20261117-rpg-boot-plan`, CONVERGED 2/2 chatgpt+gemini su sha `ac06f1cf`); R-358 `in corso` in attesa di ruling.
+**A (verbatim Director):** *"battezzo il plan PLAN-126, eseguilo"*.
+- Piano attivo con ordine §9: Fase A misura (HAR byte budget per categoria, timing per fase su SwiftShader + GPU reale, A/B packaging con gate ≥2s riproducibile) → Fase B byte (audit WebP → pixel-diff harness → audit pixel ridondanti → re-encode solo su item `safe` con visual gate OB-4) → Fase C decode/upload solo se la misura lo conferma → Fase D spike KTX2 in parallelo dopo Fase A → Fase E piccoli guadagni opzionali.
+- **D-1 resta aperta** (soglia di parità visiva per re-encode/downscale: ruling Director prima che varianti tocchino produzione) — blocca T-B4 e il deploy di qualsiasi variante di asset.
+- Kill list ratificata immutata: niente lazy/deferred/streaming (mandato R-166), niente archivio binario monolitico come fix primario, niente tuning HTTP/3.
+**Fonte:** `plans/PLAN-126-game-cold-boot-bytes.md`; `RICHIESTE.md` R-358.
+
+## 2026-11-17 — PLAN-126 Fase A: la misura smentisce "byte-bound", kill evidence-based
+**Da:** §0 del plan registrava "byte-bound" come fatto (stime on-disk 132+54MB); il dibattito convergeva su "byte + decode/upload".
+**Misurato** (run `.mw/runs/plan126-boot-bytes/`, `T-A-findings.md`):
+- Wire totale reale = **16.4MB** (HAR prod, `har-budget.json`) — il traffico on-disk ≠ traffico on-wire.
+- GPU reale (ANGLE Metal M4): veil 7.2s, di cui fetch fan-out 3.9s (~55%); upload ~4ms + texSubmit 134ms.
+- SwiftShader: veil 28.3s — sceneBuild 18.4s e decode wall 24s dominano.
+- A/B packaging (stessi byte, 344 file vs 12 bundle): delta 984ms < gate 2s → **no-adopt**.
+**Decisioni derivate dall'evidenza:**
+- Fase C upload (T-C3) **killata** — upload non è il collo su nessuno dei due env.
+- Packaging/bundling **killato** sotto il gate ≥2s riproducibile.
+- Il collo residuo è decode/scheduling (SwiftShader) e request fan-out + CDN tail (GPU): la leva byte (Fase B) resta utile sul piano decode ma non basta da sola a spiegare i ~122s prod — attesa forte componente di varianza CDN/env del probe.
+**Fonte:** `.mw/runs/plan126-boot-bytes/T-A-findings.md`, `har-budget.json`, `timing-*.json`, `ab-packaging.json`.

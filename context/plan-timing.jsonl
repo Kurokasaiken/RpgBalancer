@@ -91,3 +91,4 @@
 {"plan":"PLAN-121","event":"close","at":"2026-11-15T14:31:12.469Z"}
 {"plan":"PLAN-123","event":"open","at":"2026-11-15T14:47:36.322Z"}
 {"plan":"PLAN-123","event":"close","at":"2026-11-15T15:33:37.339Z"}
+{"plan":"PLAN-126","event":"open","at":"2026-11-17T18:34:20.675Z","lane":"local"}
