@@ -1,11 +1,11 @@
 # PLAN-126 — /game cold-boot: riduzione dei byte (preload integrale preservato)
 
-**Stato:** proposta (non battezzata) · **Parent:** R-166 (mandato preload completo) · **Richiesta:** R-358
+**Stato:** battezzata 2026-11-17 (Director: *"battezzo il plan PLAN-126, eseguilo"*) · **Parent:** R-166 (mandato preload completo) · **Richiesta:** R-358
 **Provenienza:** dibattito multi-AI `20261117-rpg-boot-plan` (mind-weaver) — CONVERGED 2/2 (chatgpt, gemini) su `artifact-r003` sha256 `ac06f1cf…`; elettorato ridotto (claude/deepseek logout, grok age-gate). Ledger: `mind-weaver/.mw/runs/20261117-rpg-boot-plan/report.md`.
 
 **Documentation Impact:** REQUIRED — nuovo plan + INDEX + DECISION_LOG per i ruling + context/ se emergono pattern.
 
-**visual-fork: skipped — piano di pipeline/perf, nessuna nuova forma estetica. La baseline visiva è l'asset set corrente committato (look approvato); la parità è enforced da pixel-diff con soglia + eyeball Director (OB-4).**
+- `visual-fork: skipped — piano di pipeline/perf, nessuna nuova forma estetica (baseline visiva = asset set committato; parità enforced da pixel-diff con soglia + eyeball Director OB-4) — .mw/runs/plan126-boot-bytes/verification.json`
 
 ## 0. Fatti verificati
 
@@ -31,7 +31,7 @@ Ridurre il cold-boot wall time di `/game` **senza rimuovere, differire o rendere
 | # | Decisione | Stato |
 |---|---|---|
 | D-1 | Soglia di parità visiva per re-encode/downscale: approvare via pixel-diff + side-by-side **prima** che qualsiasi variante tocchi produzione (obbligazione OB-4) | ⏸ |
-| D-2 | Battesimo del plan (plan:stamp, ordine fasi come da §9) | ⏸ |
+| D-2 | Battesimo del plan (plan:stamp, ordine fasi come da §9) | ✅ battezzato 2026-11-17 — *"battezzo il plan PLAN-126, eseguilo"* |
 
 ## 4. Piano di esecuzione
 
@@ -105,3 +105,15 @@ Ridurre il cold-boot wall time di `/game` **senza rimuovere, differire o rendere
 ## 9. Ordine proposto
 
 T-A1 → T-A2 → T-A3 ∥ (T-B1 → T-B2 → T-B3 → [ruling D-1] → T-B4) ∥ (T-D1 spike) → T-C* condizionati dalla misura → T-E* opzionali → OB-5 deploy verify → OB-6 bundle.
+
+## 10. Execution log
+
+**2026-11-17 — Fase A completa + Fase B parziale** (run dir `.mw/runs/plan126-boot-bytes/`, dettagli in `T-A-findings.md`):
+
+- **T-A1 ✅** `har-budget.json` — wire totale **16.4MB** (OB-1 PASS). Il fatto §0 "byte-bound" è **corretto dalla misura**: 15.7–16.4MB totali, non 60–130MB.
+- **T-A2 ✅** dual-env (OB-2 PASS): SwiftShader veil 28.3s — sceneBuild 18.4s + decode wall 24s dominano; GPU Metal M4 veil 7.2s — fetch fan-out 3.9s (~55%), upload trivial (4ms + 134ms texSubmit). **Fase C upload (T-C3) killata dall'evidenza**; decode parallelo (T-C2) resta candidato solo per env decode-bound.
+- **T-A3 ✅ → no-adopt**: A/B 344 file vs 12 bundle, stessi 13.7MB, 5 run — delta mediano 984ms < gate 2s. Packaging killato.
+- **T-B1 ✅** `T-B1-bake-audit.md`; **T-B2 ✅** `scripts/asset-pixel-diff.py`; **T-B3 parziale**: maxZoom=3 + DPR2 → sorgenti prevalentemente *sotto*campionati; `ui/bg.webp` e grade-sheets = candidati `director-ruling`.
+- **T-B4 ⏸ bloccato su D-1** — nessun re-encode eseguito.
+- **OB-3 ✅** `tests/unit/idleVillage/gameBootAssets.test.ts` (golden set 352 path / 14.38MB baseline).
+- **Strumentazione**: `performance.mark('game-boot:<phase>')` in `PixiWorldMap.emitBootProgress` + mark post-`prepare.upload` — misura pura, zero cambio comportamento.

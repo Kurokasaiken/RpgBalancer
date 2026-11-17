@@ -405,6 +405,21 @@ export default function GameMappa2Page() {
   const [view, setView] = useState<'map' | 'village'>('map');
   const [recenterSignal, setRecenterSignal] = useState(0);
   const [boot, setBoot] = useState<PixiBootProgress>({ phase: 'assets', loaded: 0, total: 0 });
+  /* PLAN-126 T-A2: phase-transition marks consumed by scripts/boot-phase-timing.mjs.
+   * Emitted at the page seam (not inside PixiWorldMap — sealed contract surface);
+   * the `uploaded` boundary lives in .mw/runs/plan126-boot-bytes/pixiwm-phase-marks.patch. */
+  const bootPhaseMarkedRef = useRef(new Set<string>());
+  const onBootProgress = useCallback((p: PixiBootProgress) => {
+    if (!bootPhaseMarkedRef.current.has(p.phase)) {
+      bootPhaseMarkedRef.current.add(p.phase);
+      try {
+        performance.mark(`game-boot:${p.phase}`);
+      } catch {
+        /* marks are best-effort */
+      }
+    }
+    setBoot(p);
+  }, []);
   const [ready, setReady] = useState(false);
   const [veilGone, setVeilGone] = useState(false);
   const [bootError, setBootError] = useState<string | null>(null);
@@ -1388,7 +1403,7 @@ export default function GameMappa2Page() {
                   ))
               : undefined
           }
-          onBootProgress={setBoot}
+          onBootProgress={onBootProgress}
           onReady={() => setReady(true)}
           onBootError={(err) => setBootError(err.message)}
         />
