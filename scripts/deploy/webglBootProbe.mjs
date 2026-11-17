@@ -17,7 +17,9 @@ if (!url) {
   process.exit(2);
 }
 
-const MAX_MS = Number(process.env.WEBGL_PROBE_TIMEOUT_MS ?? 150000);
+// 150s was below reality: R-166 mandates total preload (~450 assets, ~2min on a
+// cold edge + software WebGL). 300s aligns the gate with the ratified design.
+const MAX_MS = Number(process.env.WEBGL_PROBE_TIMEOUT_MS ?? 300000);
 const POLL_MS = 2000;
 
 const browser = await chromium.launch({ args: ['--enable-unsafe-swiftshader'] });

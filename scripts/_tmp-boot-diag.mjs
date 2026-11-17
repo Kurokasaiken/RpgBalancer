@@ -1,21 +1,30 @@
 import { chromium } from 'playwright';
-const b = await chromium.launch({ args: ['--enable-unsafe-swiftshader'] });
-const p = await b.newPage({ viewport: { width: 1280, height: 800 } });
-p.on('pageerror', (e) => console.log('[pageerror]', String(e).slice(0, 250)));
-p.on('console', (m) => { if (m.type() === 'error' && !m.text().includes('example-circle')) console.log('[err]', m.text().slice(0, 200)); });
-await p.goto('http://localhost:5173/game', { waitUntil: 'domcontentloaded', timeout: 60000 });
-for (let i = 0; i < 8; i += 1) {
-  await p.waitForTimeout(15000);
-  const s = await p.evaluate(() => ({
-    canvas: !!document.querySelector('canvas'),
-    ready: !!document.querySelector('[data-map-ready]'),
-    anchors: document.querySelectorAll('[data-anchor-id]').length,
-    zanara: document.querySelectorAll('[data-poi-zanara]').length,
-    veil: !!document.querySelector('[data-testid="game-boot-screen"]'),
-    veilText: document.querySelector('[data-testid="game-boot-screen"]')?.textContent?.slice(0, 80) ?? '',
-    cam: window.__worldCam?.zoom ?? null,
-  }));
-  console.log(`t+${(i + 1) * 15}s`, JSON.stringify(s));
-  if (s.zanara > 0 || s.ready) break;
-}
-await b.close();
+const url = process.argv[2];
+const browser = await chromium.launch({ args: ['--enable-unsafe-swiftshader'] });
+const page = await browser.newPage({ viewport: { width: 1600, height: 900 } });
+const reqs = new Map();
+const fails = [];
+page.on('request', (r) => reqs.set(r, Date.now()));
+page.on('requestfailed', (r) => fails.push(`${r.failure()?.errorText} ${r.url().slice(0,140)}`));
+page.on('response', (res) => {
+  const t0 = reqs.get(res.request());
+  if (t0) reqs.set(res.request(), Date.now() - t0);
+});
+const done = [];
+page.on('requestfinished', (r) => { if (reqs.has(r)) done.push({ t: reqs.get(r), url: r.url() }); });
+page.on('pageerror', (e) => fails.push('PAGEERR ' + String(e).slice(0,200)));
+const t0 = Date.now();
+await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45000 });
+await page.waitForTimeout(120000);
+const phase = await page.evaluate(() => document.querySelector('[data-boot-phase]')?.getAttribute('data-boot-phase') ?? 'gone');
+const pending = [...reqs.entries()].filter(([r]) => !done.find(d => d.url === r.url()));
+console.log(`phase after ${(Date.now()-t0)/1000}s: ${phase}`);
+console.log(`finished: ${done.length}, pending: ${pending.length}, failed: ${fails.length}`);
+done.sort((a,b) => b.t - a.t);
+console.log('--- slowest 15 ---');
+done.slice(0,15).forEach(d => console.log(`${(d.t/1000).toFixed(1)}s ${d.url.slice(0,140)}`));
+console.log('--- pending (stuck) ---');
+pending.slice(0,15).forEach(([r,t]) => console.log(`${r.url().slice(0,140)}`));
+console.log('--- failed ---');
+fails.slice(0,15).forEach(f => console.log(f));
+await browser.close();
