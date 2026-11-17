@@ -16,6 +16,7 @@ import {
 // N settori anulari parametrici contigui, fill order sx→dx, overflow → planner.
 
 describe('placeFanGeometry (anello ellittico v65)', () => {
+  // INV:place-fan-geometry.INV-1 — the fan's contiguous sectors cover the 360° ring net of the gold gaps.
   it('N settori contigui coprono i 360° al netto dei gap oro', () => {
     const step = 360 / FAN_RING.slotsTotal;
     for (let i = 0; i < FAN_RING.slotsTotal; i++) {

@@ -15,7 +15,7 @@ fast_checks:
 e2e_checks: []
 e2e_trigger_globs: []
 invariants:
-  - id: INV-1
+  - id: game-save.INV-1
     source: director-bug
     source_ref: PLAN-076
     statement: >-
@@ -23,7 +23,7 @@ invariants:
       non solo lo store gameplay
     test_refs:
       - tests/unit/idleVillage/gameSave.test.ts
-  - id: INV-2
+  - id: game-save.INV-2
     source: director-bug
     source_ref: PLAN-076
     statement: >-
@@ -31,25 +31,25 @@ invariants:
       toccano
     test_refs:
       - tests/unit/idleVillage/gameSave.test.ts
-  - id: INV-3
+  - id: game-save.INV-3
     source: director-bug
     source_ref: PLAN-076
     statement: Un salvataggio corrotto o di versione più nuova viene rifiutato senza scrivere nulla
     test_refs:
       - tests/unit/idleVillage/gameSave.test.ts
-  - id: INV-4
+  - id: game-save.INV-4
     source: director-bug
     source_ref: PLAN-076
     statement: Una scrittura che fallisce a metà lascia intatto il mondo precedente (tutto o niente)
     test_refs:
       - tests/unit/idleVillage/gameSave.test.ts
-  - id: INV-5
+  - id: game-save.INV-5
     source: director-bug
     source_ref: PLAN-076
     statement: Lo slot autosalvataggio è separato dai tre manuali; l'elenco distingue vuoto, valido, corrotto
     test_refs:
       - tests/unit/idleVillage/gameSave.test.ts
-  - id: INV-6
+  - id: game-save.INV-6
     source: director-bug
     source_ref: PLAN-076
     statement: >-
@@ -57,7 +57,7 @@ invariants:
       solo store gameplay
     test_refs:
       - tests/unit/idleVillage/gameSaveService.test.ts
-  - id: INV-7
+  - id: game-save.INV-7
     source: director-bug
     source_ref: PLAN-076
     statement: >-
@@ -65,13 +65,13 @@ invariants:
       autosalvataggio
     test_refs:
       - tests/unit/idleVillage/gameSaveService.test.ts
-  - id: INV-8
+  - id: game-save.INV-8
     source: director-bug
     source_ref: PLAN-076
     statement: Caricare uno slot ripristina il mondo salvato e diventa la base di confronto per il progresso non salvato
     test_refs:
       - tests/unit/idleVillage/gameSaveService.test.ts
-  - id: INV-9
+  - id: game-save.INV-9
     source: director-bug
     source_ref: PLAN-076
     statement: L'autosalvataggio aggiorna solo lo slot auto, a intervallo, e solo se il clock è avanzato; mai uno slot manuale

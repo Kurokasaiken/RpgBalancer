@@ -1,3 +1,8 @@
+---
+trigger: model_decision
+description: "How to fold Director behavioral statements into spec/trusted docs: single-source contract, expected-behavior blocks in the Director's words, spec-derived tests."
+---
+
 # Director Intent → Spec
 
 ## Purpose

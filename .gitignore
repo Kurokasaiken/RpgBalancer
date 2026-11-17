@@ -138,3 +138,7 @@ __pycache__/
 
 # PLAN-110 restoration models (local, large)
 tools/hud-real/models/
+
+# Private signing keys (e.g. PAdES self-signed material)
+**/signer-key.pem
+*.key

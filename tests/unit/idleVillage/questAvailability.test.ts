@@ -7,6 +7,7 @@ describe('questAvailability', () => {
     expect(questAvailability(250, 100, 60, 5).progress).toBeCloseTo(0.5);
   });
 
+  // INV:quest-availability.INV-1 — an offer reads "expiring" in the last quarter of its window and "expired" at zero.
   it('turns expiring in the last quarter and expired at zero', () => {
     expect(questAvailability(100 + 240, 100, 60, 5).state).toBe('expiring'); // 20% left
     expect(questAvailability(100 + 300, 100, 60, 5)).toEqual({ progress: 0, state: 'expired' });

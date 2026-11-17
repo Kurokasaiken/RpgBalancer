@@ -1,6 +1,6 @@
 # Current State — RpgBalancer
 
-**Ultimo aggiornamento:** 2026-10-23
+**Ultimo aggiornamento:** 2026-11-15
 **Superficie canonica:** `/game` (Game Frame Pixi — raggiungibile dal link «Game» in `/test hub`; R-075 v2)
 **Repo remoto:** `https://github.com/Kurokasaiken/RpgBalancer`
 
@@ -43,8 +43,11 @@ Questa è una fotografia; per lo stato più aggiornato verificare `SESSION_HANDO
 - **Knowledge pipeline** (2026-10-05, R-084/v25): `QUEST_RULES.md` canonico (PLAN-020), registry `context/REJECTED.md` + `context/OPEN.md`, report di ingestion tracciati in `context/ingestions/`, router L0–L4 in `context/INDEX.md`.
 - **Quest S1 lab** `/quest-s1-lab` (PLAN-019-S1, 2026-10-02/03): «La cassa delle sementi» giocabile end-to-end — preset party, mercante, check con Astrolabe, bodyguard, permadeath, push-your-luck, esito graduato. Audit 2026-10-03: strutturalmente imperdibile (diagnosi + playtest seed 1983 in `.mw/runs/20261003-quest-v6-science/`); redesign proposto in `context/QUEST_V6_REDESIGN.md` (TAKEN≠SECURED + estrazione; originale in `.mw/runs/20261003-quest-v6-science/`). Bibliografia scientifica: `context/QUEST_GAMEPLAY_SCIENCE.md` (P1–P47). Seconda quest authored 2026-10-04: «Le Rovine sotto il Fiume» (`questScenarioRovine.ts`, da mockup Director/ChatGPT — spec tracciata in `src/docs/docs/idle_village/quest_rovine_scenario_spec.md`; provenance `.mw/runs/20261004-rovine-preview-chatgpt/`). **Quest Simulation Preview** (R-082, 2026-10-04): `questSimulation.ts` (analitico esatto per check + Monte Carlo seeded per quest, consumabili ignorati nel total) + `QuestSimulationPreview`/`QuestCheckPreview` integrati nella pagina — X-ray probabilistico con what-if bench e counterfactual consumabile.
 
+- **Delega subagent + context budget** (R-343/R-344, 2026-11-15): profili RPG-aware `.devin/agents/` (`rpg-researcher` read-only, `rpg-verifier` safeguard, `rpg-implementer` write-capable — pinned `swe-1-6-fast`) + gemelli generici globali `~/.config/devin/agents/` (tutti i progetti, MW incluso); regole `.windsurf/rules/55-delegation-context-budget.md` (RPG) + `~/.devin/rules/delegation-context-budget.md` (globale); hook `PostCompaction`/`UserPromptSubmit` globali in `~/.config/devin/config.json` → `mind-weaver/tools/devin-context-hooks.py` (rilevamento docs canonici per progetto); `agent.subagent_model` pinnato. `devin doctor`: profili caricati ovunque.
+
 ## Parzialmente implementato
 
+- **Contract resync R-345** (2026-11-15, in corso): meccanica chiusa (scope→inventory, INV namespacing, stub popolati, override cap apposto col "go" Director). Resume point con lista errori residui e opzioni (per-INV retire vs re-seal) in `RICHIESTE.md` → R-345. Gate rosso su drift sessione parallela + ruling 2-owner pendente.
 - `resourceHudKit`, `jobCardKit`, `questCardKit` (richiedono reskin/rifacimento).
 - `skillCheckKit` d20 originale (da sostituire con Asterism V6).
 - `marketKit` (`MarketActionCard` è placeholder).

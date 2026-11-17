@@ -1,3 +1,8 @@
+---
+trigger: model_decision
+description: Canonical dev server port (localhost:5173) and authorized way to start/verify the Vite dev server for agent testing, smoke checks and runtime verification.
+---
+
 # Canonical Dev Server Port for Agent Testing
 
 Applies to every task that requires running the application in the Vite dev server for manual or automated testing, smoke checks, browser preview, or runtime verification.

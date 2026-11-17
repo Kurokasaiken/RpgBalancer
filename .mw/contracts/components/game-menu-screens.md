@@ -20,7 +20,7 @@ fast_checks:
 e2e_checks: []
 e2e_trigger_globs: []
 invariants:
-  - id: INV-1
+  - id: game-menu-screens.INV-1
     source: director-bug
     source_ref: PLAN-076
     statement: >-
@@ -28,7 +28,7 @@ invariants:
       caricare
     test_refs:
       - tests/unit/idleVillage/loadGamePanel.test.tsx
-  - id: INV-2
+  - id: game-menu-screens.INV-2
     source: director-bug
     source_ref: PLAN-076
     statement: >-
@@ -36,13 +36,13 @@ invariants:
       nulla
     test_refs:
       - tests/unit/idleVillage/loadGamePanel.test.tsx
-  - id: INV-3
+  - id: game-menu-screens.INV-3
     source: director-bug
     source_ref: PLAN-076
     statement: Eliminare un salvataggio chiede conferma
     test_refs:
       - tests/unit/idleVillage/loadGamePanel.test.tsx
-  - id: INV-4
+  - id: game-menu-screens.INV-4
     source: director-bug
     source_ref: PLAN-076
     statement: >-
@@ -50,13 +50,13 @@ invariants:
       salvataggio
     test_refs:
       - tests/unit/idleVillage/menuFlow.test.ts
-  - id: INV-5
+  - id: game-menu-screens.INV-5
     source: director-bug
     source_ref: PLAN-076
     statement: «Continua» riprende lo slot valido più recente; slot danneggiati o vuoti non si scelgono mai
     test_refs:
       - tests/unit/idleVillage/menuFlow.test.ts
-  - id: INV-6
+  - id: game-menu-screens.INV-6
     source: director-bug
     source_ref: PLAN-076
     statement: >-
@@ -64,7 +64,7 @@ invariants:
       dritta al gioco
     test_refs:
       - tests/unit/idleVillage/menuFlow.test.ts
-  - id: INV-7
+  - id: game-menu-screens.INV-7
     source: director-bug
     source_ref: PLAN-076
     statement: >-
@@ -72,31 +72,31 @@ invariants:
       gioco
     test_refs:
       - tests/unit/idleVillage/menuScreens.test.tsx
-  - id: INV-8
+  - id: game-menu-screens.INV-8
     source: director-bug
     source_ref: PLAN-076
     statement: «Nuova partita» sopra un progresso chiede prima; azzera il mondo e lo slot automatico e tiene i salvataggi manuali
     test_refs:
       - tests/unit/idleVillage/menuScreens.test.tsx
-  - id: INV-9
+  - id: game-menu-screens.INV-9
     source: director-bug
     source_ref: PLAN-076
     statement: «Esci dal gioco» esiste solo nell'app desktop
     test_refs:
       - tests/unit/idleVillage/menuScreens.test.tsx
-  - id: INV-10
+  - id: game-menu-screens.INV-10
     source: director-bug
     source_ref: PLAN-076
     statement: Le impostazioni agiscono subito; la musica non ha riga finché /game non ha musica
     test_refs:
       - tests/unit/idleVillage/menuScreens.test.tsx
-  - id: INV-11
+  - id: game-menu-screens.INV-11
     source: director-bug
     source_ref: PLAN-076
     statement: Uscire senza nulla da perdere esce subito; con progresso non salvato chiede, e ogni risposta fa ciò che dice
     test_refs:
       - tests/unit/idleVillage/menuScreens.test.tsx
-  - id: INV-12
+  - id: game-menu-screens.INV-12
     source: director-bug
     source_ref: PLAN-076
     statement: >-

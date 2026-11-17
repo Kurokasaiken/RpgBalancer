@@ -8,9 +8,18 @@ scope_files:
   - src/ui/idleVillage/memorial/memorialHall.ts
 fast_checks:
   - tests/unit/idleVillage/memorialHall.test.ts
+  - tests/unit/idleVillage/memorialHall.idempotent.test.ts
 e2e_checks: []
 e2e_trigger_globs: []
-invariants: []
+invariants:
+  - id: memorial-hall.INV-1
+    source: plan
+    source_ref: PLAN-067
+    statement: >-
+      `appendMemorial` è idempotente: ripianificare lo stesso settlement non aggiunge voci — ogni morte
+      scrive una sola entry del memoriale.
+    test_refs:
+      - tests/unit/idleVillage/memorialHall.idempotent.test.ts
 ---
 
 # memorial-hall

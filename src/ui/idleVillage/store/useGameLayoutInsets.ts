@@ -2,8 +2,8 @@
  * useGameLayoutInsets — the shared docked-surfaces inset ledger
  * (R-339 / PLAN-119 D4, mw-debate artifact-r004).
  *
- * Docked HUD surfaces (expedition drawer right, future roster|stash rail left,
- * future Chronicle zone top-right) publish the screen space they occupy here,
+ * Docked HUD surfaces (expedition drawer right, future Chronicle zone
+ * top-right) publish the screen space they occupy here,
  * so the map layer and any layout consumer can derive the free rectangle
  * without peeking at component internals. This is the single source for
  * "how much viewport is still world".
@@ -30,7 +30,8 @@ interface GameLayoutInsetsState {
    * Merge a side's published inset. Publishers pass the FULL value they
    * currently occupy for the sides they own (0 when closed/collapsed) —
    * last writer wins per side, so independent surfaces must own disjoint
-   * sides (drawer → right, rail → left, chrome → top/bottom).
+   * sides (drawer → right, chrome → top/bottom; `left` is unowned — the
+   * Roster|Stash rail that published it was reverted 2026-11-15).
    */
   publish: (patch: Partial<GameLayoutInsets>) => void;
 }

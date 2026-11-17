@@ -17,8 +17,7 @@ invariants:
     source_ref: PLAN-119
     statement: >-
       Lo schema Zod `cassettoLayoutSchema` (.strict) dichiara tutti i token T1 delle superfici
-      expedition — drawer clamp {widthMinPx 360, widthVwFraction 0.23, widthMaxPx 460}, rail
-      {widthPx, chipWidthPx, marginPx, bottomInsetPx, mutualExclusionBelowPx, bars}, bottomSheet
+      expedition — drawer clamp {widthMinPx 360, widthVwFraction 0.23, widthMaxPx 460}, bottomSheet
       detents {peekPx, halfFraction, fullFraction}, topChrome {marginPx, gapPx, chronicleReservePx,
       minFitScale} e cta.vars — e rigetta chiavi sconosciute.
     test_refs:
@@ -38,8 +37,8 @@ invariants:
     statement: >-
       Ogni colore/opacity dipinto sulle superfici expedition risale la catena config →
       `var(--skin-*)` → `BASE_SKIN_CSS_VARS` (AC8): le regole scoped del cassetto CONFIRM non
-      contengono letterali colore né opacity letterale, e ogni token nominato in `cta.vars` e
-      `rail.bars[].fill` esiste nel layer skin.
+      contengono letterali colore né opacity letterale, e ogni token nominato in `cta.vars`
+      esiste nel layer skin.
     test_refs:
       - tests/unit/idleVillage/r339ExpeditionTokens.test.tsx
 ---
@@ -47,9 +46,9 @@ invariants:
 
 Modulo token T1 delle superfici expedition di /game (R-339/PLAN-119,
 artifact-r004 T1): `cassettoLayoutConfig` dichiara nello schema Zod strict i
-clamp e gli inset (drawer, rail, bottom-sheet detents, topChrome + riserva
-Chronicle) e i NOMI dei token skin che la CTA e le barre leggono; i valori
+clamp e gli inset (drawer, bottom-sheet detents, topChrome + riserva
+Chronicle) e i NOMI dei token skin che la CTA legge; i valori
 vivono in `BASE_SKIN_CSS_VARS` (+ override per preset). `cassettoColumn` è la
 regola pura larghezza/altezza della colonna baked (cap a `widthMaxPx`, mai
-distorsione). Consumatori: `HudRealCassetto`, `RosterStashRail`,
+distorsione). Consumatori: `HudRealCassetto`,
 `GameTopChrome`, `useGameLayoutInsets` (ledger pubblicato).

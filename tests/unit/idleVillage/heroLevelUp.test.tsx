@@ -109,6 +109,7 @@ describe('heroLevelConfig', () => {
 });
 
 describe('heroLevelView', () => {
+  // INV:hero-level-view-model.INV-1 — the view resolves the level only for a hero that has a configured level; anything else → null.
   it('hero + configured level → the level; non-hero in levels → null; hero without level → null', () => {
     const heroId = Object.keys(HERO_LEVEL_CONFIG!.levels)[0];
     expect(heroLevelView(resident(heroId, true)).level).toBe(HERO_LEVEL_CONFIG!.levels[heroId]);

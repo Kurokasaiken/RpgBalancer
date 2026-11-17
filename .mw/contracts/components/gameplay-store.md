@@ -8,10 +8,20 @@ scope_files:
   - "src/ui/idleVillage/store/gameplayStore.ts"
   - "src/ui/idleVillage/types/gameplayTypes.ts"
   - "src/ui/idleVillage/types/jobTypes.ts"
-fast_checks: []
+fast_checks:
+  - tests/unit/idleVillage/gameplayStore.test.ts
 e2e_checks: []
 e2e_trigger_globs: []
-invariants: []
+invariants:
+  - id: gameplay-store.INV-1
+    source: plan
+    source_ref: PLAN-076
+    statement: >-
+      Lo store gameplay persiste sotto l'unica chiave `minimal-gameplay-state` e `getGameplaySnapshot`
+      riflette lo stato vivo (giorno, oro) nella forma persistita; `resetAll` ripristina il mondo
+      iniziale.
+    test_refs:
+      - tests/unit/idleVillage/gameplayStore.test.ts
 ---
 # gameplay-store
 

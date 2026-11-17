@@ -9,6 +9,7 @@ describe('slot flight target geometry', () => {
     document.body.innerHTML = '';
   });
 
+  // INV:use-drag-outcome.INV-1 — the flight target is the Slot component rect, not its caption/footer rack cell.
   it('uses the Slot component rect rather than its caption/footer rack cell', () => {
     const slotId = 'poi-goblin:goblin-slot-member-1';
     const cell = document.createElement('div');

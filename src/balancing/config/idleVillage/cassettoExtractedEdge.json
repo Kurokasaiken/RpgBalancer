@@ -1,0 +1,262 @@
+{
+  "_comment": "R-353 \u2014 Director pick + ruling 2026-11-16 (design px sul reticolo artW x artH: 753x1613 per 1440, 806x1613 per 1280). edgeClipPx: arte che esce fuori schermo a destra. leftCutPx: taglio sx \u2014 il pezzo ornamentale (filigrana + smeraldo enorme + ciondoli) va via, resta solo frame/bordo. leftTrim.eraseRects: cancellazioni (incl. festone top-right 'pezzo d'oro che scende cn i ciondoli' \u2014 ruling Director: rigenerare pulito); leftTrim.patchRects: rattoppi lacca piana con feather; leftTrim.barTile: ripavimenta la barra gold. pieces: ricomposizioni {src,dest,flipH,flipV,feather,gamma}; il pezzo flipV e' l'angolo bottom-left specchiato -> top-left. wideFactor: stretch orizzontale dell'arte tenuta. restore: elementi pittorici ripristinati 1:1 post-stretch (Director: 'hai strettchato davvero il teschio e il reward, ripristinalo'; 'il componente delle risorse deve essere proporzionato'; 'il pulsante in basso che tocca il frame') \u2014 patch lacca sul ghost stirato + icona originale centrata; le zone DOM corrispondenti (resources/riskValue/rewards/confirm) restano non-stirate via drawer.unstretchedZones.",
+  "edgeClipPx": {
+    "1440": 72,
+    "1280": 76
+  },
+  "leftCutPx": {
+    "1440": 190,
+    "1280": 190
+  },
+  "wideFactor": 1.3333,
+  "unstretchedZones": [
+    "resources",
+    "riskValue",
+    "rewards",
+    "confirm"
+  ],
+  "leftTrim": {
+    "1440": {
+      "eraseRects": [
+        {
+          "x": 0,
+          "y": 140,
+          "w": 233,
+          "h": 1378
+        },
+        {
+          "x": 0,
+          "y": 1518,
+          "w": 190,
+          "h": 95
+        },
+        {
+          "x": 500,
+          "y": 0,
+          "w": 140,
+          "h": 20
+        },
+        {
+          "x": 190,
+          "y": 0,
+          "w": 170,
+          "h": 44
+        }
+      ],
+      "patchRects": [],
+      "barTile": {
+        "srcImage": "public/assets/ui/hud-real/cassetto/gemini-bar-1440.png",
+        "destX": 225,
+        "destY0": 78,
+        "destY1": 1550
+      }
+    },
+    "1280": {
+      "eraseRects": [
+        {
+          "x": 0,
+          "y": 140,
+          "w": 233,
+          "h": 1372
+        },
+        {
+          "x": 0,
+          "y": 1512,
+          "w": 190,
+          "h": 101
+        },
+        {
+          "x": 540,
+          "y": 0,
+          "w": 150,
+          "h": 20
+        },
+        {
+          "x": 190,
+          "y": 0,
+          "w": 170,
+          "h": 44
+        }
+      ],
+      "patchRects": [],
+      "barTile": {
+        "srcImage": "public/assets/ui/hud-real/cassetto/gemini-bar-1280.png",
+        "destX": 226,
+        "destY0": 78,
+        "destY1": 1548
+      }
+    }
+  },
+  "pieces": {
+    "1440": [
+      {
+        "srcImage": "public/assets/ui/hud-real/cassetto/gemini-corner-1440.png",
+        "dest": {
+          "x": 190,
+          "y": 0
+        },
+        "destW": 165.4,
+        "destH": 276,
+        "_note": "corner Gemini web (ruling Director 'corner gemini'): cluster smeraldi+foglie, alpha-keyed patch"
+      },
+      {
+        "src": {
+          "x": 192,
+          "y": 45,
+          "w": 248,
+          "h": 240
+        },
+        "dest": {
+          "x": 430,
+          "y": 45
+        },
+        "flipH": true,
+        "flipV": false,
+        "feather": {
+          "left": 26,
+          "right": 10,
+          "top": 10,
+          "bottom": 10
+        },
+        "brighten": 0.94,
+        "gamma": 1.12,
+        "_note": "regione sx specchiata -> copre festone + ricostruisce punta dx placca title"
+      }
+    ],
+    "1280": [
+      {
+        "srcImage": "public/assets/ui/hud-real/cassetto/gemini-corner-1280.png",
+        "dest": {
+          "x": 190,
+          "y": 0
+        },
+        "destW": 181.4,
+        "destH": 302
+      },
+      {
+        "src": {
+          "x": 192,
+          "y": 45,
+          "w": 248,
+          "h": 240
+        },
+        "dest": {
+          "x": 482,
+          "y": 45
+        },
+        "flipH": true,
+        "flipV": false,
+        "feather": {
+          "left": 26,
+          "right": 10,
+          "top": 10,
+          "bottom": 10
+        },
+        "brighten": 0.94,
+        "gamma": 1.12
+      }
+    ]
+  },
+  "restore": {
+    "1440": [
+      {
+        "name": "skull",
+        "src": {
+          "x": 255,
+          "y": 1145,
+          "w": 108,
+          "h": 118
+        },
+        "patch": {
+          "x": 300,
+          "y": 650,
+          "w": 150,
+          "h": 150
+        },
+        "feather": 12
+      },
+      {
+        "name": "chest",
+        "src": {
+          "x": 473,
+          "y": 1142,
+          "w": 210,
+          "h": 136
+        },
+        "patch": {
+          "x": 300,
+          "y": 650,
+          "w": 150,
+          "h": 150
+        },
+        "feather": 12
+      },
+      {
+        "name": "confirmPlaque",
+        "src": {
+          "x": 251,
+          "y": 1378,
+          "w": 448,
+          "h": 138
+        },
+        "patch": {
+          "x": 300,
+          "y": 650,
+          "w": 150,
+          "h": 150
+        },
+        "feather": 10
+      }
+    ],
+    "1280": [
+      {
+        "name": "skull",
+        "src": {
+          "x": 281,
+          "y": 1145,
+          "w": 108,
+          "h": 118
+        },
+        "patch": {
+          "x": 330,
+          "y": 650,
+          "w": 150,
+          "h": 150
+        },
+        "feather": 12
+      },
+      {
+        "name": "chest",
+        "src": {
+          "x": 500,
+          "y": 1142,
+          "w": 210,
+          "h": 136
+        },
+        "patch": {
+          "x": 330,
+          "y": 650,
+          "w": 150,
+          "h": 150
+        },
+        "feather": 12
+      },
+      {
+        "name": "confirmPlaque",
+        "src": {
+          "x": 277,
+          "y": 1378,
+          "w": 448,
+          "h": 138
+        },
+        "patch": {
+          "x": 330,
+          "y": 650,
+          "w": 150,
+          "h": 150
+        },
+        "feather": 10
+      }
+    ]
+  }
+}

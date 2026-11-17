@@ -59,6 +59,7 @@ describe('villageStash ledger — assign/release', () => {
     expect(remainingFor(ITEM, S().bags, S().committed)).toBe(0);
   });
 
+  // INV:use-village-stash-store.INV-1 — assign fills the first FREE slot, not the tail.
   it('fills the first FREE slot, not the tail (release in the middle first)', () => {
     S().assign(POI_A, ITEM);
     S().assign(POI_A, ITEM2);

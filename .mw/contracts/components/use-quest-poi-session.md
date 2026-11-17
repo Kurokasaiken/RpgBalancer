@@ -13,7 +13,6 @@ scope_files:
   - src/ui/idleVillage/hooks/useActiveHUDStateSync.ts
   - src/ui/idleVillage/hooks/useMilestoneEngine.ts
   - src/ui/idleVillage/hooks/useQuestAssignmentPreview.ts
-  - src/ui/idleVillage/hooks/useQuestLoreDrop.ts
   - src/ui/idleVillage/quests/useQuestPoiSession.tsx
   - src/ui/idleVillage/utils/hudPersistence.ts
   - src/ui/idleVillage/utils/statRequirementDisplay.ts
@@ -90,7 +89,6 @@ Root: `src/ui/idleVillage/quests/useQuestPoiSession.tsx`.
 - `src/ui/idleVillage/hooks/useActiveHUDStateSync.ts`
 - `src/ui/idleVillage/hooks/useMilestoneEngine.ts`
 - `src/ui/idleVillage/hooks/useQuestAssignmentPreview.ts`
-- `src/ui/idleVillage/hooks/useQuestLoreDrop.ts`
 - `src/ui/idleVillage/quests/useQuestPoiSession.tsx`
 - `src/ui/idleVillage/utils/hudPersistence.ts`
 - `src/ui/idleVillage/utils/statRequirementDisplay.ts`

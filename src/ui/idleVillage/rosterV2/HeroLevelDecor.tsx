@@ -89,6 +89,7 @@ export const HeroLevelDecor: React.FC<HeroLevelDecorProps> = ({ resident }) => {
   const [portraitRect, setPortraitRect] = useState<Rect | null>(null);
   /** Badge right edge (wrapper-relative) and the wrapper width it is measured against. */
   const [badgeAnchor, setBadgeAnchor] = useState<{ right: number; wrapperWidth: number } | null>(null);
+  const [isCompactBadge, setIsCompactBadge] = useState(false);
   const [flare, setFlare] = useState<HeroLevelUpEvent | null>(null);
   const [floater, setFloater] = useState<{ eventId: string; text: string; rect: Rect } | null>(null);
   const reducedMotion = useRef(prefersReducedMotion()).current;
@@ -112,6 +113,18 @@ export const HeroLevelDecor: React.FC<HeroLevelDecorProps> = ({ resident }) => {
       const wr = wrapper.getBoundingClientRect();
       const pr = portrait.getBoundingClientRect();
       setPortraitRect({ left: pr.left - wr.left, top: pr.top - wr.top, width: pr.width, height: pr.height });
+      /* R-353: on compact rows the mockup gives the LV cluster its own column
+       *  between medallion and name — chip over a small emblem shield, centred
+       *  on the ring. The card reserves a 34px spacer; the cluster's right
+       *  edge sits 32px right of the portrait so even two-digit levels clear
+       *  the ring. The top-right contract stays for other densities. */
+      const isCompact = wrapper.querySelector('[data-density="compact"]') !== null;
+      if (isCompact) {
+        setBadgeAnchor({ right: pr.right - wr.left + 32, wrapperWidth: wr.width });
+        setIsCompactBadge(true);
+        return;
+      }
+      setIsCompactBadge(false);
       const corner = pr.right - wr.left + BADGE_OVERHANG_PX;
       const name = wrapper.querySelector<HTMLElement>('[data-roster-name]');
       const right = name ? Math.min(corner, name.getBoundingClientRect().left - wr.left - BADGE_NAME_GAP_PX) : corner;
@@ -185,7 +198,9 @@ export const HeroLevelDecor: React.FC<HeroLevelDecorProps> = ({ resident }) => {
               }}
             />
             {flare && <IgnitionRing rect={{ left: portraitRect.left - 2, top: portraitRect.top - 2, width: portraitRect.width + 4, height: portraitRect.height + 4 }} eventId={flare.eventId} reducedMotion={reducedMotion} />}
-            {/* Badge: top-right corner of the portrait, growing leftwards, clear of the name. */}
+            {/* Badge: top-right corner of the portrait, growing leftwards, clear of the name.
+             *  Compact (R-353 mockup): dedicated column right of the medallion —
+             *  LV chip over a small emblem shield, centred on the ring. */}
             <span
               data-hero-level={resident.id}
               role="img"
@@ -193,21 +208,75 @@ export const HeroLevelDecor: React.FC<HeroLevelDecorProps> = ({ resident }) => {
               style={{
                 position: 'absolute',
                 right: badgeAnchor ? badgeAnchor.wrapperWidth - badgeAnchor.right : undefined,
-                top: portraitRect.top - 7,
+                top: isCompactBadge ? portraitRect.top + portraitRect.height / 2 - 18 : portraitRect.top - 7,
                 whiteSpace: 'nowrap',
                 fontFamily: 'var(--skin-font-display)',
-                fontSize: 12,
+                fontSize: isCompactBadge ? 9 : 12,
                 fontWeight: 700,
                 fontVariantNumeric: 'tabular-nums',
                 lineHeight: 1,
                 color: 'var(--skin-title-color)',
-                background: 'var(--skin-hud-lacquer-deep)',
-                border: '1px solid var(--skin-icon-color)',
-                borderRadius: 4,
-                padding: '1px 3px',
+                ...(isCompactBadge
+                  ? { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }
+                  : {
+                      background: 'var(--skin-hud-lacquer-deep)',
+                      border: '1px solid var(--skin-icon-color)',
+                      borderRadius: 4,
+                      padding: '1px 3px',
+                      textShadow: '0 1px 1px rgba(0,0,0,0.8)',
+                    }),
               }}
             >
-              {t('gameFrame.heroLevel.badge', { n: level })}
+              {isCompactBadge ? (
+                <>
+                  <span
+                    style={{
+                      background: 'var(--skin-hud-lacquer-deep)',
+                      border: '1px solid var(--skin-icon-color)',
+                      borderRadius: 4,
+                      padding: '1px 4px',
+                      textShadow: '0 1px 1px rgba(0,0,0,0.8)',
+                    }}
+                  >
+                    {t('gameFrame.heroLevel.badge', { n: level })}
+                  </span>
+                  {/* Emblem shield under the chip (mockup): gold rim, lacquer
+                   *  field, engraved diamond. */}
+                  <span
+                    aria-hidden
+                    style={{
+                      position: 'relative',
+                      width: 16,
+                      height: 19,
+                      clipPath: 'polygon(0 0, 100% 0, 100% 60%, 50% 100%, 0 60%)',
+                      background: 'var(--skin-icon-color)',
+                      display: 'block',
+                    }}
+                  >
+                    <span
+                      style={{
+                        position: 'absolute',
+                        inset: 1.5,
+                        clipPath: 'polygon(0 0, 100% 0, 100% 60%, 50% 100%, 0 60%)',
+                        background: 'var(--skin-hud-lacquer-deep)',
+                      }}
+                    />
+                    <span
+                      style={{
+                        position: 'absolute',
+                        left: '50%',
+                        top: '38%',
+                        width: 5,
+                        height: 5,
+                        transform: 'translate(-50%, -50%) rotate(45deg)',
+                        background: 'var(--skin-icon-color)',
+                      }}
+                    />
+                  </span>
+                </>
+              ) : (
+                t('gameFrame.heroLevel.badge', { n: level })
+              )}
             </span>
           </>
         )}

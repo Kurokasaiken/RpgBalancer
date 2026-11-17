@@ -1,3 +1,8 @@
+---
+trigger: model_decision
+description: "Documentation Impact contract (R-085): every plan in plans/ and executive task must declare documentation impact NONE/OPTIONAL/REQUIRED; REQUIRED blocks completion until docs updated."
+---
+
 # Documentation Impact Contract (R-085)
 
 Ogni piano in `plans/` e ogni task esecutivo che modifica conoscenza di progetto

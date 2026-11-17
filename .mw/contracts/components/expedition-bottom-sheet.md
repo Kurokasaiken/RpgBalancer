@@ -81,8 +81,8 @@ invariants:
       Mutua esclusione delle superfici laterali ≤`bottomSheet.maxWidthPx` (1100,
       boundary incluso — verificato a 1024 e 1100, AC10): `ExpeditionDrawer` in quella
       banda monta lo sheet via `useExpeditionSheetMode` e la colonna firmata + entrambi
-      i chip non montano mai, anche con il drawer ripiegato; la pagina esclude
-      `ExpeditionEdgeTab` sulla stessa soglia (`win.w > maxWidthPx`). Sopra 1100 il
+      i chip non montano mai, anche con il drawer ripiegato; la pagina ne monte
+      aucune surface au repos (R-351, `ExpeditionEdgeTab` supprimé). Sopra 1100 il
       drawer mantiene la colonna.
     test_refs:
       - tests/unit/idleVillage/r339ExpeditionSheet.test.tsx

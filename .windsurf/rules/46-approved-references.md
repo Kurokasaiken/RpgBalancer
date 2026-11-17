@@ -1,3 +1,8 @@
+---
+trigger: model_decision
+description: "Approved-references preservation (Director ruling 2026-11-14): anything the Director baptizes or designates as visual reference must be preserved durably as a reference artifact."
+---
+
 # Approved References Preservation (Director ruling 2026-11-14)
 
 Applies to every visual/design artifact in the project.

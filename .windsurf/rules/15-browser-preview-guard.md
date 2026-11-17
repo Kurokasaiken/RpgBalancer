@@ -1,3 +1,8 @@
+---
+trigger: model_decision
+description: "Rules for opening web previews or automated browser sessions: canonical preview URL, mandatory pre-flight check that the Vite dev server serves JS modules, and forbidden injected URLs."
+---
+
 # Browser Preview Guard (ALL SKILLS)
 
 Applies to **every skill, agent, and task** that opens a web preview, smoke check, or automated browser session — including `browser_preview`, Puppeteer, Playwright, curl checks, and any "open in browser" action.

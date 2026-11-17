@@ -18,7 +18,7 @@ import { useMatericSkin } from '@/ui/wanderlust-surface/MatericSkinContext';
 import { MATERIC_SKIN_CONFIG } from '@/ui/wanderlust-surface/matericSkinConfig';
 import { BezelMolding, WellBronzeBezel } from '@/ui/visualFidelityLab/plateVariants';
 import { useTranslation } from 'react-i18next';
-import { HudPlaque } from '@/ui/idleVillage/skins/primitives';
+import { HudPlaque, PanelFrameOrnaments } from '@/ui/idleVillage/skins/primitives';
 
 /** QoL-9 (R-281): eligibility reasons with a dedicated roster copy key —
  *  anything else (raw producer strings, e.g. the POI session's legacy
@@ -1185,9 +1185,14 @@ function DragTestContainerV2({
         </div>
       )}
       {hudSurface ? (
-        <HudPlaque shape="panel" aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
-          {null}
-        </HudPlaque>
+        <>
+          <HudPlaque shape="panel" aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+            {null}
+          </HudPlaque>
+          {/* R-353 mockup frame: painted acanthus corners + inner filet over
+           *  the plaque edge — decoration only, same layer as the seat line. */}
+          <PanelFrameOrnaments variant="roster" />
+        </>
       ) : (
         useWanderlustSkin && <WellBronzeBezel band={2} rx={19} flush />
       )}

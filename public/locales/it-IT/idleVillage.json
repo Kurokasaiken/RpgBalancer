@@ -1141,7 +1141,16 @@
         "released": "{item} tornato in magazzino",
         "swapped": "{item} nella sacca — l’oggetto spostato è tornato in magazzino",
         "releasedAll": "Sacca svuotata — ogni oggetto è tornato in magazzino"
-      }
+      },
+      "filterLabel": "Filtra gli oggetti",
+      "tabs": {
+        "all": "Tutto",
+        "equipment": "Equipaggiamento",
+        "consumable": "Consumabili"
+      },
+      "filterEmpty": "Niente di questo tipo in magazzino",
+      "detailLabel": "Dettagli oggetto",
+      "pack": "Insacca"
     },
     "buildings": {
       "stash": {
@@ -1566,9 +1575,6 @@
       "confirmReason": {
         "partyIncomplete": "Gruppo incompleto — riempi gli slot richiesti",
         "unavailable": "Spedizione non ancora pronta"
-      },
-      "edgeTab": {
-        "hint": "Seleziona un segnalino quest"
       },
       "demo": {
         "subtitle": "Pianifica la spedizione"

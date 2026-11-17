@@ -87,6 +87,7 @@ describe('villageStashConfig', () => {
 });
 
 describe('villageStashViewModel', () => {
+  // INV:village-stash-view-model.INV-1 — the displayed count is derived from sum(qty) and every row resolves its descKey from config.
   it('derives the displayed count from sum(qty) and resolves a descKey per row', () => {
     const vm = villageStashViewModel(CFG);
     expect(vm.storedCount).toBe(CFG.items.reduce((s, i) => s + i.qty, 0));

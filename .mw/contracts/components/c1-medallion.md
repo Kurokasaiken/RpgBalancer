@@ -6,7 +6,7 @@ tier: 2
 root_file: src/ui/idleVillage/components/C1Medallion.tsx
 scope_files:
   - src/ui/idleVillage/components/C1Medallion.tsx
-  - src/ui/idleVillage/hudReal/c1RowModGeometry.ts
+  - src/ui/idleVillage/hudReal/c1Geometry.ts
 fast_checks: []
 e2e_checks: []
 e2e_trigger_globs: []
@@ -27,7 +27,7 @@ Root: `src/ui/idleVillage/components/C1Medallion.tsx`.
 ## Scope
 
 - `src/ui/idleVillage/components/C1Medallion.tsx`
-- `src/ui/idleVillage/hudReal/c1RowModGeometry.ts`
+- `src/ui/idleVillage/hudReal/c1Geometry.ts`
 
 ## Decision history
 

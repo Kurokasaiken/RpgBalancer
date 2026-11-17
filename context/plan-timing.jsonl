@@ -83,3 +83,11 @@
 {"plan":"PLAN-115","event":"close","at":"2026-11-10T18:52:10.856Z","kind":"backfill","text":"planForensics: bundle produced_at"}
 {"plan":"PLAN-118","event":"open","at":"2026-11-13T08:18:48.332Z"}
 {"plan":"PLAN-119","event":"open","at":"2026-11-15T01:48:00.425Z"}
+{"plan":"PLAN-120","event":"open","at":"2026-11-15T13:19:36.894Z"}
+{"plan":"PLAN-120","event":"close","at":"2026-11-15T13:27:10.210Z"}
+{"plan":"PLAN-120","event":"close","at":"2026-11-15T13:28:33.602Z"}
+{"plan":"PLAN-121","event":"open","at":"2026-11-15T13:56:08.864Z"}
+{"plan":"PLAN-121","event":"open","at":"2026-11-15T13:57:24.799Z"}
+{"plan":"PLAN-121","event":"close","at":"2026-11-15T14:31:12.469Z"}
+{"plan":"PLAN-123","event":"open","at":"2026-11-15T14:47:36.322Z"}
+{"plan":"PLAN-123","event":"close","at":"2026-11-15T15:33:37.339Z"}

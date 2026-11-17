@@ -10,9 +10,7 @@ scope_files:
   - src/ui/idleVillage/components/gameFrame/questBag.ts
   - src/ui/idleVillage/questS1Lab/questTheatreSequencer.ts
   - src/ui/idleVillage/questS1Lab/render/cameraEval.ts
-  - src/ui/idleVillage/questS1Lab/render/depthTransform.ts
   - src/ui/idleVillage/questS1Lab/render/sceneManifest.ts
-  - src/ui/idleVillage/questS1Lab/render/trauma.ts
 fast_checks:
   - tests/unit/idleVillage/combatStrip.test.tsx
   - tests/unit/idleVillage/questBag.test.tsx
@@ -300,9 +298,7 @@ Superficie quest completa — implementazione di proprietà WS-3 (planner PASS) 
 - `src/ui/idleVillage/components/gameFrame/questBag.ts`
 - `src/ui/idleVillage/questS1Lab/questTheatreSequencer.ts`
 - `src/ui/idleVillage/questS1Lab/render/cameraEval.ts`
-- `src/ui/idleVillage/questS1Lab/render/depthTransform.ts`
 - `src/ui/idleVillage/questS1Lab/render/sceneManifest.ts`
-- `src/ui/idleVillage/questS1Lab/render/trauma.ts`
 
 ## Decision history
 

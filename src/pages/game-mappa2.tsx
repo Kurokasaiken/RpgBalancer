@@ -88,6 +88,7 @@ import { HudRealReliquary } from '@/ui/idleVillage/hudReal/HudRealReliquary';
 import { HudRealMerchantPanel } from '@/ui/idleVillage/hudReal/HudRealMerchantPanel';
 import { HudRealLedgerPanel } from '@/ui/idleVillage/hudReal/HudRealLedgerPanel';
 import { HudRealExpeditionLost } from '@/ui/idleVillage/hudReal/HudRealExpeditionLost';
+import { HudRealVictoryReward } from '@/ui/idleVillage/hudReal/HudRealVictoryReward';
 import { HudRealLevelUp } from '@/ui/idleVillage/hudReal/HudRealLevelUp';
 import { SettlementLostOverlay } from '@/ui/idleVillage/components/SettlementLostOverlay';
 import { OxidizedGradeFilter } from '@/ui/idleVillage/components/OxidizedGradeFilter';
@@ -103,14 +104,11 @@ import { COMPARABLE_SKIN_IDS, resolveInitialSkinPresetId } from '@/ui/idleVillag
 import { warmGameCursors } from '@/ui/idleVillage/utils/gameAssetWarmup';
 import { MatericRosterComponentV2 } from '@/ui/idleVillage/rosterV2';
 import { RosterKitShell, useRosterKitData, type RosterDropVerdict } from '@/ui/idleVillage/frozen/kits/rosterKit';
-import { QuestJourneyRoute, QuestOverlays, QuestRewardPopup, QuestRunWindow, RegionTooltip, useHeroSheet, usePanelWhileOpen, type HeroSheetApi, type HudEvent, type HudPanelsApi, type VillageScreenViewHandle } from '@/ui/idleVillage/components/gameFrame';
+import { QuestJourneyRoute, QuestOverlays, QuestRunWindow, RegionTooltip, useHeroSheet, usePanelWhileOpen, type HeroSheetApi, type HudEvent, type HudPanelsApi, type VillageScreenViewHandle } from '@/ui/idleVillage/components/gameFrame';
 import { MapDemoPoi } from '@/ui/idleVillage/components/gameFrame/MapDemoPoi';
 import { VillageStashPanel } from '@/ui/idleVillage/components/gameFrame/VillageStashPanel';
-import { ExpeditionEdgeTab } from '@/ui/idleVillage/components/gameFrame/ExpeditionEdgeTab';
-import { RosterStashRail } from '@/ui/idleVillage/components/gameFrame/RosterStashRail';
-import { GameTopChrome } from '@/ui/idleVillage/components/gameFrame/GameTopChrome';
-import { useExpeditionRail } from '@/ui/idleVillage/store/useExpeditionRail';
 import { CASSETTO_LAYOUT_CONFIG } from '@/balancing/config/idleVillage/cassettoLayoutConfig';
+import { GameTopChrome } from '@/ui/idleVillage/components/gameFrame/GameTopChrome';
 import { useVillageStashStore } from '@/ui/idleVillage/store/useVillageStashStore';
 import { VILLAGE_STASH_CONFIG } from '@/balancing/config/idleVillage/villageStashConfig';
 import { MERCHANT_CONFIG } from '@/balancing/config/idleVillage/merchantConfig';
@@ -530,16 +528,18 @@ export default function GameMappa2Page() {
       <StagePanelFrame panelId="questDetail" positioned={false} className="hud-panel">
         {/* R-333: the signed cassetto IS the planner detail on /game — fed the
          *  production detail's own props read off the wrapped node (slots,
-         *  estimate, items, canSend/send/clear are the real session's). */}
+         *  estimate, items, canSend/send/clear are the real session's).
+         *  R-339/PLAN-119 T2: the Detail mounts `ExpeditionDrawer`, so the
+         *  docked column also carries its fold contract (collapse chip ⇄
+         *  right-edge chip, state preserved). */}
         <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none' }}>
           {isValidElement(node) ? (
             <HudRealCassettoDetail
               {...(node.props as QuestExpeditionDetailProps)}
-              /* R-339/PLAN-119 AC4+T5: tap an empty party seat → open the
-               *  docked Roster|Stash rail on the Roster tab so the player
-               *  picks a member (tap member → fills the slot, existing
-               *  assign flow). */
-              onOpenRoster={() => useExpeditionRail.getState().open('roster')}
+              /* R-339/PLAN-119 AC4: tap an empty party seat → open the roster
+               *  panel so the player picks a member (Claude note: tap member →
+               *  fills the slot, existing assign flow). */
+              onOpenRoster={() => panels.set('roster', true)}
               resourceItems={resources}
             />
           ) : (
@@ -627,22 +627,6 @@ export default function GameMappa2Page() {
   );
   const anyExpeditionDetailOpen = expeditions.some((exp) => exp.isDetailOpen && (!exp.run || exp.run.ended));
   usePanelWhileOpen(panels, 'roster', anyExpeditionDetailOpen);
-  /* R-339/PLAN-119 T5 D2 mutual exclusion (≤1100px): when the player EXPANDS
-   *  the docked rail while a drawer holds the screen, the rail wins and the
-   *  drawer detail closes. Only a false→true transition counts — an already
-   *  expanded rail does not veto a drawer the player is opening (the rail's
-   *  own mutex folds it in that direction). */
-  const railExpanded = useExpeditionRail((s) => s.expanded);
-  const railExpandedPrev = useRef(railExpanded);
-  useEffect(() => {
-    const wasExpanded = railExpandedPrev.current;
-    railExpandedPrev.current = railExpanded;
-    if (!railExpanded || wasExpanded || !anyExpeditionDetailOpen) return;
-    if (!window.matchMedia(`(max-width: ${CASSETTO_LAYOUT_CONFIG.rail.mutualExclusionBelowPx}px)`).matches) return;
-    expeditionsRef.current.forEach((exp) => {
-      if (exp.isDetailOpen) exp.closeDetail();
-    });
-  }, [railExpanded, anyExpeditionDetailOpen]);
   /* Stage occupancy follows the real surfaces: a planner being open means the
    *  `questDetail` panel is on stage; no run means `quest` must be released. */
   useEffect(() => {
@@ -661,14 +645,10 @@ export default function GameMappa2Page() {
     .join(',');
   const activeStashOwner = useVillageStashStore((s) => s.activeStashOwner);
   const stashPanelOpen = panels.visible.villageStash;
-  /* T5: the docked rail's Stash tab is a stash surface too — a single open
-   *  planner binds the ledger to it exactly like the floating magazzino. */
-  const railStashOpen = useExpeditionRail((s) => s.expanded && s.tab === 'stash');
-  const stashSurfaceOpen = stashPanelOpen || railStashOpen;
   useEffect(() => {
     const stash = useVillageStashStore.getState();
     const openPlannerIds = openPlannerKey ? openPlannerKey.split(',') : [];
-    if (!stashSurfaceOpen) {
+    if (!stashPanelOpen) {
       if (stash.activeStashOwner) stash.bindStash(null);
       return;
     }
@@ -677,7 +657,7 @@ export default function GameMappa2Page() {
       return;
     }
     if (!stash.activeStashOwner && openPlannerIds.length === 1) stash.bindStash(openPlannerIds[0]);
-  }, [stashSurfaceOpen, activeStashOwner, openPlannerKey]);
+  }, [stashPanelOpen, activeStashOwner, openPlannerKey]);
   const expeditionsRef = useRef(expeditions);
   expeditionsRef.current = expeditions;
   const closeAnyExpeditionDetail = useCallback(() => {
@@ -1170,7 +1150,7 @@ export default function GameMappa2Page() {
    *  (no key/menu entry), so nothing else drives it — no intercept bridge
    *  needed here (/gameOld's version exists for the stage). No quest window on
    *  this page yet → `questBounds` null; no drag yet → `dragActive` false. */
-  const { residents, residentsById } = useRosterKitData();
+  const { residentsById } = useRosterKitData();
   /* Page chrome insets (top time bar, bottom nav) — the hero sheet avoids them,
    *  the event card centres on the free area they leave. */
   const heroSheetChrome = {
@@ -1624,56 +1604,12 @@ export default function GameMappa2Page() {
           )}
         </StagePanelFrame>
       )}
-      {/* R-339/PLAN-119 D6(b): the expedition surface's resting state — a slim
-       *  right-edge tab with the mechanism hint while no quest is selected.
-       *  The signed cassetto replaces it the moment a marker opens a detail. */}
-      <ExpeditionEdgeTab visible={view === 'map' && !anyExpeditionDetailOpen && !hudHidden} />
-      {/* R-339/PLAN-119 T5 (D1/D2): the docked left Roster|Stash column —
-       *  persistent by default, publishes `insets.left`, ends above the
-       *  bottom-left medallion zone (rail.bottomInsetPx). Member picks route
-       *  through the same expedition→session chain the floating roster uses. */}
-      <RosterStashRail
-        visible={view === 'map' && !hudHidden}
-        residents={residents}
-        stashConfig={VILLAGE_STASH_CONFIG}
-        lockedResidentIds={[
-          ...new Set([
-            ...session.lockedResidentIds,
-            ...expeditionGoblin.lockedResidentIds,
-            ...expeditionRovine.lockedResidentIds,
-          ]),
-        ]}
-        lockedStatusLabel={session.t('roster.status.assigned')}
-        selectedResidentId={draggingResidentId ?? null}
-        onResidentSelect={(residentId) => {
-          if (expeditionGoblin.handleResidentSelect(residentId)) return;
-          if (expeditionRovine.handleResidentSelect(residentId)) return;
-          session.handleResidentSelect(residentId);
-        }}
-        /* R-340: rail rows carry the production drag contract — same verdict
-         *  routing and flight-commit chain as the floating roster. While that
-         *  panel is mounted it stays the single drag source (kill-switch). */
-        dragEnabled={!panels.visible.roster}
-        onDragEnd={(event: DragEndEvent) => {
-          let verdict: RosterDropVerdict;
-          session.setDraggingResidentId(null);
-          expeditionGoblin.setDraggingResidentId(null);
-          expeditionRovine.setDraggingResidentId(null);
-          startTransition(() => {
-            verdict =
-              expeditionGoblin.handleDragEnd(event) ??
-              expeditionRovine.handleDragEnd(event) ??
-              session.handleDragEnd(event);
-          });
-          return verdict!;
-        }}
-        onFlightComplete={(residentId: string, slotId: string) => {
-          const owner = expeditions.find((exp) => exp.ownsSlotId(slotId));
-          if (owner) owner.handleFlightComplete(residentId, slotId);
-          else session.handleFlightComplete(residentId, slotId);
-        }}
-      />
-
+      {/* R-351 (Director ruling 2026-11-15): the expedition surface has NO
+       *  resting state — with no quest selected the page mounts nothing at
+       *  all. The signed cassetto appears the moment a marker opens a
+       *  detail; in the ≤`bottomSheet.maxWidthPx` band the bottom sheet is
+       *  the only expedition form (drawer-side guard inside
+       *  `ExpeditionDrawer`). */}
       {view === 'map' && regionHover && (
         <RegionTooltip name={t(`gameFrame.regions.${regionHover.region.id}`)} x={regionHover.x} y={regionHover.y} />
       )}
@@ -1760,8 +1696,7 @@ export default function GameMappa2Page() {
       {/* R-199 pt.14: the end-of-run report floats OUTSIDE the window's DOM —
        *  staged reveal, skippable, non-modal. */}
       {/* R-334ter: the signed expedition-lost takeover replaces the stock
-       *  popup for the lost path (`lostReportModel` real data); the reward
-       *  report keeps the stock staged popup until its signed surface lands. */}
+       *  popup for the lost path (`lostReportModel` real data). */}
       {expeditionLostRun && (
         <HudRealExpeditionLost
           run={expeditionLostRun}
@@ -1769,13 +1704,14 @@ export default function GameMappa2Page() {
           onClose={() => setExpeditionLostRun(null)}
         />
       )}
+      {/* R-348: the signed pergamena report replaces the stock staged popup —
+       *  same run/scenario/onClose contract, same staged reveal and commit
+       *  boundary, baptized frame `/assets/ui/hud-real/victory/frame.webp`. */}
       {!expeditionLostRun && rewardVisible && activeQuestRun.run && (
-        <QuestRewardPopup
+        <HudRealVictoryReward
           run={activeQuestRun.run}
           scenario={scenarioForQuest(activeQuestId)}
-          widthPx={questWindow.rewardPopup.widthPx}
           stageMs={questWindow.rewardPopup.stageMs}
-          edgeInsetPx={questWindow.rewardPopup.edgeInsetPx}
           onClose={closeReward}
         />
       )}

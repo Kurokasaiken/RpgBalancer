@@ -3,6 +3,7 @@ import { useDraggable } from '@dnd-kit/core';
 import { useTranslation } from 'react-i18next';
 import { WanderlustStatBar } from '@/ui/wanderlust-surface/layout/WanderlustStatBar';
 import { WanderlustPortrait } from '@/ui/wanderlust-surface/layout/WanderlustPortrait';
+import { C1Medallion } from '@/ui/idleVillage/components/C1Medallion';
 import type { ResidentCompatibilityState } from '../components/ResidentRosterTypes';
 
 /* ════════════════════════════════════════════════════════════════════════
@@ -374,15 +375,21 @@ const WanderlustRosterCardV2 = memo<WanderlustRosterCardV2Props>(({
         className={className}
         style={{
           ...cardStyle,
-          gridTemplateColumns: '22px minmax(0, 1fr) 116px',
+          /* R-353 mockup row: signed C1 medallion, dedicated LV-badge column
+           *  (spacer sized by the overlay decor), parchment name, value bars
+           *  right — engraved hairline under each row, no boxed filet. The
+           *  medallion carries `data-wanderlust-portrait` so HeroLevelDecor
+           *  and the drag home-center measure the same bounds they always did. */
+          gridTemplateColumns: 'auto 34px minmax(0, 1fr) 116px',
           gap: 'var(--skin-hud-row-column-gap)',
-          padding: 'var(--skin-hud-row-padding)',
+          padding: '6px 10px',
           borderRadius: 'var(--skin-hud-row-radius)',
-          // A thin gold filet makes each strip read as a separate, graspable object
-          // on the dark panel; it brightens on hover as the drag affordance.
-          border: `1px solid ${isHovered ? 'var(--skin-hud-row-filet-hover)' : 'var(--skin-hud-row-filet)'}`,
-          boxShadow: cardBoxShadow,
-          transition: 'box-shadow 200ms ease, opacity 200ms ease, border-color 200ms ease',
+          border: '1px solid transparent',
+          background: isHovered ? 'rgba(240,207,106,0.05)' : 'rgba(6,15,22,0.35)',
+          boxShadow: isHovered
+            ? 'inset 0 1px 0 rgba(240,207,106,0.20), inset 0 -1px 0 rgba(0,0,0,0.45)'
+            : 'inset 0 -1px 0 rgba(0,0,0,0.45)',
+          transition: 'box-shadow 200ms ease, opacity 200ms ease, background-color 200ms ease',
         }}
         onClick={handleClick}
         onPointerDown={(e) => {
@@ -399,12 +406,11 @@ const WanderlustRosterCardV2 = memo<WanderlustRosterCardV2Props>(({
         data-compatibility={compatibilityState}
         data-density="compact"
       >
-        <WanderlustPortrait
-          portraitUrl={portraitUrl}
-          initials={label.charAt(0).toUpperCase()}
-          size={22}
-          isHero={isHero}
-        />
+        <span data-wanderlust-portrait style={{ display: 'inline-block', width: 50, height: 50, flexShrink: 0 }}>
+          <C1Medallion portraitUrl={portraitUrl} sizePx={50} isDragging={isDragging} />
+        </span>
+        {/* LV-badge column (mockup): the overlay decor renders chip+emblem here. */}
+        <span aria-hidden style={{ width: 34, flexShrink: 0 }} />
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--skin-hud-inline-gap)', minWidth: 0 }}>
           <span
             data-roster-name
@@ -449,10 +455,10 @@ const WanderlustRosterCardV2 = memo<WanderlustRosterCardV2Props>(({
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--skin-hud-bar-gap)' }}>
           <div title={`${t('roster.stats.hp')} ${hp}/${maxHp}`}>
-            <WanderlustStatBar label="HP" value={hp} maxValue={maxHp} variant="hp" size="xs" hideLabel />
+            <WanderlustStatBar label="HP" value={hp} maxValue={maxHp} variant="hp" size="md" hideLabel />
           </div>
           <div title={`${t('roster.stats.stamina')} ${100 - fatigue}/100`}>
-            <WanderlustStatBar label="Stamina" value={100 - fatigue} maxValue={100} variant="stamina" size="xs" hideLabel />
+            <WanderlustStatBar label="Stamina" value={100 - fatigue} maxValue={100} variant="stamina" size="md" hideLabel />
           </div>
         </div>
       </div>

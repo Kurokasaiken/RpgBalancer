@@ -2,6 +2,7 @@ import React, { useMemo, useRef, useState, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { HudPlaque } from '@/ui/idleVillage/skins/primitives/HudPlaque';
+import { PanelFrameOrnaments } from '@/ui/idleVillage/skins/primitives/PanelFrameOrnaments';
 import { SkinScope } from '@/ui/idleVillage/skins/primitives/SkinScope';
 import { EngravedIcon } from './engravedIcons';
 import { useHudPanelDrag } from './useHudPanelDrag';
@@ -49,6 +50,12 @@ export interface VillageStashPanelProps {
 
 const titleId = 'village-stash-panel-title';
 
+/** Engraved glyph per item `kind` on the filter tabs (R-353 mockup strip). */
+const KIND_TAB_ICON: Record<string, string> = {
+  equipment: 'ico-axe',
+  consumable: 'ico-vial',
+};
+
 const controlButton: CSSProperties = {
   display: 'inline-flex',
   alignItems: 'center',
@@ -58,23 +65,30 @@ const controlButton: CSSProperties = {
   padding: 0,
 };
 
+/** Visually-hidden text kept inside every shelf cell so the grid carries the
+ *  same name/description vocabulary the list rows did (screen readers and the
+ *  component contract both read it — village-stash-panel.INV-1). */
+const srOnlyText: CSSProperties = {
+  position: 'absolute',
+  width: 1,
+  height: 1,
+  overflow: 'hidden',
+  clip: 'rect(0 0 0 0)',
+  whiteSpace: 'nowrap',
+};
+
 /**
- * Shared row face — `StashItemTile` (the planner's item-face: lacquer tile +
- * corner ×N badge) + name + description — used by both modes so the two
- * surfaces never diverge (R-270, village-stash-panel.INV-1).
+ * Shared cell face — `StashItemTile` (the planner's item-face: lacquer tile +
+ * corner ×N badge) as the visual, name + description as sr-only text — used
+ * by both modes so the two surfaces never diverge (R-270, R-353 grid restyle).
  */
-const StashRowFace: React.FC<{ row: VillageStashRowView }> = ({ row }) => {
+const StashCellFace: React.FC<{ row: VillageStashRowView }> = ({ row }) => {
   const { t } = useTranslation('idleVillage');
   return (
     <>
-      <StashItemTile icon={row.icon} qty={row.qty} size={32} iconSize={18} />
-      <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2, textAlign: 'left' }}>
-        <span style={{ font: '600 12px var(--skin-font-serif)', color: 'var(--skin-text-primary)' }}>
-          {t(row.nameKey)}
-        </span>
-        <span style={{ font: '12px var(--skin-font-serif)', color: 'var(--skin-text-secondary)', whiteSpace: 'normal', overflowWrap: 'break-word' }}>
-          {t(row.descKey)}
-        </span>
+      <StashItemTile icon={row.icon} qty={row.qty} size={44} iconSize={22} />
+      <span style={srOnlyText}>
+        {t(row.nameKey)} — {t(row.descKey)}
       </span>
     </>
   );
@@ -103,18 +117,19 @@ const StashRowTooltip: React.FC<{ row: VillageStashRowView; children: React.Reac
  * clickable — the click still flows to the ledger, which announces the
  * localized reject (`alreadyInBag`/`bagFull`) through lastEvent. The shelf
  * never duplicates the mutation check: `assign` stays the only authority. */
-const rowChrome = (interactive: boolean, assignState?: BagAssignEligibility): CSSProperties => ({
+const cellChrome = (interactive: boolean, assignState?: BagAssignEligibility): CSSProperties => ({
   display: 'flex',
-  alignItems: 'flex-start',
-  gap: 'var(--skin-hud-inline-gap)',
+  alignItems: 'center',
+  justifyContent: 'center',
+  position: 'relative',
   minWidth: 0,
   ...(interactive
     ? {
         width: '100%',
-        padding: '4px 6px',
-        margin: '-4px -6px',
+        padding: '5px 4px',
+        margin: '-5px -4px',
         border: '1px solid color-mix(in srgb, var(--skin-surface-border) 35%, transparent)',
-        borderRadius: 6,
+        borderRadius: 8,
         background: 'none',
         color: 'inherit',
         cursor: 'pointer',
@@ -129,18 +144,34 @@ const rowChrome = (interactive: boolean, assignState?: BagAssignEligibility): CS
     : {}),
 });
 
-/**
- * A planner-bound shelf row: a click assigns to the first free bag slot.
- * After a successful assign the focus lands on the filled bag slot —
- * deterministic, never to body.
- */
-const InteractiveStashRow: React.FC<{
-  row: VillageStashRowView;
-  assignState: BagAssignEligibility;
-}> = ({ row, assignState }) => {
-  const { t } = useTranslation('idleVillage');
+/** Single assign authority shared by the grid cell and the detail card's
+ *  Pack control: a click assigns to the bound planner's first free bag slot,
+ *  and on success the focus lands on the filled bag slot — deterministic,
+ *  never to body. Rejects announce through the store's lastEvent live region. */
+const useStashPack = () => {
   const owner = useVillageStashStore((s) => s.activeStashOwner);
   const assign = useVillageStashStore((s) => s.assign);
+  return (itemId: string) => {
+    if (!owner) return;
+    if (assign(owner, itemId) === 'ok') {
+      window.requestAnimationFrame(() =>
+        document.querySelector<HTMLElement>(`[data-testid="loadout-item-${itemId}"]`)?.focus(),
+      );
+    }
+  };
+};
+
+/**
+ * A planner-bound shelf cell: a click assigns to the first free bag slot;
+ * hover/focus previews the item in the detail card (R-353).
+ */
+const InteractiveStashCell: React.FC<{
+  row: VillageStashRowView;
+  assignState: BagAssignEligibility;
+  onPreview: (itemId: string) => void;
+}> = ({ row, assignState, onPreview }) => {
+  const { t } = useTranslation('idleVillage');
+  const pack = useStashPack();
   return (
     <div role="listitem">
       <StashRowTooltip row={row}>
@@ -149,18 +180,12 @@ const InteractiveStashRow: React.FC<{
           data-testid={`stash-item-${row.itemId}`}
           data-assign-state={assignState}
           aria-label={t('gameFrame.stash.addToBag', { item: t(row.nameKey) })}
-          onClick={() => {
-            if (!owner) return;
-            /* Rejects announce through the store's lastEvent live region — no local echo. */
-            if (assign(owner, row.itemId) === 'ok') {
-              window.requestAnimationFrame(() =>
-                document.querySelector<HTMLElement>(`[data-testid="loadout-item-${row.itemId}"]`)?.focus(),
-              );
-            }
-          }}
-          style={rowChrome(true, assignState)}
+          onClick={() => pack(row.itemId)}
+          onMouseEnter={() => onPreview(row.itemId)}
+          onFocus={() => onPreview(row.itemId)}
+          style={cellChrome(true, assignState)}
         >
-          <StashRowFace row={row} />
+          <StashCellFace row={row} />
         </button>
       </StashRowTooltip>
     </div>
@@ -217,6 +242,29 @@ export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, le
   const reserved = useMemo(() => countReservations(bags, committed), [bags, committed]);
   const vm = useMemo(() => villageStashViewModel(config, reserved), [config, reserved]);
   const interactive = hydration === 'ready' && activeStashOwner !== null;
+  /* R-353 mockup restyle: kind tabs + tile grid + hover/focus detail card.
+   *  Tabs derive from the kinds configured for this shelf (config-first) so
+   *  the strip never advertises a category the store cannot hold; the
+   *  radiogroup pattern mirrors HudRealTime's speed pills. */
+  const kinds = useMemo(() => {
+    const seen = new Set<string>();
+    for (const it of config.items) {
+      const k = defaultQuestItems[it.itemId]?.kind;
+      if (k) seen.add(k);
+    }
+    return [...seen];
+  }, [config.items]);
+  const [tab, setTab] = useState<string>('all');
+  const [detailItemId, setDetailItemId] = useState<string | null>(null);
+  const visibleRows = useMemo(
+    () => (tab === 'all' ? vm.rows : vm.rows.filter((r) => defaultQuestItems[r.itemId]?.kind === tab)),
+    [tab, vm.rows],
+  );
+  /* Sticky preview: the last hovered/focused cell wins, falling back to the
+   *  first visible row — the card never renders empty while the shelf has
+   *  stock (inventory-inspector idiom, no click needed). */
+  const detailRow = visibleRows.find((r) => r.itemId === detailItemId) ?? visibleRows[0] ?? null;
+  const pack = useStashPack();
   /* T3-S2: per-row assign eligibility for the BOUND planner's sparse bag —
    *  `bags[owner]` keeps slot positions; an absent bag counts as empty.
    *  `bagFull` is true only when the bag has no free slot AND at least one
@@ -344,7 +392,7 @@ export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, le
            *  R-251 bis: the expanded row uses the SAME content insets as the
            *  collapsed strip (plaque padding 10 + this 12/8 = the strip's
            *  22/18) — collapsing changes the glyph, never the geometry. */}
-          <div {...handleProps} style={{ display: 'flex', alignItems: 'center', gap: 'var(--skin-hud-inline-gap)', paddingInline: '12px 8px', ...handleProps.style }}>
+          <div {...handleProps} style={{ display: 'flex', alignItems: 'center', gap: 'var(--skin-hud-inline-gap)', paddingInline: '34px 8px', ...handleProps.style }}>
             <EngravedIcon id="ico-chest" size={14} aria-hidden style={{ color: 'var(--skin-title-color)', flexShrink: 0 }} />
             <span
               id={titleId}
@@ -376,6 +424,55 @@ export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, le
             </span>
           </div>
 
+          {/* Kind tabs (R-353): radiogroup filter for the shelf grid. Labels
+           *  resolve per-kind from i18n; the strip stays in both modes —
+           *  filtering is a view concern, not a mutation. */}
+          {kinds.length > 0 && (
+            <div
+              role="radiogroup"
+              aria-label={t('gameFrame.stash.filterLabel')}
+              data-testid="stash-tabs"
+              style={{ display: 'flex', gap: 6, flexWrap: 'wrap', paddingInlineStart: 22 }}
+            >
+              {(['all', ...kinds] as const).map((id) => {
+                const active = tab === id;
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    role="radio"
+                    aria-checked={active}
+                    data-testid={`stash-tab-${id}`}
+                    onClick={() => setTab(id)}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 5,
+                      padding: '3px 10px',
+                      borderRadius: 999,
+                      border: `1px solid color-mix(in srgb, ${active ? 'var(--skin-icon-accent)' : 'var(--skin-surface-border)'} ${active ? 70 : 40}%, transparent)`,
+                      background: active
+                        ? 'color-mix(in srgb, var(--skin-icon-accent) 18%, transparent)'
+                        : 'color-mix(in srgb, var(--skin-hud-lacquer-deep) 45%, transparent)',
+                      color: active ? 'var(--skin-title-color)' : 'var(--skin-text-secondary)',
+                      font: 'var(--skin-hud-caps-weight) var(--skin-hud-caps-size) var(--skin-font-display)',
+                      letterSpacing: 'var(--skin-hud-caps-tracking)',
+                      textTransform: 'uppercase',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <EngravedIcon
+                      id={id === 'all' ? 'ico-chest' : KIND_TAB_ICON[id] ?? 'ico-pouch'}
+                      size={12}
+                      aria-hidden
+                    />
+                    {id === 'all' ? t('gameFrame.stash.tabs.all') : t(`gameFrame.stash.tabs.${id}`)}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
           {/* Global-pool counters: reservations held by other planners or frozen in a run. */}
           {elsewhere > 0 && (
             <span
@@ -386,39 +483,103 @@ export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, le
             </span>
           )}
 
-          {/* Stock: planner-bound rows are buttons; read-only rows stay a plain list.
-           *  `data-hud-scroll` picks up the bronze themed scrollbar (skinScope.css). */}
+          {/* Stock: planner-bound cells are buttons; read-only cells stay a
+           *  plain list. The shelf is a tile grid (R-353 mockup); each
+           *  listitem still carries the item's name/description as sr-only
+           *  text. `data-hud-scroll` picks up the bronze themed scrollbar. */}
           <div
             role="list"
             data-testid="stash-shelf"
             data-stash-mode={interactive ? 'interactive' : 'readonly'}
             data-hud-scroll=""
             style={{
-              display: 'flex',
-              flexDirection: 'column',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(52px, 1fr))',
               gap: 'var(--skin-hud-stack-gap)',
+              alignContent: 'start',
               minHeight: 0,
               overflowY: 'auto',
               scrollbarGutter: 'stable',
             }}
           >
             {vm.rows.length === 0 && (
-              <span style={{ font: '12px var(--skin-font-serif)', color: 'var(--skin-text-secondary)' }}>
+              <span style={{ gridColumn: '1 / -1', font: '12px var(--skin-font-serif)', color: 'var(--skin-text-secondary)' }}>
                 {t('gameFrame.stash.empty')}
               </span>
             )}
-            {vm.rows.map((row) =>
+            {vm.rows.length > 0 && visibleRows.length === 0 && (
+              <span style={{ gridColumn: '1 / -1', font: '12px var(--skin-font-serif)', color: 'var(--skin-text-secondary)' }}>
+                {t('gameFrame.stash.filterEmpty')}
+              </span>
+            )}
+            {visibleRows.map((row) =>
               interactive ? (
-                <InteractiveStashRow key={row.itemId} row={row} assignState={assignStates[row.itemId] ?? 'eligible'} />
+                <InteractiveStashCell
+                  key={row.itemId}
+                  row={row}
+                  assignState={assignStates[row.itemId] ?? 'eligible'}
+                  onPreview={setDetailItemId}
+                />
               ) : (
                 <StashRowTooltip key={row.itemId} row={row}>
-                  <div role="listitem" style={rowChrome(false)}>
-                    <StashRowFace row={row} />
+                  <div role="listitem" style={cellChrome(false)} onMouseEnter={() => setDetailItemId(row.itemId)}>
+                    <StashCellFace row={row} />
                   </div>
                 </StashRowTooltip>
               ),
             )}
           </div>
+
+          {/* Item detail card (R-353 mockup): the hovered/focused cell's item
+           *  in the shared tooltip vocabulary — name, effect, stat coverage,
+           *  stock — with a Pack affordance when a planner is bound. */}
+          {detailRow && (
+            <div
+              data-testid="stash-detail"
+              aria-label={t('gameFrame.stash.detailLabel')}
+              style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 10,
+                borderTop: '1px solid color-mix(in srgb, var(--skin-surface-border) 40%, transparent)',
+                paddingTop: 'var(--skin-hud-stack-gap)',
+              }}
+            >
+              <StashItemTile icon={detailRow.icon} qty={detailRow.qty} size={52} iconSize={28} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <StashItemTooltipBody
+                  labelKey={detailRow.nameKey}
+                  descKey={detailRow.descKey}
+                  covers={stashItemCovers(detailRow.itemId)}
+                  stockQty={detailRow.qty}
+                />
+              </div>
+              {interactive && (
+                <button
+                  type="button"
+                  data-testid="stash-pack-detail"
+                  data-assign-state={assignStates[detailRow.itemId] ?? 'eligible'}
+                  aria-label={t('gameFrame.stash.addToBag', { item: t(detailRow.nameKey) })}
+                  onClick={() => pack(detailRow.itemId)}
+                  style={{
+                    flexShrink: 0,
+                    alignSelf: 'center',
+                    padding: '5px 14px',
+                    borderRadius: 999,
+                    border: '1px solid color-mix(in srgb, var(--skin-icon-accent) 60%, transparent)',
+                    background: 'color-mix(in srgb, var(--skin-icon-accent) 16%, transparent)',
+                    color: 'var(--skin-title-color)',
+                    font: 'var(--skin-hud-caps-weight) var(--skin-hud-caps-size) var(--skin-font-display)',
+                    letterSpacing: 'var(--skin-hud-caps-tracking)',
+                    textTransform: 'uppercase',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {t('gameFrame.stash.pack')}
+                </button>
+              )}
+            </div>
+          )}
 
           {/* Mode hint: how to unlock interactions, or why the shelf is frozen. */}
           {!interactive && (
@@ -448,6 +609,9 @@ export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, le
             style={{
               borderTop: '1px solid color-mix(in srgb, var(--skin-surface-border) 40%, transparent)',
               paddingTop: 'var(--skin-hud-stack-gap)',
+              /* R-353: the corner ornament's bottom tail grazes the frame edge —
+               *  the caption starts clear of it. */
+              paddingInlineStart: 26,
               font: 'var(--skin-hud-caps-weight) var(--skin-hud-caps-size) var(--skin-font-display)',
               letterSpacing: 'var(--skin-hud-caps-tracking)',
               textTransform: 'uppercase',
@@ -460,6 +624,9 @@ export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, le
           <span aria-live="polite" style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)', whiteSpace: 'nowrap' }}>
             {announcement}
           </span>
+          {/* R-353 mockup frame: painted filigree corners + inner filet over
+           *  the plaque edge — decoration only, same layer as the seat line. */}
+          <PanelFrameOrnaments />
         </HudPlaque>
         </Tooltip.Provider>
       </SkinScope>

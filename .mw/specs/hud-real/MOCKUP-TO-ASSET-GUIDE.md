@@ -4,6 +4,10 @@ Guida operativa per portare una superficie firmata (mockup approvato dal Directo
 a componente reale in `/hud-compose` (e poi `/game`). Nata dagli errori del
 2026-11-09: tre giri di "toppe" bocciati prima del metodo corretto.
 
+Questa guida riguarda **l'asset**; per il percorso completo fino al componente
+montato sul runtime vero, con contratto, witness e bundle, vedi
+`context/MOCKUP-TO-PRODUCTION-PIPELINE.md`.
+
 ## L'invariante violata (perché i primi giri erano sbagliati)
 
 **Un mockup firmato NON è un asset.** È un concept: sfondo mappa cucito dentro,
@@ -15,11 +19,14 @@ come `<img>` + toppare le scritte con `<Cover>` opachi produce:
 - residui di testo/widget dipinti che sbucano sotto le toppe,
 - zone misurate a occhio → rack tagliati, titoli troncati.
 
-L'asset corretto è quello di `panel/frame.webp` / `C1/emblem.webp`: **RGBA con
-alpha vera scontornata al pixel** e **interni vuoti puliti** — il DOM vi monta
-contenuto vero direttamente sullo smalto/pietra/vetro dipinto.
+Per le **silhouette isolate dal fondo mappa**, l'asset corretto è quello di
+`panel/frame.webp` / `C1/emblem.webp`: **RGBA con alpha vera scontornata al
+pixel** e **interni vuoti puliti** — il DOM vi monta contenuto vero direttamente
+sullo smalto/pietra/vetro dipinto. Una cornice intenzionalmente **opaca**
+(es. la pergamena R-348) non richiede alpha esterna: richiede comunque
+superfici interne pulite, senza testo o controlli baked.
 
-## La pipeline (6 passi, nessuno opzionale)
+## La pipeline (6 passi; lo scontorno vale solo per silhouette isolate)
 
 ### 1. Identifica sorgente e approvazione
 Il punto di partenza è il file firmato esatto (`cassetto-rich-0.png`,
@@ -30,7 +37,7 @@ generazione con il pattern di `prompt-panel-frame.txt`:
 navy background #0a1622 behind the element. No text, no letters, no interface
 elements."` → poi `bra.cut()` (flood fill navy) in `build-*-assets.py`.
 
-### 2. Scontorna la silhouette (alpha RGBA reale)
+### 2. Scontorna la silhouette se serve (alpha RGBA reale)
 Quando il mockup ha lo sfondo cucito dentro (mappa sfocata), estrailo col
 classificatore per materiale, MAI con un crop rettangolare + mask CSS:
 
@@ -88,7 +95,7 @@ Cattura sulla **pagina/mappa vera** a scala reale e fai il confronto
 ## Definition of done per un port visivo
 
 - [ ] Sorgente = immagine firmata (o generazione pulita "#0a1622, no text")
-- [ ] RGBA scontornato al pixel — niente rettangoli né fade CSS
+- [ ] Silhouette staccata dalla mappa: RGBA scontornato al pixel — niente rettangoli né fade CSS; cornice opaca intenzionale: bordo e sfondo verificati
 - [ ] Zero `<Cover>` opache — testo dipinto rimosso **nell'asset**
 - [ ] Zone misurate con griglia, non stimate
 - [ ] Contenuto vivo = componenti/dati reali nei socket dipinti

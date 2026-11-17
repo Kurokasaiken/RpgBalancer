@@ -30,8 +30,8 @@ invariants:
     statement: >-
       CTA scalata sotto 32px: applicare actionStyle minHeight = ceil(32/cardScale) (Sentinel small-target S0/S1, run
       0829)
-    test_refs: 
-      - tests/unit/idleVillage/worldSurfaceEventCard.armed.test.tsx
+    test_refs:
+      - tests/unit/idleVillage/worldEventCard.ctaMinHeight.test.ts
 ---
 # world-surface-event-card
 

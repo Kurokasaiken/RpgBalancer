@@ -56,6 +56,7 @@ import {
 } from '@/ui/idleVillage/skins/primitives';
 import { cueHasTag, theatreCueForBeat } from '@/ui/idleVillage/questS1Lab/questTheatreSequencer';
 import { DepthScene } from '@/ui/idleVillage/questS1Lab/render/DepthScene';
+import { SceneRevealLayer } from '@/ui/idleVillage/questS1Lab/render/SceneRevealLayer';
 import { cinematicEntryForSrc } from '@/ui/idleVillage/questS1Lab/render/sceneManifest';
 import { JOURNEY_LEG_ART } from '@/ui/idleVillage/questS1Lab/questArt';
 import { documentClock, resolveShot } from '@/ui/idleVillage/questS1Lab/render/cameraEval';

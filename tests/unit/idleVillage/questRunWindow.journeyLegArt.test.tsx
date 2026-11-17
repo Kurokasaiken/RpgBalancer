@@ -82,6 +82,8 @@ const stageSrc = (container: HTMLElement): string | null => {
 };
 
 describe('QuestRunWindow — journey leg art (R-263)', () => {
+  // INV:quest-run-window.INV-6 — a travel leg owns no scenario nodes: with a drained
+  // queue the theatre shows the leg art instead of the latched node.
   it('andata travel with a drained queue shows the outbound leg painting', () => {
     const run = withJourneyFase(createRun(PRESET, 42, 'goblin'), 'andata');
     const { container } = renderWindow(run);
