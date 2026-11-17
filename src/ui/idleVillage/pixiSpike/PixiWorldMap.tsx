@@ -1376,7 +1376,14 @@ export function PixiWorldMap({
             const late: Promise<unknown>[] = [];
             for (const l of sub.surfaceLayers) {
               if (!l.rect || !/forest|trees/.test(l.id)) continue;
-              const url = layerUrl(manifest.world, `${l.file.replace('.webp', '')}.canopy${variant}.webp`);
+              // Mirror addCanopies' resolution order (detail → hiLand suffix → variant)
+              // so the prefetched file is the one the build will actually use —
+              // previously this enumerated the 2752 `.canopy.webp` while the build
+              // loaded the heavy `.canopy.v2hi.webp` lazily mid-build.
+              const stem = l.file.replace('.webp', '');
+              const url = layerUrl(manifest.world, fxOn.canopyDetail
+                ? `${stem}.canopy.detail.webp`
+                : hiLand && !variant ? `${stem}.canopy${hiLand.canopySuffix}.webp` : `${stem}.canopy${variant}.webp`);
               if (bootUrls.has(url)) continue;
               bootUrls.add(url);
               bootTotal += 1;
