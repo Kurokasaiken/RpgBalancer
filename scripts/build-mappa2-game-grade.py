@@ -11,7 +11,8 @@ all full-world sprites, sorted by zIndex in PixiWorldMap:
 
 is one affine map per channel:  d4 = d * k + b   with   k = S * M * (1 - Ca),   b = (A2 / 2) * (1 - Ca) + Cp.
 
-Output (lossless, so no codec error on top of the 8-bit rounding):
+Output (lossy q85 — D-1 ruling 2026-11-17 PLAN-126, approved on live before/after screenshots; was lossless
+to keep codec error off the 8-bit rounding):
   fx/game-grade-mult.webp   k
   fx/game-grade-add.webp    b stored x1 (b reaches 0.92 on the clarity highlights: x2 storage would clip 0.19% px)
 Drawn by PixiWorldMap `seaGrade` with `addScale: 1`. Saves 2 full-world textures (~43 MB GPU) and 3 full-screen
@@ -44,8 +45,9 @@ def main() -> None:
     b = (a2 / 2) * (1 - ca) + cp
     assert b.max() <= 1.0 + 1e-9, b.max()
     name = "game-grade-noclarity" if no_clarity else "game-grade"
-    Image.fromarray(np.round(k * 255).astype(np.uint8), "RGB").save(FX / f"{name}-mult.webp", lossless=True, quality=80, method=4)
-    Image.fromarray(np.round(b * 255).astype(np.uint8), "RGB").save(FX / f"{name}-add.webp", lossless=True, quality=80, method=4)
+    # D-1 ruling 2026-11-17 PLAN-126: lossy q85 (was lossless) — Director approved on live in-game screenshots.
+    Image.fromarray(np.round(k * 255).astype(np.uint8), "RGB").save(FX / f"{name}-mult.webp", quality=85, method=4)
+    Image.fromarray(np.round(b * 255).astype(np.uint8), "RGB").save(FX / f"{name}-add.webp", quality=85, method=4)
 
     # offline check against the chain on random backdrops, both with per-pass 8-bit rounding like the framebuffer
     rng = np.random.default_rng(7)

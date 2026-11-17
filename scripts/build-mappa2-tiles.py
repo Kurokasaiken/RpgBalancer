@@ -52,7 +52,9 @@ def main() -> None:
     for layer in manifest["pack"]["canopyLayers"]:
         stem = layer["file"].replace(".webp", "")
         hi = LAYERS / f"{stem}.canopy.hiraw.webp"
-        shutil.copyfile(hi, LAYERS / f"{stem}.canopy.v2hi.webp")
+        # D-1 ruling 2026-11-17 PLAN-126: v2hi ships as lossy q85 (was a byte-copy of the q95 hiraw). RGBA mode is
+        # preserved so the sway alpha/edge handling is unchanged; hiraw itself stays the lossless q95 source.
+        Image.open(hi).save(LAYERS / f"{stem}.canopy.v2hi.webp", quality=85, method=4)
         rgba = np.asarray(Image.open(hi).convert("RGBA")).astype(np.float32)
         r = layer["rect"]
         lo = cv2.resize(rgba, (r["width"], r["height"]), interpolation=cv2.INTER_AREA)

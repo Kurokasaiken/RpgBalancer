@@ -30,7 +30,7 @@ Ridurre il cold-boot wall time di `/game` **senza rimuovere, differire o rendere
 
 | # | Decisione | Stato |
 |---|---|---|
-| D-1 | Soglia di parità visiva per re-encode/downscale: approvare via pixel-diff + side-by-side **prima** che qualsiasi variante tocchi produzione (obbligazione OB-4) | ⏸ |
+| D-1 | Soglia di parità visiva per re-encode/downscale: approvare via pixel-diff + side-by-side **prima** che qualsiasi variante tocchi produzione (obbligazione OB-4) | ✅ approvato 2026-11-17 — *"approvo"* dopo live composites (q85 grade/canopy, q75 bg; soglia diff RGB=8; signoff in `d1-live/` + `director-signoff.json`) |
 | D-2 | Battesimo del plan (plan:stamp, ordine fasi come da §9) | ✅ battezzato 2026-11-17 — *"battezzo il plan PLAN-126, eseguilo"* |
 
 ## 4. Piano di esecuzione
@@ -117,3 +117,5 @@ T-A1 → T-A2 → T-A3 ∥ (T-B1 → T-B2 → T-B3 → [ruling D-1] → T-B4) �
 - **T-B4 ⏸ bloccato su D-1** — nessun re-encode eseguito.
 - **OB-3 ✅** `tests/unit/idleVillage/gameBootAssets.test.ts` (golden set 352 path / 14.38MB baseline).
 - **Strumentazione**: `performance.mark('game-boot:<phase>')` in `PixiWorldMap.emitBootProgress` + mark post-`prepare.upload` — misura pura, zero cambio comportamento.
+
+**2026-11-17 — D-1 ruling + T-B4 avviato**: Director *"approvo"* dopo live in-game composites (request interception, GPU Metal, 3200×2000). Applicate: grade sheets →q85, 40 canopy v2hi →q85, bg.webp →q75. Bake pipeline allineata alle nuove qualità. OB-4 PASS (`director-signoff.json`). **Nota contratto:** PixiWorldMap.tsx revertato a HEAD (sealed `game-frame-pixi.INV-1` import-closure — anche edit di sola misura = Mode B-amend non autorizzato); marks spostati al page seam `game-mappa2.tsx`; patch pipeline completa preservata nel run dir. Commit `4dba4cf1`.

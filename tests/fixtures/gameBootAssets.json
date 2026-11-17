@@ -2,10 +2,10 @@
  "meta": {
   "source": "har-budget.json (prod cold boot 2026-11-17)",
   "files": 352,
-  "bytes": 14382523,
-  "note": "golden set of /game boot assets; OB-3 asserts all resolve + total <= baseline*1.10"
+  "bytes": 10232019,
+  "note": "golden set of /game boot assets; OB-3 asserts all resolve + total <= baseline*1.10. baselineBytes re-based 2026-11-17 after D-1 ruling PLAN-126: game-grade-mult/add q85, all 40 canopy v2hi q85, ui/bg.webp q75 (was 14382523)"
  },
- "baselineBytes": 14382523,
+ "baselineBytes": 10232019,
  "paths": [
   "/assets/atmosphere/birds/bird_strip.webp",
   "/assets/ui/bg.webp",
