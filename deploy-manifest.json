@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-17T14:02:06.671Z",
+  "generated": "2026-11-17T14:47:00.539Z",
   "generator": "scripts/deploy/deployManifest.mjs",
   "profile": "slim",
   "keptRoutes": [
@@ -214,7 +214,7 @@
   },
   "public": {
     "totalFiles": 3175,
-    "referencedCount": 323,
+    "referencedCount": 325,
     "dynamicPrefixes": [
       "/assets/atmosphere/",
       "/assets/atmosphere/fog/mask-",
