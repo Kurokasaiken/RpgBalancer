@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-15T13:26:50.190Z",
+  "generated": "2026-11-17T14:02:06.671Z",
   "generator": "scripts/deploy/deployManifest.mjs",
   "profile": "slim",
   "keptRoutes": [
@@ -213,13 +213,14 @@
     "/world-surface-demo": "registry"
   },
   "public": {
-    "totalFiles": 3158,
-    "referencedCount": 321,
+    "totalFiles": 3175,
+    "referencedCount": 323,
     "dynamicPrefixes": [
       "/assets/atmosphere/",
       "/assets/atmosphere/fog/mask-",
       "/assets/audio/",
       "/assets/ui/cursors/game-",
+      "/assets/ui/hud-real/cassetto/column-",
       "/assets/ui/poi/icon_",
       "/assets/ui/resources/res-",
       "/assets/world/",
@@ -558,10 +559,6 @@
         "bytes": 713541
       },
       {
-        "path": "/assets/village/layers/house-big-west.webp",
-        "bytes": 706062
-      },
-      {
         "path": "/assets/alt-visuals/v8/background/noise/Data/512_512/LDR_RG01_0.png",
         "bytes": 705573
       },
@@ -570,16 +567,16 @@
         "bytes": 626262
       },
       {
-        "path": "/assets/village/layers/house-thatch-big.webp",
-        "bytes": 564174
-      },
-      {
         "path": "/assets/fantasy_ui/card_glow.png",
         "bytes": 564060
       },
       {
         "path": "/ui/fantasy/card-glow.png",
         "bytes": 564060
+      },
+      {
+        "path": "/assets/village/layers/house-big-west.webp",
+        "bytes": 559124
       },
       {
         "path": "/tmp-fan/fancards-element.png",
@@ -636,6 +633,10 @@
       {
         "path": "/assets/ui/hud-real/medaglione-battezzato-v3.webp",
         "bytes": 475812
+      },
+      {
+        "path": "/assets/village/layers/house-thatch-big.webp",
+        "bytes": 443712
       },
       {
         "path": "/assets/creatures/reference/regina-ibrida.jpg",
@@ -834,10 +835,6 @@
         "bytes": 211136
       },
       {
-        "path": "/assets/village/layers/house-stone-mid.webp",
-        "bytes": 195184
-      },
-      {
         "path": "/assets/quest-goblin/combattimento.jpg",
         "bytes": 184708
       },
@@ -886,16 +883,16 @@
         "bytes": 154336
       },
       {
-        "path": "/assets/village/layers/house-east-edge.webp",
-        "bytes": 153000
-      },
-      {
         "path": "/assets/ui/hud-real/C1/emblem.webp",
         "bytes": 152792
       },
       {
         "path": "/assets/ui/poi-radial/slices/ring-sapphire.webp",
         "bytes": 144984
+      },
+      {
+        "path": "/assets/village/layers/house-stone-mid.webp",
+        "bytes": 142052
       },
       {
         "path": "/assets/ui/poi-radial/slices/ring-amethyst.webp",
@@ -912,6 +909,10 @@
       {
         "path": "/assets/ui/hud-real/poi/layers/poi-green-base.webp",
         "bytes": 136594
+      },
+      {
+        "path": "/assets/village/layers/house-east-edge.webp",
+        "bytes": 136136
       },
       {
         "path": "/assets/ui/hud-real/poi/poi-job-frame.webp",
@@ -1038,6 +1039,14 @@
         "bytes": 108968
       },
       {
+        "path": "/assets/ui/hud-real/cassetto/gemini-corner-1440.png",
+        "bytes": 106589
+      },
+      {
+        "path": "/assets/ui/hud-real/cassetto/gemini-corner-1280.png",
+        "bytes": 102536
+      },
+      {
         "path": "/assets/ui/hud-real/kit-divider.png",
         "bytes": 100155
       },
@@ -1072,10 +1081,6 @@
       {
         "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/LDR_LLL1_2.png",
         "bytes": 99123
-      },
-      {
-        "path": "/assets/village/layers/hut-far-2.webp",
-        "bytes": 96794
       },
       {
         "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_RGB_10.png",
@@ -1222,6 +1227,10 @@
         "bytes": 65752
       },
       {
+        "path": "/assets/village/layers/hut-far-2.webp",
+        "bytes": 63274
+      },
+      {
         "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_LA_3.png",
         "bytes": 62543
       },
@@ -1292,6 +1301,10 @@
       {
         "path": "/assets/ui/time/time-night.webp",
         "bytes": 60270
+      },
+      {
+        "path": "/assets/ui/hud-real/cassetto/gemini-bar-1440.png",
+        "bytes": 59727
       },
       {
         "path": "/assets/ui/zanara/roster/emblem.png",
@@ -1418,6 +1431,14 @@
         "bytes": 48876
       },
       {
+        "path": "/assets/ui/hud-real/cassetto/gemini-bar-1280.png",
+        "bytes": 45571
+      },
+      {
+        "path": "/assets/village/layers/hut-far-1.webp",
+        "bytes": 45518
+      },
+      {
         "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RG01_15.png",
         "bytes": 44573
       },
@@ -1520,10 +1541,6 @@
       {
         "path": "/assets/characters/prototypes/fantasy_vector/knight_blade/character_run_2.png",
         "bytes": 36274
-      },
-      {
-        "path": "/assets/village/layers/hut-far-1.webp",
-        "bytes": 36006
       },
       {
         "path": "/assets/characters/prototypes/fantasy_vector/knight_blade/character_jump_0.png",
@@ -1986,6 +2003,10 @@
         "bytes": 21948
       },
       {
+        "path": "/assets/ui/hud-real/panel-frame/corner-tl.webp",
+        "bytes": 21700
+      },
+      {
         "path": "/assets/ui/zanara/roster/ring.png",
         "bytes": 21385
       },
@@ -2328,28 +2349,8 @@
       {
         "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_25.png",
         "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_26.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_27.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_28.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_29.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_3.png",
-        "bytes": 16521
       }
     ],
-    "orphanBytes": 182135920
+    "orphanBytes": 182136533
   }
 }
