@@ -208,6 +208,7 @@ La fonte normativa è `.mw/contracts/**` + `.mw/contracts/components/inventory.j
 | `CTR-game-002` | 2 | 5 |
 | `CTR-game-003` | 4 | 6 |
 | `CTR-game-004` | 5 | 6 |
+| `CTR-game-005` | 3 | 3 |
 | `CTR-game-006` | 8 | 3 |
 | `CTR-game-007` | 7 | 3 |
 | `CTR-game-008` | 6 | 5 |
