@@ -24,14 +24,18 @@ scope_files:
   - src/ui/idleVillage/components/gameFrame/useHudPanels.ts
   - src/ui/idleVillage/components/gameFrame/useHudScale.ts
   - src/ui/idleVillage/components/gameFrame/usePanelWhileOpen.ts
+  - src/ui/idleVillage/components/gameFrame/villageStashViewModel.ts
   - src/ui/idleVillage/config/gamePerfBudgets.ts
   - src/ui/idleVillage/config/worldSurfaceConfig.ts
+  - src/ui/idleVillage/frozen/_infra/CanonicalDataBridge.ts
   - src/ui/idleVillage/hooks/useFrameMetrics.ts
   - src/ui/idleVillage/hooks/useQuestLoreDrop.ts
   - src/ui/idleVillage/hooks/useReducedMotion.ts
   - src/ui/idleVillage/hooks/useSettlementLostGrade.ts
   - src/ui/idleVillage/hooks/useThrottledValue.ts
+  - src/ui/idleVillage/interaction/dragSensors.ts
   - src/ui/idleVillage/interaction/magneticCollision.ts
+  - src/ui/idleVillage/interaction/useDragOutcome.ts
   - src/ui/idleVillage/pixiSpike/pixiDestroy.ts
   - src/ui/idleVillage/questS1Lab/questArt.ts
   - src/ui/idleVillage/questS1Lab/questForecast.worker.ts
@@ -43,7 +47,9 @@ scope_files:
   - src/ui/idleVillage/questS1Lab/useQuestRun.ts
   - src/ui/idleVillage/quests/rosterCompatibility.ts
   - src/ui/idleVillage/rosterV2/heroLevelCue.ts
+  - src/ui/idleVillage/rosterV2/heroLevelMock.ts
   - src/ui/idleVillage/rosterV2/heroLevelUpEvents.ts
+  - src/ui/idleVillage/rosterV2/heroLevelViewModel.ts
   - src/ui/idleVillage/rosterV2/index.ts
   - src/ui/idleVillage/rosterV2/mountedCardRegistry.ts
   - src/ui/idleVillage/rosterV2/runHeroLevelUpStaging.ts
@@ -52,6 +58,7 @@ scope_files:
   - src/ui/idleVillage/skins/dayNightPoiSkinConfig.ts
   - src/ui/idleVillage/skins/resolveInitialSkin.ts
   - src/ui/idleVillage/slots/useResidentSlotController.ts
+  - src/ui/idleVillage/store/useVillageStashStore.ts
   - src/ui/idleVillage/utils/gameAssetWarmup.ts
   - src/ui/idleVillage/utils/gamePerfProbe.ts
 fast_checks:
@@ -103,6 +110,10 @@ fast_checks:
   - tests/unit/idleVillage/stageZonesSolver.test.ts
   - tests/unit/idleVillage/villageStash.test.tsx
   - tests/unit/questS1Lab/questGoblin.test.ts
+  - tests/unit/idleVillage/canonicalDataBridge.test.ts
+  - tests/unit/idleVillage/dragSensors.test.ts
+  - tests/unit/idleVillage/heroLevelMock.test.ts
+  - tests/unit/idleVillage/villageStashLedger.test.ts
 e2e_checks:
   - tests/e2e/idleVillage/gamePerf.spec.ts
   - tests/e2e/idleVillage/questJourneyRoute.spec.ts
@@ -231,7 +242,66 @@ invariants:
       italiano; ogni letterale del motore ha una voce nel catalogo, quindi una riga nuova non esce non tradotta
       (PLAN-067 T-A13b)
     test_refs:
-      - tests/unit/idleVillage/questEngineText.test.ts
+      - tests/unit/idleVillage/questEngineText.test.ts  - id: village-stash-view-model.INV-1
+    source: plan
+    source_ref: PLAN-073
+    statement: >-
+      Il conteggio mostrato deriva da `sum(qty)` delle righe config e ogni riga risolve `descKey` e
+      `nameKey` dalla config canonica (i18n keys, mai stringhe inline).
+    test_refs:
+      - tests/unit/idleVillage/villageStash.test.tsx
+  - id: canonical-data-bridge.INV-1
+    source: plan
+    source_ref: PLAN-054
+    statement: >-
+      Il bridge ri-esporta hook, resolver e config canonici per identità (stesso riferimento del modulo
+      canonico), così i kit frozen non possono mai derivere su una copia privata — e non pubblica nessun
+      fixture mock («no mocks» per costruzione).
+    test_refs:
+      - tests/unit/idleVillage/canonicalDataBridge.test.ts
+  - id: drag-sensors.INV-1
+    source: plan
+    source_ref: PLAN-043
+    statement: >-
+      `useIdleVillageDragSensors` arma esattamente tre sensori (pointer hold-or-move, touch, keyboard)
+      da una sola config: un click rapido resta un click, tenere o muovere avvia il drag, e la tastiera
+      mantiene la parità completa.
+    test_refs:
+      - tests/unit/idleVillage/dragSensors.test.ts
+  - id: use-drag-outcome.INV-1
+    source: plan
+    source_ref: PLAN-043
+    statement: >-
+      Il target di volo è il rect del componente Slot (`slot-button-<slotId>`), non la cella rack con
+      caption/footer — `getSlotComponentElement` torna `null` quando lo slot non è montato.
+    test_refs:
+      - tests/unit/idleVillage/slotFlightTarget.test.ts
+  - id: hero-level-mock.INV-1
+    source: plan
+    source_ref: PLAN-067
+    statement: >-
+      Ogni `bumpMockLevel` alza di esattamente uno il boost in memoria del resident e
+      `resetMockLevelsForTest` azzera tutto — solo memoria, nessuna persistenza (il sistema reale è di
+      PROGRESSION.md).
+    test_refs:
+      - tests/unit/idleVillage/heroLevelMock.test.ts
+  - id: hero-level-view-model.INV-1
+    source: plan
+    source_ref: PLAN-032
+    statement: >-
+      `heroLevelView` risolve il livello solo per un hero che ha un livello configurato (base + boost
+      mock); un non-hero elencato in `levels` o un hero senza livello configurato → `null`.
+    test_refs:
+      - tests/unit/idleVillage/heroLevelUp.test.tsx
+  - id: use-village-stash-store.INV-1
+    source: plan
+    source_ref: PLAN-073
+    statement: >-
+      `assign` riempie il PRIMO slot libero della bag, non la coda — un release in mezzo viene
+      riempito prima di appendere.
+    test_refs:
+      - tests/unit/idleVillage/villageStashLedger.test.ts
+
 ---
 # game-frame-pixi
 
