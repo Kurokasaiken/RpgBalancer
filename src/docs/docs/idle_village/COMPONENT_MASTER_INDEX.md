@@ -214,6 +214,7 @@ La fonte normativa è `.mw/contracts/**` + `.mw/contracts/components/inventory.j
 | `CTR-game-008` | 6 | 5 |
 | `CTR-game-009` | 7 | 4 |
 | `CTR-game-010` | 2 | 4 |
+| `CTR-game-011` | 8 | 14 |
 
 ### Component units
 
@@ -242,7 +243,7 @@ La fonte normativa è `.mw/contracts/**` + `.mw/contracts/components/inventory.j
 | `consumable-belt` | ui-component | 2 | `src/ui/idleVillage/questS1Lab/hud/ConsumableBelt.tsx` | `.mw/contracts/components/consumable-belt.md` |
 | `context-strip` | ui-component | 2 | `src/ui/idleVillage/questS1Lab/hud/ContextStrip.tsx` | `.mw/contracts/components/context-strip.md` |
 | `crew-scheduler-hudcard` | ui-component | 2 | `src/ui/idleVillage/components/CrewSchedulerHUDCard.tsx` | `.mw/contracts/components/crew-scheduler-hudcard.md` |
-| `custom-drag-overlay` | ui-component | 3 | `src/ui/idleVillage/components/CustomDragOverlay.tsx` | `.mw/contracts/components/custom-drag-overlay.md` |
+| `custom-drag-overlay` | ui-component | 2 | `src/ui/idleVillage/components/CustomDragOverlay.tsx` | `.mw/contracts/components/custom-drag-overlay.md` |
 | `damage-channel` | ui-component | 2 | `src/ui/idleVillage/questS1Lab/hud/DamageChannel.tsx` | `.mw/contracts/components/damage-channel.md` |
 | `day-night-poi` | ui-component | 2 | `src/ui/idleVillage/components/minimal/DayNightPOI.tsx` | `.mw/contracts/components/day-night-poi.md` |
 | `day-night-poi-skin` | ui-component | 2 | `src/ui/idleVillage/components/minimal/DayNightPoiSkin.tsx` | `.mw/contracts/components/day-night-poi-skin.md` |
@@ -253,7 +254,7 @@ La fonte normativa è `.mw/contracts/**` + `.mw/contracts/components/inventory.j
 | `destiny-astrolabe-v62` | ui-component | 2 | `src/ui/idleVillage/components/destinyAstrolabeV62/DestinyAstrolabeV62.tsx` | `.mw/contracts/components/destiny-astrolabe-v62.md` |
 | `destiny-astrolabe-v62-kit` | shared-kernel | 1 | `src/ui/idleVillage/frozen/kits/destinyAstrolabeV62Kit.tsx` | `.mw/contracts/components/destiny-astrolabe-v62-kit.md` |
 | `director-panel` | ui-component | 2 | `src/ui/idleVillage/components/gameFrame/DirectorPanel.tsx` | `.mw/contracts/components/director-panel.md` |
-| `drag-config` | shared-kernel | 2 | `src/ui/idleVillage/config/dragConfig.ts` | `.mw/contracts/components/drag-config.md` |
+| `drag-config` | shared-kernel | 1 | `src/ui/idleVillage/config/dragConfig.ts` | `.mw/contracts/components/drag-config.md` |
 | `drag-context` | ui-component | 2 | `src/ui/idleVillage/components/DragContext.tsx` | `.mw/contracts/components/drag-context.md` |
 | `drag-context-store` | shared-kernel | 1 | `src/ui/idleVillage/components/DragContextStore.ts` | `.mw/contracts/components/drag-context-store.md` |
 | `drag-outcome-flight` | ui-component | 2 | `src/ui/idleVillage/interaction/DragOutcomeFlight.tsx` | `.mw/contracts/components/drag-outcome-flight.md` |
@@ -467,7 +468,7 @@ La fonte normativa è `.mw/contracts/**` + `.mw/contracts/components/inventory.j
 | `use-hero-sheet` | ui-component | 2 | `src/ui/idleVillage/components/gameFrame/useHeroSheet.tsx` | `.mw/contracts/components/use-hero-sheet.md` |
 | `use-hud-panel-drag` | shared-kernel | 1 | `src/ui/idleVillage/components/gameFrame/useHudPanelDrag.ts` | `.mw/contracts/components/use-hud-panel-drag.md` |
 | `use-poi-type-icon` | shared-kernel | 1 | `src/ui/idleVillage/components/gameFrame/usePoiTypeIcon.ts` | `.mw/contracts/components/use-poi-type-icon.md` |
-| `use-quest-expedition-session` | ui-component | 8 | `src/ui/idleVillage/quests/useQuestExpeditionSession.tsx` | `.mw/contracts/components/use-quest-expedition-session.md` |
+| `use-quest-expedition-session` | ui-component | 2 | `src/ui/idleVillage/quests/useQuestExpeditionSession.tsx` | `.mw/contracts/components/use-quest-expedition-session.md` |
 | `use-quest-poi-session` | ui-component | 2 | `src/ui/idleVillage/quests/useQuestPoiSession.tsx` | `.mw/contracts/components/use-quest-poi-session.md` |
 | `use-sandbox-timing-bridge` | ui-component | 2 | `src/ui/idleVillage/hooks/useSandboxTimingBridge.tsx` | `.mw/contracts/components/use-sandbox-timing-bridge.md` |
 | `use-sensory-audio` | shared-kernel | 1 | `src/ui/idleVillage/hooks/useSensoryAudio.ts` | `.mw/contracts/components/use-sensory-audio.md` |

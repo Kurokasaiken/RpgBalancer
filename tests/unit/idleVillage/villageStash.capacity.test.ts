@@ -16,6 +16,7 @@ import { villageStashViewModel } from '@/ui/idleVillage/components/gameFrame/vil
 vi.mock('react-i18next', () => ({ useTranslation: () => ({ t: (key: string) => key }) }));
 
 describe('village stash — capacity has one source (R-234)', () => {
+  // INV:village-stash-panel.INV-2
   // INV:R-234-stash-capacity-one-source — the stash panel's capacity equals the Warehouse
   // tier's storage capacity at the level the Village view shows; no second literal.
   it('panel capacity = Warehouse storage capacity at its current level', () => {
