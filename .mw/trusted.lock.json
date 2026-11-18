@@ -1,12 +1,12 @@
 {
   "version": 1,
-  "sealed_at": "2026-11-18T19:53:39.202Z",
+  "sealed_at": "2026-11-18T21:52:55.552Z",
   "sealed_by": "director",
   "entries": {
     ".mw/surface-map.json": "f75d07c8e236520de771cb2457419e1d15db43cc5f63f20eb33092ea93d15a0a",
     ".mw/verify-tiers.json": "37a392a4010ec39bf729873f5960112b8efe174a3d8a7e0f6f2c3e6f72958354",
     "scripts/agentsLint.ts": "05848c41906889e4877eccf2cae3cde233f88f29d5c81b39ef2da0d1e9dd4215",
-    "scripts/closureLint.ts": "738cf1c0c80d038adb851fdb4820a8bf1ab41648a8b9618121b4d49e67205a22",
+    "scripts/closureLint.ts": "0dc7f9f9ef4c65ca37d1fdd749902ab7d289a618a1180ab8e9e1d7bf1e8d6c4c",
     "scripts/contractsCheck.ts": "9f41cbb8722ee88e5c8c38dbf8e779f0be9eda6e69c6e2a26953f07c335437b7",
     "scripts/coverageException.ts": "30d9ce23671ae138d4d73448b3a037f6c88c7ac32d49d4ccaee35a7abc6346e6",
     "scripts/directorAnswer.ts": "177ffb7a5eeff6f683fae119fcc30ccbafb958846d8e84f1fc09740e176ffb60",
@@ -16,7 +16,7 @@
     "scripts/verification/bvMetrics.ts": "91f36809b0b531bd9ef10776c204185f9cbb266e6125278f8a4129c35486b445",
     "scripts/verification/componentInventory.ts": "1a16fdd40f718b932ec18a9a7e9588d2e025e0dc3f2558696e01a021f022f94b",
     "scripts/verification/contractSchema.ts": "a2b3c9163bae690eb3cabe0547f2cdb29e2b571554a4d396aeac841bdbb04d76",
-    "scripts/verification/contractsCheck.ts": "a26975235d731353e7d232b8044990fc00ae7d7b956e92ebe1b124b72cb66d14",
+    "scripts/verification/contractsCheck.ts": "efe185ddec0151fd5b2c9f854d2b16db3b2ae05a70aba0edb23eb372792c5f14",
     "scripts/verification/contractsIndexSync.ts": "70ccb49dfa8241031d719b8149682003aaf20003d3fc046a43f6d5cee4ca224a",
     "scripts/verification/directorApprove.ts": "6070c349dd4da8bc1822d43ab5cf3e2dab95f528943caa7bbc97ef3223d33260",
     "scripts/verification/e2eCache.ts": "c96d974a26900e7786de4aae0a6ff998dbaaf30ba3063ac2e7185a3dc3c05bc4",
@@ -146,7 +146,7 @@
     "src/ui/idleVillage/frozen/mockData/residents.ts": "6b5e48ce5794ac2bd1bf1a37666d3af9d28967cf8aa747473e082d064fcb36aa",
     "src/ui/idleVillage/frozen/registry.ts": "c7c6faeaed6367a5f53ca06f7d809a9902ed104dbbb5e5b7a2d3f56360963648"
   },
-  "sealed_base_sha": "5866fc002331a380a75d882b5f59420eb97d649c",
+  "sealed_base_sha": "65700b1c5ba0eca2e65b94b631ea9255d8134d76",
   "executed_counts": {
     "CTR-game-001.INV-1": "unknown",
     "CTR-game-001.INV-2": "unknown",
