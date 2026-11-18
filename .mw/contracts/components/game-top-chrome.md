@@ -65,7 +65,7 @@ invariants:
     test_refs:
       - tests/unit/idleVillage/r339TopChrome.test.tsx
   - id: game-top-chrome.INV-6
-    source: ruling
+    source: director-spec
     source_ref: R-352
     statement: >-
       La resource bar è speculare da capo a capo, con sedi capo SIMMETRICHE, e pareggiata in altezza
