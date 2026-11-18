@@ -110,4 +110,21 @@ describe('HudRealVictoryReward — baptized pergamena report (R-348)', () => {
       vi.useRealTimers();
     }
   });
+
+  // INV:hudreal-victory-reward.INV-5
+  it('rewards paint real epilogue sections (consumed/reward/loot/xp), never placeholders', () => {
+    vi.useFakeTimers();
+    try {
+      const run = endedRun(7);
+      renderReward(run);
+      revealAll();
+      const rewards = screen.getByTestId('hudreal-victory-rewards');
+      const text = rewards.textContent ?? '';
+      expect(text.trim().length).toBeGreaterThan(0);
+      expect(text).not.toMatch(/placeholder|lorem|TODO/i);
+      expect(screen.getByTestId('hudreal-victory-echoes')).toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });

@@ -72,7 +72,7 @@ describe('WanderlustRosterCardV2 — compact mockup row', () => {
 });
 
 describe('HeroLevelDecor — compact badge column', () => {
-  // INV:hero-level-decor.R-353-compact-badge-corner — with data-density="compact" inside the
+  // INV:R-353-compact-badge-corner — with data-density="compact" inside the
   // wrapper, the LV cluster lives in the dedicated column right of the medallion (right edge
   // at portrait.right + 32, vertically centred on the ring): chip over emblem shield, never
   // on the name.

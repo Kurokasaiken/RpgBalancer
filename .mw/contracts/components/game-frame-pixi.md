@@ -242,7 +242,8 @@ invariants:
       italiano; ogni letterale del motore ha una voce nel catalogo, quindi una riga nuova non esce non tradotta
       (PLAN-067 T-A13b)
     test_refs:
-      - tests/unit/idleVillage/questEngineText.test.ts  - id: village-stash-view-model.INV-1
+      - tests/unit/idleVillage/questEngineText.test.ts
+  - id: village-stash-view-model.INV-1
     source: plan
     source_ref: PLAN-073
     statement: >-

@@ -1,6 +1,6 @@
 {
   "schema": "plan054-component-inventory/1",
-  "generated_at": "2026-11-15T15:55:40.545Z",
+  "generated_at": "2026-11-18T11:21:35.418Z",
   "strict_files": [
     "src/pages/game-frame-pixi.tsx",
     "src/pages/game-frame.tsx",
@@ -111,8 +111,8 @@
     "src/ui/idleVillage/components/destinyAstrolabeV62/tentacles.ts",
     "src/ui/idleVillage/components/gameFrame/AmanuensePage.tsx",
     "src/ui/idleVillage/components/gameFrame/DirectorPanel.tsx",
+    "src/ui/idleVillage/components/gameFrame/ExpeditionBottomSheet.tsx",
     "src/ui/idleVillage/components/gameFrame/ExpeditionDrawer.tsx",
-    "src/ui/idleVillage/components/gameFrame/ExpeditionEdgeTab.tsx",
     "src/ui/idleVillage/components/gameFrame/GameBootScreen.tsx",
     "src/ui/idleVillage/components/gameFrame/GameFrame.tsx",
     "src/ui/idleVillage/components/gameFrame/GameFrameDragCursor.tsx",
@@ -164,6 +164,7 @@
     "src/ui/idleVillage/components/gameFrame/VillageStashPanel.tsx",
     "src/ui/idleVillage/components/gameFrame/WhenWhereCluster.tsx",
     "src/ui/idleVillage/components/gameFrame/engravedIcons.tsx",
+    "src/ui/idleVillage/components/gameFrame/expeditionBagAssign.ts",
     "src/ui/idleVillage/components/gameFrame/expeditionLost.ts",
     "src/ui/idleVillage/components/gameFrame/expeditionLostStaging.ts",
     "src/ui/idleVillage/components/gameFrame/gameFrameCursors.css",
@@ -371,6 +372,7 @@
     "src/ui/idleVillage/questS1Lab/render/AmbientLayer.tsx",
     "src/ui/idleVillage/questS1Lab/render/AtmosphereLayer.tsx",
     "src/ui/idleVillage/questS1Lab/render/DepthScene.tsx",
+    "src/ui/idleVillage/questS1Lab/render/SceneRevealLayer.tsx",
     "src/ui/idleVillage/questS1Lab/render/atmosphereOverlay.ts",
     "src/ui/idleVillage/questS1Lab/render/cameraEval.ts",
     "src/ui/idleVillage/questS1Lab/render/depthShader.ts",
@@ -430,6 +432,7 @@
     "src/ui/idleVillage/skins/poi/poiDetailSkinConfig.ts",
     "src/ui/idleVillage/skins/primitives/HudPanel.tsx",
     "src/ui/idleVillage/skins/primitives/HudPlaque.tsx",
+    "src/ui/idleVillage/skins/primitives/PanelFrameOrnaments.tsx",
     "src/ui/idleVillage/skins/primitives/SkinBadge.tsx",
     "src/ui/idleVillage/skins/primitives/SkinButton.tsx",
     "src/ui/idleVillage/skins/primitives/SkinCloseButton.tsx",
@@ -1004,23 +1007,12 @@
       "tier_source": "default"
     },
     {
-      "id": "expedition-bag-assign",
-      "role": "ui-component",
-      "tier": 2,
-      "root_file": "src/ui/idleVillage/components/gameFrame/expeditionBagAssign.ts",
-      "scope_files": [
-        "src/ui/idleVillage/components/gameFrame/expeditionBagAssign.ts"
-      ],
-      "tier_source": "default"
-    },
-    {
       "id": "expedition-bottom-sheet",
       "role": "ui-component",
       "tier": 2,
       "root_file": "src/ui/idleVillage/components/gameFrame/ExpeditionBottomSheet.tsx",
       "scope_files": [
-        "src/ui/idleVillage/components/gameFrame/ExpeditionBottomSheet.tsx",
-        "src/ui/idleVillage/store/useExpeditionSheet.ts"
+        "src/ui/idleVillage/components/gameFrame/ExpeditionBottomSheet.tsx"
       ],
       "tier_source": "default"
     },
@@ -1031,16 +1023,6 @@
       "root_file": "src/ui/idleVillage/components/gameFrame/ExpeditionDrawer.tsx",
       "scope_files": [
         "src/ui/idleVillage/components/gameFrame/ExpeditionDrawer.tsx"
-      ],
-      "tier_source": "default"
-    },
-    {
-      "id": "expedition-edge-tab",
-      "role": "ui-component",
-      "tier": 2,
-      "root_file": "src/ui/idleVillage/components/gameFrame/ExpeditionEdgeTab.tsx",
-      "scope_files": [
-        "src/ui/idleVillage/components/gameFrame/ExpeditionEdgeTab.tsx"
       ],
       "tier_source": "default"
     },
@@ -2021,6 +2003,16 @@
       "tier_source": "default"
     },
     {
+      "id": "panel-frame-ornaments",
+      "role": "ui-component",
+      "tier": 2,
+      "root_file": "src/ui/idleVillage/skins/primitives/PanelFrameOrnaments.tsx",
+      "scope_files": [
+        "src/ui/idleVillage/skins/primitives/PanelFrameOrnaments.tsx"
+      ],
+      "tier_source": "default"
+    },
+    {
       "id": "pg-card",
       "role": "ui-component",
       "tier": 2,
@@ -2757,6 +2749,16 @@
       "tier_source": "kernel"
     },
     {
+      "id": "scene-reveal-layer",
+      "role": "ui-component",
+      "tier": 2,
+      "root_file": "src/ui/idleVillage/questS1Lab/render/SceneRevealLayer.tsx",
+      "scope_files": [
+        "src/ui/idleVillage/questS1Lab/render/SceneRevealLayer.tsx"
+      ],
+      "tier_source": "default"
+    },
+    {
       "id": "settings-panel",
       "role": "ui-component",
       "tier": 2,
@@ -3389,7 +3391,8 @@
       "tier": 2,
       "root_file": "src/ui/idleVillage/components/gameFrame/VillageStashPanel.tsx",
       "scope_files": [
-        "src/ui/idleVillage/components/gameFrame/VillageStashPanel.tsx"
+        "src/ui/idleVillage/components/gameFrame/VillageStashPanel.tsx",
+        "src/ui/idleVillage/components/gameFrame/expeditionBagAssign.ts"
       ],
       "tier_source": "default"
     },
@@ -3709,10 +3712,10 @@
     }
   ],
   "stats": {
-    "files": 500,
-    "units": 299,
-    "ui_components": 228,
+    "files": 503,
+    "units": 300,
+    "ui_components": 229,
     "shared_kernels": 71
   },
-  "content_sha256": "4b8067910c1421f561a0375f774e3ea19bb71334d2c9ba9fefeca2eb3bb20ba9"
+  "content_sha256": "8254e35142bbfb8d88c8bfe09bc38654b73526c3741bf086e84471289fc1e36c"
 }
