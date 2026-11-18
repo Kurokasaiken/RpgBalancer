@@ -3,7 +3,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const MENU_DIR = 'src/ui/idleVillage/components/gameFrame/menu';
-const LOCALES = ['en', 'it-IT'] as const;
 
 /** Every `t('gameFrame.menu.…')` literal in the menu screens and the menu itself. */
 function usedKeys(): string[] {
@@ -39,7 +38,7 @@ function parseNoDuplicates(raw: string): { value: unknown; duplicates: string[] 
 
 describe('menu i18n', () => {
   // INV:game-menu-screens.INV-12 — every text key the menu screens use is a string in en and it-IT, and the menu namespace has no duplicate key (a duplicate silently turns a label into an object and crashes the page)
-  it.each(LOCALES)('%s: every used gameFrame.menu key resolves to a string, no duplicate keys', (locale) => {
+  it.each(['en', 'it-IT'] as const)('%s: every used gameFrame.menu key resolves to a string, no duplicate keys', (locale) => {
     const { value, duplicates } = parseNoDuplicates(fs.readFileSync(`public/locales/${locale}/idleVillage.json`, 'utf8'));
     expect(duplicates.filter((k) => ['quit', 'load', 'settings', 'loadGame', 'newGame', 'close', 'cancel', 'title'].includes(k))).toEqual([]);
     const menu = (value as { gameFrame: { menu: Record<string, unknown> } }).gameFrame.menu;
