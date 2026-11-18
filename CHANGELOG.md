@@ -1,3 +1,18 @@
+## [1.2.1](https://github.com/Kurokasaiken/RpgBalancer/compare/v1.2.0...v1.2.1) (2026-11-18)
+
+### 🐛 Bug Fixes
+
+* **verification:** closure:lint hang — living:'skip' mode + delegation bypass in light mode ([65700b1](https://github.com/Kurokasaiken/RpgBalancer/commit/65700b1c5ba0eca2e65b94b631ea9255d8134d76))
+
+### 📚 Documentation
+
+* add game design knowledge map ([146aa11](https://github.com/Kurokasaiken/RpgBalancer/commit/146aa1134b40e0fc33da02681e5bd4afc6cc6cb8))
+* **governance:** PLAN-122 status + handoff resume point (T-6/T-7 gating) ([03d4776](https://github.com/Kurokasaiken/RpgBalancer/commit/03d47765fadd0a4fee4b5b0e4fb217878463ea15))
+* index game design knowledge map ([57ff5d3](https://github.com/Kurokasaiken/RpgBalancer/commit/57ff5d3e6ba1ccf12cad1816a77a2ba6e92e4957))
+* load game design knowledge map for design work ([90b6d57](https://github.com/Kurokasaiken/RpgBalancer/commit/90b6d571d24cbd05284c7c64358338b4b73e5f86))
+* **R-326:** it6 silhouette recut — ledger update ([6458c17](https://github.com/Kurokasaiken/RpgBalancer/commit/6458c179e1292ccddc3673cabf9785ba9aaa4f9e))
+* record game design context workflow request ([ffb9618](https://github.com/Kurokasaiken/RpgBalancer/commit/ffb9618df5f7a47ffb71b548911260fa31ef6f76))
+
 ## [1.2.0](https://github.com/Kurokasaiken/RpgBalancer/compare/v1.1.0...v1.2.0) (2026-11-15)
 
 ### 🚀 Features
