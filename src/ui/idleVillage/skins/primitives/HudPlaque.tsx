@@ -20,6 +20,10 @@ export interface HudPlaqueProps extends React.HTMLAttributes<HTMLElement> {
   shape?: HudPlaqueShape;
   /** Render as a different element (e.g. 'section'). Default 'div'. */
   as?: keyof React.JSX.IntrinsicElements;
+  /** R-357: skip the inner highlight, the dark step and the brass BAND — keep shadow, lacquer, grain and seat. Used when
+   *  a painted frame (`PanelFrameOrnaments` 'cornici') carries the border, so the old band no longer reads as a second
+   *  frame under it (Director 2026-11-18: «sembra che ci sono 2 frame uno sopra l'altro»). */
+  bare?: boolean;
 }
 
 /**
@@ -31,7 +35,7 @@ export interface HudPlaqueProps extends React.HTMLAttributes<HTMLElement> {
  * The seat, the band and the shadow are not optional: the bronze alone disappears
  * against sand and sea, and it is the seat line that keeps the border visible.
  */
-export const HudPlaque: React.FC<HudPlaqueProps> = ({ shape = 'panel', as: Tag = 'div', children, style, ...rest }) => {
+export const HudPlaque: React.FC<HudPlaqueProps> = ({ shape = 'panel', as: Tag = 'div', bare = false, children, style, ...rest }) => {
   const Component = Tag as React.ElementType;
   const ref = useRef<HTMLElement>(null);
   const [size, setSize] = useState<{ w: number; h: number } | null>(null);
@@ -90,7 +94,7 @@ export const HudPlaque: React.FC<HudPlaqueProps> = ({ shape = 'panel', as: Tag =
           </defs>
           <path d={d} fill={`url(#lq-${uid})`} style={{ fillOpacity: 'var(--skin-hud-lacquer-alpha)' }} />
           <path d={d} fill={`url(#gr-${uid})`} style={{ opacity: 'var(--skin-hud-grain-alpha)' }} />
-          <g clipPath={`url(#in-${uid})`}>
+          {!bare && (<g clipPath={`url(#in-${uid})`}>
             <path d={d} fill="none" stroke={`url(#hl-${uid})`} strokeWidth={2 * (BAND_PX + 3)} />
             <path d={d} fill="none" style={{ stroke: 'var(--skin-hud-step)' }} strokeWidth={2 * (BAND_PX + 1)} />
             {/* R-253: the wear mask cut the band through to the dark step,
@@ -99,7 +103,7 @@ export const HudPlaque: React.FC<HudPlaqueProps> = ({ shape = 'panel', as: Tag =
              *  border (Director eye-check). The band now paints solid — the
              *  brass gradient still carries the material variation. */}
             <path d={d} fill="none" stroke={`url(#br-${uid})`} strokeWidth={2 * BAND_PX} />
-          </g>
+          </g>)}
           <path d={d} fill="none" style={{ stroke: 'var(--skin-hud-seat)' }} strokeWidth={SEAT_PX} />
         </svg>
       )}
