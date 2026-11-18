@@ -1,6 +1,6 @@
 {
   "schema": "plan054-component-inventory/1",
-  "generated_at": "2026-11-18T11:21:35.418Z",
+  "generated_at": "2026-11-18T16:59:31.352Z",
   "strict_files": [
     "src/pages/game-frame-pixi.tsx",
     "src/pages/game-frame.tsx",

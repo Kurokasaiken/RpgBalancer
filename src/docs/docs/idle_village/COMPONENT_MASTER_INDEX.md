@@ -208,7 +208,6 @@ La fonte normativa è `.mw/contracts/**` + `.mw/contracts/components/inventory.j
 | `CTR-game-002` | 2 | 5 |
 | `CTR-game-003` | 4 | 6 |
 | `CTR-game-004` | 5 | 6 |
-| `CTR-game-005` | 3 | 3 |
 | `CTR-game-006` | 8 | 3 |
 | `CTR-game-007` | 7 | 3 |
 | `CTR-game-008` | 6 | 5 |
@@ -265,10 +264,8 @@ La fonte normativa è `.mw/contracts/**` + `.mw/contracts/components/inventory.j
 | `drop-feedback-config` | shared-kernel | 1 | `src/ui/idleVillage/config/dropFeedbackConfig.ts` | `.mw/contracts/components/drop-feedback-config.md` |
 | `drop-feedback-ui` | ui-component | 2 | `src/ui/idleVillage/components/DropFeedbackUI.tsx` | `.mw/contracts/components/drop-feedback-ui.md` |
 | `engraved-icons` | ui-component | 2 | `src/ui/idleVillage/components/gameFrame/engravedIcons.tsx` | `.mw/contracts/components/engraved-icons.md` |
-| `expedition-bag-assign` | ui-component | 2 | `src/ui/idleVillage/components/gameFrame/expeditionBagAssign.ts` | `.mw/contracts/components/expedition-bag-assign.md` |
 | `expedition-bottom-sheet` | ui-component | 2 | `src/ui/idleVillage/components/gameFrame/ExpeditionBottomSheet.tsx` | `.mw/contracts/components/expedition-bottom-sheet.md` |
 | `expedition-drawer` | ui-component | 2 | `src/ui/idleVillage/components/gameFrame/ExpeditionDrawer.tsx` | `.mw/contracts/components/expedition-drawer.md` |
-| `expedition-edge-tab` | ui-component | 2 | `src/ui/idleVillage/components/gameFrame/ExpeditionEdgeTab.tsx` | `.mw/contracts/components/expedition-edge-tab.md` |
 | `field-grain` | ui-component | 2 | `src/ui/visualFidelityLab/FieldGrain.tsx` | `.mw/contracts/components/field-grain.md` |
 | `flight-proxy` | ui-component | 2 | `src/ui/idleVillage/components/FlightProxy.tsx` | `.mw/contracts/components/flight-proxy.md` |
 | `floating-panel` | ui-component | 2 | `src/ui/idleVillage/components/FloatingPanel.tsx` | `.mw/contracts/components/floating-panel.md` |
@@ -360,6 +357,7 @@ La fonte normativa è `.mw/contracts/**` + `.mw/contracts/components/inventory.j
 | `orb-icon` | ui-component | 2 | `src/ui/fantasy/atoms/OrbIcon.tsx` | `.mw/contracts/components/orb-icon.md` |
 | `overlay-stack` | shared-kernel | 1 | `src/ui/idleVillage/components/gameFrame/overlayStack.ts` | `.mw/contracts/components/overlay-stack.md` |
 | `oxidized-grade-filter` | ui-component | 2 | `src/ui/idleVillage/components/OxidizedGradeFilter.tsx` | `.mw/contracts/components/oxidized-grade-filter.md` |
+| `panel-frame-ornaments` | ui-component | 2 | `src/ui/idleVillage/skins/primitives/PanelFrameOrnaments.tsx` | `.mw/contracts/components/panel-frame-ornaments.md` |
 | `pg-card` | ui-component | 2 | `src/ui/idleVillage/components/PgCard.tsx` | `.mw/contracts/components/pg-card.md` |
 | `physics-defaults` | shared-kernel | 1 | `src/ui/styleLab/config/physicsDefaults.ts` | `.mw/contracts/components/physics-defaults.md` |
 | `pixi-world-map` | ui-component | 1 | `src/ui/idleVillage/pixiSpike/PixiWorldMap.tsx` | `.mw/contracts/components/pixi-world-map.md` |
@@ -428,6 +426,7 @@ La fonte normativa è `.mw/contracts/**` + `.mw/contracts/components/inventory.j
 | `roster-sort-icon` | ui-component | 2 | `src/ui/idleVillage/components/RosterSortIcon.tsx` | `.mw/contracts/components/roster-sort-icon.md` |
 | `sandbox-diagnostics` | shared-kernel | 1 | `src/ui/idleVillage/utils/sandboxDiagnostics.ts` | `.mw/contracts/components/sandbox-diagnostics.md` |
 | `sandbox-timing-context` | shared-kernel | 1 | `src/ui/idleVillage/hooks/sandboxTimingContext.ts` | `.mw/contracts/components/sandbox-timing-context.md` |
+| `scene-reveal-layer` | ui-component | 2 | `src/ui/idleVillage/questS1Lab/render/SceneRevealLayer.tsx` | `.mw/contracts/components/scene-reveal-layer.md` |
 | `settings-panel` | ui-component | 2 | `src/ui/idleVillage/components/gameFrame/menu/SettingsPanel.tsx` | `.mw/contracts/components/settings-panel.md` |
 | `settlement-lost-overlay` | ui-component | 2 | `src/ui/idleVillage/components/SettlementLostOverlay.tsx` | `.mw/contracts/components/settlement-lost-overlay.md` |
 | `settlement-tally` | shared-kernel | 1 | `src/ui/idleVillage/settlement/settlementTally.ts` | `.mw/contracts/components/settlement-tally.md` |
