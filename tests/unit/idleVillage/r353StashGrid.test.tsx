@@ -121,13 +121,14 @@ describe('stash item detail card (INV-4)', () => {
   });
 
   // INV:village-stash-panel.INV-5 — the plaque mounts the mockup's ornate frame:
-  // PanelFrameOrnaments (data-panel-frame="ornate"), four signed filigree corners + inner filet,
+  // PanelFrameOrnaments (data-panel-frame="ornate"), the R-357 9-slice set —
+  // 4 fixed corners + chest clasp <img> + repeat-tile edge strips + inner filet,
   // decorative only (aria-hidden, pointer-events none), in every mode.
   it('mounts the mockup ornate frame on the plaque', () => {
     const { container } = renderPanel();
     const frame = container.querySelector('[data-panel-frame="ornate"]') as HTMLElement;
     expect(frame).toBeTruthy();
     expect(frame.getAttribute('aria-hidden')).toBe('true');
-    expect(frame.querySelectorAll('img').length).toBe(4);
+    expect(frame.querySelectorAll('img').length).toBe(5);
   });
 });

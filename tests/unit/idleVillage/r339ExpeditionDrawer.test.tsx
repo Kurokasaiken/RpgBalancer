@@ -106,12 +106,9 @@ describe('R-339 T2 — the drawer mounts the six named blocks of the mockup', ()
   });
 
   // INV:expedition-drawer.INV-4
-  it('risk-rewards reserves the S2 cost slot, flagged placeholder and empty', () => {
+  it('SUPPLIES (bag-slots) carries no cost cell (R-357: saved idea, not shown)', () => {
     const { container } = renderDrawer();
-    const slot = container.querySelector('[data-block="risk-rewards"] [data-testid="cassetto-cost-slot"]');
-    expect(slot).toBeInTheDocument();
-    expect(slot).toHaveAttribute('data-placeholder', 'cost-preview');
-    expect(slot).toBeEmptyDOMElement();
+    expect(container.querySelector('[data-testid="cassetto-cost-slot"]')).toBeNull();
   });
 });
 
@@ -142,7 +139,7 @@ describe('R-339 T2 — expanded ⇄ chip fold preserves the session surface', ()
     const chip = screen.getByTestId('expedition-drawer-collapse');
     expect(chip.style.right).toContain('min(');
     expect(chip.style.right).toContain('100vh');
-    expect(chip.style.right).toContain(`${DRAWER.widthMaxPx}px`);
+    expect(chip.style.right).toContain(`${DRAWER.widthMaxPxExtracted}px`);
   });
 });
 
