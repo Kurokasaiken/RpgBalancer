@@ -149,3 +149,34 @@ il "witness" deve vedere l'immagine NEL SUO CONTESTO, non solo averla generata.
   di qualsiasi discussione visiva con l'utente.
 
 Fonte: `.mw/runs/r309-village-plates/pattern-candidate.md`
+
+## P-010 — Selettore imperativo orfano: il patch DOM punta al markup del predecessore (2026-11-18)
+
+**Stato:** proposta — 2 istanze nella stessa superficie (warm node introdotto per R-238 come workaround, poi orfano del sostituto C1Medallion in R-359).
+**Pattern:** `.mw/runs/20261118-r359-learn/pattern-candidate.md` §"stale-imperative-selector".
+**Istanze:** (1) `CustomDragOverlay` patchava `querySelector('image')` — elemento SVG del `WanderlustMedalOverlay` ritirato — mentre `C1Medallion` renderizza `<img>` HTML: il flip del warm node non girava mai → overlay sempre col portrait di `residentsById[0]` (Spaccaculi). (2) Stessa classe: il warm node stesso era nato come patch imperativa (R-238) — ogni patch-by-selector verso markup altrui eredita il rischio.
+
+**Cosa si propone (trappola candidata):**
+1. Quando un componente viene sostituito da un altro con markup diverso, grep dei selettori imperativi che puntano al suo subtree (`querySelector('image'|'img'|'.classe-figlia')`) e aggiornamento obbligatorio.
+2. Test di regressione che monta il componente reale e asserisce l'effetto del patch — il selettore nullo non deve passare in silenzio (INV `custom-drag-overlay.INV-2` come modello).
+
+## P-011 — Il probe che viola la tolleranza d'input misura il vincolo, non la feature (2026-11-18)
+
+**Stato:** proposta — 2 istanze nella stessa sessione.
+**Pattern:** `.mw/runs/20261118-r359-learn/pattern-candidate.md` §"probe-input-tolerance false-negative".
+**Istanze:** (1) Probe estrazione: `move -250px` prima del release durante press-and-hold con `EXTRACTION_HOLD_MOVE_TOLERANCE_PX=7` → sequenza cancellata → `flights:0` diagnosticato come "volo assente" (bug fantasma, un ciclo di diagnosi sprecato). (2) Click-assign: misure di latenza con timing noise pre-fix lette come regressioni.
+
+**Cosa si propone (trappola candidata):**
+1. Prima di scrivere un probe su una feature gestuale, leggere i vincoli d'input del componente (hold ms, tolerance px, debounce) e codificarli nel probe come assert espliciti.
+2. Un `flights:0`/`null` del probe è un dato del probe, non del sistema: rieseguire col vincolo rispettato prima di dichiarare il bug (T-04 complementare: il witness deve guardare la feature, non il suo stesso artefatto).
+
+## P-012 — Commit su worktree condiviso: index temporaneo + commit-tree, mai `git commit` nudo (2026-11-18)
+
+**Stato:** proposta — tecnica usata in R-359 (commit `db93d793`/`d4614cf9`: 23 file propri, 0 file R-357, index altrui intatto).
+**Pattern:** `.mw/runs/20261118-r359-learn/pattern-candidate.md` §"shared-worktree temp-index commit".
+**Istanze:** sessioni parallele R-357/R-359 sullo stesso worktree: index con 107 file staged di R-357 + file entangled (mie righe + loro nello stesso file).
+
+**Cosa si propone (complemento operativo di T-13):**
+1. `GIT_INDEX_FILE=/tmp/x git read-tree HEAD` → `git add` dei file puliti → per i file entangled blob "HEAD + mie righe" via `hash-object -w` + `update-index --cacheinfo` → `write-tree`/`commit-tree`/`update-ref`.
+2. Dopo il commit riparare le entry stantie dell'index reale sui propri path (`git reset HEAD -- <paths>`) — `git checkout HEAD --` durante cerimonie (red-first) sporca index+worktree.
+3. `commit-tree` non esegue i git hooks: registrarlo nel ledger (governance:check saltato consapevolmente).

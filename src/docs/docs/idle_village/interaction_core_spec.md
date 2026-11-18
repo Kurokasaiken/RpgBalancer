@@ -233,6 +233,12 @@ press-and-hold on occupied slot → useExtractionSequence.start
 | P10 | Away pg still draggable/full-opacity | `lockedResidentIds` not plumbed; Wanderlust card showed `subtitle`, not `statusLabel` | pass locked ids + label through the kit; unavailable = alpha + pointer-events none |
 | P11 | Skin looks washed out / ugly | POI medallion rendered on a white panel | the skin (extracted from `poi3.html`) is designed for dark backgrounds |
 
+| P12 | Drag overlay shows the wrong portrait (always the first resident) | warm node patched `querySelector('image')` — SVG of the retired `WanderlustMedalOverlay`; `C1Medallion` renders HTML `<img>` (R-359) | imperative selectors must match the CURRENT component markup — regression test on the real mount (`custom-drag-overlay.INV-2`) |
+| P13 | Drop commits on open sea, far from every slot | `createMagneticSlotCollision` called with the whole config object → `distance > NaN` always false → radius check bypassed (R-359) | pass `getCurrentDragConfig().magnetism.slotRadiusPx`; source-scan the call site (`drag-config.INV-2`) |
+| P14 | Token swap/extract dead inside HudRealCassetto | rack mounted without `enableSlotSwap`/`onSlotPhaseChange` → token drag disabled + phase guard `undefined` (R-359) | every ResidentSlotRack consumer passes both props (`hud-real-cassetto.INV-6`) |
+| P15 | Click-assign feels dead ~450ms, then snaps | `setTimeout(50)` + `startTransition` deferred the flight mount (R-359) | start the flight synchronously; only the lock lands via transition (`use-quest-expedition-session.INV-8`) |
+| P16 | Extraction "does nothing" when testing by dragging away mid-hold | hold cancels if the pointer moves >`EXTRACTION_HOLD_MOVE_TOLERANCE_PX` (7px) before release | extraction probe/manual: release WITHOUT moving — cancellation is by design, not a bug |
+
 **Testing gotcha**: extraction/flight animations are rAF-driven; Chrome suspends rAF in
 occluded tabs (headless previews). Interaction tests must run with a visible viewport
 (Playwright) — the first synthetic drag after a reload may also miss the droppable.

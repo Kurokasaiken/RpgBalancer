@@ -1,4 +1,14 @@
-# Session Handoff — 2026-10-14
+# Session Handoff — 2026-10-14 (ultima voce: 2026-11-18)
+
+## 2026-11-18 — R-359: regressioni drag medaglioni /game fixate + deployate + witness prod
+
+- **Bug record**: `.mw/bugs/20261118-medallion-drag/bug.md` (gitignored — le prove copiate in `test-results/r359-*`). Commit `db93d793` (fix) + `d4614cf9` (esito ledger + probe parametrici), su main, deploy Vercel live (`index-B1u-whYz.js`), probe prod verdi.
+- **Root causes (5)**: (a) `CustomDragOverlay` patchava `querySelector('image')` del WanderlustMedalOverlay SVG ritirato — `C1Medallion` rende `<img>` → overlay sempre col primo residente; (b) `SLOT_MAGNET = createMagneticSlotCollision(getCurrentDragConfig())` — oggetto invece di `radiusPx` → `distance > NaN` sempre falso → drop ovunque; (c) `HudRealCassetto` montava il rack senza `enableSlotSwap`/`onSlotPhaseChange` → token swap/extract morti (bug committato, NON debito R-357); (d) `/game` chiamava solo `warmGameCursors()` — ora `warmGameAssets()` (portrait+scene decode nel veil); (e) click-assign con `setTimeout(50)`+`startTransition` → volo ora sincrono.
+- **Test + contratti**: 5 nuovi file INV-tagged (`gameMappa2Magnet`, `customDragOverlayWarmPortrait`, `hudRealCassettoSlotSwap`, `questExpeditionClickAssign`, `gameMappa2Warmup`) — 18/18 verdi con `questExpeditionReturnFlight`; INV: `custom-drag-overlay.INV-2`, `drag-config.INV-2`, `hud-real-cassetto.INV-6`, `use-quest-expedition-session.INV-8`; red-first ×4 con run rosse reali; `test_refs` popolati.
+- **Regola Director (D-300)**: ogni bug fixato → test permanente + test_refs obbligatori a ogni modifica del componente.
+- **Tecnica commit condivisa**: `GIT_INDEX_FILE`+`commit-tree` — 23 file propri, 0 file R-357; index riparato dopo (`git reset HEAD -- <miei>`).
+- **Residui**: swap vero a 2 slot occupati coperto solo a livello sessione (ReturnFlight test), mai E2E dal probe; `hud-real-cassetto` non ha riga nella tabella generata di COMPONENT_MASTER_INDEX (dominio plan054); PLAN-126 OB-5/OB-6 ancora pendenti (probe prod bytes + verify:bundle).
+- **Doc aggiornate**: `roster_drag_trusted.md` (R-359 evidence), `interaction_core_spec.md` §4 (P12-P16), `COMPONENT_MASTER_INDEX.md` (righe 21/23/142 + count), `context/DECISION_LOG.md` (2026-11-18), `context/INDEX.md` (learn run), `PROPOSALS.md` (P-010/011/012), `.mw/runs/20261118-r359-learn/pattern-candidate.md`.
 
 ## 2026-10-23 — Audit `/game`: test non verdi classificati, doc e contratti risincronizzati
 
