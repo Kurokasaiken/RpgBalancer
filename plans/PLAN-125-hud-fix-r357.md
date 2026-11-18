@@ -259,3 +259,7 @@ I bug della Fase 2 non dipendono dai mockup e possono partire subito dopo il bat
 **Rev. 3 — ordine operativo:** (1) mockup **Detail** → (2) mockup **banda di scorrimento** → (3) **Roster** → (4) **Stash** → (5) Fase 8 sul cassetto (Detail, clic assegna/porta, tasche per quest) → (6) **Eventi** (mockup chiuso + Event Detail) → (7) **Victory/Reward** → (8) sole, tipografia, icone, POI (mockup). I punti 3-4 dipendono dalla banda di scorrimento; il punto 5 dipende dal Detail. Battezzato il 2026-11-17.
 
 **Chiusura del ledger (2026-11-18):** R-357 è chiusa `fatta` (waived-director, DECISION_LOG 2026-11-18): il deliverable della richiesta era critica + mockup POI + «come procedere». Da qui in poi **questo plan è il tracker unico** del lavoro residuo: i progressi si loggano qui, non più in RICHIESTE.md. Puntuali non già in tabella: banco POI pubblicato https://claude.ai/artifact/NHid7BaDTHWu5Q5yjFXhW7 (varianti A oggi / B smalto nel castone / C sigillo ancorato, sorgente in scratchpad di sessione — da promuovere in run dir quando scelta); lastra d'ottone sinistra del cassetto lasciata com'è fino agli angoli nuovi.
+
+visual-fork: skipped — rebuild HUD R-357 eseguito sotto supervisione live del Director (mockup e riferimenti approvati in sessione; nessuna fork aperta: baseline visiva già battezzata) — .mw/specs/expedition-ui/refs/
+
+Scope coperto dallo skip qui sopra: `src/ui/idleVillage/skins/primitives/sliceKitManifest.ts` (manifest slice-kit R-361, stesso lavoro approvato).

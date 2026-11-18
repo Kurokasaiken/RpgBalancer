@@ -56,6 +56,7 @@ async function main() {
   // citare un bundle.json valido. Baseline = HEAD: le righe già chiuse e
   // committate sono grandfathered; chi scrive Completato/fatta a mano senza
   // bundle lascia il repo rosso qui (fail-loud).
+  const changedFiles = gitChangedFiles(process.cwd());
   try {
     const repoRoot = process.cwd();
     const readBaseline = (rel: string) =>
@@ -122,7 +123,7 @@ async function main() {
           if (baseErr) errors.push(baseErr);
           if (manifest.intent_gate === true) {
             const report = checkIntentGate(runDir, repoRoot, {
-              changedFiles: gitChangedFiles(repoRoot),
+              changedFiles,
             });
             for (const err of report.errors) {
               errors.push(`intent-gate ${runDir}: ${err}`);
@@ -147,12 +148,17 @@ async function main() {
 
   // Gate file→superficie (PLAN-044 T-002): file toccato senza superficie
   // mappata né disposition → rosso (fail-closed).
-  errors.push(...checkContractsGate(process.cwd()).errors);
+  // `living:'skip'`: la sezione living-contracts (ratchet BASE..WT) richiede
+  // minuti e viola il budget di questo gate — resta coperta da
+  // `contracts:check` (full-only nella governance matrix, D-4).
+  errors.push(
+    ...checkContractsGate(process.cwd(), { changedFiles, living: 'skip' }).errors,
+  );
 
   // Gate red-first (PLAN-044 T-004): un file test con record attivo
   // mutato nella diff corrente senza re-record/retire → rosso.
   errors.push(
-    ...checkRedFirstGate(process.cwd(), { changedFiles: gitChangedFiles(process.cwd()) })
+    ...checkRedFirstGate(process.cwd(), { changedFiles })
       .errors,
   );
 
@@ -161,7 +167,7 @@ async function main() {
   // l'omissione silenziosa fallisce qui (fail-closed). File attribuiti a plan
   // pre-v35: warning transitorio (copertura dovuta alla loro chiusura).
   const visualFork = checkVisualForkGate(process.cwd(), {
-    changedFiles: gitChangedFiles(process.cwd()),
+    changedFiles,
   });
   errors.push(...visualFork.errors);
   for (const w of visualFork.warnings) {

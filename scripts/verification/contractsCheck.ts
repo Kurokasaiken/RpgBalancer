@@ -322,6 +322,7 @@ function headFile(repoRoot: string, rel: string): string | null {
 export function runCommittedGate(
   repoRoot: string,
   changedFiles?: string[],
+  living?: 'full' | 'skip',
 ): ContractsReport | null {
   let scriptsListing: string[];
   try {
@@ -387,6 +388,10 @@ export function runCommittedGate(
           ...process.env,
           REPO_ROOT: repoRoot,
           ...(changedFiles ? { CONTRACTS_CHANGED_FILES: JSON.stringify(changedFiles) } : {}),
+          /* closure:lint propaga la modalità leggera anche al gate
+           * committato: senza questo il delegato riesegue il ratchet
+           * completo (minuti) ogni volta che un gate-file è nel diff. */
+          ...(living ? { CONTRACTS_LIVING: living } : {}),
         },
         stdio: ['ignore', outFd, errFd],
         timeout: 150_000,
@@ -419,7 +424,7 @@ export interface ContractsReport {
   unmapped: string[];
   required_checks: string[];
   /** Gate-file nella diff valutati dal gate committato o via director_answer. */
-  gate_files?: { file: string; via: 'head-gate' | 'director_answer' | 'unanswered' }[];
+  gate_files?: { file: string; via: 'head-gate' | 'director_answer' | 'unanswered' | 'advisory-light' }[];
   /** Sintesi del sotto-gate PLAN-054 (contratti vivi). */
   living_contracts?: {
     contracts_loaded: number;
@@ -443,8 +448,11 @@ export interface ContractsReport {
 
 export function checkContractsGate(
   repoRoot: string,
-  opts: { changedFiles?: string[]; scopeFiles?: string[] } = {},
+  opts: { changedFiles?: string[]; scopeFiles?: string[]; living?: 'full' | 'skip' } = {},
 ): ContractsReport {
+  /* `living:'skip'` può arrivare anche via env (closure:lint / runner
+   * delegato): il ratchet BASE..WT resta appannaggio di contracts:check. */
+  const living = opts.living ?? (process.env.CONTRACTS_LIVING === 'skip' ? 'skip' : 'full');
   const errors: string[] = [];
   const report: ContractsReport = {
     changed_files: [],
@@ -476,8 +484,14 @@ export function checkContractsGate(
   // gate-file modificato richiede un director_answer kind 'gate-diff'.
   const gateDiff = changed.filter((f) => GATE_FILES.includes(f));
   let gateBootstrap = false;
-  if (gateDiff.length > 0) {
-    const delegated = runCommittedGate(repoRoot, changed);
+  if (gateDiff.length > 0 && living === 'skip') {
+    /* Light mode (closure:lint): niente delega al gate committato — il
+     * subprocess esegue il ratchet completo (minuti) e viola il budget.
+     * I gate-file toccati restano advisory: l'audit delegato completo
+     * resta in `contracts:check` (full-only, D-4 governance matrix). */
+    report.gate_files = gateDiff.map((f) => ({ file: f, via: 'advisory-light' as const }));
+  } else if (gateDiff.length > 0) {
+    const delegated = runCommittedGate(repoRoot, changed, living);
     if (delegated) {
       delegated.gate_files = gateDiff.map((f) => ({ file: f, via: 'head-gate' as const }));
       if (opts.scopeFiles && opts.scopeFiles.length > 0) delegated.foreign_scope = foreign;
@@ -613,7 +627,10 @@ export function checkContractsGate(
   // PLAN-054 T-002 — living contracts: schema, partizione STRICT_FILES,
   // CTR↔componenti, ratchet strutturale/asserzioni // INV:<id> su BASE.
   // Eseguito a ogni check, anche su diff di soli test (ratchet globale).
+  // `living:'skip'` (closure:lint): questa sezione richiede minuti — il
+  // gate completo resta `contracts:check` (full-only, D-4 governance matrix).
   try {
+  if (living !== 'skip') {
     const lc = checkLivingContracts(repoRoot);
     errors.push(...lc.errors);
     report.living_contracts = {
@@ -647,6 +664,7 @@ export function checkContractsGate(
         executed_counts_enforced: Object.values(sync.executed_counts).filter((c) => c.status === 'enforced').length,
       };
     }
+  }
   } catch (e) {
     errors.push(`living-contracts check non eseguito: ${(e as Error).message}`);
   }
