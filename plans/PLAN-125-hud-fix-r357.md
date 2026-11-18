@@ -1,6 +1,8 @@
-# PLAN-125 — Fix HUD /game dalla critica R-357 (esclusi i POI)
+# PLAN-125 — Restyling HUD /game (critica R-357): cassetto, roster, stash, victory/reward, eventi, dettagli, POI
 
-**Stato:** **proposta rev. 2, non battezzata.** Rev. 2 (2026-11-17) incorpora i ruling D-1..D-7 (sezione 3) e allarga lo scope: componente Eventi nuovo e nuovi mockup per tutti i componenti HUD. D-8 presa lo stesso giorno: tempo a sinistra, risorse al centro, Eventi a destra.
+**Stato:** **BATTEZZATO 2026-11-17 (rev. 3, ruling Director «battezza ed handoff»)** — `npm run plan:stamp -- open PLAN-125` eseguito (`context/plan-timing.jsonl`, 2026-11-17T20:23Z; la rigenerazione forensics è stata saltata dallo script per un percorso `../mind-weaver` fuori repo, non bloccante). Handoff in `SESSION_HANDOFF.md` (voce 2026-11-17). Rev. 3 registra cosa è già fatto sul **cassetto** (approvato per palette, montato su `/game`), fissa il **metodo** che ha funzionato e allarga lo scope: portare le altre superfici (roster, stash, victory/reward) allo stesso standard su `/game`, e proseguire i mockup di ciò che ancora non esiste (Detail, Eventi, POI, bande di scorrimento, …). Rev. 2 aveva incorporato i ruling D-1..D-8.
+
+**Nome del plan: PLAN-125.** (Il file resta `plans/PLAN-125-hud-fix-r357.md` per non rompere i link; il titolo ora dice «Restyling».)
 
 **Parent:** R-357 (`RICHIESTE.md`, verbatim Director 2026-11-17: *"sto facendo un restlying dei componenti di /game … ci sn tanti errori, imperfezioni, nn sn all'altezza dei mockup che avevo scelto, il componente in alto a sinistra ha il sole troppo piccolo … la direzione penso sia giusta, ma l'implementazione no. Esamina ogni piccolo dettaglio"*; poi *"scrivi un plan d fix d tutto, tranne i POI"*).
 
@@ -49,6 +51,58 @@ Verificati sullo screenshot del Director (1474×745) e sui file, non su una catt
 - **Nav in basso**: icone crema piatte invece di quelle dipinte del mockup; icone bloccate grigie poco leggibili.
 - **Roster**: il nome «SIR SPACCAC…» è troncato anche con spazio libero. L'altezza del pannello taglia la terza riga a metà.
 
+
+## 0bis. Stato rev. 3 (2026-11-17) — cosa è fatto, cosa no
+
+**Metodo che ha funzionato (da riusare su ogni superficie, in quest'ordine):**
+1. **Golden**: il mockup approvato dal Director, registrato in `.mw/specs/expedition-ui/refs/REGISTERED.md` + riga in `context/DECISION_LOG.md`. Un elemento alla volta, mai l'HUD intera (ruling 2026-11-17).
+2. **Ricostruzione in DOM** dal golden: testo, controlli e geometria vivi; solo le parti *dipinte* restano immagini, ritagliate da uno script (`scripts/build-cassetto3-assets.py`), mai l'arte unica «cotta» con zone assolute (quella strada ha prodotto tagli, stiramenti e residui sul vecchio cassetto).
+3. **Palette dalla nav** (golden standard dei colori, ruling 2026-11-17): oro champagne 45°/49%/79%, verde (10,67,42); correzione con `scripts/lib_grade_gold.py`; misura live prima/dopo (non a occhio).
+4. **Token**: colori e stati dei pulsanti in `skinCssVariables.ts` + `cassettoLayoutConfig` (AC8), mai letterali nel componente.
+5. **Witness live su `/game`** a 1440×900 (headless, `--use-angle=metal`, porta 5197, clic sul POI), con **ingrandimenti** e un **audit di ogni nodo di testo** (clip, copertura via `elementFromPoint`, uscita dalla colonna): script in `.mw/runs/20261117-r357-cassetto-bugs/audit.mjs`. T-04: un claim visivo si chiude solo con ciò che l'occhio può vedere ingrandito; due volte in questa sessione ho dichiarato «fatto» senza guardare ingrandito (cornice nord, aloni) e il Director se n'è accorto.
+6. **Test di regressione** per ogni correzione (`// INV:`), amend dichiarato dei test che fissavano il vecchio disegno.
+
+**Cassetto — stato:**
+
+| Voce | Stato |
+|---|---|
+| Golden `mockup-r357-cassetto-largo.png`, DOM, 512 px a 1440×900, destra a filo, senza barra risorse né «EXPEDITION CONSOLE» | ✅ montato su `/game` |
+| Cornice nord piena, bordo sx, plancia CTA con finestra trasparente + smalto vivo (riposo/hover/press/focus/disabled su token) | ✅ |
+| Palette allineata alla nav (cornice 42°/56%/71%; ghiere 41°/53%/64%), aloni di teschio/forziere tolti | ✅ approvata («approvo») |
+| Slot: simboli di ruolo (preset `draghiGlifo`), drago archiviato (`ghiera-draghi.webp`, preset `draghi`) | ✅ |
+| Titoli di blocco tolti; Supplies centrate + scroller; chiusura con Esc e × | ✅ (feedback 2026-11-17) |
+| Animazione laterale 280 ms (`drawer.slideMs`), reduced-motion rispettato | ✅ non vista a velocità reale |
+| `cost` | ❌ **non deve esistere**; idea salvata in `.mw/specs/expedition-ui/ideas.md#cost-preview` |
+| **Numero di tasche per quest** (oggi `QUEST_STASH.bagSlots`=3 globale, max 8): campo per POI + lunghezza del ledger | ⏳ aperto, è una modifica ai dati |
+| **Vignetta dalla quest** (oggi sempre le rovine) | ⏳ aperto |
+| Detail (Party / Supplies / Risk & Rewards) come componente a sinistra del cassetto, non modale, uno alla volta (GX-0042) | ⏳ manca il mockup |
+| Roster in modalità «assegna» e Stash in modalità «porta con te» dal clic su ghiera/tasca | ⏳ |
+| × = scarta o tiene la scelta di eroi/oggetti? (chiudere ≠ piegare col chip) | ⏳ decisione Director |
+| Clic sulla mappa per chiudere | ✗ sconsigliato (pan/zoom, POI): proposta registrata, non implementata |
+| Più premi (oggetti, XP) oltre all'oro; titoli lunghi; it-IT («PARTI IN SPEDIZIONE»); ordine di Tab | ⏳ da verificare |
+| Variante 1280, bottom sheet ≤1100 px (usa ancora la cella `cost` vuota segnaposto) | ⏳ mai catturate |
+| Contratto `hud-real-cassetto` (INV-1..5 + nuove regole), `sync:bug`/`redfirst`, **commit** | ⏳ nessun commit fatto (worktree condiviso, T-13) |
+
+**Superfici ancora da portare allo standard (tutte già montate su `/game`, `src/pages/game-mappa2.tsx`):**
+
+| Superficie | Componente / contratto | Cosa manca |
+|---|---|---|
+| **Roster** | `MatericRosterComponentV2` → `WanderlustRosterCardV2`, toolbar in `DragTestContainerV2` | cornice battezzata (angoli ad acanto + gemma, intestazione incisa), toolbar identica a Stash/Ledger (icone: imbuto / barrette / frecce opposte / vista / − / ×), ghiere dei ritratti con artigli, livello «LV n» leggibile, **banda di scorrimento** per gli eroi nascosti, bug 2a–2d |
+| **Stash** | `VillageStashPanel` (637 righe), `villageStashItemIcons`, contratto `village-stash-panel` | cornice battezzata, chip categoria ALL/CONSUMABLES + «N of M goods», scheda dettaglio **dentro** la cornice, icone dipinte (programma icone D-6), **banda di scorrimento**, modalità «porta con te» |
+| **Victory / Reward** | `HudRealVictoryReward` (contratto `hudreal-victory-reward`), `questEpilogue`, `questSettlement` | **nessun mockup nuovo ancora**: va riportata alla palette-nav e alla cornice battezzata; verificare che segua il metodo (DOM + ritagli) e non arte cotta |
+
+**Mockup ancora da fare** (un elemento alla volta, ognuno con golden registrato prima del codice):
+
+| Mockup | Stato |
+|---|---|
+| **Detail** del cassetto (Party, Supplies, Risk & Rewards) | da fare — il primo da fare, sblocca clic e Roster/Stash «assegna» |
+| **World Ledger / Eventi** (colonna destra, coperta dal cassetto): v4c (`mockup-r357-hud-aperta-v4c.png`) approvato per toolbar/filtri e risorse, bocciato per sole e cornici; mancano la versione chiusa corretta e l'**Event Detail** | in corso |
+| **Sole** (rifatto da solo, medaglione con gemma, non il v4c) | da fare — serve dal Director cosa non va (forma/colori) |
+| **Banda di scorrimento** (barra incisa, uguale su Roster/Stash/Ledger) | da fare |
+| **POI** (Sigillo, 3 varianti A/B/C sul banco `/lab/poi-luogo`; Director ha detto che i POI attuali non gli piacciono) | rientra nel plan solo come **mockup**; l'implementazione resta fuori finché non c'è il golden |
+| **Icone** (D-6, programma trasversale) | plan proprio, non scritto |
+| **Tipografia** (D-4, 3 prove) | da fare — nel cassetto Cinzel+EB Garamond «non piace» |
+
 ## 1. Obiettivo
 
 Portare i cinque componenti (barra giorno, roster, stash, cassetto, nav) allo stesso livello dei mockup firmati, con **una sola scala di ornamento** e senza difetti di bug. Nessun componente nuovo. Nessuna riscrittura dei componenti che già funzionano.
@@ -60,7 +114,7 @@ Portare i cinque componenti (barra giorno, roster, stash, cassetto, nav) allo st
 **Dipendenza esterna:** il **programma icone** (D-6: tutte le icone da capo — stash, POI, nav, risorse) è trasversale e avrà un plan proprio. PLAN-125 ne consuma l'output; finché non arriva, le icone attuali restano.
 
 **Fuori:**
-- **POI** (tutto il Sigillo, le ghiere mappa, `MapQuestPoi`, `poiZanaraConfig`): escluso per richiesta.
+- **POI — implementazione** (Sigillo, ghiere mappa, `MapQuestPoi`, `poiZanaraConfig`): fuori finché non c'è un golden. **Rev. 3: i mockup dei POI rientrano nel plan** (richiesta 2026-11-17 «continuare il lavoro sui mockup di quello che ancora non abbiamo (… i POI …)»).
 - **Ruling già presi, non riaperti:** ghiera draghi (R-333); roster e stash sempre separati e flottanti (PLAN-124, R-347, R-353); stamina ambrata, non teal (R-353); smeraldo non schiarito (memoria 2026-11-04); niente viola in nessun ruolo e niente placca CTA smalto-teal (2026-10-20); blu bocciato come superficie dei pannelli (2026-10-28), ammesso solo sulla ghiera e sui POI; cassetto estratto con bordo destro a filo schermo (R-353, `drawer.edgeMode`).
 - **Nessuna nuova superficie**, nessuna nuova feature di gioco.
 
@@ -135,6 +189,10 @@ Ogni fase ha un artefatto verificabile prima della fase successiva.
 - Margini uguali tra barra, roster, stash e cassetto (un unico valore di gutter).
 - **Visual fork:** obbligatoria (due famiglie di tipografia = due rappresentazioni).
 
+**Fase 7 — Portare Roster, Stash e Victory/Reward allo standard (rev. 3, richiesta 2026-11-17).** Un elemento alla volta, con il metodo di §0bis, in quest'ordine: (a) **bande di scorrimento** (mockup → componente condiviso), (b) **Roster**, (c) **Stash**, (d) **Victory/Reward**. Ogni passo: golden registrato → DOM + ritagli → palette-nav misurata → token → witness live con ingrandimenti e audit testi → test `// INV:` → amend dichiarato → nessun commit su file altrui (T-13). Prerequisito di Roster/Stash: gli angoli ad alta risoluzione della cornice battezzata (il Director li genera; senza, si usa il ritaglio dal golden come per il cassetto).
+
+**Fase 8 — Cassetto: chiusura dei punti aperti.** Detail (dopo il mockup), Roster «assegna» / Stash «porta con te», numero di tasche per quest (campo POI + ledger), vignetta dalla quest, decisione su × (scarta o tiene), prove tipografiche D-4, 1280 e ≤1100 px, contratto `hud-real-cassetto` (+ nuovi INV), `sync:bug`/`redfirst`, commit selettivo per file.
+
 **Fase 6 — Verifica finale.**
 - Witness headless su `/game` a 1440×900 e 1920×1080: ogni componente con cattura e misura.
 - Occhio del Director su tre catture zoomate (roster, stash, cassetto) e sulla barra giorno.
@@ -153,6 +211,8 @@ Ogni fase ha un artefatto verificabile prima della fase successiva.
 | OB-7 | Sole ingrandito secondo il rapporto misurato sul mockup (Fase 3) | `human-eye` + misura | sì |
 | OB-8 | Componente Eventi montato dal mockup approvato; con il cassetto aperto nessun pixel degli Eventi visibile (Fase 4, regola di copertura) | `state` (bbox) + `human-eye` + `visual-fork` | sì |
 | OB-8b | Ogni componente ha un mockup approvato e registrato in `REGISTERED.md` prima della sua implementazione (Fase 2bis) | `visual-fork` | sì |
+| OB-10 | Cassetto su `/game`: nessun testo coperto/tagliato (audit `audit.mjs`), palette entro ±3° e ±5 punti sat dalla nav, Esc e × chiudono, nessuna cella `cost` | `state` + test `r357*` | sì |
+| OB-11 | Roster, Stash, Victory/Reward: stesso standard del cassetto (golden registrato, DOM + ritagli, palette misurata, token, witness ingrandito) | `visual-fork` + `human-eye` + `state` | sì |
 | OB-9 | Occhio del Director sui tre componenti zoomati e sulla barra giorno (Fase 6) | `human-eye` | sì |
 
 **Regression test (R-247):** ogni bug di Fase 2 ha un test permanente che fallirebbe senza la correzione (OB-2, OB-3, OB-5, OB-6, OB-4 con bbox).
@@ -190,8 +250,12 @@ Per ogni INV toccato: `sync:bug` + `redfirst` o `redfirst:retire` con `R-NNN` (P
 - **Closure globale:** `closure:lint` può restare BLOCKED per drift parallelo, come già accade per R-322 e R-350. Il bundle del singolo task resta valido se i suoi OB sono PASS.
 - **Non verificato da questo piano:** nessuna cattura live di `/game` è stata fatta in questa sessione. Il banco di prova dei POI è un montaggio HTML, non il motore Pixi, e non è usato come prova dei componenti HUD.
 
-## 9. Ordine proposto (rev. 2)
+## 9. Ordine proposto (rev. 3)
 
 Fase 0 → Fase 1 → Fase 2 (bug) in parallelo alla Fase 2bis (mockup) → Fase 3 (sole) → Fase 4 (Eventi, illustrazione, icone quando pronte) → Fase 5 (3 prove tipografiche) → Fase 6.
 
 I bug della Fase 2 non dipendono dai mockup e possono partire subito dopo il battesimo. La Fase 2bis può partire subito (D-8 ✅).
+
+**Rev. 3 — ordine operativo:** (1) mockup **Detail** → (2) mockup **banda di scorrimento** → (3) **Roster** → (4) **Stash** → (5) Fase 8 sul cassetto (Detail, clic assegna/porta, tasche per quest) → (6) **Eventi** (mockup chiuso + Event Detail) → (7) **Victory/Reward** → (8) sole, tipografia, icone, POI (mockup). I punti 3-4 dipendono dalla banda di scorrimento; il punto 5 dipende dal Detail. Battezzato il 2026-11-17.
+
+**Chiusura del ledger (2026-11-18):** R-357 è chiusa `fatta` (waived-director, DECISION_LOG 2026-11-18): il deliverable della richiesta era critica + mockup POI + «come procedere». Da qui in poi **questo plan è il tracker unico** del lavoro residuo: i progressi si loggano qui, non più in RICHIESTE.md. Puntuali non già in tabella: banco POI pubblicato https://claude.ai/artifact/NHid7BaDTHWu5Q5yjFXhW7 (varianti A oggi / B smalto nel castone / C sigillo ancorato, sorgente in scratchpad di sessione — da promuovere in run dir quando scelta); lastra d'ottone sinistra del cassetto lasciata com'è fino agli angoli nuovi.

@@ -5,6 +5,22 @@
 
 ---
 
+## 2026-11-18 — R-357 chiusa `fatta` con waived-director; tracker unico = PLAN-125
+
+**Da:** R-357 (`in corso`) cumulava la richiesta originale e il diario di esecuzione; il lavoro
+residuo era scritto in due posti (voce ledger + §0bis del plan).
+**A:** il deliverable della richiesta 2026-11-17 (critica AAA dell'HUD /game + mockup POI +
+«come procedere») è assolto: critica consegnata, banco POI pubblicato, plan fix prodotto e
+battezzato (PLAN-125 rev. 3). Chiusa `fatta` con `waived-director:` (gate closure:lint); tutto
+il residuo — punti aperti del cassetto, Roster/Stash/Victory-Reward allo standard, mockup
+Detail/Eventi/Sole/bande/POI, tipografia, icone — vive nel contratto di PLAN-125 (§0bis +
+Fasi 7-8 + ordine operativo), tracker unico. I progressi si loggano nel plan, non più in
+RICHIESTE.md.
+**Fonte:** ruling Director 2026-11-18 «devi chiudere R-357 e fare in modo che quello che
+ancora resta da fare sia in quel plan».
+
+---
+
 ## 2026-11-18 — Regola: ogni bug fixato ha un test permanente; commit su worktree condiviso via temp-index
 
 **Da:** i bugfix venivano chiusi su probe/witness ad hoc; test a discrezione del task. I commit su
@@ -634,6 +650,32 @@ contraddicono la semantica config NON si portano (stamina ambrata > teal AI).
 **D-8 (stesso giorno, «1 · Sì, così»):** banda alta = **tempo a sinistra, risorse al centro, Eventi a destra**. Motivo: il cassetto copre la colonna destra, il tempo non deve mai essere coperto, e le risorse a destra avevano generato la duplicazione nel cassetto (R-323).
 **Fonte:** `RICHIESTE.md` R-357; `plans/PLAN-125-hud-fix-r357.md` rev. 2.
 
+## 2026-11-17 — R-357 / PLAN-125: battesimo cornici HUD e placca risorse (mockup Gemini v4b)
+**Da:** cornici lisce a filo d'oro (produzione e mockup v3/v4); placca risorse attuale.
+**A (verbatim Director):** *"Molto belle le cornici così, le battezzo, voglio quelle ma dobbiamo sistemare meglio"*; *"anche il componente delle risorse sono meglio, cambiamo anche quello"*.
+- Golden reference: `.mw/specs/expedition-ui/refs/mockup-r357-cornici-aperta.png` (+ `-chiusa.png`). Vale per **grammatica delle cornici** (filo esterno oro antico, fascia champagne incisa, filo interno; angoli ad acanto con gemma a griffe; intestazioni incise con ornamento centrale; fermaglio al centro del bordo alto, niente «testa» sul Ledger) e per la **placca risorse** (icone dipinte, numeri grandi, fregio centrale sotto).
+- Non vale per i contenuti: *"roster e stash hanno perso le opzioni di filtro, e quello di world ledger dovrebbe essere come quello di roster"* → i controlli dei pannelli restano quelli della produzione (Roster: filtro ▾, ordina ▾, verso, vista, riduci, chiudi; Stash: chip categoria, conteggio merci), e il World Ledger adotta la **stessa toolbar del Roster** al posto della griglia di chip.
+**Fonte:** `RICHIESTE.md` R-357.
+
+## 2026-11-17 — R-357 / PLAN-125: ruling sul giro GPT v4c e metodo «un elemento alla volta»
+**Da:** mockup HUD intero come unico oggetto di giudizio.
+**A (verbatim Director):** *"ha cambiato la parte che mi piaceva di quei nuovi componenti [le cornici battezzate]. I filtri nuovi sono buoni, approvati. Il Sole nuovo bocciato, il componente centrale in alto approvato. Tutti questi componenti avranno bisogno di bande per mostrare anche i componenti nascosti (altri pg, altri oggetti, altri eventi). Come procediamo? un elemento alla volta? cominciamo a fixare quello che abbiamo già scelto e approvato?"*
+- **Approvati:** toolbar/filtri nuovi (`mockup-r357-hud-aperta-v4c.png`: imbuto, ordina, verso, vista, riduci, chiudi, uguale su Roster/Stash/Ledger — l'icona «ordina» va resa identica); componente centrale in alto (risorse).
+- **Bocciato:** il sole nuovo (v4c, corona giorno/notte). Da rifare da solo.
+- **Cornici:** restano quelle battezzate di `mockup-r357-cornici-aperta.png` (g4); GPT v4c le ha alterate, quindi v4c NON è golden per le cornici.
+- **Nuovo requisito:** ogni pannello a lista (Roster, Stash, Ledger) deve prevedere una **banda di scorrimento** (scrollbar incisa) per mostrare gli elementi nascosti: altri eroi, altri oggetti, altri eventi.
+- **Metodo:** un elemento alla volta, ciascuno con il proprio prompt/allegato, invece del giudizio sull'HUD intero; si parte dagli elementi già scelti.
+**Fonte:** `RICHIESTE.md` R-357.
+
+## 2026-11-17 — R-357 / PLAN-125: cassetto largo approvato come base; clic «entrambe le cose»
+**Da:** cassetto estratto da `column-*-extracted.webp` (taglio sx + stiramento 4/3, icone troncate già nell'arte R-323, percorso danneggiato), con fascia risorse e senza area oggetti.
+**A (verbatim Director):** *"questo era + bello, no?"* (golden v2) · *"C vuole un'area a parte x gli oggetti da portare in viaggio, e se clicchi dovrebbe aprire lo stash"* · *"deve essere agevolmente + largo e la parte a destra senza spazio vuoto o frame"* · *"entrambe le cose a seconda di dove premi"* · *"È la base"*.
+- **Base:** `.mw/specs/expedition-ui/refs/mockup-r357-cassetto-largo.png` (golden del cassetto; sostituisce v2).
+- **Struttura:** niente barra risorse (D-1) né «EXPEDITION CONSOLE»; vignetta + titolo vivo + descrizione; PARTY SLOTS, **SUPPLIES (nuovo)**, JOURNEY, RISK & REWARDS, LAUNCH EXPEDITION. Largo ~+25–33% (≈520 px a 1440×900), destra a filo schermo.
+- **Interazione (raccomandata, accettata con «È la base»):** ghiera → Roster in modalità assegna; tasca → Stash in modalità «porta con te»; titolo del blocco con › → **Detail** come componente a parte, a sinistra del cassetto, flottante, non modale (GX-0042), uno alla volta, chiusura X/Esc. Journey senza Detail.
+- **Da fare nel codice:** togliere `data-cassetto-resources`; blocco SUPPLIES; larghezza (`widthMaxPxExtracted`, oggi 613) e arte rifatta dal nuovo golden a risoluzione piena; clic sui blocchi; mockup del Detail (non fatto).
+**Fonte:** `RICHIESTE.md` R-357.
+
 ## 2026-11-17 — R-358 / PLAN-126: battesimo del piano cold-boot bytes (D-2)
 **Da:** PLAN-126 in stato `proposta` (artifact-r003 del dibattito MW `20261117-rpg-boot-plan`, CONVERGED 2/2 chatgpt+gemini su sha `ac06f1cf`); R-358 `in corso` in attesa di ruling.
 **A (verbatim Director):** *"battezzo il plan PLAN-126, eseguilo"*.
@@ -655,6 +697,14 @@ contraddicono la semantica config NON si portano (stamina ambrata > teal AI).
 - Il collo residuo è decode/scheduling (SwiftShader) e request fan-out + CDN tail (GPU): la leva byte (Fase B) resta utile sul piano decode ma non basta da sola a spiegare i ~122s prod — attesa forte componente di varianza CDN/env del probe.
 **Fonte:** `.mw/runs/plan126-boot-bytes/T-A-findings.md`, `har-budget.json`, `timing-*.json`, `ab-packaging.json`.
 
+## 2026-11-17 — R-357 / PLAN-125: cassetto /game approvato per palette (ghiere, cornice nord, elementi dipinti)
+**Da:** cassetto montato con oro più arancio/scuro della nav, ghiere bronzo, cornice nord a filo, aloni su teschio/forziere.
+**A (verbatim Director):** *«approvo»* dopo l'allineamento slot↔frame (ghiere 41°/53%/64% vs frame 42°/56%/71%, misurato live /game 1440×900).
+- Riferimento palette = nav in basso al centro (oro 45°/49%/79%, verde (10,67,42)); helper `scripts/lib_grade_gold.py`; asset in `public/assets/ui/hud-real/cassetto3/` + `ghiera-glifo*.webp` (preset `draghiGlifo`; drago archiviato in `ghiera-draghi.webp`/preset `draghi`).
+- `cost` non esiste nel cassetto (idea in `.mw/specs/expedition-ui/ideas.md#cost-preview`); niente barra risorse (D-1).
+- **Non coperto dall'approvazione:** Detail, Roster «assegna»/Stash «porta con te», animazione laterale, variante ≤1100 px e 1280, commit, `sync:bug`/`redfirst`/contratto `hud-real-cassetto`.
+**Fonte:** `RICHIESTE.md` R-357.
+
 ## 2026-11-17 — R-358 / PLAN-126: ruling D-1 — parità visiva approvata, T-B4 sbloccato
 **Da:** D-1 aperta dal battesimo; pipeline che baka `game-grade-*` lossless per scelta (matematica affine) e canopy v2hi a q95.
 **Metodo (OB-4):** pixel-diff `asset-pixel-diff.py` (soglia RGB=8) su varianti q75/q80/q85 + **live in-game** prima/dopo via request interception (Metal GPU, 3200×2000@2x, nessuna modifica a public/ durante il test) — `.mw/runs/plan126-boot-bytes/d1-live/`.
@@ -665,3 +715,9 @@ contraddicono la semantica config NON si portano (stamina ambrata > teal AI).
 - `assets/ui/bg.webp`: → **q75** (worst case testato live, indistinguibile sotto overlay).
 - Nessun downscale; T-B3 confermava i sorgenti prevalentemente sottocampionati (maxZoom=3, DPR2).
 **Fonte:** `d1-live/` compositi, `d1-variants/report/` pixel-diff, `director-signoff.json` nel run dir.
+
+## 2026-11-18 — Modello subagent: niente pin hardcoded, inherit-parent via `subagent_general`
+**Da:** errore `ResourceExhausted: weekly usage quota has been exhausted` durante fan-out subagent; in parallelo il log mostrava `agent.subagent_model=swe-1-6-fast did not resolve to an available, allowed model`.
+**Verificato:** cache catalogo `~/.cache/devin/cli/model_configs_v7` — `swe-1-6-fast` rimosso dal catalogo; unico flag "free" = sidekick SWE-2 Medium nei modelli Fusion. La quota settimanale copre tutti i modelli: a quota esaurita fallisce qualunque chiamata.
+**Decisione Director:** i subagent non devono puntare a un modello hardcoded — "quello gratuito o quello che stiamo usando". Rimosso `model:` dai 6 profili (`~/.config/devin/agents/*`, `.devin/agents/rpg-*`) e `agent.subagent_model` da `~/.config/devin/config.json`; i custom ora vanno al router di default (si auto-adatta al catalogo). `subagent_general` resta l'unico profilo che eredita il modello del parent → profilo preferito quando il subagent deve girare sul modello in uso. Aggiornate `.windsurf/rules/55-delegation-context-budget.md` e `~/.devin/rules/delegation-context-budget.md`.
+**Fonte:** log `devin_20261118-083841_5267.log`, `devin doctor` (6 profili OK dopo fix).
