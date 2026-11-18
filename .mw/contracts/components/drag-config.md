@@ -18,7 +18,16 @@ invariants:
       La collisione magnetica onora il raggio da dragConfig: oltre il raggio nessuna attrazione, dentro il rettangolo
       distanza zero.
     test_refs:
-      - tests/unit/idleVillage/magneticCollision.test.ts---
+      - tests/unit/idleVillage/magneticCollision.test.ts
+
+  - id: drag-config.INV-2
+    source: director-bug
+    source_ref: R-359
+    statement: R-359 medallion drag regressions on /game
+    test_refs:
+      - tests/unit/idleVillage/gameMappa2Magnet.test.ts
+
+---
 
 # drag-config
 
@@ -44,10 +53,3 @@ Root: `src/ui/idleVillage/config/dragConfig.ts`.
 - PLAN-054 T-002: partizione generata meccanicamente da `componentInventory.ts`.
 
 <!-- /plan054:generated -->
-  - id: drag-config.INV-2
-    source: director-bug
-    source_ref: R-359
-    statement: R-359 medallion drag regressions on /game
-    test_refs:
-      - tests/unit/idleVillage/gameMappa2Magnet.test.ts
-
