@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "sealed_at": "2026-11-18T19:08:59.573Z",
+  "sealed_at": "2026-11-18T19:37:45.268Z",
   "sealed_by": "director",
   "entries": {
     ".mw/surface-map.json": "f75d07c8e236520de771cb2457419e1d15db43cc5f63f20eb33092ea93d15a0a",
@@ -146,7 +146,7 @@
     "src/ui/idleVillage/frozen/mockData/residents.ts": "6b5e48ce5794ac2bd1bf1a37666d3af9d28967cf8aa747473e082d064fcb36aa",
     "src/ui/idleVillage/frozen/registry.ts": "c7c6faeaed6367a5f53ca06f7d809a9902ed104dbbb5e5b7a2d3f56360963648"
   },
-  "sealed_base_sha": "ea149589afd796be1bcad53c5eddc341aa325c2c",
+  "sealed_base_sha": "5dfa295cc0afb92daeaa7001c06b2549fce6642e",
   "executed_counts": {
     "CTR-game-001.INV-1": "unknown",
     "CTR-game-001.INV-2": "unknown",
@@ -225,6 +225,7 @@
     "pixi-world-map.INV-7": 6,
     "bloom-effect.INV-1": 2,
     "canonical-data-bridge.INV-1": 5,
+    "hud-plaque.INV-1": 3,
     "index-primitives.INV-1": 2,
     "custom-drag-overlay.INV-2": 8,
     "destiny-astrolabe-v62-kit.INV-1": 4,
