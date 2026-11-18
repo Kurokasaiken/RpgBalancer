@@ -6,6 +6,7 @@ tier: 2
 root_file: src/ui/idleVillage/components/gameFrame/VillageStashPanel.tsx
 scope_files:
   - src/ui/idleVillage/components/gameFrame/VillageStashPanel.tsx
+  - src/ui/idleVillage/components/gameFrame/expeditionBagAssign.ts
 fast_checks:
   - tests/unit/idleVillage/villageStash.test.tsx
   - tests/unit/idleVillage/villageStashLedger.test.ts
@@ -99,6 +100,28 @@ invariants:
       griglia, detail né alcun anchor di contratto.
     test_refs:
       - tests/unit/idleVillage/r353StashGrid.test.tsx
+  - id: expedition-bag-assign.INV-1
+    source: plan
+    source_ref: PLAN-119
+    statement: >-
+      `bagAssignEligibility(bag, itemId, bagSlots)` specchia i reject del ledger (`alreadyInBag` /
+      `bagFull`) sulla bag SPARSA del planner bound: posizioni fisse, i buchi contano come liberi,
+      una bag assente vale `bagSlots` slot liberi. È una derivazione di sola lettura — la mutazione
+      resta di `useVillageStashStore.assign`, mai duplicata.
+    test_refs:
+      - tests/unit/idleVillage/r339BagAssign.test.tsx
+  - id: expedition-bag-assign.INV-2
+    source: plan
+    source_ref: PLAN-119
+    statement: >-
+      `expeditionFoodCost(partySize, totalDays, perResidentPerDay)` = ceil(party × days × rate) —
+      la stessa tariffa `globalRules.foodConsumptionPerResidentPerDay` che il TimeEngine addebita
+      per tick diurno a ogni residente vivo (i membri away continuano a consumare dal pool
+      condiviso). Preview display-only: non introduce un nuovo addebito; input non finiti o
+      negativi collassano a 0.
+    test_refs:
+      - tests/unit/idleVillage/r339BagAssign.test.tsx
+
 ---
 # village-stash-panel
 
@@ -131,6 +154,8 @@ in skinScope.css.
 - PLAN-073 (R-240, artifact-r003 5/5 ACCEPT): da mock read-only a dual-mode ledger-driven. Ruling Director: pool globale condiviso, draft persistente con release-all per-owner (D-2), auto-bind con un solo planner aperto (D-1).
 - R-246 (Director 2026-10-21): drag&drop rimosso — la superficie è click-only; refresh presentazione (icona header `ico-chest`, pulsante «riduci a striscia» con contatore `n/max`, scrollbar tematizzata bronzea `data-hud-scroll`).
 - R-251 (Director 2026-10-21): striscia stabile — cluster `[restore][close]` negli stessi slot dell'header; guard 350ms sul restore (il secondo click di un doppio-click veloce non chiude-e-riapre); inset `10px 18px` (+4px handle) oltre la fascia `hang` (~6.5px dentro la silhouette).
-- R-251 bis (Director ruling 2026-10-21): l'invariante geometrica vive nell'**header espanso** — la title row usa `paddingInline: '12px 8px'` (placca 10 + riga 12/8 = il content box 22/18 della striscia): il collapse cambia il glifo del toggle, mai la geometria (misurato dx=0/dy=0 su chest/toggle/close). `controlButton` su tutte le pill icona.
+- R-251 bis (Director ruling 2026-10-21): l'invariante geometrica vive nell'**header espanso** — la title row usa `paddingInline: '34px 8px'` (R-357: 34px libera la nocca ad acanto del frame corniciStash sul bordo alto; prima '12px 8px' per parità con la striscia 22/18). `controlButton` su tutte le pill icona.
+
+- R-357 (PLAN-125, 2026-11-17): frame `corniciStash`, vero 9-slice (panel-frame3/: un unico frame completo generato AI affettato da `scripts/build-panel-frame3-9slice.py` — 4 angoli fissi + 4 bordi `background-repeat` seamless via overlap-blend; nocche ad acanto+gemma a sinistra, banda vite incisa cotta nel bordo alto `edge-top`), emblema-forziere sul bordo alto che sostituisce l'icona `ico-chest` nell'header espanso (resta nella striscia `hang`). Header: conteggio `gameFrame.stash.goodsCount` ("N of M goods") accanto al titolo. Chip categoria a smalto smeraldo con bordo champagne sull'attivo (ALL/CONSUMABLES — solo kind presenti in config). Detail card: una riga di effetto (label `questS1Lab.item.*` ora name-only; l'effetto resta in `descKey`), titolo senza a capo forzato, `data-testid="stash-goods-count"`. PACK: bottone inciso squadrato (radius 6, bordo brass, laccato) invece della pill web. Footer capacità `paddingInlineStart: 66` libera la coda dell'angolo bl.
 
 <!-- /plan054:generated -->

@@ -6,7 +6,6 @@ tier: 2
 root_file: src/ui/idleVillage/components/gameFrame/ExpeditionBottomSheet.tsx
 scope_files:
   - src/ui/idleVillage/components/gameFrame/ExpeditionBottomSheet.tsx
-  - src/ui/idleVillage/store/useExpeditionSheet.ts
 fast_checks:
   - tests/unit/idleVillage/r339ExpeditionSheet.test.tsx
 e2e_checks: []
