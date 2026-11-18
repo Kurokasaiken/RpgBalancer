@@ -120,8 +120,9 @@ describe('R-183 planSlotSwap', () => {
   });
 });
 
-// INV:use-quest-expedition-session.INV-5 — R-281: a roster medallion dropped
-// on an occupied seat takes it; the displaced resident leaves `assignments`
+// covers use-quest-expedition-session.INV-5 (plan-level twin — canonical
+// marker in questExpeditionReturnFlight.test.tsx) — R-281: a roster medallion
+// dropped on an occupied seat takes it; the displaced resident leaves `assignments`
 // entirely (derived roster = back to roster, no gate on the way out). Only
 // the incoming resident crosses the eligibility gate.
 describe('R-281 planRosterSlotReplace', () => {
