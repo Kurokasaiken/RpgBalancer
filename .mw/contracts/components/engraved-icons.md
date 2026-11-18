@@ -10,7 +10,15 @@ fast_checks:
   - tests/unit/idleVillage/hudGuards.test.ts
 e2e_checks: []
 e2e_trigger_globs: []
-invariants: []
+invariants:
+  - id: engraved-icons.INV-1
+    source: code-baseline
+    statement: >-
+      Il set engraved disegna glyph solidi: fill="currentColor", nessuno stroke e
+      nessun colore letterale; ENGRAVED_ICON_IDS copre ogni entry incisa del
+      registro icone della HUD.
+    test_refs:
+      - tests/unit/idleVillage/hudGuards.test.ts
 ---
 
 # engraved-icons

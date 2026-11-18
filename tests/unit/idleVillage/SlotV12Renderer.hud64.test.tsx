@@ -33,6 +33,7 @@ beforeAll(() => {
 const bezelOf = (root: HTMLElement) => root.querySelector<SVGGElement>('.slot-v12__bezel');
 
 describe('SlotV12Renderer — hud64 variant (BV-02/BV-03)', () => {
+  // INV:slot-v12-renderer.INV-1
   it('geometry: 64×64 DOM box, viewBox -79 -79 158 158, data-bite ≈ 2.56 (2.5 ± 0.25)', () => {
     const { container } = render(<SlotV12Renderer variant="hud64" state="empty" role="member" />);
     const root = container.querySelector<HTMLElement>('.slot-v12')!;

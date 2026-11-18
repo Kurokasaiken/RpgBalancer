@@ -206,6 +206,7 @@ describe('HUD guards', () => {
     for (const file of ROSTER_V2_FILES) expect(read(file), file).not.toContain('components/gameIcons');
   });
 
+    // INV:engraved-icons.INV-1
   it('draws the engraved icons solid: no stroke, no colour literal, only currentColor', () => {
     for (const file of ['engravedIcons.tsx', 'hudIcons.tsx']) {
       const code = stripComments(read(`src/ui/idleVillage/components/gameFrame/${file}`));
