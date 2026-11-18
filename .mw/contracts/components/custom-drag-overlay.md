@@ -32,6 +32,14 @@ invariants:
     test_refs:
       - tests/e2e/idleVillage/gameFirstInteraction.spec.ts
 ---
+  - id: custom-drag-overlay.INV-2
+    source: director-bug
+    source_ref: R-359
+    statement: R-359 medallion drag regressions on /game
+    test_refs:
+      - tests/unit/idleVillage/customDragOverlayWarmPortrait.test.tsx
+---
+
 # custom-drag-overlay
 
 Unità `ui-component` (tier 2, default) — contratto vivo PLAN-054. Root: `src/ui/idleVillage/components/CustomDragOverlay.tsx`.

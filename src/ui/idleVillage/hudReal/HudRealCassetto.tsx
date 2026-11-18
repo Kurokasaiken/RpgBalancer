@@ -18,7 +18,7 @@ import React, { useSyncExternalStore } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useGameLayoutInsets } from '@/ui/idleVillage/store/useGameLayoutInsets';
 import { ResidentSlotRack } from '@/ui/idleVillage/components/ResidentSlotRack';
-import type { ResidentSlotViewModel } from '@/ui/idleVillage/slots/types';
+import type { ResidentSlotViewModel, SlotSeatPhase } from '@/ui/idleVillage/slots/types';
 import { StashItemTile } from '@/ui/idleVillage/components/gameFrame/stashItemFace';
 import { EngravedIcon } from '@/ui/idleVillage/components/gameFrame/engravedIcons';
 import type { ResourceReadoutItem } from '@/ui/idleVillage/components/gameFrame/ResourceReadout';
@@ -90,6 +90,9 @@ export interface HudRealCassettoProps {
   onSlotClick?: (slotId: string) => void;
   onSlotClear?: (slotId: string) => void;
   suppressedResidentIds?: readonly string[];
+  /** R-359: seat-phase guard callback for slot-token swap/extract — the session
+   *  feeds `handleSlotPhaseChange`; without it the rack runs swap drags blind. */
+  onSlotPhaseChange?: (slotId: string, phase: SlotSeatPhase) => void;
   loadout?: CassettoLoadout;
   canSend?: boolean;
   /** R-339/PLAN-119 AC4: why CONFIRM is muted, shown inline just above the
@@ -187,7 +190,7 @@ const RACK_SCOPED_CSS = `
 `;
 
 export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
-  quest, slots, resourceItems, onSlotClick, onSlotClear, suppressedResidentIds, loadout, canSend = true, disabledReason, onConfirm,
+  quest, slots, resourceItems, onSlotClick, onSlotClear, suppressedResidentIds, onSlotPhaseChange, loadout, canSend = true, disabledReason, onConfirm,
 }) => {
   const { t } = useTranslation('idleVillage');
   const spec = useCassettoColumnSpec();
@@ -382,6 +385,8 @@ export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
               onSlotClick={onSlotClick}
               onSlotClear={onSlotClear}
               suppressedResidentIds={suppressedResidentIds}
+              onSlotPhaseChange={onSlotPhaseChange}
+              enableSlotSwap
             />
           </div>
           </div>
