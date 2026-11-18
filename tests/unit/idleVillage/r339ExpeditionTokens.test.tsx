@@ -70,7 +70,10 @@ describe('R-339/T1 — the layout contract is declared once, strict and complete
     const c = CASSETTO_LAYOUT_CONFIG;
     /* D4 — clamp(360px, 23vw, 460px): the bound that caps the baked column;
      *  + T2 chipWidthPx (the collapsed edge chip's published width). */
-    expect(c.drawer).toEqual({ widthMinPx: 360, widthVwFraction: 0.23, widthMaxPx: 460, chipWidthPx: 40 });
+    expect(c.drawer).toMatchObject({ widthMinPx: 360, widthVwFraction: 0.23, widthMaxPx: 460, chipWidthPx: 40 });
+    /* R-357 (Mode B-amend): the DOM drawer is `columnAspect × viewportH`, capped at 613 px. */
+    expect(c.drawer.columnAspect).toBeCloseTo(0.5689, 4);
+    expect(c.drawer.widthMaxPxExtracted).toBe(613);
     /* T8 — non-modal sheet detents (peek / half / full). */
     expect(c.bottomSheet.peekPx).toBe(56);
     expect(c.bottomSheet.halfFraction).toBe(0.5);
@@ -90,9 +93,12 @@ describe('R-339/T1 — the baked column keeps the clamp as a cap, never a stretc
   it('width = aspect × viewportH below the cap; widthMaxPx above', () => {
     const lowH = 800;
     expect(cassettoColumnWidthFor(spec, lowH)).toBeCloseTo(spec.aspect * lowH, 6);
-    const highH = 2000; // aspect × 2000 far beyond the 460px cap
-    expect(cassettoColumnWidthFor(spec, highH)).toBe(CASSETTO_LAYOUT_CONFIG.drawer.widthMaxPx);
-    expect(cassettoColumnHeightFor(spec, highH)).toBeLessThan(highH);
+    const highH = 2000; // aspect × 2000 far beyond the cap
+    expect(cassettoColumnWidthFor(spec, highH)).toBe(CASSETTO_LAYOUT_CONFIG.drawer.widthMaxPxExtracted);
+    // R-357: the DOM column flexes its content, so it always fills the viewport height
+    expect(cassettoColumnHeightFor(spec, highH)).toBe(highH);
+    // 1440×900 → 512 px (was 420)
+    expect(cassettoColumnWidthFor(spec, 900)).toBeCloseTo(512, 0);
   });
 });
 
@@ -135,9 +141,9 @@ describe('R-339/T1 — every painted CTA/bar color traces config → skin regist
      * .confirm-text color/shadow) — asserted on the raw CSS text because
      * jsdom's CSSOM does not evaluate var() in inline styles. */
     const css = container.querySelector('[data-hudreal-cassetto] style')?.textContent ?? '';
-    expect(css).toMatch(
-      /\[data-testid="cassetto-confirm"\]:disabled\s*\{\s*opacity:\s*var\(--skin-cassetto-cta-muted-opacity\)/,
-    );
+    /* R-357: the plaque is a picture — the muted look is a filter on it plus the label's opacity token. */
+    expect(css).toMatch(/\[data-testid="cassetto-confirm"\]:disabled \.confirm-art\s*\{\s*filter:\s*var\(--skin-cassetto-cta-enamel-disabled\)/);
+    expect(css).toMatch(/:disabled \.confirm-text\s*\{\s*opacity:\s*var\(--skin-cassetto-cta-muted-opacity\)/);
     expect(css).toMatch(/\.confirm-text\s*\{[^}]*color:\s*var\(--skin-cassetto-cta-text\)/);
     expect(css).toMatch(/\.confirm-text\s*\{[^}]*text-shadow:\s*var\(--skin-cassetto-cta-text-shadow\)/);
   });
