@@ -128,6 +128,7 @@ Format: `[filename](path) — one sentence — \`tag\``
 |[PROGRESSION.md](PROGRESSION.md) — dominio progressione eroi/villaggio: XP, sblocchi, blueprint, licenze — DRAFT bozza — `progression` `draft` `L1`
 |[NARRATIVE.md](NARRATIVE.md) — dominio narrativa: setting, struttura quest, semi narrativi, storia emergente — DRAFT bozza — `narrative` `draft` `L1`
 |[QUEST_RULES.md](QUEST_RULES.md) — doc canonico regole quest vigenti (PLAN-020): regola → fonte → stato — `quest` `canonical` `L1`
+|[context/GAME_DESIGN_KNOWLEDGE_MAP.md](GAME_DESIGN_KNOWLEDGE_MAP.md) — router interpretativo non-canonico per game design: domini, autorità, stato, dipendenze e protocollo di analisi; non introduce regole — `game-design` `knowledge-map` `reference` `L0`
 |[context/REJECTED.md](context/REJECTED.md) — registro approcci/idee valutati e rifiutati con motivo — `knowledge` `rejected` `L3`
 |[context/OPEN.md](context/OPEN.md) — registro delle questioni irrisolte con link a fonti e piani — `knowledge` `open` `L3`
 |[context/ingestions/2026-11-11-poi-stati-hub-opportunita.md](context/ingestions/2026-11-11-poi-stati-hub-opportunita.md) — ingestion proposta ChatGPT + mockup su stato sul POI, quest/job/attività e LocationHub: stato sul POI già coperto dall'halo del Sigillo; conflitti (etichette sul POI, icona-verbo, placca CTA); nuove OPEN-025 (Hub) e OPEN-026 (tassonomia) — `knowledge` `evidence` `poi` `hud` `L4`
