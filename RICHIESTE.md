@@ -576,3 +576,17 @@ Triage 2026-10-12 (R-156): 28 voci chiuse su evidenza kanban/artefatto — `cont
 - v: funding MW verificato con ricerca mirata — RIBALTATA stima: nessuna cascade call aperta adatta (NLnet/OIS esclude GenAI <1M utenti; EIC/EIT/Smart&Start vogliono impresa). MW funding è quasi solo post-gioco. BUSINESS_PLAN.md §6.F aggiornato.
 - v: mappa outreach creator/press verificata (ricerca) — BUSINESS_PLAN.md §6.G: contatti reali, playbook timing demo→fest→lancio, Keymailer>Woovit(morto), caveat policy anti-AI di Retromation (pitch gameplay-first ai creator, storia AI solo a stampa). Monitor: 30 fonti rilevanti + sistema deadline reminder attivo (opportunity-deadlines.json).
 - v: decisione nome "Wanderlust: Triumph" TENUTO — collisione formato con 2 saghe "Wanderlust: X" (Yeti Trunk/Chucklefish dormiente, Different Tales attivo) valutata come trade-off positivo (SEO prestata, rischio legale ~zero). Rivalutabile solo se uno studio riemerge attivo. Registrato in BUSINESS_PLAN.md §1.
+
+
+## R-361 — Contesto di game design consultabile e riutilizzabile nelle sessioni AI
+
+**Richiesta (verbatim, 2026-11-18):** *"fa tutto tu direttamente"* — riferito alla richiesta di esaminare il repository aggiornato e predisporre autonomamente il contesto teorico necessario per continuare a discutere il progetto (gameplay, bilanciamento, funzionalità, strategia), senza concentrarsi sul codice.
+**Data:** 2026-11-18
+**Stato:** `fatta`
+**Delivered:**
+- Creato `context/GAME_DESIGN_KNOWLEDGE_MAP.md`: router non-canonico che mappa autorità, domini di design, stato, dipendenze, OPEN e protocollo di analisi. Nessuna regola di gioco ratificata o modificata.
+- Aggiunto il documento a `context/INDEX.md` come reference L0.
+- Aggiornato `AGENTS.md`: quando il task riguarda game design, la knowledge map entra nel read-path iniziale come router subordinato a `CANON.md`.
+- Fonti esaminate su `main`: CANON, AGENTS, CURRENT_STATE, DESIGN_PILLARS, GAMEPLAY_DESIGN, QUEST_RULES, GOOD_QUEST_DEFINITION, QUEST_GAMEPLAY_SCIENCE, OPEN, DECISION_LOG, RICHIESTE, desiderata digest, INDEX, piani e draft di economia/progressione/narrativa.
+**Vincoli:** la mappa non è una nuova fonte canonica, non è sincronizzata automaticamente e non autorizza agenti a decidere per il Director. Ogni sessione deve verificare le fonti correnti e rispettare Mind Weaver.
+**Commit:** knowledge map `146aa113`; index `57ff5d3`; AGENTS `90b6d57`.
