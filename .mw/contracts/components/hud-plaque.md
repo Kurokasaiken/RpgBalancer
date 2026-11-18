@@ -11,7 +11,13 @@ fast_checks:
   - tests/unit/idleVillage/cartouchePath.test.ts
 e2e_checks: []
 e2e_trigger_globs: []
-invariants: []
+invariants:
+  - id: hud-plaque.INV-1
+    source: test
+    provenance: mode-b-add
+    test_refs:
+      - tests/unit/idleVillage/cartouchePath.test.ts
+    statement: "cartouchePath produce silhouette chiuse (M…Z) e contenute nel box per le forme panel/hang/plinth, con spalle simmetriche."
 ---
 
 # hud-plaque
