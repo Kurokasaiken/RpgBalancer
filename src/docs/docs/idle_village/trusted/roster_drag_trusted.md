@@ -218,6 +218,13 @@ VillageRosterSection -> PgCard (draggable)
 - **Reuse Decision**: All existing systems comply with trusted contracts
 - **Parallel Systems**: None created (verification-only task)
 
+### R-359 Regression Fixes (2026-11-18)
+- **File**: `test-results/r359-*` (probe JSON + witness PNG) · `.mw/bugs/20261118-medallion-drag/bug.md`
+- **Status**: fixati, deployati, verificati su produzione (Playwright headless, GPU reale)
+- **Root causes fixate**: (a) warm-node `querySelector('image')` puntava al `WanderlustMedalOverlay` SVG ritirato — `C1Medallion` renderizza `<img>` HTML → overlay mostrava sempre `residentsById[0]`; (b) `createMagneticSlotCollision(getCurrentDragConfig())` — oggetto config passato come `radiusPx` → `distance > NaN` sempre falso → drop committava ovunque; (c) `HudRealCassetto` montava `ResidentSlotRack` senza `enableSlotSwap`/`onSlotPhaseChange` → token swap/extract morti; (d) `/game` chiamava solo `warmGameCursors()` — `warmGameAssets()` mai invocata; (e) click-assign con `setTimeout(50)`+`startTransition` → ~450ms di latenza morta.
+- **Invariants**: `custom-drag-overlay.INV-2`, `drag-config.INV-2`, `hud-real-cassetto.INV-6`, `use-quest-expedition-session.INV-8` — 5 nuovi test file INV-tagged (18/18 verdi con `questExpeditionReturnFlight`), red-first ×4 registrato.
+- **Commits**: `db93d793`, `d4614cf9` (temp-index commit: 0 file della sessione parallela R-357).
+
 ---
 
 ## Maintenance and Updates

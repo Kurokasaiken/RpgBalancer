@@ -5,6 +5,25 @@
 
 ---
 
+## 2026-11-18 — Regola: ogni bug fixato ha un test permanente; commit su worktree condiviso via temp-index
+
+**Da:** i bugfix venivano chiusi su probe/witness ad hoc; test a discrezione del task. I commit su
+worktree condiviso non avevano una tecnica stabilita (rischio di committare lo staging altrui, T-13).
+**A:** (a) direttiva Director (D-300): ogni bug trovato e fixato deve avere un test di regressione
+permanente, `test_refs` popolati nel contratto del componente, e quei test eseguiti a ogni modifica
+del componente (enforcement meccanico: `livingSyncGate` Mode C + red-first record per invariant).
+Applicato retroattivamente su R-359: 5 nuovi file INV-tagged, 18/18 verdi, red-first ×4.
+(b) tecnica commit condivisa: `GIT_INDEX_FILE` + `read-tree` + `hash-object`/`cacheinfo` per file
+entangled + `commit-tree`/`update-ref` — commit `db93d793`/`d4614cf9` con 0 file R-357 e index
+altrui intatto. `commit-tree` non esegue gli hooks (governance:check saltato consapevolmente,
+documentato nel bug record).
+**Motivo:** R-359 (5 regressioni drag /game): ogni bug aveva una root cause diversa e silenziosa —
+senza test permanenti sarebbero tornate invisibili. Il worktree condiviso richiedeva una via di
+commit che non distruggesse lo staging parallelo.
+**Fonte:** `.mw/runs/20261118-r359-learn/pattern-candidate.md` · `.mw/bugs/20261118-medallion-drag/bug.md` · PROPOSALS.md P-010/011/012
+
+---
+
 ## 2026-10-24 — Sprite kit non occludono: cloud-sky tirato da andata
 
 **Da:** i kit atmosphere `sprite` potevano essere attaccati a qualsiasi scena —
