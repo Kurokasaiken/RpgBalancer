@@ -121,6 +121,7 @@ export const HudRealCassettoDetail: React.FC<HudRealCassettoDetailProps> = (p) =
       onSlotClick={p.onOpenRoster ? () => p.onOpenRoster!() : undefined}
       onSlotClear={p.onSlotClear}
       suppressedResidentIds={p.suppressedResidentIds}
+      onSlotPhaseChange={p.onSlotPhaseChange}
       loadout={loadout}
       canSend={p.canSend}
       disabledReason={p.canSend ? null : t('questExpedition.forecast.incomplete')}

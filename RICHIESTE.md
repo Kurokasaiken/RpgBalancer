@@ -525,3 +525,15 @@ Triage 2026-10-12 (R-156): 28 voci chiuse su evidenza kanban/artefatto — `cont
 - **Smoke prod build**: `/game` interactive **4485ms** su Metal (era 7.2s), 43 URL swappate 200 OK, zero 404.
 - **T-D1 spike KTX2**: CONDITIONAL GO — leva VRAM/wire non boot-time (transcode single-worker serializza, più lento del decode WebP nativo parallelo); UASTC NO. Killato come leva boot.
 - **Residui**: OB-5 probe post-deploy, OB-6 bundle, chiusura.
+## R-359 — Regressioni drag & drop medaglioni su /game + warmup portrait mancante
+
+**Richiesta (verbatim, 2026-11-18):** *"fixalo. inoltre qunado provo a fare il drag d un medaglione inizialmente esce sempre il ritratto d sir spaccaculi. Il drop deve incastrare il medaglione solo se è nelle vicinanze di un drop valido, attualmetne lo fa quasi ovunque. avevo implementato lo swap tra pg assegnati e nn funziona +. Altra regressione: mentre provo ad estrarre un pg assegnato il medalgione scompare. fixxa tutta la regressione, dovrebbero esserci test a riguardo che nn sn stati effettuati, provvedi. dovresti conoscere tutte interazioni tra questi due componenti, assicurati che funzionino tutte correttametne. Inoltre sembra che sir spccaculi sia rimasto assegnato anche se nn è in nessuno slot, altro bug"*
+**Data:** 2026-11-18
+**Bug record:** `.mw/bugs/20261118-medallion-drag/bug.md` — probe live `.mw/runs/plan126-boot-bytes/component-audit/dnd-regressions.json` + witness 01-07.
+**Cluster (root cause da evidenza):**
+- **B-A** warm node dell'overlay patcha `querySelector('image')` (SVG della vecchia WanderlustMedalOverlay) ma `C1Medallion` renderizza `<img>` HTML → il medaglione drag mostra sempre `residentsById[0]` = Sir Spaccaculi. Fix: selettore portrait img (`img:not([src*="ring.webp"])`) + `img.src`.
+- **B-B** `game-mappa2.tsx` passa `getCurrentDragConfig()` (oggetto) a `createMagneticSlotCollision(radiusPx:number)` → `distance > NaN` sempre falso → check raggio bypassato, slot più vicino vince a qualsiasi distanza (regressione da `7e8f6559`, 14/11). Fix: `.magnetism.slotRadiusPx`.
+- **B-C** `HudRealCassetto` monta `ResidentSlotRack` senza `enableSlotSwap`/`onSlotPhaseChange` (a differenza di `QuestExpeditionDetail`) → token drag disabilitato → no swap, no ghost in extract (medaglione "scompare"). Assente anche in HEAD: bug committato, non debito R-357. Fix: prop plumbing `HudRealCassettoDetail`→`ExpeditionDrawer`→`HudRealCassetto`→rack.
+- **Warmup**: `/game` chiamava solo `warmGameCursors()` — `warmGameAssets()` (portrait+scene art decode) mai invocata sulla route → primo roster open pagava ~365ms fetch+decode (misura probe prod). Fix: `warmGameAssets()` al mount.
+- **B-E** "assegnato ma in nessuno slot": plausibile effetto di B-B (commit su slot di un altro POI/rack — collision su tutti i `data-drop-slot` visibili) → verifica empirica post-fix.
+**Stato:** `in corso`

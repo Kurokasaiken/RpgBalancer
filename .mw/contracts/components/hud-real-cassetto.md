@@ -62,3 +62,10 @@ invariants:
       - tests/unit/idleVillage/r339BagAssign.test.tsx
       - tests/unit/idleVillage/r337CassettoBagSlots.test.tsx
 ---
+  - id: hud-real-cassetto.INV-6
+    source: director-bug
+    source_ref: R-359
+    statement: R-359 medallion drag regressions on /game
+    test_refs:
+      - tests/unit/idleVillage/hudRealCassettoSlotSwap.test.tsx
+---

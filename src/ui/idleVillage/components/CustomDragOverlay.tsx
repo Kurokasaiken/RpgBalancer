@@ -350,11 +350,12 @@ export function CustomDragOverlay({
       if (!resident) return;
       const portraitUrl = getResidentPortraitUrl(resident);
       const medalUrl = portraitUrl ? getMedalPortraitUrl(portraitUrl) : undefined;
-      const img = node.querySelector('image');
-      if (img && medalUrl) {
-        img.setAttribute('href', medalUrl);
-        img.setAttribute('xlink:href', medalUrl);
-      }
+      /* R-359: C1Medallion paints HTML <img> nodes (portrait + ring), not the
+       *  SVG <image> of the retired WanderlustMedalOverlay — the selector must
+       *  target the portrait img or the warm node keeps the first resident's
+       *  face (Sir Spaccaculi) on every drag. */
+      const img = node.querySelector<HTMLImageElement>('img:not([src*="ring.webp"])');
+      if (img && medalUrl) img.src = medalUrl;
       const sizePx = cfg.overlay.medalSizePx * getHudZoomFactor();
       node.style.width = `${sizePx}px`;
       node.style.height = `${sizePx}px`;

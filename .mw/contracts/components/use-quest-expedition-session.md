@@ -94,6 +94,16 @@ invariants:
       → PgCard disabilita il draggable e lo swap roster→castone occupato (INV-5, R-281) e' irraggiungibile. Un castone
       OCCUPATO eleggibile per il trascinato deve contare come compatibile (lo scalzato torna sempre al roster).
     test_refs: []
+  - id: use-quest-expedition-session.INV-8
+    source: director-bug
+    source_ref: R-359
+    statement: >-
+      Click-assign pays ~450ms dead latency: 50ms setTimeout + startTransition defer the flight mount; make the flight
+      start synchronous
+    test_refs:
+      - tests/unit/idleVillage/questExpeditionClickAssign.test.tsx
+
+
 ---
 # use-quest-expedition-session
 

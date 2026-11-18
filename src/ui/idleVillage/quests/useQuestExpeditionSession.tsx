@@ -1270,17 +1270,14 @@ export function useQuestExpeditionSession({
       if (!slot) return false;
       const from = elementCenter(document.querySelector(`[data-resident-id="${residentId}"]`));
       if (!from) return false;
+      const to = elementCenter(getSlotComponentElement(slot.id));
+      if (!to) return false;
+      /* R-359: start the flight synchronously — the 50 ms timeout + deferred
+       *  transition left ~450 ms of dead latency between the click and the
+       *  medallion leaving the card ("lento e clunky"). The lock paint still
+       *  lands via `setFlying`'s transition; only the proxy mount is urgent. */
       setFlying(residentId);
-      window.setTimeout(() => {
-        const to = elementCenter(getSlotComponentElement(slot.id));
-        if (!to) {
-          setFlying(null);
-          return;
-        }
-        startTransition(() =>
-          startFlight({ residentId, slotId: slot.id, isInset: true, fromX: from.x, fromY: from.y, toX: to.x, toY: to.y }),
-        );
-      }, 50);
+      startFlight({ residentId, slotId: slot.id, isInset: true, fromX: from.x, fromY: from.y, toX: to.x, toY: to.y });
       return true;
     },
     [isDetailOpen, run, findAcceptingSlot, startFlight, setFlying],

@@ -101,7 +101,7 @@ import goblinStickerImage from '@/assets/ui/idleVillage/goblin-march-trasparente
 import { applySkinCssVariables } from '@/ui/idleVillage/skins/skinCssVariables';
 import { getSkinPresetConfig, type SkinPresetId } from '@/ui/idleVillage/skins/skinConfigRegistry';
 import { COMPARABLE_SKIN_IDS, resolveInitialSkinPresetId } from '@/ui/idleVillage/skins/resolveInitialSkin';
-import { warmGameCursors } from '@/ui/idleVillage/utils/gameAssetWarmup';
+import { warmGameAssets } from '@/ui/idleVillage/utils/gameAssetWarmup';
 import { MatericRosterComponentV2 } from '@/ui/idleVillage/rosterV2';
 import { RosterKitShell, useRosterKitData, type RosterDropVerdict } from '@/ui/idleVillage/frozen/kits/rosterKit';
 import { QuestJourneyRoute, QuestOverlays, QuestRunWindow, RegionTooltip, useHeroSheet, usePanelWhileOpen, type HeroSheetApi, type HudEvent, type HudPanelsApi, type VillageScreenViewHandle } from '@/ui/idleVillage/components/gameFrame';
@@ -190,7 +190,7 @@ const mappa2Poi = (id: string): QuestPoi | undefined => {
   const pos = MAPPA2_POI_POS[id];
   return p && pos ? { ...p, ...pos } : undefined;
 };
-const SLOT_MAGNET = createMagneticSlotCollision(getCurrentDragConfig());
+const SLOT_MAGNET = createMagneticSlotCollision(getCurrentDragConfig().magnetism.slotRadiusPx);
 const EMPTY_QUEST_RUN_TIME: { progress: number; label: string; overrunFrom?: number } = { progress: 0, label: '' };
 /** Field-wise equality for the quest-window time model (R-265). */
 function questRunTimeEqual(
@@ -1193,10 +1193,11 @@ export default function GameMappa2Page() {
     () => (state.residents ?? []).reduce((n, r) => n + (r.isDead ? 1 : 0), 0),
     [state.residents],
   );
-  /* The brass cursors fetch on first use: warm them at mount (the roster/quest
-   *  art of `warmGameAssets` has nothing to show on this page yet). */
+  /* R-359: warm the full boot-hidden set — portraits (roster/medallion/hero
+   *  sheet), brass cursors and quest scene art — so the first roster open and
+   *  every drag preview paint from decoded cache, not a visible fetch. */
   useEffect(() => {
-    void warmGameCursors();
+    void warmGameAssets();
   }, []);
   useEffect(() => {
     applySkinCssVariables(skinId);

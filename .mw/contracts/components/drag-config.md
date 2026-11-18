@@ -20,6 +20,13 @@ invariants:
     test_refs:
       - tests/unit/idleVillage/magneticCollision.test.ts
 ---
+  - id: drag-config.INV-2
+    source: director-bug
+    source_ref: R-359
+    statement: R-359 medallion drag regressions on /game
+    test_refs:
+      - tests/unit/idleVillage/gameMappa2Magnet.test.ts
+---
 
 # drag-config
 
