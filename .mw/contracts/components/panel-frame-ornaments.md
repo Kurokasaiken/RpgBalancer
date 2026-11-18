@@ -6,6 +6,7 @@ tier: 2
 root_file: src/ui/idleVillage/skins/primitives/PanelFrameOrnaments.tsx
 scope_files:
   - src/ui/idleVillage/skins/primitives/PanelFrameOrnaments.tsx
+  - src/ui/idleVillage/skins/primitives/sliceKitManifest.ts
 fast_checks:
   - tests/unit/idleVillage/r353StashGrid.test.tsx
 e2e_checks: []

@@ -1,6 +1,6 @@
 {
   "schema": "plan054-component-inventory/1",
-  "generated_at": "2026-11-18T16:59:31.352Z",
+  "generated_at": "2026-11-18T22:11:05.891Z",
   "strict_files": [
     "src/pages/game-frame-pixi.tsx",
     "src/pages/game-frame.tsx",
@@ -441,6 +441,7 @@
     "src/ui/idleVillage/skins/primitives/cinemaFx.tsx",
     "src/ui/idleVillage/skins/primitives/hudBand.ts",
     "src/ui/idleVillage/skins/primitives/index.ts",
+    "src/ui/idleVillage/skins/primitives/sliceKitManifest.ts",
     "src/ui/idleVillage/skins/questChronicleSkinConfig.ts",
     "src/ui/idleVillage/skins/questPoiSkinConfig.ts",
     "src/ui/idleVillage/skins/resolveInitialSkin.ts",
@@ -2008,7 +2009,8 @@
       "tier": 2,
       "root_file": "src/ui/idleVillage/skins/primitives/PanelFrameOrnaments.tsx",
       "scope_files": [
-        "src/ui/idleVillage/skins/primitives/PanelFrameOrnaments.tsx"
+        "src/ui/idleVillage/skins/primitives/PanelFrameOrnaments.tsx",
+        "src/ui/idleVillage/skins/primitives/sliceKitManifest.ts"
       ],
       "tier_source": "default"
     },
@@ -3712,10 +3714,10 @@
     }
   ],
   "stats": {
-    "files": 503,
+    "files": 504,
     "units": 300,
     "ui_components": 229,
     "shared_kernels": 71
   },
-  "content_sha256": "8254e35142bbfb8d88c8bfe09bc38654b73526c3741bf086e84471289fc1e36c"
+  "content_sha256": "5679bf991b39dc0a27b41a85b230cada7bfc00381e1e9bf7ff24a6115e1b5ced"
 }
