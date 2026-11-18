@@ -2,7 +2,7 @@
 import { chromium } from 'playwright';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-const url = 'http://localhost:4173/game';
+const url = process.env.PROBE_URL || 'https://rpg-balancer.vercel.app/game';
 const OUT = '.mw/bugs/20261118-medallion-drag/evidence';
 mkdirSync(OUT, { recursive: true });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
