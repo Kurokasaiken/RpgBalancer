@@ -137,4 +137,15 @@ invariants:
     statement: R-359 medallion drag regressions on /game
     test_refs:
       - tests/unit/idleVillage/hudRealCassettoSlotSwap.test.tsx
+
+  - id: cassetto-cta-tips-intact
+    source: director-bug
+    source_ref: R-357
+    statement: >-
+      Il bottone CTA del cassetto e un asset generato standalone (refs/button-launch-gemini.png):
+      entrambe le punte della freccia (sinistra E destra) devono sopravvivere nell'asset baked,
+      simmetriche, su fondo trasparente. R-357 Director 2026-11-18 — errore fatto due volte.
+    test_refs:
+      - tests/unit/idleVillage/r357CassettoFrame.test.ts
+
 ---
