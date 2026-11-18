@@ -24,7 +24,7 @@
  * manifesta cambiando il rapporto viewport/mappa.
  */
 
-import { test, expect } from '@playwright/test';
+import { syncGateTest as test, invExpect as expect } from '../../helpers/syncGateExpect';
 import { PNG } from 'pngjs';
 import {
   expectCoversViewport,
