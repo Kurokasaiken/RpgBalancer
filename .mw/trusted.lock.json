@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "sealed_at": "2026-11-18T15:09:54.470Z",
+  "sealed_at": "2026-11-18T17:00:38.403Z",
   "sealed_by": "director",
   "entries": {
     ".mw/surface-map.json": "f75d07c8e236520de771cb2457419e1d15db43cc5f63f20eb33092ea93d15a0a",
@@ -146,7 +146,7 @@
     "src/ui/idleVillage/frozen/mockData/residents.ts": "6b5e48ce5794ac2bd1bf1a37666d3af9d28967cf8aa747473e082d064fcb36aa",
     "src/ui/idleVillage/frozen/registry.ts": "c7c6faeaed6367a5f53ca06f7d809a9902ed104dbbb5e5b7a2d3f56360963648"
   },
-  "sealed_base_sha": "b30103e4455f4dd9775da182195539aaf2e7a34f",
+  "sealed_base_sha": "631ced30c462bff6bca5f1a8a621c3cb4688d426",
   "executed_counts": {
     "CTR-game-001.INV-1": "unknown",
     "CTR-game-001.INV-2": "unknown",
@@ -158,9 +158,6 @@
     "CTR-game-002.INV-4": "unknown",
     "custom-drag-overlay.INV-1": "unknown",
     "drag-test-container-v2.INV-1": 3,
-    "CTR-game-005.INV-1": "unknown",
-    "CTR-game-005.INV-2": "unknown",
-    "CTR-game-005.INV-3": "unknown",
     "CTR-game-002.INV-5": "unknown",
     "CTR-game-004.INV-6": 4,
     "CTR-game-004.INV-1": "unknown",
