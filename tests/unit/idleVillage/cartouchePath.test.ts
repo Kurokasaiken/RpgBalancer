@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { cartouchePath } from '@/ui/designSystem/primitives/geometry/cartouchePath';
 
 describe('cartouchePath', () => {
+  // INV:hud-plaque.INV-1 — silhouette chiuse e bounded per panel/hang/plinth
   it('draws a closed rounded rectangle for panels, clamping the radius', () => {
     const d = cartouchePath({ shape: 'panel', size: 18 }, 300, 86);
     expect(d.startsWith('M18,0')).toBe(true);
