@@ -148,3 +148,10 @@ T-A1 → T-A2 → T-A3 ∥ (T-B1 → T-B2 → T-B3 → [ruling D-1] → T-B4) �
 - `contracts:check --diff` su fileset proprio: **OK**. Repo-wide: instabile mentre la sessione parallela muta il worktree (gate-file editati + pull/autostash mid-run → flood artefatto, verificato).
 - Per il PASS finale serve: worktree quieto (R-357/sessione parallela committata) → `contracts:check` → `verify:bundle --all-tiers`.
 - Commit: `84e1a61c`, `5dfa295c`, `8eec6a96`, `5866fc00`, `58996f50`.
+
+## CHIUSURA — 2026-11-18
+
+- `verify:bundle -- --manifest=.mw/runs/plan126-boot-bytes/verification.json --all-tiers` → **Verdict: PASS**
+- OB-1…OB-6 tutti verdi; verifier+trust OK; 193 file sessioni parallele → foreign_scope advisory (non bloccante).
+- R-358 chiusa `fatta` in RICHIESTE.md con citazione `bundle: .mw/runs/plan126-boot-bytes/bundle.json`.
+- Residuo noto: `closure:lint` hang >60s senza output su worktree condiviso — gate-file modificati in storia committata attendono ri-approvazione director_answer (verificare in ambiente stabile).
