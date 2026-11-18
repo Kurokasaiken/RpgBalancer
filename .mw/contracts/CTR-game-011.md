@@ -1,18 +1,16 @@
 ---
-id: game-menu-screens
-kind: component
-role: ui-component
-tier: 2
-root_file: src/ui/idleVillage/components/gameFrame/menu/LoadGamePanel.tsx
-scope_files:
-  - src/ui/idleVillage/components/gameFrame/menu/LoadGamePanel.tsx
-  - src/ui/idleVillage/components/gameFrame/menu/GameMenuDialog.tsx
-  - src/ui/idleVillage/components/gameFrame/menu/SettingsPanel.tsx
-  - src/ui/idleVillage/components/gameFrame/menu/GameMenuConfirm.tsx
-  - src/ui/idleVillage/components/gameFrame/menu/TitleScreen.tsx
-  - src/ui/idleVillage/components/gameFrame/menu/GameEntry.tsx
-  - src/ui/idleVillage/components/gameFrame/menu/useGameMenuFlow.tsx
-  - src/ui/idleVillage/components/gameFrame/menu/menuFlow.ts
+id: CTR-game-011
+kind: integration
+components:
+  - game-entry
+  - game-menu-confirm
+  - game-menu-dialog
+  - load-game-panel
+  - settings-panel
+  - title-screen
+  - menu-flow
+  - use-game-menu-flow
+external_dependencies: []
 fast_checks:
   - tests/unit/idleVillage/loadGamePanel.test.tsx
   - tests/unit/idleVillage/menuFlow.test.ts
@@ -122,35 +120,14 @@ invariants:
       - tests/unit/idleVillage/menuScreens.test.tsx
       - tests/unit/idleVillage/mappa2Tiers.test.ts
 ---
-# game-menu-screens
 
-Schermate del menu di gioco (PLAN-076, DN-7): Carica partita, Impostazioni, conferme di uscita/Nuova partita, schermata titolo. Fork scelti: LOAD-1 A, SET-1 A, QUIT-1 B, TITLE-1 A (card in `.mw/runs/plan076-fork/`).
+# CTR-game-011 — game menu screens (integration)
 
-<!-- plan054:notes -->
+Contratto-ombrello per le schermate del menu di gioco (PLAN-076, DN-7): Carica partita, Impostazioni,
+conferme di uscita/Nuova partita, schermata titolo. Fork scelti: LOAD-1 A, SET-1 A, QUIT-1 B, TITLE-1 A
+(card in `.mw/runs/plan076-fork/`).
 
-<!-- /plan054:notes -->
-
-<!-- plan054:generated -->
-
-## Scopo
-
-Superfici che il giocatore apre dal menu di gioco o dal titolo; pillole neutre (BTN-1 aperto), mai viola, mai placca CTA.
-
-## Scope
-
-- `src/ui/idleVillage/components/gameFrame/menu/LoadGamePanel.tsx`
-- `src/ui/idleVillage/components/gameFrame/menu/GameMenuDialog.tsx`
-- `src/ui/idleVillage/components/gameFrame/menu/SettingsPanel.tsx`
-- `src/ui/idleVillage/components/gameFrame/menu/GameMenuConfirm.tsx`
-- `src/ui/idleVillage/components/gameFrame/menu/TitleScreen.tsx`
-- `src/ui/idleVillage/components/gameFrame/menu/GameEntry.tsx`
-- `src/ui/idleVillage/components/gameFrame/menu/useGameMenuFlow.tsx`
-- `src/ui/idleVillage/components/gameFrame/menu/menuFlow.ts`
-- `src/ui/idleVillage/components/gameFrame/menu/SettingsPanel.tsx`
-- `src/ui/idleVillage/components/gameFrame/menu/GameMenuConfirm.tsx`
-- `src/ui/idleVillage/components/gameFrame/menu/TitleScreen.tsx`
-- `src/ui/idleVillage/components/gameFrame/menu/GameEntry.tsx`
-- `src/ui/idleVillage/components/gameFrame/menu/useGameMenuFlow.tsx`
-- `src/ui/idleVillage/components/gameFrame/menu/menuFlow.ts`
-
-<!-- /plan054:generated -->
+Migrazione 2026-11-18 (PLAN-126 OB-6 debt, Director-approved): ex `game-menu-screens` era un contratto
+`component` che claimava 8 file già posseduti dalle unità dedicate della partizione PLAN-054 → violazioni
+STRICT_FILES a 2 owner. Convertito in `kind: integration` sulle unità componenti; invarianti preservati
+verbatim con gli id storici `game-menu-screens.INV-*` (i marker `// INV:` nei test restano validi).

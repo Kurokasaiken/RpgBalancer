@@ -6,9 +6,6 @@ tier: 2
 root_file: src/ui/idleVillage/hudReal/HudRealVictoryReward.tsx
 scope_files:
   - src/ui/idleVillage/hudReal/HudRealVictoryReward.tsx
-  - src/ui/idleVillage/quests/questEpilogue.ts
-  - src/ui/idleVillage/quests/questSettlement.ts
-  - src/ui/idleVillage/components/C1Medallion.tsx
 fast_checks:
   - tests/unit/idleVillage/hudRealVictoryReward.test.tsx
 e2e_checks: []
