@@ -47,7 +47,7 @@ describe('tier profiles', () => {
     expect(page).toContain('...profile.tiles');
     expect(page).toContain('seabed: MAPPA2_APPROVED_MAP_PROPS.effects.seabed && profile.seabed');
   });
-  // INV:pixi-world-map.INV-8 — the reveal-only sea is neither fetched nor loaded without a seabed
+  // covers pixi-world-map.INV-8 (canonical marker in mappa2ApprovedLook.test.ts) — the reveal-only sea is neither fetched nor loaded without a seabed
   it('a reveal-only sea is never fetched when the seabed is off (−21 MB on phones)', () => {
     const src = readFileSync('src/ui/idleVillage/pixiSpike/PixiWorldMap.tsx', 'utf8');
     expect(src).toContain('const texture = revealOnlySea && !seabedOn ? Texture.EMPTY');

@@ -138,7 +138,7 @@ describe('R-339 — the drawer publishes its docked width to the insets ledger',
 });
 
 describe('R-351 — no quest: the surface mounts nothing (edge tab deleted)', () => {
-  // INV:expedition-drawer.INV-1
+  // covers expedition-drawer.INV-1 (canonical marker in r339ExpeditionDrawer.test.tsx)
   it('the page no longer imports nor mounts ExpeditionEdgeTab / expedition-edge-tab', () => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const read = (p: string) =>

@@ -23,7 +23,7 @@ const endedRun = (seed: number): QuestRunState => {
 };
 
 describe('QuestRewardPopup — one title (R-234)', () => {
-  // INV:R-234-report-one-title — the report's title is painted once (the plaque's title row);
+  // covers R-234-report-one-title (canonical marker in hudRealVictoryReward.test.tsx) — the report's title is painted once (the plaque's title row);
   // the epilogue inside it does not repeat it as a section label.
   it('paints the report title once, revealed in full', () => {
     vi.useFakeTimers();
