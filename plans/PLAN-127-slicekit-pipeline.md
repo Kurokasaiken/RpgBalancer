@@ -1,30 +1,18 @@
 # PLAN-127 — Pipeline canonica mockup→componente scalabile ("slice-kit")
 
-**Stato:** **rev.2 — DA RIBATTEZZARE.** La rev.1 era stata battezzata il 2026-11-18
-(ruling Director «battezzo», stamp `open` in `context/plan-timing.jsonl`
-2026-11-18T19:48Z). Il Director ha poi chiesto, il 2026-11-19, di dividerla in
-standard generico + parti specifiche RPG — lo stesso split di PLAN-128 rev.2.
-Le regole di formato vogliono una spec immutabile dopo il battesimo, quindi
-questa rev.2 è valida solo dopo un nuovo battesimo del Director. Il testo
-della rev.1 è conservato verbatim in
+**Stato:** **rev.2 — BATTEZZATO.** Rev.1 battezzata 2026-11-18 (ruling «battezzo»,
+stamp `open` 2026-11-18T19:48Z). Rev.2 richiesta il 2026-11-19 (split standard
+generico/profilo RPG — come PLAN-128 rev.2) e **battezzata 2026-11-19** (ruling
+Director «battezzo», stamp `note --kind rebaptism` 2026-11-19T21:36:39Z) nella
+forma **artifact-r004** del dibattito multi-AI
+`20261119-plan127-rev2` (sha256 `9e66ec81981d…31ba3627ef`, decision_memo:
+3/4 ACCEPT — chatgpt/gemini/deepseek; grok scope disagreement registrato sul
+trust boundary dichiarato). In testa alla rev.2 sono assorbiti, per ruling
+Director opzione A, task e obbligazioni del draft PLAN-129 («pipeline
+esecutiva con ricevute», R-365) — PLAN-129 non esiste più come piano separato.
+Il testo della rev.1 è conservato verbatim in
 `mind-weaver/.mw/runs/20261119-plan127-split/plan-127-rev1-battezzato.md`
-(sha256 `b3d1ba09…ba884`). **Aggiornamento rev.2 (2026-11-19, R-365):**
-assorbiti i task e le obbligazioni del draft PLAN-129 («pipeline esecutiva
-con ricevute») — stessa rev.2, stesso ribattesimo; il draft è eliminato.
-Motivazione Director: un piano separato sullo stesso tema è rumore.
-
-**Parent:** R-361 (`RICHIESTE.md`, verbatim Director 2026-11-18: *"per adesso abbiamo un problema sempre + fastidioso. abbiamo dei componenti mockati. Devono diventare componenti corretti del progetto. Noi possiamo sia modificare le cose qua, che farle ricreare da gemini. Xò nn credo che i componenti che stiamo usando adesso siano utilizzabili scalando, quello che si chiama 9 slice o qualcosa del genere. Dobbiamo avere una pipeline o qualocsa del genere finale. … Questo processo è molto importante. anche soluzioni tipo chiedere d rigenerare senza le scritte va bene. Fa una ricerca, proponi, ecc"*).
-
-**Documentation Impact:** REQUIRED — `mind-weaver/docs/SLICEKIT.md` (standard Fase A),
-`mind-weaver/docs/MOCKUP-TO-COMPONENT.md` (nucleo metodo), `context/mockup-pipeline-profile.md`
-(profilo RPG), `context/MOCKUP-TO-PRODUCTION-PIPELINE.md` (caso D canonico),
-`.mw/specs/hud-real/MOCKUP-TO-ASSET-GUIDE.md`, `.devin/skills/painter/SKILL.md`
-(caso D percorso obbligatorio per superfici incorniciate), `context/recurring-traps.md`,
-`context/INDEX.md`, `plans/INDEX.md`.
-
-**Visual-fork:** skipped — piano di tooling/pipeline; ogni conversione di superficie apre il suo fork per-superficie sotto PLAN-047 come già previsto.
-
----
+(sha256 `b3d1ba09…ba884`).
 
 ## 1. Problema (RPG)
 
@@ -54,8 +42,8 @@ Cornici golden `mockup-r357-cornici-aperta.png`; scala uniforme degli ornamenti;
 2. **Primitivo condiviso** (estende `PanelFrameOrnaments`) secondo `SLICEKIT.md` Passo 4 + probe V1/V2/V3 secondo Passo 5, matrice in [P9].
 3. **Registro di classificazione** `hud-real/*` per la procedura del Passo 6 (OB-5).
 4. **N=3 conversioni impegnate** — banda di scorrimento → Roster → Stash ([P11]). **Roster è la prova di scroll lungo che soddisfa OB-8** — fissarlo come tale così OB-8 non viene reinterpretato come "prima che Roster ship" (deadlock). Oltre N=3, touch-driven.
-5. **Ricevute e audit di pipeline (R-365):** ogni passo dello standard scrive la sua ricevuta nel record della superficie (`test-results/slicekit/<surface>.json` — schema passo↔campo↔writer in `SLICEKIT.md` Passo 7bis, mirror [P8]); `slice:gate` scrive `sliceability_1ter` via `--record`; `npm run slice:audit -- <surface>` rende i passi saltati visibili e meccanici (exit 1); la skill esecutiva `mw-slice-run` impone il workflow step-by-step con le condizioni STOP di T-30/31/32. Causale dalla retrospettiva pilota (`.mw/runs/plan128-review-2026-11-19/`): il protocollo esisteva ed è stato saltato — un documento non impone, una ricevuta sì.
-6. **Enforcement:** la skill painter rende il caso D il percorso obbligatorio per le superfici incorniciate; `closure:lint` blocca la chiusura senza spec + manifest + evidenza probe + record di conversione e greppa `WHY-NOT-SPEC` su `plugins/*.py` (`SLICEKIT.md` §3). **Decisione aperta (R-365):** wiring di `slice:audit`/`slice:gate` dentro `closure:lint` — il gate trusted merita un dibattito a parte.
+5. **Ricevute, audit e tripwire in-flight (R-365, r003):** ogni passo scrive la sua ricevuta nel record della superficie (`test-results/slicekit/<surface>.json` — schema in `SLICEKIT.md` Passo 7bis, mirror [P8]). **Anti-falsificazione + anti-staleness (r004, chatgpt):** la ricevuta è scritta SOLO dal tool che esegue il controllo e porta evidenza (exit code, `inputSha` del golden, `specHash`, `toolVersion`, file+sha); **l'audit invalida una ricevuta il cui hash registrato ≠ input corrente **o la cui `toolVersion` ≠ versione corrente** — golden, spec o logica del tool cambiati rendono la ricevuta stale = mancante. Campi attestati dall'agente sono marcati `declared:` e non bastano — servono a fermare gli skip, non il sabotaggio (modifica manuale del JSON = attacco, boundary dichiarato). **Tripwire in-flight (r003/r004):** `patch_attempts` vive in un **journal append-only** `test-results/slicekit/<surface>.journal.jsonl` scritto dai tool (counter = conteggio entry, non un campo azzerabile — r004, gemini); **il tool che emetterebbe la patch successiva rifiuta a ≥3 senza ricevuta `regenerated`**. Residuo dichiarato (deepseek): ogni path di patch che bypassa i tool emittenti (edit manuale del manifest, copia di asset approvati) non incrementa il counter — il tripwire copre le patch emesse dai tool; il bypass manuale è il boundary già dichiarato. **Audit = transition gate (r003, chatgpt):** `npm run slice:audit -- <surface>` deve essere verde dopo OGNI passo prima del successivo (la skill `mw-slice-run` lo impone a ogni passo — gate sequenziale locale); verifica anche `matrix_coverage` (lista viewport×DPR registrata dalla probe vs minimo del profilo [P9]) — la ricevuta certifica l'invocazione E l'adeguatezza minima. **T-31 dichiarato human-only (r003):** lo stop per ambiguità non è meccanicamente forzabile — resta regola di condotta, il piano non finge enforcement.
+6. **Enforcement:** la skill painter rende il caso D il percorso obbligatorio per le superfici incorniciate; `closure:lint` blocca la chiusura senza spec + manifest + evidenza probe + record di conversione e greppa `WHY-NOT-SPEC` su `plugins/*.py` (`SLICEKIT.md` §3). **Wiring scoped (r002):** `slice:audit` entra in `closure:lint` solo quando la chiusura tocca superfici slice-kit — lo scope è riconosciuto per **path pattern meccanico** (`scripts/hud-real/specs/`, `test-results/slicekit/`, `src/generated/slicekit/`, primitivo `PanelFrameOrnaments`), non dal registro di classificazione umano (che resta parallelo — r003, deepseek: niente evasione per superficie non classificata). Stesso pattern scope-aware dei check pre-commit esistenti.
 7. **Review di batch** dopo N=3: ricalibrazione soglie del validatore dal record (`SLICEKIT.md` §3).
 
 ## 5. Contratto di chiusura (obbligazioni verificabili)
@@ -72,10 +60,12 @@ Cornici golden `mockup-r357-cornici-aperta.png`; scala uniforme degli ornamenti;
 | OB-8 | Primitivo condiviso provato su ≥2 superfici ridimensionabili distinte, incl. una con contenuto a scroll lungo, prima della migrazione ampia | `state` + probe | sì |
 | OB-9 | Witness T-04 Director su slice-kit + superfici convertite | `human-eye` | sì |
 | OB-10 | Stadio slop gate (Passo 1bis) eseguito su ogni golden prima dell'affettatura — controlli meccanici + rubrica VLM advisory, regioni flaggate annotate nel review bundle, esito (pulito / rigenerato / T-04) registrato nel record di conversione | `state` (+ `human-eye` sull'esito T-04) | sì |
-| OB-11 | (R-365) Schema ricevute documentato in `SLICEKIT.md` Passo 7bis + profilo [P8]: tabella passo↔campo↔writer, nessun campo duplicato rispetto al record esistente; `npm run slice:gate -- <spec> --record <record>` scrive `sliceability_1ter` (evidenza su `panel-frame6.json`, ri-run non distruttivo) | `docs` + `state` | sì |
-| OB-12 | (R-365) `npm run slice:audit -- <surface>`: legge il record, stampa ✓/✗ per passo richiesto con motivazione del ✗; exit 1 su record incompleto / 0 su completo; non invocato da altri script (wiring in `closure:lint` = decisione aperta) | `state` | sì |
+| OB-11 | (R-365, r002) Schema ricevute in `SLICEKIT.md` Passo 7bis + profilo [P8]: tabella passo↔campo↔writer + **proprietà anti-falsificazione** — ricevuta = evidenza prodotta dal tool (exit code, sha input, specHash), mai attestazione; campi agente marcati `declared:`; `npm run slice:gate -- <spec> --record <record>` scrive `sliceability_1ter` con exit code + hash input (evidenza su `panel-frame6.json`, ri-run non distruttivo) | `docs` + `state` | sì |
+| OB-12 | (R-365, r003) `npm run slice:audit -- <surface>`: exit 1 su passi mancanti, ricevute `declared:` senza evidenza, `patch_attempts` ≥3 senza `regenerated`, o `matrix_coverage` sotto il minimo di profilo; **transition gate**: la skill impone audit verde dopo ogni passo; **cablato in `closure:lint` scoped** per path pattern | `state` | sì |
+| OB-12b | (r004) **Tripwire in-flight**: i tool di montaggio/cattura appendono a `<surface>.journal.jsonl` e **rifiutano la patch successiva** a ≥3 entry senza ricevuta `regenerated` — evidenza: patch simulata su fixture bloccata meccanicamente | `state` | sì |
+| OB-15 | (r004, chatgpt+deepseek) **Test di accettazione avversariale**: scenario dove un flusso salta deliberatamente 3 passi + ignora la skill → chiusura DEVE risultare bloccata con elenco esatto delle evidenze mancanti; il test usa i **tool reali** (slicer, gate, audit — non stub) e, tra i casi, ricevute stale (golden modificato post-hoc) **e journal-tamper** (entry che falsifica una ricevuta `regenerated`). Se passa verde, l'enforcement non funziona | `state` | sì |
 | OB-13 | (R-365) Skill esecutiva `.devin/skills/mw-slice-run/SKILL.md`: workflow dei Passi 1→7 dove ogni passo dichiara comando + ricevuta attesa + condizione STOP (warning gate → decidere a monte; riferimento ambiguo → 2 opzioni e stop, T-31; 3 patch → rigenerare, T-32; mai metriche aggregate come prova, T-30); referenziata dal profilo | `docs` | sì |
-| OB-14 | (R-365) Test di regressione permanente (R-247): fixture record (1 completo + 1 con passi mancanti) coperto da `npm run test` o script dedicato che fallirebbe senza `slice:audit`; audit sul record reale del pilota allegato al run — mostra quali passi mancavano | `state` + `human-eye` | sì |
+| OB-14 | (R-365, r002) Test di regressione permanente (R-247): fixture record (1 completo + 1 con passi mancanti + 1 con ricevute `declared:` forgiate → audit deve bocciarlo) che fallirebbe senza `slice:audit`; audit sul record reale del pilota allegato al run — mostra quali passi mancavano | `state` + `human-eye` | sì |
 
 ## 6. Provenance
 
