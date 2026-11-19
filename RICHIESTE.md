@@ -591,3 +591,11 @@ Triage 2026-10-12 (R-156): 28 voci chiuse su evidenza kanban/artefatto — `cont
 **Data:** 2026-11-18
 **Stato:** `in corso` — esplorazione conclusa via dibattito multi-AI web (run `20261118-hudreal-slicekit-plan`, converged 4/4 ACCEPT) → PLAN-127 (artefatto dibattito converged, in attesa battesimo).
 **Rilevato (2026-11-18):** i "componenti mockati" sono la famiglia `src/ui/idleVillage/hudReal/*` + pannelli: frame raster unico (`frame.webp`, ~133 asset in `public/assets/ui/hud-real/`) + zone assolute (`*Geometry.ts`) + `aspectRatio` fisso + testo in `cqw` → non ridimensionabili, non reflow, testi sotto il floor. La guida esiste (`context/MOCKUP-TO-PRODUCTION-PIPELINE.md` + `.mw/specs/hud-real/MOCKUP-TO-ASSET-GUIDE.md`, R-356) ma descrive il metodo "arte cotta + zone" — il metodo nuovo provato (R-357: DOM vivo + pezzi dipinti affettati, `build-cassetto3-assets.py`; 9-slice vero `build-panel-frame3-9slice.py`/`panel-frame5` consumato da `PanelFrameOrnaments`) vive solo in PLAN-125 §0bis, non in un doc canonico. Learn FROZEN 2026-11-16: "frame vuoto rigenerato > patching raster" (victory V5).
+
+## R-365 — Pipeline slice-kit esecutiva: ricevute per-passo e workflow obbligato
+
+**Data:** 2026-11-19
+**Stato:** `in corso`
+**Richiesta (verbatim):** «nn voglio continuare su claude code, il putno è trovare una pipeline corretta che c faccia avere un prodotto finale "facilmente"» → «procedi» sulla direzione skill esecutiva + ricevute → «a» (fold nel PLAN-127).
+**Scope:** rendere la pipeline mockup→componente (PLAN-127/128) auto-vincolante: ogni passo scrive la sua ricevuta nel record della superficie e l'esecuzione segue un workflow step-by-step dove un passo senza artefatto non è fatto. Causa radice dalla retrospettiva (`.mw/runs/plan128-review-2026-11-19/ANALISI.md`): il protocollo esisteva e non è stato eseguito — i documenti non impongono, le ricevute sì.
+**Collegamenti:** `plans/PLAN-127-slicekit-pipeline.md` rev.2 (draft PLAN-129 assorbito qui — ordine di lavoro passo 5, OB-11..OB-14), `context/shared/SLICEKIT.md` Passo 1ter, `scripts/hud-real/sliceability-gate.mjs`, traps T-30/31/32, PLAN-128, `.mw/runs/plan128-review-2026-11-19/`.
