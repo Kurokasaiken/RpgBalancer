@@ -33,7 +33,8 @@
       "start": "Avvia",
       "startPending": "In attesa…",
       "cancel": "Annulla",
-      "collect": "Raccogli"
+      "collect": "Raccogli",
+      "collecting": "Raccolta in corso..."
     },
     "status": {
       "idle": "Inattivo",
@@ -73,14 +74,19 @@
       "quest": "Quest",
       "training": "Allenamento",
       "maintenance": "Manutenzione"
-    }
+    },
+    "workerAlt": "Lavoratore",
+    "dropHint": "Rilascia",
+    "defaultHalo": "POI"
   },
   "floatingPanel": {
     "minimize": "Riduci a icona",
     "restore": "Ripristina il pannello",
     "pin": "Fissa il pannello",
     "unpin": "Sblocca il pannello",
-    "close": "Chiudi il pannello"
+    "close": "Chiudi il pannello",
+    "collapse": "Comprimi il pannello",
+    "expand": "Espandi il pannello"
   },
   "interactionMode": {
     "mode": {
@@ -338,6 +344,43 @@
       "danger": {
         "title": "Grado di pericolo di questa attività"
       }
+    },
+    "duration": {
+      "none": "—",
+      "seconds": "{seconds}s",
+      "minutes": "{minutes}m",
+      "milliseconds": "{ms}ms"
+    },
+    "reward": {
+      "summary": "Risorse + XP",
+      "single": "{resourceId}: +{amountFormula}",
+      "daily": "{resourceId}/giorno {amountPerDay}",
+      "separator": " · ",
+      "none": "—"
+    },
+    "openDetail": "clicca per aprire i dettagli",
+    "ariaLabel": "Dettaglio POI: {label}",
+    "rating": {
+      "outOf": "{rating}/5"
+    },
+    "badgeLabels": {
+      "riskLevel": "Livello di rischio",
+      "repeatable": "Ripetibile",
+      "yes": "Sì",
+      "no": "No",
+      "injuryRisk": "Rischio ferite",
+      "deathRisk": "Rischio morte",
+      "dangerRating": "Grado di pericolo"
+    },
+    "telemetry": {
+      "initialized": "Attività inizializzata",
+      "workerAssigned": "{worker} assegnato allo slot {slotNumber}",
+      "progressUpdate": "Avanzamento: {percent}%",
+      "assigned": "{resident} → {slotId}",
+      "detached": "{resident} ← {slotId}",
+      "started": "Attività {label} avviata",
+      "cancelled": "Attività {label} annullata",
+      "collected": "Ricompensa {label} raccolta"
     }
   },
   "poiMarkerLab": {
@@ -426,6 +469,9 @@
       "dialogue": "dialogo",
       "branch": "diramazione",
       "timedChoice": "scelta a tempo"
+    },
+    "amanuense": {
+      "open": "Leggi la pagina intera"
     }
   },
   "questReward": {
@@ -1037,6 +1083,9 @@
     },
     "roster": {
       "title": "Roster",
+      "view": {
+        "ariaLabel": "Cambia vista del roster"
+      },
       "ariaLabel": "Roster dei residenti",
       "ariaLabelNight": "Roster dei residenti, fase notturna: trascinamento disattivato",
       "show": "Mostra roster",
@@ -1126,6 +1175,7 @@
     "stash": {
       "title": "Magazzino del villaggio",
       "capacity": "{count} di {max} beni in deposito",
+      "goodsCount": "{count} di {max} beni",
       "qty": "{qty} in deposito",
       "openHint": "Apri il planner di una quest per preparare gli oggetti nella sacca",
       "notReady": "Magazzino non disponibile — il registro non si è caricato",
@@ -1563,11 +1613,15 @@
     },
     "cassetto": {
       "party": "Slot del gruppo",
+      "supplies": "Provviste",
+      "food": "Cibo",
+      "openRoster": "Apri il roster",
+      "openStash": "Apri lo stash",
       "journey": "Viaggio",
       "riskRewards": "Rischio e ricompense",
       "risk": "Rischio",
       "cost": "Costo",
-      "confirm": "CONFERMA",
+      "confirm": "PARTI IN SPEDIZIONE",
       "collapse": "Comprimi il cassetto della spedizione",
       "expand": "Apri il planner della spedizione",
       "legDays": "{count, plural, one {# giorno} other {# giorni}}",
@@ -1770,12 +1824,12 @@
     "reset": "Reset",
     "chestRecovered": "Cassa recuperata",
     "item": {
-      "potion": "Pozione — cura un ferito",
-      "smoke": "Fumogeno — +15 infiltrazione",
-      "rope": "Corda — +15 arrampicata",
-      "bonusForza": "Bonus Forza — +15 a un check",
-      "bonusPerc": "Bonus Percezione — +15 a un check",
-      "healing": "Cura — +20 HP al più ferito",
+      "potion": "Pozione",
+      "smoke": "Fumogeno",
+      "rope": "Corda",
+      "bonusForza": "Bonus Forza",
+      "bonusPerc": "Bonus Percezione",
+      "healing": "Cura",
       "usePotion": "Pozione → cura {name}"
     },
     "loot": "Bottino: {items}",
@@ -1876,7 +1930,8 @@
         "secureStake": "la strategia mette al sicuro la posta al checkpoint",
         "stakeOnTable": "{value} oro di tesoro già in mano"
       },
-      "toll": "pedaggio certo: −{amount} HP su {name} (−{epic} se va malissimo)"
+      "toll": "pedaggio certo: −{amount} HP su {name} (−{epic} se va malissimo)",
+      "close": "Chiudi la previsione"
     },
     "outcome": {
       "reward": "VITTORIA — reward ottenuta",
@@ -2255,6 +2310,310 @@
         "ruins": "Rovine del ponte vecchio",
         "mill": "Mulino a vento"
       }
+    },
+    "radial": {
+      "emptySlot": "Slot vuoto",
+      "ariaLabel": "Azioni del luogo",
+      "lockedState": "Non disponibile — vedi il planner per lo sblocco"
+    }
+  },
+  "map": {
+    "activitySlots": "Slot attività",
+    "activeActivities": "Attività attive",
+    "error": "Si è verificato un errore nella Sandbox del Villaggio.",
+    "resetting": "Ripristino…",
+    "reset": "Reimposta"
+  },
+  "medalOverlay": {
+    "token": "PG",
+    "ariaLabel": "Medaglia del residente"
+  },
+  "narrative": {
+    "title": "Pannello narrativo della quest",
+    "pause": "Pausa",
+    "play": "Avvia",
+    "refresh": "Aggiorna",
+    "questProgress": "Progresso della quest",
+    "tabs": {
+      "narratives": "Narrazioni",
+      "context": "Contesto",
+      "telemetry": "Telemetria",
+      "config": "Config"
+    },
+    "narratives": {
+      "title": "Narrazioni generate",
+      "count": "{count} narrazioni",
+      "complete": "Completa la quest",
+      "fail": "Fallisci la quest",
+      "noNarratives": "Nessuna narrazione generata",
+      "noNarrativesHint": "Clicca \"Avvia\" per avviare la generazione automatica o usa i pulsanti qui sopra",
+      "details": {
+        "title": "Dettagli della narrazione",
+        "id": "ID: {id}",
+        "hook": "Hook",
+        "template": "Template",
+        "text": "Testo",
+        "variables": "Variabili",
+        "metadata": "Metadati",
+        "telemetry": "Telemetria",
+        "telemetryTracked": "Tracciata",
+        "telemetryNotTracked": "Non tracciata",
+        "generated": "Generata"
+      }
+    },
+    "context": {
+      "questName": "Nome della quest",
+      "questType": "Tipo di quest",
+      "questDifficulty": "Difficoltà della quest",
+      "residentName": "Nome del residente",
+      "residentLevel": "Livello del residente",
+      "location": "Luogo",
+      "weather": "Meteo",
+      "timeOfDay": "Momento del giorno",
+      "progress": "Progresso: {progress}%"
+    },
+    "questTypes": {
+      "exploration": "Esplorazione",
+      "combat": "Combattimento",
+      "diplomacy": "Diplomazia",
+      "crafting": "Artigianato",
+      "social": "Sociale"
+    },
+    "difficulty": {
+      "easy": "Facile",
+      "normal": "Normale",
+      "hard": "Difficile",
+      "nightmare": "Incubo"
+    },
+    "weather": {
+      "clear": "Sereno",
+      "rain": "Pioggia",
+      "snow": "Neve",
+      "storm": "Tempesta",
+      "fog": "Nebbia",
+      "windy": "Ventoso"
+    },
+    "timeOfDay": {
+      "dawn": "Alba",
+      "day": "Giorno",
+      "dusk": "Tramonto",
+      "night": "Notte"
+    },
+    "telemetry": {
+      "events": "Eventi",
+      "metrics": "Metriche",
+      "connected": "Connesso",
+      "disconnected": "Disconnesso",
+      "status": "Stato",
+      "lastActivity": "Ultima attività",
+      "topEvents": "Eventi principali",
+      "topMetrics": "Metriche principali"
+    },
+    "config": {
+      "availableHooks": "Hook disponibili",
+      "configurationStatus": "Stato della configurazione",
+      "hooks": "Hook",
+      "templates": "Template",
+      "telemetryEnabled": "Telemetria attiva",
+      "yes": "Sì",
+      "no": "No",
+      "configVersion": "Versione config"
+    }
+  },
+  "questRisk": {
+    "noRisk": "Nessun rischio",
+    "level": {
+      "low": "BASSO",
+      "med": "MEDIO",
+      "high": "ALTO"
+    },
+    "stripeAriaLabel": {
+      "injury": "Rischio ferite: {percent}%",
+      "death": "Rischio morte: {percent}%"
+    }
+  },
+  "questTelemetry": {
+    "title": "Telemetria delle quest",
+    "clear": "Pulisci",
+    "live": "Live",
+    "loading": "Caricamento della telemetria...",
+    "heatmapTitle": "Heatmap del rischio delle quest",
+    "questTypes": "Tipi di quest",
+    "noQuestTaxonomy": "Nessuna tassonomia di quest configurata. Definisci questTypes in IdleVillageConfig.",
+    "noQuestData": "Ancora nessun dato sulle quest",
+    "recentDecisions": "Decisioni recenti",
+    "noDecisions": "Ancora nessuna decisione",
+    "decisionFallback": "Decisione",
+    "riskAssessment": "Valutazione del rischio della quest",
+    "phaseLabel": "Fase: {phaseId}",
+    "riskSummary": "Ferite: {injury}% | Morte: {death}%",
+    "metrics": {
+      "totalQuests": "Quest totali",
+      "successRate": "Tasso di successo",
+      "avgDuration": "Durata media",
+      "heroicMoments": "Momenti eroici"
+    },
+    "totalBranches": "{count} diramazioni totali",
+    "avgChoiceTime": "{duration} tempo medio di scelta"
+  },
+  "scheduler": {
+    "title": "🏘️ Monitor Scheduler Multi-Villaggio",
+    "subtitle": "Monitoraggio di {villages} villaggi • {kpis} KPI raccolti • {alerts} alert attivi",
+    "lastUpdated": "Ultimo aggiornamento",
+    "tabs": {
+      "overview": "📊 Panoramica",
+      "comparison": "🏆 Confronto",
+      "alerts": "🚨 Alert",
+      "details": "📈 Dettagli"
+    },
+    "overview": {
+      "villageId": "{id}",
+      "queue": "Coda",
+      "queueSize": "{size}/{maxSize}",
+      "successRate": "Tasso di successo",
+      "utilization": "Utilizzo",
+      "throughput": "Throughput",
+      "efficiency": "Efficienza"
+    },
+    "comparison": {
+      "analysisTimeWindow": "Finestra temporale di analisi",
+      "timeRanges": {
+        "15m": "15 minuti",
+        "30m": "30 minuti",
+        "1h": "1 ora",
+        "4h": "4 ore",
+        "24h": "24 ore"
+      },
+      "bestPerformer": "Miglior performance",
+      "worstPerformer": "Peggior performance",
+      "avgEfficiency": "Efficienza media",
+      "variance": "Varianza",
+      "performanceRankings": "Classifica delle performance",
+      "columns": {
+        "village": "Villaggio",
+        "queueEfficiency": "Efficienza coda",
+        "assignmentSuccess": "Successo assegnazioni",
+        "residentUtilization": "Utilizzo residenti",
+        "throughput": "Throughput"
+      },
+      "rankValue": "#{rank} ({score})",
+      "recommendations": "💡 Raccomandazioni"
+    },
+    "alerts": {
+      "noAlerts": "✅ Nessun alert attivo",
+      "noAlertsDescription": "Tutti gli scheduler dei villaggi operano entro i parametri normali.",
+      "contextDetails": "Dettagli del contesto"
+    },
+    "details": {
+      "selectVillage": "Seleziona villaggio",
+      "selectVillagePlaceholder": "Seleziona un villaggio...",
+      "currentMetrics": "Metriche correnti",
+      "queueSize": "Dimensione coda",
+      "queueUtilized": "{utilized} utilizzata",
+      "successRate": "Tasso di successo",
+      "successCount": "{successful}/{total}",
+      "utilization": "Utilizzo",
+      "activeCount": "{active}/{total} attivi",
+      "throughput": "Throughput",
+      "throughputUnit": "assegnazioni/min",
+      "activityDistribution": "Distribuzione attività",
+      "totalActivities": "Attività totali",
+      "activeActivities": "Attività attive",
+      "utilizationLabel": "Utilizzo",
+      "byType": "Per tipo:",
+      "residentFatigueDistribution": "Distribuzione fatica dei residenti",
+      "fatigueLevels": {
+        "low": "Bassa",
+        "medium": "Media",
+        "high": "Alta",
+        "critical": "Critica"
+      },
+      "selectVillagePrompt": "Seleziona un villaggio",
+      "selectVillageHint": "Scegli un villaggio dal menu a tendina per vedere metriche e grafici dettagliati."
+    }
+  },
+  "testRoster": {
+    "validation": {
+      "scenarioRequirementNotMet": "Requisito dello scenario non soddisfatto",
+      "dropOutsideValidArea": "Rilascio fuori dall'area valida"
+    },
+    "lastAttempt": {
+      "none": "Nessuna interazione registrata",
+      "success": "Successo",
+      "successWithResident": "Successo · {resident}",
+      "errorWithDetails": "Errore · {reason}{details}"
+    },
+    "debug": {
+      "drop": "Drop",
+      "dropStates": {
+        "idle": "Inattivo",
+        "valid": "Valido",
+        "invalid": "Non valido",
+        "locked": "Bloccato"
+      },
+      "slots": "Slot",
+      "warnings": "Avvisi",
+      "stamina": "Stamina min",
+      "toggle": "Visualizzazione debug degli slot",
+      "toggleDescription": "Mostra stato di drop e validazione degli slot mentre trascini i residenti.",
+      "on": "Attivo",
+      "off": "Disattivo"
+    },
+    "picker": {
+      "button": "Scegli residente"
+    },
+    "rosterFeedback": {
+      "rack": "Rack A",
+      "assigned": "{rack} · {resident} assegnato",
+      "assignedNoResident": "{rack} · assegnato",
+      "error": "{rack} · {reason}{details}",
+      "invalid": "{rack} · non valido"
+    },
+    "scenarios": {
+      "open": {
+        "title": "Rack A · Scenario permissivo",
+        "subtitle": "Richiede HP ≥ 200",
+        "requirement": "HP ≥ 200",
+        "hpInsufficient": "HP insufficienti ({hp}/200)"
+      },
+      "restricted": {
+        "title": "Rack B · Scenario restrittivo",
+        "subtitle": "Richiede HP ≥ 200",
+        "requirement": "HP ≥ 200",
+        "hpInsufficient": "HP insufficienti ({hp}/200)"
+      }
+    },
+    "controls": {
+      "randomize": "Casuale",
+      "reset": "Reimposta",
+      "dayNightCycle": "Ciclo giorno/notte"
+    },
+    "loading": "Caricamento dei residenti…",
+    "error": {
+      "title": "Errore di caricamento dei residenti",
+      "description": "Impossibile caricare il roster dei residenti dal Character Manager.",
+      "suggestedActions": "Azioni suggerite:",
+      "actions": {
+        "0": "Verifica che il Character Manager contenga dei residenti.",
+        "1": "Ricarica la pagina dopo aver configurato i dati.",
+        "2": "Controlla la console per errori di caricamento."
+      }
+    },
+    "mockRoster": {
+      "title": "Roster fittizio in uso",
+      "description": "Nessun residente salvato trovato: il lab ha generato residenti segnaposto per i test."
+    },
+    "empty": {
+      "title": "Nessun residente disponibile",
+      "description": "Il roster è vuoto: non ci sono residenti da assegnare agli slot di test.",
+      "configureResidents": "Configura i residenti nel Character Manager per eseguire i test di drag & drop."
+    },
+    "poiDetailPage": {
+      "pretitle": "Idle Village · Lab di integrazione",
+      "title": "Dettaglio POI × Roster lavori",
+      "description": "Trascina i residenti dal roster sull'attività del POI, poi apri il dettaglio del medaglione per verificare il flusso di assegnazione completo.",
+      "activityLabel": "Attività",
+      "rosterTitle": "Roster lavori"
     }
   }
 }

@@ -121,5 +121,408 @@
         "shape": "Countdown on the silhouette edge"
       }
     }
+  },
+  "floatingPanel": {
+    "collapse": "طيّ اللوحة",
+    "expand": "توسيع اللوحة"
+  },
+  "map": {
+    "activitySlots": "فتحات الأنشطة",
+    "activeActivities": "الأنشطة النشطة",
+    "error": "حدث خطأ ما في قرية المحاكاة.",
+    "resetting": "جارٍ إعادة الضبط…",
+    "reset": "إعادة ضبط"
+  },
+  "medalOverlay": {
+    "token": "PG",
+    "ariaLabel": "ميدالية الساكن"
+  },
+  "narrative": {
+    "title": "لوحة سرد المهمة",
+    "pause": "إيقاف مؤقت",
+    "play": "تشغيل",
+    "refresh": "تحديث",
+    "questProgress": "تقدم المهمة",
+    "tabs": {
+      "narratives": "السرد",
+      "context": "السياق",
+      "telemetry": "القياس",
+      "config": "الإعدادات"
+    },
+    "narratives": {
+      "title": "السرد المُولَّد",
+      "count": "{count} سرد",
+      "complete": "إكمال المهمة",
+      "fail": "إفشال المهمة",
+      "noNarratives": "لم يتم توليد أي سرد بعد",
+      "noNarrativesHint": "انقر على «تشغيل» لبدء التوليد التلقائي أو استخدم الأزرار أعلاه",
+      "details": {
+        "title": "تفاصيل السرد",
+        "id": "المعرف: {id}",
+        "hook": "الخطاف",
+        "template": "القالب",
+        "text": "النص",
+        "variables": "المتغيرات",
+        "metadata": "البيانات الوصفية",
+        "telemetry": "القياس",
+        "telemetryTracked": "مُتتبَّع",
+        "telemetryNotTracked": "غير مُتتبَّع",
+        "generated": "تم التوليد"
+      }
+    },
+    "context": {
+      "questName": "اسم المهمة",
+      "questType": "نوع المهمة",
+      "questDifficulty": "صعوبة المهمة",
+      "residentName": "اسم الساكن",
+      "residentLevel": "مستوى الساكن",
+      "location": "الموقع",
+      "weather": "الطقس",
+      "timeOfDay": "وقت اليوم",
+      "progress": "التقدم: {progress}%"
+    },
+    "questTypes": {
+      "exploration": "استكشاف",
+      "combat": "قتال",
+      "diplomacy": "دبلوماسية",
+      "crafting": "حِرفة",
+      "social": "اجتماعي"
+    },
+    "difficulty": {
+      "easy": "سهل",
+      "normal": "عادي",
+      "hard": "صعب",
+      "nightmare": "كابوس"
+    },
+    "weather": {
+      "clear": "صافٍ",
+      "rain": "مطر",
+      "snow": "ثلج",
+      "storm": "عاصفة",
+      "fog": "ضباب",
+      "windy": "عاصف"
+    },
+    "timeOfDay": {
+      "dawn": "فجر",
+      "day": "نهار",
+      "dusk": "غسق",
+      "night": "ليل"
+    },
+    "telemetry": {
+      "events": "الأحداث",
+      "metrics": "المقاييس",
+      "connected": "متصل",
+      "disconnected": "غير متصل",
+      "status": "الحالة",
+      "lastActivity": "آخر نشاط",
+      "topEvents": "أبرز الأحداث",
+      "topMetrics": "أبرز المقاييس"
+    },
+    "config": {
+      "availableHooks": "الخطافات المتاحة",
+      "configurationStatus": "حالة الإعدادات",
+      "hooks": "الخطافات",
+      "templates": "القوالب",
+      "telemetryEnabled": "القياس مفعّل",
+      "yes": "نعم",
+      "no": "لا",
+      "configVersion": "إصدار الإعدادات"
+    }
+  },
+  "places": {
+    "radial": {
+      "emptySlot": "فتحة فارغة",
+      "ariaLabel": "إجراءات المكان",
+      "lockedState": "غير متاح — راجع المخطط للفتح"
+    }
+  },
+  "poiDetail": {
+    "duration": {
+      "none": "—",
+      "seconds": "{seconds} ث",
+      "minutes": "{minutes} د",
+      "milliseconds": "{ms} مللي ث"
+    },
+    "reward": {
+      "summary": "موارد + نقاط خبرة",
+      "single": "{resourceId}: +{amountFormula}",
+      "daily": "{resourceId}/يوم {amountPerDay}",
+      "separator": " · ",
+      "none": "—"
+    },
+    "openDetail": "انقر لفتح التفاصيل",
+    "ariaLabel": "تفاصيل نقطة الاهتمام: {label}",
+    "rating": {
+      "outOf": "{rating}/5"
+    },
+    "badgeLabels": {
+      "riskLevel": "مستوى الخطر",
+      "repeatable": "قابل للتكرار",
+      "yes": "نعم",
+      "no": "لا",
+      "injuryRisk": "خطر الإصابة",
+      "deathRisk": "خطر الموت",
+      "dangerRating": "تصنيف الخطورة"
+    },
+    "telemetry": {
+      "initialized": "تمت تهيئة النشاط",
+      "workerAssigned": "تم تعيين {worker} في الفتحة {slotNumber}",
+      "progressUpdate": "تحديث التقدم: {percent}%",
+      "assigned": "{resident} → {slotId}",
+      "detached": "{resident} ← {slotId}",
+      "started": "بدأ النشاط {label}",
+      "cancelled": "أُلغي النشاط {label}",
+      "collected": "تم جمع المكافأة {label}"
+    }
+  },
+  "questChronicle": {
+    "amanuense": {
+      "open": "اقرأ الصفحة كاملة"
+    }
+  },
+  "questRisk": {
+    "noRisk": "لا خطر",
+    "level": {
+      "low": "منخفض",
+      "med": "متوسط",
+      "high": "مرتفع"
+    },
+    "stripeAriaLabel": {
+      "injury": "خطر الإصابة: {percent}%",
+      "death": "خطر الموت: {percent}%"
+    }
+  },
+  "questS1Lab": {
+    "sim": {
+      "close": "إغلاق التوقع"
+    }
+  },
+  "questTelemetry": {
+    "title": "قياس المهام",
+    "clear": "مسح",
+    "live": "مباشر",
+    "loading": "جارٍ تحميل القياس...",
+    "heatmapTitle": "خريطة حرارية لخطر المهام",
+    "questTypes": "أنواع المهام",
+    "noQuestTaxonomy": "لم يتم ضبط تصنيف المهام. عرّف questTypes في IdleVillageConfig.",
+    "noQuestData": "لا توجد بيانات مهام بعد",
+    "recentDecisions": "القرارات الأخيرة",
+    "noDecisions": "لا توجد قرارات بعد",
+    "decisionFallback": "قرار",
+    "riskAssessment": "تقييم خطر المهمة",
+    "phaseLabel": "المرحلة: {phaseId}",
+    "riskSummary": "إصابة: {injury}% | موت: {death}%",
+    "metrics": {
+      "totalQuests": "إجمالي المهام",
+      "successRate": "معدل النجاح",
+      "avgDuration": "متوسط المدة",
+      "heroicMoments": "لحظات بطولية"
+    },
+    "totalBranches": "{count} فروع إجمالية",
+    "avgChoiceTime": "{duration} متوسط وقت الاختيار"
+  },
+  "scheduler": {
+    "title": "🏘️ مراقب مجدول القرى المتعددة",
+    "subtitle": "مراقبة {villages} قرى • {kpis} مؤشرات أداء • {alerts} تنبيهات نشطة",
+    "lastUpdated": "آخر تحديث",
+    "tabs": {
+      "overview": "📊 نظرة عامة",
+      "comparison": "🏆 مقارنة",
+      "alerts": "🚨 التنبيهات",
+      "details": "📈 التفاصيل"
+    },
+    "overview": {
+      "villageId": "{id}",
+      "queue": "قائمة الانتظار",
+      "queueSize": "{size}/{maxSize}",
+      "successRate": "معدل النجاح",
+      "utilization": "الاستغلال",
+      "throughput": "معدل الإنجاز",
+      "efficiency": "الكفاءة"
+    },
+    "comparison": {
+      "analysisTimeWindow": "النافذة الزمنية للتحليل",
+      "timeRanges": {
+        "15m": "15 دقيقة",
+        "30m": "30 دقيقة",
+        "1h": "ساعة واحدة",
+        "4h": "4 ساعات",
+        "24h": "24 ساعة"
+      },
+      "bestPerformer": "الأفضل أداءً",
+      "worstPerformer": "الأضعف أداءً",
+      "avgEfficiency": "متوسط الكفاءة",
+      "variance": "التباين",
+      "performanceRankings": "ترتيب الأداء",
+      "columns": {
+        "village": "القرية",
+        "queueEfficiency": "كفاءة قائمة الانتظار",
+        "assignmentSuccess": "نجاح التعيين",
+        "residentUtilization": "استغلال السكان",
+        "throughput": "معدل الإنجاز"
+      },
+      "rankValue": "#{rank} ({score})",
+      "recommendations": "💡 توصيات"
+    },
+    "alerts": {
+      "noAlerts": "✅ لا توجد تنبيهات نشطة",
+      "noAlertsDescription": "جميع مجدولات القرى تعمل ضمن المعايير الطبيعية.",
+      "contextDetails": "تفاصيل السياق"
+    },
+    "details": {
+      "selectVillage": "اختر القرية",
+      "selectVillagePlaceholder": "اختر قرية...",
+      "currentMetrics": "المقاييس الحالية",
+      "queueSize": "حجم قائمة الانتظار",
+      "queueUtilized": "{utilized} مستغلة",
+      "successRate": "معدل النجاح",
+      "successCount": "{successful}/{total}",
+      "utilization": "الاستغلال",
+      "activeCount": "{active}/{total} نشط",
+      "throughput": "معدل الإنجاز",
+      "throughputUnit": "تعيينات/دقيقة",
+      "activityDistribution": "توزيع الأنشطة",
+      "totalActivities": "إجمالي الأنشطة",
+      "activeActivities": "الأنشطة النشطة",
+      "utilizationLabel": "الاستغلال",
+      "byType": "حسب النوع:",
+      "residentFatigueDistribution": "توزيع إرهاق السكان",
+      "fatigueLevels": {
+        "low": "منخفض",
+        "medium": "متوسط",
+        "high": "مرتفع",
+        "critical": "حرج"
+      },
+      "selectVillagePrompt": "اختر قرية",
+      "selectVillageHint": "اختر قرية من القائمة المنسدلة أعلاه لعرض المقاييس والرسوم البيانية التفصيلية."
+    }
+  },
+  "testRoster": {
+    "validation": {
+      "scenarioRequirementNotMet": "لم يتم استيفاء متطلبات السيناريو",
+      "dropOutsideValidArea": "إفلات خارج المنطقة الصالحة"
+    },
+    "lastAttempt": {
+      "none": "لا توجد تفاعلات مسجلة",
+      "success": "نجاح",
+      "successWithResident": "نجاح · {resident}",
+      "errorWithDetails": "خطأ · {reason}{details}"
+    },
+    "debug": {
+      "drop": "إفلات",
+      "dropStates": {
+        "idle": "خامل",
+        "valid": "صالح",
+        "invalid": "غير صالح",
+        "locked": "مقفل"
+      },
+      "slots": "الفتحات",
+      "warnings": "تحذيرات",
+      "stamina": "أدنى تحمل",
+      "toggle": "عرض تصحيح الفتحات",
+      "toggleDescription": "يعرض حالة الإفلات والتحقق للفتحات أثناء سحب السكان.",
+      "on": "مفعّل",
+      "off": "معطّل"
+    },
+    "picker": {
+      "button": "اختر ساكنًا"
+    },
+    "rosterFeedback": {
+      "rack": "الرف أ",
+      "assigned": "{rack} · تم تعيين {resident}",
+      "assignedNoResident": "{rack} · تم التعيين",
+      "error": "{rack} · {reason}{details}",
+      "invalid": "{rack} · غير صالح"
+    },
+    "scenarios": {
+      "open": {
+        "title": "الرف أ · سيناريو متساهل",
+        "subtitle": "يتطلب صحة ≥ 200",
+        "requirement": "صحة ≥ 200",
+        "hpInsufficient": "الصحة غير كافية ({hp}/200)"
+      },
+      "restricted": {
+        "title": "الرف ب · سيناريو مقيّد",
+        "subtitle": "يتطلب صحة ≥ 200",
+        "requirement": "صحة ≥ 200",
+        "hpInsufficient": "الصحة غير كافية ({hp}/200)"
+      }
+    },
+    "controls": {
+      "randomize": "عشوائي",
+      "reset": "إعادة ضبط",
+      "dayNightCycle": "دورة النهار/الليل"
+    },
+    "loading": "جارٍ تحميل السكان…",
+    "error": {
+      "title": "خطأ في تحميل السكان",
+      "description": "تعذر تحميل قائمة السكان من مدير الشخصيات.",
+      "suggestedActions": "إجراءات مقترحة:",
+      "actions": {
+        "0": "تحقق من أن مدير الشخصيات يحتوي على سكان.",
+        "1": "أعد تحميل الصفحة بعد ضبط البيانات.",
+        "2": "افحص وحدة التحكم بحثًا عن أخطاء التحميل."
+      }
+    },
+    "mockRoster": {
+      "title": "قائمة سكان وهمية مستخدمة",
+      "description": "لم يتم العثور على سكان محفوظين، لذا أنشأ المختبر سكانًا مؤقتين للاختبار."
+    },
+    "empty": {
+      "title": "لا يوجد سكان متاحون",
+      "description": "القائمة فارغة: لا يوجد سكان لتعيينهم في فتحات الاختبار.",
+      "configureResidents": "اضبط السكان في مدير الشخصيات لتشغيل اختبارات السحب والإفلات."
+    },
+    "poiDetailPage": {
+      "pretitle": "Idle Village · مختبر التكامل",
+      "title": "تفاصيل نقطة الاهتمام × قائمة الأعمال",
+      "description": "اسحب السكان من القائمة إلى نشاط نقطة الاهتمام، ثم افتح تفاصيل الميدالية للتحقق من تدفق التعيين الكامل.",
+      "activityLabel": "النشاط",
+      "rosterTitle": "قائمة الأعمال"
+    }
+  },
+  "workerTooltip": {
+    "labels": {
+      "hp": "نقاط الصحة",
+      "fatigue": "الإرهاق",
+      "performance": "الأداء",
+      "specialties": "التخصصات",
+      "bio": "السيرة",
+      "recommendations": "التوصيات",
+      "risk": "مستوى الخطر"
+    },
+    "statuses": {
+      "working": "في مهمة",
+      "resting": "يرتاح",
+      "injured": "مصاب",
+      "recovering": "يتعافى",
+      "available": "متاح",
+      "away": "غائب",
+      "exhausted": "منهك",
+      "dead": "ساقط"
+    },
+    "riskLevels": {
+      "low": "خطر منخفض",
+      "medium": "خطر متوسط",
+      "high": "خطر مرتفع",
+      "critical": "خطر حرج"
+    },
+    "recommendations": {
+      "lowHp": "يحتاج إلى راحة — صحة حرجة",
+      "highFatigue": "إرهاق مرتفع — يُنصح بالراحة",
+      "injured": "يتعافى من إصابة",
+      "critical": "راحة فورية مطلوبة"
+    },
+    "accessibility": {
+      "tooltipDetails": "{name} - تفاصيل العامل",
+      "riskBadge": "حالة {level}",
+      "closeTooltip": "إغلاق تلميح {name}"
+    },
+    "actions": {
+      "close": "إغلاق التلميح"
+    },
+    "sections": {
+      "quote": "اقتباس"
+    }
   }
 }

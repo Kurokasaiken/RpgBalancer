@@ -121,5 +121,408 @@
         "shape": "Countdown on the silhouette edge"
       }
     }
+  },
+  "floatingPanel": {
+    "collapse": "Panel einklappen",
+    "expand": "Panel ausklappen"
+  },
+  "map": {
+    "activitySlots": "Aktivitäts-Slots",
+    "activeActivities": "Aktive Aktivitäten",
+    "error": "In der Dorf-Sandbox ist ein Fehler aufgetreten.",
+    "resetting": "Wird zurückgesetzt…",
+    "reset": "Zurücksetzen"
+  },
+  "medalOverlay": {
+    "token": "PG",
+    "ariaLabel": "Bewohner-Medaille"
+  },
+  "narrative": {
+    "title": "Quest-Narrativ-Panel",
+    "pause": "Pause",
+    "play": "Abspielen",
+    "refresh": "Aktualisieren",
+    "questProgress": "Quest-Fortschritt",
+    "tabs": {
+      "narratives": "Narrative",
+      "context": "Kontext",
+      "telemetry": "Telemetrie",
+      "config": "Konfig"
+    },
+    "narratives": {
+      "title": "Generierte Narrative",
+      "count": "{count} Narrative",
+      "complete": "Quest abschließen",
+      "fail": "Quest scheitern lassen",
+      "noNarratives": "Noch keine Narrative generiert",
+      "noNarrativesHint": "Klicke auf „Abspielen“, um die automatische Generierung zu starten, oder nutze die Schaltflächen oben",
+      "details": {
+        "title": "Narrativ-Details",
+        "id": "ID: {id}",
+        "hook": "Hook",
+        "template": "Vorlage",
+        "text": "Text",
+        "variables": "Variablen",
+        "metadata": "Metadaten",
+        "telemetry": "Telemetrie",
+        "telemetryTracked": "Erfasst",
+        "telemetryNotTracked": "Nicht erfasst",
+        "generated": "Generiert"
+      }
+    },
+    "context": {
+      "questName": "Quest-Name",
+      "questType": "Quest-Typ",
+      "questDifficulty": "Quest-Schwierigkeit",
+      "residentName": "Name des Bewohners",
+      "residentLevel": "Stufe des Bewohners",
+      "location": "Ort",
+      "weather": "Wetter",
+      "timeOfDay": "Tageszeit",
+      "progress": "Fortschritt: {progress}%"
+    },
+    "questTypes": {
+      "exploration": "Erkundung",
+      "combat": "Kampf",
+      "diplomacy": "Diplomatie",
+      "crafting": "Handwerk",
+      "social": "Sozial"
+    },
+    "difficulty": {
+      "easy": "Leicht",
+      "normal": "Normal",
+      "hard": "Schwer",
+      "nightmare": "Albtraum"
+    },
+    "weather": {
+      "clear": "Klar",
+      "rain": "Regen",
+      "snow": "Schnee",
+      "storm": "Sturm",
+      "fog": "Nebel",
+      "windy": "Windig"
+    },
+    "timeOfDay": {
+      "dawn": "Morgendämmerung",
+      "day": "Tag",
+      "dusk": "Abenddämmerung",
+      "night": "Nacht"
+    },
+    "telemetry": {
+      "events": "Ereignisse",
+      "metrics": "Metriken",
+      "connected": "Verbunden",
+      "disconnected": "Getrennt",
+      "status": "Status",
+      "lastActivity": "Letzte Aktivität",
+      "topEvents": "Top-Ereignisse",
+      "topMetrics": "Top-Metriken"
+    },
+    "config": {
+      "availableHooks": "Verfügbare Hooks",
+      "configurationStatus": "Konfigurationsstatus",
+      "hooks": "Hooks",
+      "templates": "Vorlagen",
+      "telemetryEnabled": "Telemetrie aktiviert",
+      "yes": "Ja",
+      "no": "Nein",
+      "configVersion": "Konfig-Version"
+    }
+  },
+  "places": {
+    "radial": {
+      "emptySlot": "Leerer Slot",
+      "ariaLabel": "Ortsaktionen",
+      "lockedState": "Nicht verfügbar — Freischaltung im Planer ansehen"
+    }
+  },
+  "poiDetail": {
+    "duration": {
+      "none": "—",
+      "seconds": "{seconds} s",
+      "minutes": "{minutes} Min.",
+      "milliseconds": "{ms} ms"
+    },
+    "reward": {
+      "summary": "Ressourcen + XP",
+      "single": "{resourceId}: +{amountFormula}",
+      "daily": "{resourceId}/Tag {amountPerDay}",
+      "separator": " · ",
+      "none": "—"
+    },
+    "openDetail": "klicken, um Details zu öffnen",
+    "ariaLabel": "POI-Detail: {label}",
+    "rating": {
+      "outOf": "{rating}/5"
+    },
+    "badgeLabels": {
+      "riskLevel": "Risikostufe",
+      "repeatable": "Wiederholbar",
+      "yes": "Ja",
+      "no": "Nein",
+      "injuryRisk": "Verletzungsrisiko",
+      "deathRisk": "Todesrisiko",
+      "dangerRating": "Gefahrenstufe"
+    },
+    "telemetry": {
+      "initialized": "Aktivität initialisiert",
+      "workerAssigned": "{worker} Slot {slotNumber} zugewiesen",
+      "progressUpdate": "Fortschritt: {percent}%",
+      "assigned": "{resident} → {slotId}",
+      "detached": "{resident} ← {slotId}",
+      "started": "Aktivität {label} gestartet",
+      "cancelled": "Aktivität {label} abgebrochen",
+      "collected": "Belohnung {label} eingesammelt"
+    }
+  },
+  "questChronicle": {
+    "amanuense": {
+      "open": "Ganze Seite lesen"
+    }
+  },
+  "questRisk": {
+    "noRisk": "Kein Risiko",
+    "level": {
+      "low": "NIEDRIG",
+      "med": "MITTEL",
+      "high": "HOCH"
+    },
+    "stripeAriaLabel": {
+      "injury": "Verletzungsrisiko: {percent}%",
+      "death": "Todesrisiko: {percent}%"
+    }
+  },
+  "questS1Lab": {
+    "sim": {
+      "close": "Prognose schließen"
+    }
+  },
+  "questTelemetry": {
+    "title": "Quest-Telemetrie",
+    "clear": "Leeren",
+    "live": "Live",
+    "loading": "Telemetrie wird geladen...",
+    "heatmapTitle": "Quest-Risiko-Heatmap",
+    "questTypes": "Quest-Typen",
+    "noQuestTaxonomy": "Keine Quest-Taxonomie konfiguriert. Definiere questTypes in IdleVillageConfig.",
+    "noQuestData": "Noch keine Quest-Daten",
+    "recentDecisions": "Letzte Entscheidungen",
+    "noDecisions": "Noch keine Entscheidungen",
+    "decisionFallback": "Entscheidung",
+    "riskAssessment": "Quest-Risikobewertung",
+    "phaseLabel": "Phase: {phaseId}",
+    "riskSummary": "Verletzung: {injury}% | Tod: {death}%",
+    "metrics": {
+      "totalQuests": "Quests gesamt",
+      "successRate": "Erfolgsquote",
+      "avgDuration": "Ø Dauer",
+      "heroicMoments": "Heldische Momente"
+    },
+    "totalBranches": "{count} Verzweigungen gesamt",
+    "avgChoiceTime": "{duration} Ø Entscheidungszeit"
+  },
+  "scheduler": {
+    "title": "🏘️ Multi-Dorf-Scheduler-Monitor",
+    "subtitle": "Überwache {villages} Dörfer • {kpis} KPIs erfasst • {alerts} aktive Alarme",
+    "lastUpdated": "Zuletzt aktualisiert",
+    "tabs": {
+      "overview": "📊 Übersicht",
+      "comparison": "🏆 Vergleich",
+      "alerts": "🚨 Alarme",
+      "details": "📈 Details"
+    },
+    "overview": {
+      "villageId": "{id}",
+      "queue": "Warteschlange",
+      "queueSize": "{size}/{maxSize}",
+      "successRate": "Erfolgsquote",
+      "utilization": "Auslastung",
+      "throughput": "Durchsatz",
+      "efficiency": "Effizienz"
+    },
+    "comparison": {
+      "analysisTimeWindow": "Analyse-Zeitfenster",
+      "timeRanges": {
+        "15m": "15 Minuten",
+        "30m": "30 Minuten",
+        "1h": "1 Stunde",
+        "4h": "4 Stunden",
+        "24h": "24 Stunden"
+      },
+      "bestPerformer": "Beste Leistung",
+      "worstPerformer": "Schwächste Leistung",
+      "avgEfficiency": "Ø Effizienz",
+      "variance": "Varianz",
+      "performanceRankings": "Leistungsranking",
+      "columns": {
+        "village": "Dorf",
+        "queueEfficiency": "Warteschlangen-Effizienz",
+        "assignmentSuccess": "Zuweisungserfolg",
+        "residentUtilization": "Bewohner-Auslastung",
+        "throughput": "Durchsatz"
+      },
+      "rankValue": "#{rank} ({score})",
+      "recommendations": "💡 Empfehlungen"
+    },
+    "alerts": {
+      "noAlerts": "✅ Keine aktiven Alarme",
+      "noAlertsDescription": "Alle Dorf-Scheduler arbeiten innerhalb normaler Parameter.",
+      "contextDetails": "Kontextdetails"
+    },
+    "details": {
+      "selectVillage": "Dorf auswählen",
+      "selectVillagePlaceholder": "Wähle ein Dorf...",
+      "currentMetrics": "Aktuelle Metriken",
+      "queueSize": "Warteschlangengröße",
+      "queueUtilized": "{utilized} ausgelastet",
+      "successRate": "Erfolgsquote",
+      "successCount": "{successful}/{total}",
+      "utilization": "Auslastung",
+      "activeCount": "{active}/{total} aktiv",
+      "throughput": "Durchsatz",
+      "throughputUnit": "Zuweisungen/Min.",
+      "activityDistribution": "Aktivitätsverteilung",
+      "totalActivities": "Aktivitäten gesamt",
+      "activeActivities": "Aktive Aktivitäten",
+      "utilizationLabel": "Auslastung",
+      "byType": "Nach Typ:",
+      "residentFatigueDistribution": "Ermüdungsverteilung der Bewohner",
+      "fatigueLevels": {
+        "low": "Niedrig",
+        "medium": "Mittel",
+        "high": "Hoch",
+        "critical": "Kritisch"
+      },
+      "selectVillagePrompt": "Wähle ein Dorf",
+      "selectVillageHint": "Wähle oben im Dropdown ein Dorf, um detaillierte Metriken und Diagramme zu sehen."
+    }
+  },
+  "testRoster": {
+    "validation": {
+      "scenarioRequirementNotMet": "Szenario-Anforderung nicht erfüllt",
+      "dropOutsideValidArea": "Ablegen außerhalb des gültigen Bereichs"
+    },
+    "lastAttempt": {
+      "none": "Keine Interaktion aufgezeichnet",
+      "success": "Erfolg",
+      "successWithResident": "Erfolg · {resident}",
+      "errorWithDetails": "Fehler · {reason}{details}"
+    },
+    "debug": {
+      "drop": "Drop",
+      "dropStates": {
+        "idle": "Inaktiv",
+        "valid": "Gültig",
+        "invalid": "Ungültig",
+        "locked": "Gesperrt"
+      },
+      "slots": "Slots",
+      "warnings": "Warnungen",
+      "stamina": "Min. Ausdauer",
+      "toggle": "Slot-Debug-Anzeige",
+      "toggleDescription": "Blendet Drop-Status und Validierung der Slots beim Ziehen von Bewohnern ein.",
+      "on": "An",
+      "off": "Aus"
+    },
+    "picker": {
+      "button": "Bewohner wählen"
+    },
+    "rosterFeedback": {
+      "rack": "Rack A",
+      "assigned": "{rack} · {resident} zugewiesen",
+      "assignedNoResident": "{rack} · zugewiesen",
+      "error": "{rack} · {reason}{details}",
+      "invalid": "{rack} · ungültig"
+    },
+    "scenarios": {
+      "open": {
+        "title": "Rack A · Permissives Szenario",
+        "subtitle": "Erfordert HP ≥ 200",
+        "requirement": "HP ≥ 200",
+        "hpInsufficient": "HP unzureichend ({hp}/200)"
+      },
+      "restricted": {
+        "title": "Rack B · Restriktives Szenario",
+        "subtitle": "Erfordert HP ≥ 200",
+        "requirement": "HP ≥ 200",
+        "hpInsufficient": "HP unzureichend ({hp}/200)"
+      }
+    },
+    "controls": {
+      "randomize": "Zufällig",
+      "reset": "Zurücksetzen",
+      "dayNightCycle": "Tag/Nacht-Zyklus"
+    },
+    "loading": "Bewohner werden geladen…",
+    "error": {
+      "title": "Fehler beim Laden der Bewohner",
+      "description": "Der Bewohner-Roster konnte nicht aus dem Charakter-Manager geladen werden.",
+      "suggestedActions": "Vorgeschlagene Maßnahmen:",
+      "actions": {
+        "0": "Prüfe, ob der Charakter-Manager Bewohner enthält.",
+        "1": "Lade die Seite nach dem Konfigurieren der Daten neu.",
+        "2": "Prüfe die Konsole auf Ladefehler."
+      }
+    },
+    "mockRoster": {
+      "title": "Platzhalter-Roster aktiv",
+      "description": "Keine gespeicherten Bewohner gefunden — das Lab hat Platzhalter-Bewohner für Tests erzeugt."
+    },
+    "empty": {
+      "title": "Keine Bewohner verfügbar",
+      "description": "Der Roster ist leer: Es gibt keine Bewohner für die Test-Slots.",
+      "configureResidents": "Konfiguriere Bewohner im Charakter-Manager, um Drag-&-Drop-Tests auszuführen."
+    },
+    "poiDetailPage": {
+      "pretitle": "Idle Village · Integrations-Lab",
+      "title": "POI-Detail × Job-Roster",
+      "description": "Ziehe Bewohner aus dem Roster auf die POI-Aktivität und öffne dann das Medaillen-Detail, um den vollständigen Zuweisungsfluss zu prüfen.",
+      "activityLabel": "Aktivität",
+      "rosterTitle": "Job-Roster"
+    }
+  },
+  "workerTooltip": {
+    "labels": {
+      "hp": "HP",
+      "fatigue": "Ermüdung",
+      "performance": "Leistung",
+      "specialties": "Spezialitäten",
+      "bio": "Bio",
+      "recommendations": "Empfehlungen",
+      "risk": "Risikostufe"
+    },
+    "statuses": {
+      "working": "Im Einsatz",
+      "resting": "Ruht",
+      "injured": "Verletzt",
+      "recovering": "In Genesung",
+      "available": "Verfügbar",
+      "away": "Abwesend",
+      "exhausted": "Erschöpft",
+      "dead": "Gefallen"
+    },
+    "riskLevels": {
+      "low": "Niedriges Risiko",
+      "medium": "Mittleres Risiko",
+      "high": "Hohes Risiko",
+      "critical": "Kritisches Risiko"
+    },
+    "recommendations": {
+      "lowHp": "Ruhe nötig — kritische HP",
+      "highFatigue": "Hohe Ermüdung — Ruhe erwägen",
+      "injured": "Erholt sich von einer Verletzung",
+      "critical": "Sofortige Ruhe erforderlich"
+    },
+    "accessibility": {
+      "tooltipDetails": "{name} - Arbeiterdetails",
+      "riskBadge": "Status {level}",
+      "closeTooltip": "Tooltip für {name} schließen"
+    },
+    "actions": {
+      "close": "Tooltip schließen"
+    },
+    "sections": {
+      "quote": "Zitat"
+    }
   }
 }
