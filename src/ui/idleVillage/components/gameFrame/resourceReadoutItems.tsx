@@ -16,21 +16,21 @@ export function buildResourceReadoutItems(outlook: ResourceOutlook, t: TFunction
     const label = t(iconLabelKey);
     const { value, incoming } = outlook[id];
     const description =
-      t('gameFrame.resources.tooltip.amount', { label, value }) +
-      (incoming > 0 ? ` ${t('gameFrame.resources.tooltip.incoming', { count: incoming })}` : '');
+      t('idleVillage:gameFrame.resources.tooltip.amount', { label, value }) +
+      (incoming > 0 ? ` ${t('idleVillage:gameFrame.resources.tooltip.incoming', { count: incoming })}` : '');
     return {
       id,
       icon: <HudGlyph iconId={id} label={label} style={FILL} />,
       label,
       value,
-      detail: incoming > 0 ? t('gameFrame.resources.incoming', { count: incoming }) : undefined,
+      detail: incoming > 0 ? t('idleVillage:gameFrame.resources.incoming', { count: incoming }) : undefined,
       tone: incoming > 0 ? 'good' : undefined,
       description,
     };
   };
 
   const food = outlook.food;
-  const foodLabel = t('gameFrame.resources.food');
+  const foodLabel = t('idleVillage:gameFrame.resources.food');
   const lasts = Number.isFinite(food.daysLeft);
   const foodItem: ResourceReadoutItem = {
     id: 'food',
@@ -39,13 +39,13 @@ export function buildResourceReadoutItems(outlook: ResourceOutlook, t: TFunction
     value: food.value,
     max: food.max,
     detail: [
-      t('gameFrame.resources.perDay', { count: food.perDay }),
-      lasts ? t('gameFrame.resources.autonomy', { count: food.daysLeft }) : null,
+      t('idleVillage:gameFrame.resources.perDay', { count: food.perDay }),
+      lasts ? t('idleVillage:gameFrame.resources.autonomy', { count: food.daysLeft }) : null,
     ]
       .filter(Boolean)
       .join(' · '),
     tone: food.danger ? 'danger' : undefined,
-    description: t('gameFrame.resources.tooltip.food', {
+    description: t('idleVillage:gameFrame.resources.tooltip.food', {
       label: foodLabel,
       value: food.value,
       max: food.max,

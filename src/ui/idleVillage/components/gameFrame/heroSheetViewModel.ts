@@ -104,8 +104,8 @@ export function heroSheetViewModel(
   const snapshot = (resident.statSnapshot ?? {}) as Record<string, unknown>;
 
   const statusLabel = resident.isInjured
-    ? t('pgDetailCard.status.injured')
-    : t(`pgDetailCard.status.${resident.status}` as never, resident.status);
+    ? t('idleVillage:pgDetailCard.status.injured')
+    : t(`idleVillage:pgDetailCard.status.${resident.status}` as never, resident.status);
   const status: HeroSheetStatus = resident.isInjured ? 'injured' : resident.status === 'dead' ? 'dead' : 'alive';
 
   // Only stats with a descriptor reach the player — same rule as PgDetailCard.
@@ -122,7 +122,7 @@ export function heroSheetViewModel(
   }
   const stats: HeroSheetStatCategory[] = STAT_CATEGORY_ORDER.map((category) => ({
     category,
-    label: t(`pgDetailCard.statistics.category.${category}`),
+    label: t(`idleVillage:pgDetailCard.statistics.category.${category}`),
     entries: groups[category],
   })).filter((group) => group.entries.length > 0);
 
@@ -147,12 +147,12 @@ export function heroSheetViewModel(
     return undefined;
   };
   const equipmentSlots: HeroSheetEquipmentSlot[] = [
-    { id: 'weapon', label: t('pgDetailCard.equipment.weapon'), value: equipGetter('weapon', 'equippedWeapon', 'primaryWeapon', 'weaponName') },
-    { id: 'offhand', label: t('pgDetailCard.equipment.offhand'), value: equipGetter('offhand', 'shield', 'secondaryWeapon') },
-    { id: 'armor', label: t('pgDetailCard.equipment.armor'), value: equipGetter('armor', 'equippedArmor', 'plate') },
-    { id: 'trinket', label: t('pgDetailCard.equipment.trinket'), value: equipGetter('trinket', 'amulet', 'relic') },
-    { id: 'ring', label: t('pgDetailCard.equipment.ring'), value: equipGetter('ring', 'ringSlot', 'sigil') },
-    { id: 'mount', label: t('pgDetailCard.equipment.mount'), value: equipGetter('companion', 'pet', 'mount') },
+    { id: 'weapon', label: t('idleVillage:pgDetailCard.equipment.weapon'), value: equipGetter('weapon', 'equippedWeapon', 'primaryWeapon', 'weaponName') },
+    { id: 'offhand', label: t('idleVillage:pgDetailCard.equipment.offhand'), value: equipGetter('offhand', 'shield', 'secondaryWeapon') },
+    { id: 'armor', label: t('idleVillage:pgDetailCard.equipment.armor'), value: equipGetter('armor', 'equippedArmor', 'plate') },
+    { id: 'trinket', label: t('idleVillage:pgDetailCard.equipment.trinket'), value: equipGetter('trinket', 'amulet', 'relic') },
+    { id: 'ring', label: t('idleVillage:pgDetailCard.equipment.ring'), value: equipGetter('ring', 'ringSlot', 'sigil') },
+    { id: 'mount', label: t('idleVillage:pgDetailCard.equipment.mount'), value: equipGetter('companion', 'pet', 'mount') },
   ];
 
   const inventoryRaw = snapshot.inventory;
@@ -184,14 +184,14 @@ export function heroSheetViewModel(
     vitals: [
       {
         key: 'hp',
-        label: t('pgDetailCard.vitals.hp'),
+        label: t('idleVillage:pgDetailCard.vitals.hp'),
         value: resident.currentHp,
         max: resident.maxHp,
         ratio: clampRatio(resident.currentHp, resident.maxHp),
       },
       {
         key: 'stamina',
-        label: t('pgDetailCard.vitals.stamina'),
+        label: t('idleVillage:pgDetailCard.vitals.stamina'),
         value: staminaValue,
         max: 100,
         ratio: clampRatio(staminaValue, 100),
