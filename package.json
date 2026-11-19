@@ -199,7 +199,8 @@
     "dev:lan": "vite --mode development --host",
     "catalog:validate": "tsx scripts/catalog/catalogValidate.mts",
     "catalog:document": "tsx scripts/catalog/documentComponent.mts",
-    "catalog:critique": "tsx scripts/catalog/critiqueComponent.mts"
+    "catalog:critique": "tsx scripts/catalog/critiqueComponent.mts",
+    "slice:gate": "node scripts/hud-real/sliceability-gate.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

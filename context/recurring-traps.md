@@ -1,7 +1,7 @@
 ---
 title: Recurring Traps
 type: preflight-checklist
-updated: 2026-10-21
+updated: 2026-11-19
 ---
 
 # Recurring Traps — regole preventive lette in pre-flight
@@ -33,6 +33,9 @@ Un caso singolo resta un pattern-candidate: non viene promosso.
 | misura di latenza/percezione, verde E2E con sintomo ancora presente, preview vs dev server | T-22 |
 | prompt per generatori immagini esterni (Gemini/SD), batch su web-UI, style-reference attach, scorecard scene | T-16, T-25, T-26, T-27, T-28 |
 | `build:deploy`, deploy Vercel, `deploy-manifest.json`, asset in `public/` referenziati da codice | T-29 |
+| ricolor/confronto colore su arte dipinta (gemme, ori, smalti), ΔE o mediana come prova «uguale al golden» | T-30 |
+| richieste Director con riferimenti ambigui ("la barra", "sotto il frame", "l'originale"), screenshot allegati a commento | T-31 |
+| montaggio in gioco di arte tagliata (cornici, giunzioni, angoli), correzioni iterative su composizione di pezzi | T-32 |
 
 ---
 
@@ -704,3 +707,71 @@ asset in `public/` (incluse texture HUD referenziate da skin config).
      è l'unico gate che becca il drift prima del round-trip Vercel (~5min).
   3. Deploy Vercel in Error senza causa apparente → prima cosa controlla
      `build:deploy` locale: il manifest drift è il colpevole abituale.
+
+## T-30 — Mediana/ΔE medio come prova visiva: l'aggregato assolve, le faccette no
+
+**Surface:** ricolor e confronto colore su arte dipinta (gemme, ori, smalti);
+claim «uguale al golden/riferimento» basati su ΔE o mediana di una maschera.
+
+- **Cosa succede:** la selezione dei pixel esclude proprio le parti che
+  contano (faccette chiare, riflessi, livelli di luminosità estremi) →
+  mediana «perfetta» e pezzo visibilmente sbagliato. Tre ricadute nella
+  stessa sessione (R-361, 2026-11-19): gemme «ΔE 0,5» ma azzurrine; mediana
+  che «nasconde le facce» (ΔE reale sulle faccette 5–13); oro anelli «ΔE
+  1,58 buono» ma tinta arancio (hue 64–75° vs 75–84° della Nav).
+- **Istanze:** sessione Claude Code `c33feee9` 2026-11-19 (jsonl 3228, 3441,
+  5034) · analisi `.mw/runs/plan128-review-2026-11-19/ANALISI.md` §3.
+- **Regola:** mai dichiarare un materiale conforme su un solo aggregato.
+  Obbligatori: (1) dichiarare cosa la selezione include/esclude; (2)
+  distribuzione P5–P95 e livelli di luminosità, non solo la mediana; (3)
+  conferma a occhio su confronto affiancato a pari scala (T-04). Il ΔE
+  segnala, non assolve.
+
+## T-31 — Riferimento ambiguo del Director: chiedere costa una riga, sbagliare un round
+
+**Surface:** richieste con nomi ambigui («la barra», «sotto il frame»,
+«l'originale», «quella versione») o screenshot allegati a commento.
+
+- **Cosa succede:** l'agente sceglie un'interpretazione invece di chiedere e
+  produce lavoro sbagliato o non richiesto. Tre episodi in una sessione
+  (2026-11-19): «i pulsanti sotto il frame» → X spostata sulla fascia,
+  brutta e non richiesta; «la barra» → brief di generazione preparato per
+  UNA barra mentre ce ne sono due — e poi si scopre che «barra» era la
+  fascia della cornice; «l'originale del roster» → mostrato il mockup
+  sbagliato.
+- **Istanze:** sessione `c33feee9` (jsonl 4075–4090, 5341, 6174–6197, 6480) ·
+  `.mw/runs/plan128-review-2026-11-19/ANALISI.md` §3.
+- **Regola:** termine ambiguo → elencare i candidati (o le due letture
+  plausibili) e **fermarsi**. Su screenshot allegati: `read` del file e
+  localizzazione del difetto nella propria cattura prima di toccare codice —
+  mai correggere a memoria. Mai produrre varianti «per mostrare» una scelta
+  che il Director non ha chiesto: confondono cosa è canonico.
+
+## T-32 — Montaggio senza controlli → patch loop: dopo 3 rattoppi si rigenera
+
+**Surface:** montaggio in gioco di arte tagliata (cornici, giunzioni,
+angoli, gemme, pezzi ripetuti), correzioni iterative su composizione.
+
+- **Cosa succede:** i controlli del protocollo (pulizia del golden, filtro
+  giunzioni, confronto col golden a pari scala) vengono saltati prima del
+  montaggio → respingimenti a catena sullo stesso pezzo: ogni patch corregge
+  il difetto segnalato e ne scopre un altro. Sessione 2026-11-19: ~10
+  iterazioni e 6+ respingimenti sugli angoli della cornice (~5,5h) finché il
+  Director chiede la rigenerazione integrale («si vede che è sovrapposto
+  male»). Correlati: rimozione di backing «brutti» → cuneo scoperto →
+  «buco»; helper con scala separata per la fascia + offset scalato due
+  volte → scalino e gioielli 8,4px dentro il frame.
+- **Istanze:** sessione `c33feee9` (jsonl 2918–6591) ·
+  `.mw/runs/plan128-review-2026-11-19/ANALISI.md` §2–3.
+- **Regola:**
+  1. Controlli completi **prima** del montaggio, non dopo il respingimento:
+     AI-slop sul golden, giunzioni, confronto golden↔gioco a pari scala
+     ancorato su un landmark.
+  2. Ispezionare **tutti** i punti simmetrici (8 angoli, 4 bordi): un
+     difetto su un angolo è quasi sempre anche sugli altri.
+  3. Rimuovendo un elemento difettoso, chiedersi cos'altro copriva.
+  4. Pezzi della stessa arte: un'unica scala geometrica; verificare i valori
+     finali degli helper di trasformazione, non la formula.
+  5. Dopo **3 patch** sullo stesso pezzo senza convergenza → rigenerare il
+     pezzo intero. Il rattoppo ripetuto costa più della rigenerazione e
+     lascia comunque un risultato «cucito».
