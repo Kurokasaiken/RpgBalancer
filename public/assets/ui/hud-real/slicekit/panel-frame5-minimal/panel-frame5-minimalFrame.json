@@ -1,0 +1,125 @@
+{
+  "surface": "panel-frame5-minimal",
+  "specVersion": 1,
+  "generator": "scripts/hud-real/slice-frame.py",
+  "generatedAt": "2026-11-18T20:02:36+00:00",
+  "source": {
+    "path": ".mw/specs/expedition-ui/refs/mockup-r357-cornici-aperta.png",
+    "sha256": "cce992399f1b72e39cea927d35211e5b36c8298a34b93462871e785228b66417"
+  },
+  "assetBase": "/assets/ui/hud-real/slicekit/panel-frame5-minimal/",
+  "pieces": [
+    {
+      "id": "corner-tl",
+      "file": "corner-tl.webp",
+      "role": "corner",
+      "anchor": "tl",
+      "stretch": "none",
+      "nativeSize": [
+        64,
+        60
+      ],
+      "bytes": 1746
+    },
+    {
+      "id": "corner-tr",
+      "file": "corner-tr.webp",
+      "role": "corner",
+      "anchor": "tr",
+      "stretch": "none",
+      "nativeSize": [
+        46,
+        52
+      ],
+      "bytes": 1424
+    },
+    {
+      "id": "corner-bl",
+      "file": "corner-bl.webp",
+      "role": "corner",
+      "anchor": "bl",
+      "stretch": "none",
+      "nativeSize": [
+        34,
+        32
+      ],
+      "bytes": 790
+    },
+    {
+      "id": "corner-br",
+      "file": "corner-br.webp",
+      "role": "corner",
+      "anchor": "br",
+      "stretch": "none",
+      "nativeSize": [
+        36,
+        32
+      ],
+      "bytes": 790
+    },
+    {
+      "id": "edge-top",
+      "file": "edge-top.webp",
+      "role": "edge-x",
+      "anchor": "top",
+      "stretch": "tile",
+      "nativeSize": [
+        145,
+        39
+      ],
+      "bytes": 3400,
+      "tileSafe": true
+    },
+    {
+      "id": "edge-left",
+      "file": "edge-left.webp",
+      "role": "edge-y",
+      "anchor": "left",
+      "stretch": "tile",
+      "nativeSize": [
+        29,
+        250
+      ],
+      "bytes": 3044,
+      "tileSafe": true
+    },
+    {
+      "id": "edge-right",
+      "file": "edge-right.webp",
+      "role": "edge-y",
+      "anchor": "right",
+      "stretch": "tile",
+      "nativeSize": [
+        12,
+        260
+      ],
+      "bytes": 1102,
+      "tileSafe": true
+    },
+    {
+      "id": "edge-bottom",
+      "file": "edge-bottom.webp",
+      "role": "edge-x",
+      "anchor": "bottom",
+      "stretch": "tile",
+      "nativeSize": [
+        265,
+        10
+      ],
+      "bytes": 1044,
+      "tileSafe": true
+    },
+    {
+      "id": "emblem-chest",
+      "file": "emblem-chest.webp",
+      "role": "ornament",
+      "anchor": "explicit",
+      "stretch": "none",
+      "nativeSize": [
+        62,
+        46
+      ],
+      "bytes": 1648
+    }
+  ]
+}

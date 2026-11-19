@@ -12,6 +12,12 @@
  * Uso:
  *   node scripts/hud-real/sliceability-gate.mjs <spec.json|image.png>
  *   node scripts/hud-real/sliceability-gate.mjs spec.json --out review-bundle/gate.json
+ *   node scripts/hud-real/sliceability-gate.mjs spec.json --record test-results/slicekit/<surface>.json
+ *
+ * `--record` scrive la ricevuta `sliceability_1ter` nel record della
+ * superficie (SLICEKIT Passo 7bis, PLAN-127 OB-11): exit code + sha12
+ * golden/spec + sha del tool — evidenza prodotta dal tool, non attestazione.
+ * Appende anche una entry `gate` al journal append-only della superficie.
  *
  * Exit code: 0 nessun finding di livello warning/error · 1 findings presenti ·
  * 2 input/usage failure. I finding vanno annotati nel review bundle della
@@ -19,18 +25,40 @@
  * rigenerazione) resta umana — questo è un gate informativo, non un veto.
  */
 import { spawnSync } from 'node:child_process';
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
-import { dirname, isAbsolute, join, resolve } from 'node:path';
+import { createHash } from 'node:crypto';
+import {
+  appendFileSync, existsSync, readFileSync, writeFileSync, mkdirSync,
+} from 'node:fs';
+import {
+  basename, dirname, isAbsolute, join, relative, resolve,
+} from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
+const TOOL_SHA = createHash('sha256')
+  .update(readFileSync(fileURLToPath(import.meta.url)))
+  .digest('hex').slice(0, 12);
 
 function usage(msg) {
   if (msg) console.error(msg);
   console.error(
-    'uso: sliceability-gate.mjs <spec.json|image.png> [--out <file.json>] [-- --slicewright-args...]',
+    'uso: sliceability-gate.mjs <spec.json|image.png> [--out <file.json>]' +
+      ' [--record <record.json>] [-- --slicewright-args...]',
   );
   process.exit(2);
+}
+
+function sha12(absPath) {
+  return createHash('sha256').update(readFileSync(absPath)).digest('hex')
+    .slice(0, 12);
+}
+
+function journalAppend(surface, entry) {
+  const jpath = join(REPO_ROOT, 'test-results', 'slicekit',
+    `${surface}.journal.jsonl`);
+  mkdirSync(dirname(jpath), { recursive: true });
+  appendFileSync(jpath,
+    JSON.stringify({ ts: new Date().toISOString(), ...entry }) + '\n');
 }
 
 const argv = process.argv.slice(2);
@@ -40,22 +68,27 @@ const own = extraIdx >= 0 ? argv.slice(0, extraIdx) : argv;
 const input = own.find((a) => !a.startsWith('--'));
 const outIdx = own.indexOf('--out');
 const outPath = outIdx >= 0 ? own[outIdx + 1] : null;
+const recIdx = own.indexOf('--record');
+const recordPath = recIdx >= 0 ? own[recIdx + 1] : null;
 if (!input) usage('manca input');
+if (recIdx >= 0 && !recordPath) usage('--record senza percorso');
 
 let imagePath = input;
+let specPath = null;
+let specData = null;
 if (/\.json$/i.test(input)) {
-  const specPath = isAbsolute(input) ? input : join(REPO_ROOT, input);
-  let spec;
+  specPath = isAbsolute(input) ? input : join(REPO_ROOT, input);
   try {
-    spec = JSON.parse(readFileSync(specPath, 'utf8'));
+    specData = JSON.parse(readFileSync(specPath, 'utf8'));
   } catch (e) {
     usage(`spec illeggibile: ${specPath} (${e.message})`);
   }
-  const src = spec?.source?.path;
+  const src = specData?.source?.path;
   if (!src) usage(`spec senza source.path: ${specPath}`);
   imagePath = src;
 }
 const absImage = isAbsolute(imagePath) ? imagePath : join(REPO_ROOT, imagePath);
+if (!existsSync(absImage)) usage(`immagine non trovata: ${absImage}`);
 
 const run = spawnSync(
   'npx',
@@ -108,4 +141,55 @@ if (findings.length === 0) {
   }
 }
 if (outPath) console.log(`  report → ${outPath}`);
-process.exit(blocking.length > 0 ? 1 : 0);
+
+const exitCode = blocking.length > 0 ? 1 : 0;
+
+if (recordPath) {
+  const absRec = isAbsolute(recordPath) ? recordPath : join(REPO_ROOT, recordPath);
+  const surface = specData?.surface
+    ?? basename(input).replace(/\.(json|png|webp)$/i, '');
+  let slicewrightVersion = 'unknown';
+  const ver = spawnSync('npx', ['-y', 'slicewright', '--version'],
+    { encoding: 'utf8' });
+  if (!ver.error && ver.status === 0) {
+    slicewrightVersion = (ver.stdout || '').trim().split('\n').pop() || 'unknown';
+  }
+  let record = {};
+  if (existsSync(absRec)) {
+    try {
+      record = JSON.parse(readFileSync(absRec, 'utf8'));
+    } catch (e) {
+      usage(`record illeggibile: ${absRec} (${e.message})`);
+    }
+  }
+  record.surface ??= surface;
+  record.sliceability_1ter = {
+    tool: 'sliceability-gate.mjs',
+    toolSha: TOOL_SHA,
+    slicewrightVersion,
+    at: new Date().toISOString(),
+    exitCode,
+    spec: specPath ? relative(REPO_ROOT, specPath) : null,
+    specHash: specPath ? sha12(specPath) : null,
+    input: relative(REPO_ROOT, absImage),
+    inputSha: sha12(absImage),
+    verdict: exitCode === 0 ? 'clean' : 'warnings',
+    insets: report.insets ?? null,
+    stretchX: stretchOf('x'),
+    stretchY: stretchOf('y'),
+    minSize: report.minSize ?? null,
+    findings: findings.map(({ severity, code, message }) =>
+      ({ severity, code, message })),
+  };
+  record.recordedAt = new Date().toISOString();
+  mkdirSync(dirname(absRec), { recursive: true });
+  writeFileSync(absRec, JSON.stringify(record, null, 2) + '\n');
+  journalAppend(surface, {
+    kind: 'gate', tool: 'sliceability-gate.mjs', toolSha: TOOL_SHA,
+    surface, exitCode,
+    specHash: specPath ? sha12(specPath) : null,
+    inputSha: sha12(absImage),
+  });
+  console.log(`  ricevuta → ${absRec} (sliceability_1ter, exit ${exitCode})`);
+}
+process.exit(exitCode);

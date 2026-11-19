@@ -1,0 +1,438 @@
+{
+  "surface": "controls",
+  "specVersion": 2,
+  "generator": "scripts/hud-real/slice-frame.py",
+  "generatedAt": "2026-11-19T15:11:38+00:00",
+  "source": {
+    "path": ".mw/specs/expedition-ui/refs/controls-sheet-g2-keyed.png",
+    "sha256": "ded22aea673d90545e417757226eea7b9d5d79e3ba2130ed9d8bf758f8bdcc2f"
+  },
+  "assetBase": "/assets/ui/hud-real/slicekit/controls/",
+  "pieces": [
+    {
+      "id": "round-normal",
+      "file": "round-normal.webp",
+      "role": "ornament",
+      "anchor": "explicit",
+      "stretch": "none",
+      "nativeSize": [
+        168,
+        168
+      ],
+      "bytes": 11702,
+      "displayScale": 0.18,
+      "displaySize": [
+        30,
+        30
+      ],
+      "pos": {
+        "left": 0,
+        "top": 0
+      }
+    },
+    {
+      "id": "round-hover",
+      "file": "round-hover.webp",
+      "role": "ornament",
+      "anchor": "explicit",
+      "stretch": "none",
+      "nativeSize": [
+        168,
+        168
+      ],
+      "bytes": 12482,
+      "displayScale": 0.18,
+      "displaySize": [
+        30,
+        30
+      ],
+      "pos": {
+        "left": 0,
+        "top": 0
+      }
+    },
+    {
+      "id": "round-pressed",
+      "file": "round-pressed.webp",
+      "role": "ornament",
+      "anchor": "explicit",
+      "stretch": "none",
+      "nativeSize": [
+        168,
+        168
+      ],
+      "bytes": 11864,
+      "displayScale": 0.18,
+      "displaySize": [
+        30,
+        30
+      ],
+      "pos": {
+        "left": 0,
+        "top": 0
+      }
+    },
+    {
+      "id": "round-selected",
+      "file": "round-selected.webp",
+      "role": "ornament",
+      "anchor": "explicit",
+      "stretch": "none",
+      "nativeSize": [
+        168,
+        168
+      ],
+      "bytes": 13218,
+      "displayScale": 0.18,
+      "displaySize": [
+        30,
+        30
+      ],
+      "pos": {
+        "left": 0,
+        "top": 0
+      }
+    },
+    {
+      "id": "round-disabled",
+      "file": "round-disabled.webp",
+      "role": "ornament",
+      "anchor": "explicit",
+      "stretch": "none",
+      "nativeSize": [
+        168,
+        168
+      ],
+      "bytes": 10364,
+      "displayScale": 0.18,
+      "displaySize": [
+        30,
+        30
+      ],
+      "pos": {
+        "left": 0,
+        "top": 0
+      }
+    },
+    {
+      "id": "pill-normal-l",
+      "file": "pill-normal-l.webp",
+      "role": "ornament",
+      "anchor": "explicit",
+      "stretch": "none",
+      "nativeSize": [
+        72,
+        108
+      ],
+      "bytes": 3588,
+      "displayScale": 0.27,
+      "displaySize": [
+        19,
+        29
+      ],
+      "pos": {
+        "left": 0,
+        "top": 0
+      }
+    },
+    {
+      "id": "pill-normal-r",
+      "file": "pill-normal-r.webp",
+      "role": "ornament",
+      "anchor": "explicit",
+      "stretch": "none",
+      "nativeSize": [
+        72,
+        108
+      ],
+      "bytes": 3698,
+      "displayScale": 0.27,
+      "displaySize": [
+        19,
+        29
+      ],
+      "pos": {
+        "left": 0,
+        "top": 0
+      }
+    },
+    {
+      "id": "pill-normal-m",
+      "file": "pill-normal-m.webp",
+      "role": "edge-x",
+      "anchor": "top",
+      "stretch": "tile",
+      "nativeSize": [
+        60,
+        108
+      ],
+      "bytes": 1274,
+      "tileSafe": true,
+      "displayScale": 0.27,
+      "displaySize": [
+        16,
+        29
+      ],
+      "span": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "pill-hover-l",
+      "file": "pill-hover-l.webp",
+      "role": "ornament",
+      "anchor": "explicit",
+      "stretch": "none",
+      "nativeSize": [
+        72,
+        108
+      ],
+      "bytes": 3988,
+      "displayScale": 0.27,
+      "displaySize": [
+        19,
+        29
+      ],
+      "pos": {
+        "left": 0,
+        "top": 0
+      }
+    },
+    {
+      "id": "pill-hover-r",
+      "file": "pill-hover-r.webp",
+      "role": "ornament",
+      "anchor": "explicit",
+      "stretch": "none",
+      "nativeSize": [
+        72,
+        108
+      ],
+      "bytes": 4122,
+      "displayScale": 0.27,
+      "displaySize": [
+        19,
+        29
+      ],
+      "pos": {
+        "left": 0,
+        "top": 0
+      }
+    },
+    {
+      "id": "pill-hover-m",
+      "file": "pill-hover-m.webp",
+      "role": "edge-x",
+      "anchor": "top",
+      "stretch": "tile",
+      "nativeSize": [
+        60,
+        108
+      ],
+      "bytes": 1540,
+      "tileSafe": true,
+      "displayScale": 0.27,
+      "displaySize": [
+        16,
+        29
+      ],
+      "span": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "pill-pressed-l",
+      "file": "pill-pressed-l.webp",
+      "role": "ornament",
+      "anchor": "explicit",
+      "stretch": "none",
+      "nativeSize": [
+        72,
+        108
+      ],
+      "bytes": 3688,
+      "displayScale": 0.27,
+      "displaySize": [
+        19,
+        29
+      ],
+      "pos": {
+        "left": 0,
+        "top": 0
+      }
+    },
+    {
+      "id": "pill-pressed-r",
+      "file": "pill-pressed-r.webp",
+      "role": "ornament",
+      "anchor": "explicit",
+      "stretch": "none",
+      "nativeSize": [
+        72,
+        108
+      ],
+      "bytes": 3708,
+      "displayScale": 0.27,
+      "displaySize": [
+        19,
+        29
+      ],
+      "pos": {
+        "left": 0,
+        "top": 0
+      }
+    },
+    {
+      "id": "pill-pressed-m",
+      "file": "pill-pressed-m.webp",
+      "role": "edge-x",
+      "anchor": "top",
+      "stretch": "tile",
+      "nativeSize": [
+        60,
+        108
+      ],
+      "bytes": 1384,
+      "tileSafe": true,
+      "displayScale": 0.27,
+      "displaySize": [
+        16,
+        29
+      ],
+      "span": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "pill-selected-l",
+      "file": "pill-selected-l.webp",
+      "role": "ornament",
+      "anchor": "explicit",
+      "stretch": "none",
+      "nativeSize": [
+        72,
+        108
+      ],
+      "bytes": 4482,
+      "displayScale": 0.27,
+      "displaySize": [
+        19,
+        29
+      ],
+      "pos": {
+        "left": 0,
+        "top": 0
+      }
+    },
+    {
+      "id": "pill-selected-r",
+      "file": "pill-selected-r.webp",
+      "role": "ornament",
+      "anchor": "explicit",
+      "stretch": "none",
+      "nativeSize": [
+        72,
+        108
+      ],
+      "bytes": 4384,
+      "displayScale": 0.27,
+      "displaySize": [
+        19,
+        29
+      ],
+      "pos": {
+        "left": 0,
+        "top": 0
+      }
+    },
+    {
+      "id": "pill-selected-m",
+      "file": "pill-selected-m.webp",
+      "role": "edge-x",
+      "anchor": "top",
+      "stretch": "tile",
+      "nativeSize": [
+        60,
+        108
+      ],
+      "bytes": 1556,
+      "tileSafe": true,
+      "displayScale": 0.27,
+      "displaySize": [
+        16,
+        29
+      ],
+      "span": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "pill-disabled-l",
+      "file": "pill-disabled-l.webp",
+      "role": "ornament",
+      "anchor": "explicit",
+      "stretch": "none",
+      "nativeSize": [
+        72,
+        108
+      ],
+      "bytes": 3486,
+      "displayScale": 0.27,
+      "displaySize": [
+        19,
+        29
+      ],
+      "pos": {
+        "left": 0,
+        "top": 0
+      }
+    },
+    {
+      "id": "pill-disabled-r",
+      "file": "pill-disabled-r.webp",
+      "role": "ornament",
+      "anchor": "explicit",
+      "stretch": "none",
+      "nativeSize": [
+        72,
+        108
+      ],
+      "bytes": 3316,
+      "displayScale": 0.27,
+      "displaySize": [
+        19,
+        29
+      ],
+      "pos": {
+        "left": 0,
+        "top": 0
+      }
+    },
+    {
+      "id": "pill-disabled-m",
+      "file": "pill-disabled-m.webp",
+      "role": "edge-x",
+      "anchor": "top",
+      "stretch": "tile",
+      "nativeSize": [
+        60,
+        108
+      ],
+      "bytes": 1078,
+      "tileSafe": true,
+      "displayScale": 0.27,
+      "displaySize": [
+        16,
+        29
+      ],
+      "span": [
+        0,
+        0
+      ]
+    }
+  ]
+}

@@ -1,0 +1,112 @@
+{
+  "specVersion": 1,
+  "surface": "cornici",
+  "comment": "PLAN-127 infra pilot — reproduces scripts/build-panel-frame3-9slice.py (R-357 oracle) as data-only spec. Source is the AI-regenerated complete frame (case b, PLAN-127 §3.2): one ornate frame on flat teal bg, keyed+9-sliced.",
+  "source": {
+    "path": ".mw/runs/20261117-r357-frame-fix/frame-9slice.png",
+    "key": {
+      "type": "flatBgMaxDiff",
+      "sampleRect": [0, 0, 40, 40],
+      "threshold": 10,
+      "gain": 18
+    },
+    "cutouts": [
+      {
+        "rect": [100, 119, 1132, 841],
+        "apply": "zeroAlpha",
+        "comment": "interior hole of the source frame — keyed crops would ghost its distinct teal shade; alpha forced to 0 where a crop overlaps the hole (oracle HOLE/punch_hole)"
+      }
+    ]
+  },
+  "geometry": {
+    "outerRect": [29, 3, 1199, 895],
+    "contentRect": [100, 119, 1132, 841],
+    "rimOverlapPx": 1,
+    "comment": "outerRect = frame art bbox on the source (oracle docstring); contentRect = the interior hole, i.e. where live DOM content lands. The frame rides OUTSIDE the panel rect with ~1px inner-rim overlap (Director ruling)."
+  },
+  "output": {
+    "dir": "public/assets/ui/hud-real/slicekit/cornici",
+    "format": "webp",
+    "quality": 92,
+    "alphaQuality": 100,
+    "manifest": "corniciFrame.json"
+  },
+  "budgets": {
+    "maxPieces": 16,
+    "maxBytes": 1048576
+  },
+  "slices": [
+    {
+      "id": "corner-tl",
+      "role": "corner",
+      "anchor": "tl",
+      "crop": [29, 3, 280, 265],
+      "stretch": "none",
+      "tailFade": { "sides": "rb", "x": 6, "y": 6 }
+    },
+    {
+      "id": "corner-tr",
+      "role": "corner",
+      "anchor": "tr",
+      "crop": [955, 3, 1199, 165],
+      "stretch": "none",
+      "tailFade": { "sides": "lb", "x": 18, "y": 6 }
+    },
+    {
+      "id": "corner-bl",
+      "role": "corner",
+      "anchor": "bl",
+      "crop": [29, 615, 295, 895],
+      "stretch": "none",
+      "tailFade": { "sides": "rt", "x": 6, "y": 18 }
+    },
+    {
+      "id": "corner-br",
+      "role": "corner",
+      "anchor": "br",
+      "crop": [1035, 790, 1199, 895],
+      "stretch": "none",
+      "tailFade": { "sides": "lt", "x": 6, "y": 6 }
+    },
+    {
+      "id": "edge-top",
+      "role": "edge-x",
+      "anchor": "top",
+      "crop": [250, 3, 634, 119],
+      "stretch": "tile",
+      "tileSafe": true,
+      "wrapBlend": { "overlap": 20 },
+      "comment": "starts 30px BEFORE the TL cut (x280) — phase-continuous through the corner's soften zone; length 3*128 = 3 vine periods (oracle)"
+    },
+    {
+      "id": "edge-left",
+      "role": "edge-y",
+      "anchor": "left",
+      "crop": [29, 235, 100, 445],
+      "stretch": "tile",
+      "tileSafe": true,
+      "wrapBlend": { "overlap": 16 },
+      "comment": "starts 30px BEFORE the TL cut (y265); length 5*42 = 5 spine periods (oracle)"
+    },
+    {
+      "id": "edge-right",
+      "role": "edge-y",
+      "anchor": "right",
+      "crop": [1132, 300, 1163, 660],
+      "stretch": "tile",
+      "tileSafe": true,
+      "wrapBlend": { "overlap": 16 },
+      "comment": "plain double wire (oracle)"
+    },
+    {
+      "id": "edge-bottom",
+      "role": "edge-x",
+      "anchor": "bottom",
+      "crop": [400, 838, 760, 862],
+      "stretch": "tile",
+      "tileSafe": true,
+      "wrapBlend": { "overlap": 20 },
+      "comment": "plain double wire (oracle); crop dips 3px into the hole (punched)"
+    }
+  ]
+}

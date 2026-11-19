@@ -200,7 +200,8 @@
     "catalog:validate": "tsx scripts/catalog/catalogValidate.mts",
     "catalog:document": "tsx scripts/catalog/documentComponent.mts",
     "catalog:critique": "tsx scripts/catalog/critiqueComponent.mts",
-    "slice:gate": "node scripts/hud-real/sliceability-gate.mjs"
+    "slice:gate": "node scripts/hud-real/sliceability-gate.mjs",
+    "slice:audit": "node scripts/hud-real/slice-audit.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

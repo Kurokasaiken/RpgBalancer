@@ -1,0 +1,358 @@
+{
+ "specVersion": 2,
+ "surface": "panel-frame6",
+ "comment": "PLAN-128 candidate: regenerated frame (Gemini 2026-11-19, bronze finish, Nav gems), see .mw/runs/20261119-panel-frame5-regen/provenance.md. NEW GOLDEN \u2014 not baptised. Geometry derived from measurements of the source at uniform display scale 0.28; interior rect = the panel rect the frame sits outside of. Rollback = point the two consumers back at panelFrame5Frame.",
+ "source": {
+  "path": ".mw/specs/expedition-ui/refs/candidate-cornici-bronzo-r1-keyed.png",
+  "key": {
+   "type": "flatBgMaxDiff",
+   "sampleRect": [
+    0,
+    0,
+    40,
+    40
+   ],
+   "threshold": 10,
+   "gain": 18
+  },
+  "comment": "keyed copy of candidate-cornici-bronzo-r1.png: ONLY the flat interior teal (colour rule b-r>=18, g-r>=14, max<=95, inside the interior rect, largest component, +1px dilation) painted the background grey so flatBgMaxDiff keys it away. Replaces the rectangular interior cutout, which punched the bronze wire that sweeps around the rounded inner corners (2214 px at BR, 625 at BL, 332 at TR).",
+  "cutouts": [
+   {
+    "rect": [
+     92,
+     136,
+     235,
+     215
+    ],
+    "apply": "zeroAlpha",
+    "comment": "TL: the arc's rounded part that sits on the interior (Director 2026-11-19: corners protruding onto the green)"
+   },
+   {
+    "rect": [
+     765,
+     136,
+     935,
+     205
+    ],
+    "apply": "zeroAlpha",
+    "comment": "TR: same, mirrored"
+   }
+  ]
+ },
+ "geometry": {
+  "outerRect": [
+   12,
+   16,
+   959,
+   1023
+  ],
+  "contentRect": [
+   86,
+   135,
+   936,
+   1009
+  ],
+  "rimOverlapPx": 1,
+  "backings": [
+   {
+    "anchor": "tl",
+    "w": 18,
+    "h": 18,
+    "shape": "crescent",
+    "color": "var(--skin-hud-enamel-deep, #091d15)"
+   },
+   {
+    "anchor": "tr",
+    "w": 18,
+    "h": 18,
+    "shape": "crescent",
+    "color": "var(--skin-hud-enamel-deep, #091d15)"
+   },
+   {
+    "anchor": "bl",
+    "w": 18,
+    "h": 18,
+    "shape": "crescent",
+    "color": "var(--skin-hud-enamel-deep, #091d15)"
+   },
+   {
+    "anchor": "br",
+    "w": 18,
+    "h": 18,
+    "shape": "crescent",
+    "color": "var(--skin-hud-enamel-deep, #091d15)"
+   }
+  ],
+  "comment": "2026-11-19: the rect corner-bite backings (20x18, radius 16) painted a dark fan INSIDE the plaque; removing them left a wedge where the map shows through. Now `crescent` backings (18x18, the plaque's cartouche size) paint only the wedge outside the plaque arc."
+ },
+ "output": {
+  "dir": "public/assets/ui/hud-real/slicekit/panel-frame6",
+  "manifest": "panelFrame6Frame.json",
+  "tsModule": {
+   "path": "src/generated/slicekit/panelFrame6Frame.ts",
+   "typeImport": "@/ui/idleVillage/skins/primitives/sliceKitManifest",
+   "exportName": "panelFrame6Frame"
+  },
+  "quality": 100,
+  "method": 6
+ },
+ "budgets": {
+  "maxPieces": 16,
+  "maxBytes": 1048576
+ },
+ "slices": [
+  {
+   "id": "corner-tl",
+   "anchor": "tl",
+   "crop": [
+    10,
+    14,
+    200,
+    208
+   ],
+   "role": "corner",
+   "stretch": "none",
+   "despeckle": {
+    "minNeighbors": 3
+   },
+   "borderSoften": {
+    "width": 3,
+    "minFactor": 0.25
+   },
+   "displaySize": [
+    53,
+    54
+   ],
+   "pos": {
+    "left": -21,
+    "top": -34
+   },
+   "comment": "acanthus knuckle + emerald; pos derived: (crop origin - interior corner) * 0.28",
+   "tailFade": {
+    "sides": "rb",
+    "x": 44,
+    "y": 16
+   },
+   "alphaOps": [
+    {
+     "op": "minFilter",
+     "size": 3
+    }
+   ]
+  },
+  {
+   "id": "corner-tr",
+   "anchor": "tr",
+   "crop": [
+    786,
+    14,
+    962,
+    200
+   ],
+   "role": "corner",
+   "stretch": "none",
+   "despeckle": {
+    "minNeighbors": 3
+   },
+   "borderSoften": {
+    "width": 3,
+    "minFactor": 0.25
+   },
+   "displaySize": [
+    49,
+    52
+   ],
+   "pos": {
+    "right": -7,
+    "top": -34
+   },
+   "tailFade": {
+    "sides": "lb",
+    "x": 44,
+    "y": 16
+   },
+   "alphaOps": [
+    {
+     "op": "minFilter",
+     "size": 3
+    }
+   ]
+  },
+  {
+   "id": "corner-bl",
+   "anchor": "bl",
+   "crop": [
+    10,
+    846,
+    180,
+    1023
+   ],
+   "role": "corner",
+   "stretch": "none",
+   "despeckle": {
+    "minNeighbors": 3
+   },
+   "borderSoften": {
+    "width": 3,
+    "minFactor": 0.25
+   },
+   "displaySize": [
+    48,
+    50
+   ],
+   "pos": {
+    "left": -21,
+    "bottom": -4
+   },
+   "tailFade": {
+    "sides": "rt",
+    "x": 16,
+    "y": 16
+   },
+   "alphaOps": [
+    {
+     "op": "minFilter",
+     "size": 3
+    }
+   ]
+  },
+  {
+   "id": "corner-br",
+   "anchor": "br",
+   "crop": [
+    800,
+    880,
+    962,
+    1023
+   ],
+   "role": "corner",
+   "stretch": "none",
+   "despeckle": {
+    "minNeighbors": 3
+   },
+   "borderSoften": {
+    "width": 3,
+    "minFactor": 0.25
+   },
+   "displaySize": [
+    45,
+    40
+   ],
+   "pos": {
+    "right": -7,
+    "bottom": -4
+   },
+   "tailFade": {
+    "sides": "lt",
+    "x": 16,
+    "y": 16
+   },
+   "alphaOps": [
+    {
+     "op": "minFilter",
+     "size": 3
+    }
+   ]
+  },
+  {
+   "id": "edge-top",
+   "role": "edge-x",
+   "anchor": "top",
+   "crop": [
+    337,
+    27,
+    575,
+    135
+   ],
+   "stretch": "tile",
+   "tileSafe": true,
+   "wrapBlend": {
+    "overlap": 40
+   },
+   "key": {
+    "type": "none"
+   },
+   "displayScale": 0.28,
+   "span": [
+    12,
+    4
+   ],
+   "comment": "engraved vine band; window chosen by loop-closure search (edge strips err 22 vs random mean 53): x0=337 W=238. Rows start at 27: rows 16-26 are background."
+  },
+  {
+   "id": "edge-left",
+   "role": "edge-y",
+   "anchor": "left",
+   "crop": [
+    19,
+    257,
+    86,
+    665
+   ],
+   "stretch": "tile",
+   "tileSafe": true,
+   "wrapBlend": {
+    "overlap": 40
+   },
+   "key": {
+    "type": "none"
+   },
+   "displayScale": 0.28,
+   "span": [
+    24,
+    2
+   ],
+   "comment": "engraved lattice spine; loop-closure window y0=257 H=408 (err 25)."
+  },
+  {
+   "id": "edge-right",
+   "role": "edge-y",
+   "anchor": "right",
+   "crop": [
+    938,
+    260,
+    954,
+    760
+   ],
+   "stretch": "tile",
+   "tileSafe": true,
+   "wrapBlend": {
+    "overlap": 40
+   },
+   "key": {
+    "type": "none"
+   },
+   "displayScale": 0.28,
+   "span": [
+    24,
+    2
+   ],
+   "comment": "plain wire; crop x 938..953 \u2014 columns 954+ are the golden's grey background (the previous 937..957 crop put a 3px pale-grey stripe on the outer side)"
+  },
+  {
+   "id": "edge-bottom",
+   "role": "edge-x",
+   "anchor": "bottom",
+   "crop": [
+    250,
+    1010,
+    650,
+    1023
+   ],
+   "stretch": "tile",
+   "tileSafe": true,
+   "wrapBlend": {
+    "overlap": 40
+   },
+   "key": {
+    "type": "none"
+   },
+   "displayScale": 0.28,
+   "span": [
+    8,
+    4
+   ],
+   "comment": "plain wire; image bottom row 1023 is the frame's last row"
+  }
+ ]
+}

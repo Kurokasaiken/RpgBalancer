@@ -1,0 +1,152 @@
+{
+  "specVersion": 1,
+  "surface": "cassetto",
+  "comment": "PLAN-127 night-shift — reproduces scripts/build-cassetto3-assets.py (R-357 oracle, golden mockup-r357-cassetto-largo.png 1024x1536) as data-only spec. THE hole-bound pilot: the CTA window is a runtime-bound hole — the slicer emits the plaque piece (mask-bearing) + a manifest ctaWindow datum; the primitive clips the live DOM button to the plaque silhouette via CSS mask. Two pieces (cta-plaque, frame-top) are emitted via plugins/cassetto.py — WHY-NOT-SPEC: reconstructive raster rebuild and profile synthesis, not crops.",
+  "source": {
+    "path": ".mw/specs/expedition-ui/refs/mockup-r357-cassetto-largo.png",
+    "key": {
+      "type": "lumaFloor",
+      "lo": 14,
+      "gain": 10,
+      "comment": "oracle key_black() default — the left rail sits on true-black margin; keyed so the map shows through"
+    }
+  },
+  "geometry": {
+    "outerRect": [0, 0, 1024, 1536],
+    "contentRect": [88, 0, 1024, 1536],
+    "rimOverlapPx": 12,
+    "comment": "outerRect = whole golden (the column IS the surface, right edge flush with screen). contentRect = live DOM column: paddingLeft = RAIL_W-12 = 88u, so the rail underlaps content by 12px (rimOverlapPx).",
+    "holes": [
+      {
+        "id": "cta-window",
+        "shape": "sprite-mask",
+        "rect": [124, 1344, 1004, 1530],
+        "maskPiece": "cta-plaque",
+        "marginPx": 14,
+        "comment": "Runtime-bound CTA window: DOM button rect in the 1024-design space (right:20, bottom:6, w:880, h:186 = HudRealCassetto CTA_W/CTA_H). maskRef = the plaque piece's alpha — the primitive mask-images the DOM element to the brass silhouette. marginPx 14 = true min clearance (chest crop ends y1330) — the 'generous transparent margin' PLAN-127 requires is validated, not painted."
+      }
+    ]
+  },
+  "output": {
+    "dir": "public/assets/ui/hud-real/slicekit/cassetto",
+    "format": "webp",
+    "quality": 94,
+    "alphaQuality": 100,
+    "method": 6,
+    "manifest": "cassettoFrame.json"
+  },
+  "budgets": {
+    "maxPieces": 16,
+    "maxBytes": 4194304
+  },
+  "slices": [
+    {
+      "id": "rail-top",
+      "role": "ornament",
+      "anchor": "tl",
+      "crop": [0, 0, 100, 360],
+      "stretch": "none",
+      "regrade": { "type": "goldHue" },
+      "comment": "oracle rail-top — left rail cap (kept as ornament so edgeThickness stays the tile's, not the cap's)"
+    },
+    {
+      "id": "rail-mid",
+      "role": "edge-y",
+      "anchor": "left",
+      "crop": [0, 780, 100, 940],
+      "stretch": "tile",
+      "tileSafe": true,
+      "regrade": { "type": "goldHue" },
+      "comment": "oracle rail-mid — the left rail repeat-y tile (raw crop; oracle does NOT wrap-blend it — seam ratio is oracle-intrinsic)"
+    },
+    {
+      "id": "rail-bottom",
+      "role": "ornament",
+      "anchor": "bl",
+      "crop": [0, 1160, 100, 1536],
+      "stretch": "none",
+      "regrade": { "type": "goldHue" },
+      "comment": "oracle rail-bottom — left rail cap"
+    },
+    {
+      "id": "frame-top",
+      "role": "ornament",
+      "anchor": "top",
+      "stretch": "none",
+      "plugin": {
+        "fn": "frameTop",
+        "comment": "WHY-NOT-SPEC: the golden's north is only a floating hairline; the bar is SYNTHESISED from rail-mid's gold cross-section (median profile + seeded noise + hairline) — procedural generation, no crop. NOT regraded (oracle saves it ungraded: its profile is read from the already-graded rail-mid piece — ordering dependency: rail-mid must emit first)."
+      }
+    },
+    {
+      "id": "vignette",
+      "role": "ornament",
+      "anchor": "top",
+      "crop": [88, 28, 1024, 290],
+      "stretch": "none",
+      "key": { "type": "none" },
+      "opaque": true,
+      "comment": "oracle vignette — plain RGB crop of the quest painting, flush right; no key, saved RGB"
+    },
+    {
+      "id": "skull",
+      "role": "ornament",
+      "anchor": "explicit",
+      "crop": [130, 1160, 296, 1326],
+      "stretch": "none",
+      "key": { "type": "lumaFloor", "lo": 46, "gain": 7 },
+      "alphaOps": [
+        { "op": "minFilter", "size": 3 },
+        { "op": "gaussianBlur", "radius": 1.1 },
+        { "op": "ellipseWindow", "cx": 83, "cy": 83, "rx": 80, "ry": 80, "coreK": 0.9, "feather": 2 }
+      ],
+      "regrade": { "type": "goldHue", "srcHue": 30, "satFloor": 0.40, "satK": 0.80, "valK": 1.06 },
+      "comment": "oracle medal(skull): luma key + MinFilter + blur, then min(max(core, alpha), wide) elliptical window — inside the 0.9 core everything stays (dark reds are part of the skull), outside only bright pixels inside the wide ellipse"
+    },
+    {
+      "id": "chest",
+      "role": "ornament",
+      "anchor": "explicit",
+      "crop": [610, 1170, 770, 1330],
+      "stretch": "none",
+      "key": { "type": "lumaFloor", "lo": 46, "gain": 7 },
+      "alphaOps": [
+        { "op": "minFilter", "size": 3 },
+        { "op": "gaussianBlur", "radius": 1.1 },
+        { "op": "ellipseWindow", "cx": 80, "cy": 80, "rx": 78, "ry": 76, "coreK": 0.58, "feather": 2 }
+      ],
+      "regrade": { "type": "goldHue", "srcHue": 36, "satK": 0.85, "valK": 1.10 },
+      "comment": "oracle medal(chest) — same mask pipeline, tighter 0.58 core"
+    },
+    {
+      "id": "cta-plaque",
+      "role": "ornament",
+      "anchor": "bottom",
+      "stretch": "none",
+      "compositeMode": "hole-bound",
+      "plugin": {
+        "fn": "ctaPlaque",
+        "comment": "WHY-NOT-SPEC: oracle rebuilds the button by cv2 inpaint of the baked CONFIRM label, emerald symmetry-axis detection, right-half mirror, 2x upscale + denoise + unsharp, connected-component outside-key — reconstruction, not a crop"
+      },
+      "regrade": { "type": "goldHue" },
+      "quality": 95,
+      "comment": "The mask-bearing piece for the cta-window hole: its alpha IS the CSS mask the primitive applies to the live DOM button"
+    },
+    {
+      "id": "supply-bag",
+      "role": "ornament",
+      "anchor": "explicit",
+      "stretch": "none",
+      "source": { "path": ".mw/specs/expedition-ui/refs/icon-supply-bag.png" },
+      "crop": [0, 0, 1024, 1024],
+      "key": { "type": "lumaFloor", "lo": 18, "gain": 12 },
+      "postOps": [
+        { "op": "cropToAlpha", "threshold": 24 },
+        { "op": "padSquare" },
+        { "op": "resize", "w": 192, "h": 192 }
+      ],
+      "regrade": { "type": "goldHue", "srcHue": 41, "satK": 0.88, "valK": 1.62 },
+      "comment": "oracle supply-bag — separate Gemini-generated icon source (per-slice source override), keyed, alpha-cropped, squared, resized"
+    }
+  ]
+}

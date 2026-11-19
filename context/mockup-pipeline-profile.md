@@ -153,7 +153,10 @@ T2 (ruling 2026-10-28).
 | manifest TS generato | `src/generated/slicekit/<spec>Frame.ts` |
 | primitivo cornice condiviso | `src/ui/idleVillage/skins/primitives/PanelFrameOrnaments.tsx` |
 | record di conversione (+ verdetto di Fase C) | `test-results/slicekit/<surface>.json` |
-| gate di affettabilità pre-slice (Passo 1ter) | `npm run slice:gate -- <spec.json|image.png>` (`scripts/hud-real/sliceability-gate.mjs` → `npx -y slicewright inspect`; accetta spec con `source.path` o PNG; exit 1 se ci sono warning; `--out` salva il report nel review bundle) |
+| journal append-only patch/gate (Passo 7bis, T-32) | `test-results/slicekit/<surface>.journal.jsonl` |
+| gate di affettabilità pre-slice (Passo 1ter) | `npm run slice:gate -- <spec.json|image.png>` (`scripts/hud-real/sliceability-gate.mjs` → `npx -y slicewright inspect`; accetta spec con `source.path` o PNG; exit 1 se ci sono warning; `--out` salva il report nel review bundle; `--record <record>` scrive la ricevuta `sliceability_1ter` con exit code + sha12 golden/spec/tool) |
+| audit ricevute (transition gate, Passo 7bis) | `npm run slice:audit -- <surface>` (`scripts/hud-real/slice-audit.mjs`; exit 1 su ricevuta mancante/stale/`declared:` senza evidenza/patch ≥3/matrix sotto minimo [P9]; cablato scoped in `closure:lint`) |
+| skill esecutiva pipeline | `coordinator/skills/mw-slice-run/SKILL.md` (obbligatoria; workflow per-passo comando+ricevuta+STOP) |
 | cartella del componente (nucleo §6) | `test-results/slicekit/<surface>/review/` |
 | base di riferimento HUD | `test-results/slicekit/hud-baseline/<data>-<surface>.png` |
 | gate di chiusura | `npm run closure:lint` |
@@ -167,6 +170,12 @@ registro senza verdetto → rosso; «entro tolleranza» senza numero ΔE → ros
   3440×1440 × DPR 1–2, contenuto normale + contenuto lungo.
 - Una corsia WKWebView (runtime Tauri) a 1440×900 DPR 2.
 - Testimone manuale in `tauri dev` per la chiusura.
+- Minimo macchinabile per `npm run slice:audit` (`matrix_coverage` nel record
+  deve coprire questo; matrice ridotta consentita per superfici non pilota):
+
+```json matrixMin
+{"viewports":["1280x800","1440x900","1920x1080","3440x1440"],"dprs":[1,2],"contents":["normal","long"],"wkwebview":true}
+```
 
 ## [P10] Consegna
 

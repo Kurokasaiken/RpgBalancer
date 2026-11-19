@@ -1,0 +1,112 @@
+{
+  "specVersion": 1,
+  "surface": "panel-frame5-full",
+  "comment": "PLAN-127 night-shift A/B strategy A2 — RUNNABLE subset of panel-frame5-full.json. Engine-supported fields only: the oracle's per-slice colorClassDelta key, despeckle and borderSoften have no engine equivalent (declared as x- candidates in the full spec). Without a key all pieces emit OPAQUE: edges are pixel-faithful (oracle edges are opaque too); corner|ornament pieces cannot be reproduced — expected alpha-heavy fidelity FAILs vs oracle, quantifying exactly the missing ops. tailFade rltb x=4 y=4 on keyart pieces approximates the oracle's 3px border-soften (tailFade zeroes the rim px, oracle keeps a 0.25 floor — off-by-one quarter-step documented in findings).",
+  "source": {
+    "path": ".mw/specs/expedition-ui/refs/mockup-r357-cornici-aperta.png"
+  },
+  "geometry": {
+    "outerRect": [2, 96, 352, 464],
+    "contentRect": [49, 147, 331, 449],
+    "rimOverlapPx": 1,
+    "comment": "inferred from oracle docstring (roster box x14-340 y108-453; spine x15-49; right wire x331-338; bottom wire y449-453); emblem-chest is the stash band ornament below"
+  },
+  "output": {
+    "dir": "public/assets/ui/hud-real/slicekit/panel-frame5-full",
+    "format": "webp",
+    "quality": 92,
+    "alphaQuality": 100,
+    "manifest": "panelFrame5FullFrame.json"
+  },
+  "budgets": {
+    "maxPieces": 16,
+    "maxBytes": 1048576
+  },
+  "slices": [
+    {
+      "id": "corner-tl",
+      "role": "corner",
+      "anchor": "tl",
+      "crop": [2, 96, 66, 156],
+      "stretch": "none",
+      "tailFade": { "sides": "rltb", "x": 4, "y": 4 },
+      "comment": "APPROXIMATION: stands in for oracle colorClassDelta key + despeckle + borderSoften (see x- fields in full spec). Piece emits opaque — fidelity FAIL expected."
+    },
+    {
+      "id": "corner-tr",
+      "role": "corner",
+      "anchor": "tr",
+      "crop": [306, 100, 352, 152],
+      "stretch": "none",
+      "tailFade": { "sides": "rltb", "x": 4, "y": 4 },
+      "comment": "APPROXIMATION — opaque piece, fidelity FAIL expected"
+    },
+    {
+      "id": "corner-bl",
+      "role": "corner",
+      "anchor": "bl",
+      "crop": [10, 432, 44, 464],
+      "stretch": "none",
+      "tailFade": { "sides": "rltb", "x": 4, "y": 4 },
+      "comment": "APPROXIMATION — opaque piece, fidelity FAIL expected"
+    },
+    {
+      "id": "corner-br",
+      "role": "corner",
+      "anchor": "br",
+      "crop": [312, 432, 348, 464],
+      "stretch": "none",
+      "tailFade": { "sides": "rltb", "x": 4, "y": 4 },
+      "comment": "APPROXIMATION — opaque piece, fidelity FAIL expected"
+    },
+    {
+      "id": "edge-top",
+      "role": "edge-x",
+      "anchor": "top",
+      "crop": [155, 108, 300, 147],
+      "stretch": "tile",
+      "tileSafe": true,
+      "wrapBlend": { "overlap": 30 },
+      "comment": "oracle edge(): opaque + 30px wrap crossfade — engine-exact"
+    },
+    {
+      "id": "edge-left",
+      "role": "edge-y",
+      "anchor": "left",
+      "crop": [15, 155, 44, 405],
+      "stretch": "tile",
+      "tileSafe": true,
+      "wrapBlend": { "overlap": 30 },
+      "comment": "oracle edge(): opaque + 30px wrap crossfade — engine-exact"
+    },
+    {
+      "id": "edge-right",
+      "role": "edge-y",
+      "anchor": "right",
+      "crop": [329, 160, 341, 420],
+      "stretch": "tile",
+      "tileSafe": true,
+      "wrapBlend": { "overlap": 30 },
+      "comment": "oracle edge(): opaque + 30px wrap crossfade — engine-exact"
+    },
+    {
+      "id": "edge-bottom",
+      "role": "edge-x",
+      "anchor": "bottom",
+      "crop": [55, 447, 320, 457],
+      "stretch": "tile",
+      "tileSafe": true,
+      "wrapBlend": { "overlap": 30 },
+      "comment": "oracle edge(): opaque + 30px wrap crossfade — engine-exact"
+    },
+    {
+      "id": "emblem-chest",
+      "role": "ornament",
+      "anchor": "explicit",
+      "crop": [38, 458, 100, 504],
+      "stretch": "none",
+      "tailFade": { "sides": "rltb", "x": 4, "y": 4 },
+      "comment": "APPROXIMATION — stash-band clasp ornament; opaque piece, fidelity FAIL expected"
+    }
+  ]
+}

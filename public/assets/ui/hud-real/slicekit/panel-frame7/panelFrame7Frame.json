@@ -1,0 +1,256 @@
+{
+  "surface": "panel-frame7",
+  "specVersion": 2,
+  "generator": "scripts/hud-real/slice-frame.py",
+  "generatedAt": "2026-11-19T17:36:07+00:00",
+  "source": {
+    "path": "test-results/slicekit/frame-smeraldo/frame-smeraldo-keyed.png",
+    "sha256": "578e4c41eca4ed4e0e5291e679f2edbc2c28251c20f36a46865e2a2da539221c"
+  },
+  "assetBase": "/assets/ui/hud-real/slicekit/panel-frame7/",
+  "pieces": [
+    {
+      "id": "corner-tl",
+      "file": "corner-tl.webp",
+      "role": "corner",
+      "anchor": "tl",
+      "stretch": "none",
+      "nativeSize": [
+        192,
+        199
+      ],
+      "bytes": 21198,
+      "displaySize": [
+        54,
+        56
+      ],
+      "pos": {
+        "left": -20,
+        "top": -34
+      }
+    },
+    {
+      "id": "corner-tr",
+      "file": "corner-tr.webp",
+      "role": "corner",
+      "anchor": "tr",
+      "stretch": "none",
+      "nativeSize": [
+        193,
+        196
+      ],
+      "bytes": 17262,
+      "displaySize": [
+        54,
+        55
+      ],
+      "pos": {
+        "right": -6,
+        "top": -34
+      }
+    },
+    {
+      "id": "corner-bl",
+      "file": "corner-bl.webp",
+      "role": "corner",
+      "anchor": "bl",
+      "stretch": "none",
+      "nativeSize": [
+        222,
+        208
+      ],
+      "bytes": 12148,
+      "displaySize": [
+        62,
+        58
+      ],
+      "pos": {
+        "left": -20,
+        "bottom": -3
+      }
+    },
+    {
+      "id": "corner-br",
+      "file": "corner-br.webp",
+      "role": "corner",
+      "anchor": "br",
+      "stretch": "none",
+      "nativeSize": [
+        191,
+        195
+      ],
+      "bytes": 6970,
+      "displaySize": [
+        53,
+        55
+      ],
+      "pos": {
+        "right": -6,
+        "bottom": -4
+      }
+    },
+    {
+      "id": "edge-top",
+      "file": "edge-top.webp",
+      "role": "edge-x",
+      "anchor": "top",
+      "stretch": "tile",
+      "nativeSize": [
+        238,
+        109
+      ],
+      "bytes": 17036,
+      "tileSafe": true,
+      "displayScale": 0.28,
+      "displaySize": [
+        67,
+        31
+      ],
+      "span": [
+        12,
+        4
+      ]
+    },
+    {
+      "id": "edge-left",
+      "file": "edge-left.webp",
+      "role": "edge-y",
+      "anchor": "left",
+      "stretch": "tile",
+      "nativeSize": [
+        64,
+        182
+      ],
+      "bytes": 7586,
+      "tileSafe": true,
+      "displayScale": 0.28,
+      "displaySize": [
+        18,
+        51
+      ],
+      "span": [
+        24,
+        2
+      ]
+    },
+    {
+      "id": "edge-right",
+      "file": "edge-right.webp",
+      "role": "edge-y",
+      "anchor": "right",
+      "stretch": "tile",
+      "nativeSize": [
+        12,
+        500
+      ],
+      "bytes": 2298,
+      "tileSafe": true,
+      "displayScale": 0.28,
+      "displaySize": [
+        3,
+        140
+      ],
+      "span": [
+        24,
+        2
+      ]
+    },
+    {
+      "id": "edge-bottom",
+      "file": "edge-bottom.webp",
+      "role": "edge-x",
+      "anchor": "bottom",
+      "stretch": "tile",
+      "nativeSize": [
+        400,
+        12
+      ],
+      "bytes": 1470,
+      "tileSafe": true,
+      "displayScale": 0.28,
+      "displaySize": [
+        112,
+        3
+      ],
+      "span": [
+        8,
+        4
+      ]
+    }
+  ],
+  "geometry": {
+    "outer": {
+      "x": 13,
+      "y": 16,
+      "w": 948,
+      "h": 1008
+    },
+    "contentRect": {
+      "x": 86,
+      "y": 136,
+      "w": 854,
+      "h": 876
+    },
+    "contentInsets": {
+      "top": 120,
+      "right": 21,
+      "bottom": 12,
+      "left": 73
+    },
+    "rimOverlapPx": 1,
+    "corners": {
+      "tl": {
+        "w": 192,
+        "h": 199
+      },
+      "tr": {
+        "w": 193,
+        "h": 196
+      },
+      "bl": {
+        "w": 222,
+        "h": 208
+      },
+      "br": {
+        "w": 191,
+        "h": 195
+      }
+    },
+    "edgeThickness": {
+      "top": 109,
+      "left": 64,
+      "right": 12,
+      "bottom": 12
+    },
+    "backings": [
+      {
+        "anchor": "tl",
+        "w": 18,
+        "h": 18,
+        "shape": "crescent",
+        "color": "var(--skin-hud-enamel-deep, #091d15)"
+      },
+      {
+        "anchor": "tr",
+        "w": 18,
+        "h": 18,
+        "shape": "crescent",
+        "color": "var(--skin-hud-enamel-deep, #091d15)"
+      },
+      {
+        "anchor": "bl",
+        "w": 18,
+        "h": 18,
+        "shape": "crescent",
+        "color": "var(--skin-hud-enamel-deep, #091d15)"
+      },
+      {
+        "anchor": "br",
+        "w": 18,
+        "h": 18,
+        "shape": "crescent",
+        "color": "var(--skin-hud-enamel-deep, #091d15)"
+      }
+    ]
+  }
+}

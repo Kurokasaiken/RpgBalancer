@@ -1,0 +1,228 @@
+{
+  "specVersion": 1,
+  "surface": "panel-frame5-full",
+  "comment": "PLAN-127 night-shift A/B strategy A2 — COMPREHENSIVE spec. Expresses the ENTIRE op chain of oracle scripts/build-panel-frame5-assets.py (R-357 frame set v5, sliced directly from the baptized golden mockup-r357-cornici-aperta.png, case a of PLAN-127 §3.2). Every field prefixed x- is a CANDIDATE schema field the engine does not yet implement: declared here so the spec is self-documenting and each gap is named, not implicit. EXPECTED to fail jsonschema validation on the x- keys — see panel-frame5-full-runnable.json for the engine-supported subset and test-results/slicekit/night-shift/frame5-full-findings.md for the gap analysis.",
+  "x-oracle": {
+    "script": "scripts/build-panel-frame5-assets.py",
+    "golden": ".mw/specs/expedition-ui/refs/mockup-r357-cornici-aperta.png",
+    "goldenDims": [1376, 768],
+    "oracleAssets": "public/assets/ui/hud-real/panel-frame5/",
+    "comment": "Two oracle functions: edge() = opaque RGB strip + 30px wrap crossfade (alpha 255 everywhere); keyart() = colour-class key + despeckle + 3px border soften on all sides.",
+    "sourceNotes": "The golden is a full painted mockup (map + panels), NOT a flat-background render — flatBgMaxDiff cannot express the oracle's key, which selects by colour CLASS (brass/gem) wherever they sit in the image. No global key: keying is per-slice, so each slice carries its own x-key. No cutouts: the oracle punches no interior hole — keying drops the plaque/map background for keyart pieces and edges are opaque crops of painted border."
+  },
+  "x-pipeline": [
+    "crop (+wrapBlend overlap extension on the repeat axis, edges only)",
+    "key (per-slice: colorClassDelta on corner|ornament, none on edges) — engine has only a single global source.key of type flatBgMaxDiff",
+    "despeckle (corner|ornament) — oracle neighbour filter, no engine equivalent",
+    "borderSoften (corner|ornament) — oracle 3px floor ramp on all sides; closest engine op is tailFade but it zeroes the rim pixel and is meant for corner→edge transitions only",
+    "wrapBlend crossfade + trim (edges) — engine parity",
+    "WebP RGBA save (quality 92, alpha lossless) — engine parity"
+  ],
+  "source": {
+    "path": ".mw/specs/expedition-ui/refs/mockup-r357-cornici-aperta.png"
+  },
+  "geometry": {
+    "outerRect": [2, 96, 352, 464],
+    "contentRect": [49, 147, 331, 449],
+    "rimOverlapPx": 1,
+    "comment": "INFERRED from the oracle docstring (roster panel box x14-340, y108-453; left spine x15-49; right wire x331-338; bottom wire y449-453) — corner crops span the painted knuckles outside the panel box (frame rides OUTSIDE, ~1px inner-rim overlap, Director ruling). emblem-chest belongs to the stash's top band below (y458-504), not this rect. Per-surface visual fork confirms."
+  },
+  "output": {
+    "dir": "public/assets/ui/hud-real/slicekit/panel-frame5-full",
+    "format": "webp",
+    "quality": 92,
+    "alphaQuality": 100,
+    "manifest": "panelFrame5FullFrame.json"
+  },
+  "budgets": {
+    "maxPieces": 16,
+    "maxBytes": 1048576
+  },
+  "slices": [
+    {
+      "id": "corner-tl",
+      "role": "corner",
+      "anchor": "tl",
+      "crop": [2, 96, 66, 156],
+      "stretch": "none",
+      "x-key": {
+        "type": "colorClassDelta",
+        "classes": [
+          { "name": "brass", "expr": "r - max(g,b)", "bias": 0 },
+          { "name": "gem", "expr": "g - max(r,b)", "bias": -8 }
+        ],
+        "threshold": 6,
+        "gain": 18,
+        "comment": "oracle keyart(): keep = max(brass, gem+bias); alpha = clip((keep - threshold) * gain, 0, 255). Per-class keying: keeps warm acanthus metal + emerald knuckles, drops teal/blue/grey map+plaque."
+      },
+      "x-despeckle": {
+        "minOpaqueNeighbors": 3,
+        "connectivity": 8,
+        "comment": "oracle keyart(): an opaque px needs >=3 opaque 8-neighbours to survive — kills lone map-foliage specks that key as green"
+      },
+      "x-borderSoften": {
+        "sides": "rltb",
+        "widthPx": 3,
+        "curve": "floorRamp",
+        "comment": "oracle keyart(): alpha *= (i+1)/(widthPx+1) at offset i in [0,widthPx) — floor 0.25 at the rim px, never zeroes it (unlike tailFade which ramps to 0 at the edge)"
+      }
+    },
+    {
+      "id": "corner-tr",
+      "role": "corner",
+      "anchor": "tr",
+      "crop": [306, 100, 352, 152],
+      "stretch": "none",
+      "x-key": {
+        "type": "colorClassDelta",
+        "classes": [
+          { "name": "brass", "expr": "r - max(g,b)", "bias": 0 },
+          { "name": "gem", "expr": "g - max(r,b)", "bias": -8 }
+        ],
+        "threshold": 6,
+        "gain": 18,
+        "comment": "oracle keyart() — same class profile as all keyart pieces"
+      },
+      "x-despeckle": {
+        "minOpaqueNeighbors": 3,
+        "connectivity": 8,
+        "comment": "oracle keyart() neighbour filter"
+      },
+      "x-borderSoften": {
+        "sides": "rltb",
+        "widthPx": 3,
+        "curve": "floorRamp",
+        "comment": "oracle keyart() 3px rim ramp on all sides"
+      }
+    },
+    {
+      "id": "corner-bl",
+      "role": "corner",
+      "anchor": "bl",
+      "crop": [10, 432, 44, 464],
+      "stretch": "none",
+      "x-key": {
+        "type": "colorClassDelta",
+        "classes": [
+          { "name": "brass", "expr": "r - max(g,b)", "bias": 0 },
+          { "name": "gem", "expr": "g - max(r,b)", "bias": -8 }
+        ],
+        "threshold": 6,
+        "gain": 18,
+        "comment": "oracle keyart() — small gem stud"
+      },
+      "x-despeckle": {
+        "minOpaqueNeighbors": 3,
+        "connectivity": 8,
+        "comment": "oracle keyart() neighbour filter"
+      },
+      "x-borderSoften": {
+        "sides": "rltb",
+        "widthPx": 3,
+        "curve": "floorRamp",
+        "comment": "oracle keyart() 3px rim ramp on all sides"
+      }
+    },
+    {
+      "id": "corner-br",
+      "role": "corner",
+      "anchor": "br",
+      "crop": [312, 432, 348, 464],
+      "stretch": "none",
+      "x-key": {
+        "type": "colorClassDelta",
+        "classes": [
+          { "name": "brass", "expr": "r - max(g,b)", "bias": 0 },
+          { "name": "gem", "expr": "g - max(r,b)", "bias": -8 }
+        ],
+        "threshold": 6,
+        "gain": 18,
+        "comment": "oracle keyart() — small gem stud"
+      },
+      "x-despeckle": {
+        "minOpaqueNeighbors": 3,
+        "connectivity": 8,
+        "comment": "oracle keyart() neighbour filter"
+      },
+      "x-borderSoften": {
+        "sides": "rltb",
+        "widthPx": 3,
+        "curve": "floorRamp",
+        "comment": "oracle keyart() 3px rim ramp on all sides"
+      }
+    },
+    {
+      "id": "edge-top",
+      "role": "edge-x",
+      "anchor": "top",
+      "crop": [155, 108, 300, 147],
+      "stretch": "tile",
+      "tileSafe": true,
+      "wrapBlend": { "overlap": 30 },
+      "x-key": { "type": "none", "comment": "oracle edge(): OPAQUE strip — alpha 255 everywhere, no keying. Band field right of the title plaque (x<155 covered)." },
+      "comment": "oracle edge('edge-top',(155,108,300,147),'x',ov=30): engraved vine band, aperiodic ornament -> 30px overlap-blend at wrap"
+    },
+    {
+      "id": "edge-left",
+      "role": "edge-y",
+      "anchor": "left",
+      "crop": [15, 155, 44, 405],
+      "stretch": "tile",
+      "tileSafe": true,
+      "wrapBlend": { "overlap": 30 },
+      "x-key": { "type": "none", "comment": "oracle edge(): opaque. Spine filets + engraved lattice; x<44 avoids the LV badges painted in the mockup." },
+      "comment": "oracle edge('edge-left',(15,155,44,405),'y',ov=30)"
+    },
+    {
+      "id": "edge-right",
+      "role": "edge-y",
+      "anchor": "right",
+      "crop": [329, 160, 341, 420],
+      "stretch": "tile",
+      "tileSafe": true,
+      "wrapBlend": { "overlap": 30 },
+      "x-key": { "type": "none", "comment": "oracle edge(): opaque. Thin gold wire + outer channel." },
+      "comment": "oracle edge('edge-right',(329,160,341,420),'y',ov=30)"
+    },
+    {
+      "id": "edge-bottom",
+      "role": "edge-x",
+      "anchor": "bottom",
+      "crop": [55, 447, 320, 457],
+      "stretch": "tile",
+      "tileSafe": true,
+      "wrapBlend": { "overlap": 30 },
+      "x-key": { "type": "none", "comment": "oracle edge(): opaque. Thin gold wire + outer channel." },
+      "comment": "oracle edge('edge-bottom',(55,447,320,457),'x',ov=30)"
+    },
+    {
+      "id": "emblem-chest",
+      "role": "ornament",
+      "anchor": "explicit",
+      "crop": [38, 458, 100, 504],
+      "stretch": "none",
+      "x-key": {
+        "type": "colorClassDelta",
+        "classes": [
+          { "name": "brass", "expr": "r - max(g,b)", "bias": 0 },
+          { "name": "gem", "expr": "g - max(r,b)", "bias": -8 }
+        ],
+        "threshold": 6,
+        "gain": 18,
+        "comment": "oracle keyart() — stash chest clasp seated on the stash's top band"
+      },
+      "x-despeckle": {
+        "minOpaqueNeighbors": 3,
+        "connectivity": 8,
+        "comment": "oracle keyart() neighbour filter"
+      },
+      "x-borderSoften": {
+        "sides": "rltb",
+        "widthPx": 3,
+        "curve": "floorRamp",
+        "comment": "oracle keyart() 3px rim ramp on all sides"
+      },
+      "comment": "ornament anchored explicitly on the stash band (below the roster rect this frame dresses)"
+    }
+  ]
+}

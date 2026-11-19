@@ -1,0 +1,404 @@
+{
+ "specVersion": 2,
+ "surface": "controls",
+ "comment": "PLAN-128: HUD controls golden (controls-sheet-g2.png, ChatGPT 2026-11-19, Director-approved \u00abS\u00ec, approvo\u00bb). Round = one piece per state (28px ring, scale 0.18); pill = 3-slice per state (left cap, right cap, repeat-x centre strip; 24px tall, scale 0.27). Alpha comes from the keyed derivative (sourceAlpha); hover/selected glow is CSS box-shadow. Oval and dropdown rows are in the golden but not sliced until a surface uses them (minimum assets).",
+ "source": {
+  "path": ".mw/specs/expedition-ui/refs/controls-sheet-g2-keyed.png",
+  "key": {
+   "type": "sourceAlpha"
+  },
+  "comment": "RGBA derivative of controls-sheet-g2.png made by scripts/hud-real/prep_controls_keyed.py (analytic silhouette alpha, RGB untouched, halos left to CSS)"
+ },
+ "output": {
+  "dir": "public/assets/ui/hud-real/slicekit/controls",
+  "manifest": "controlsFrame.json",
+  "quality": 100,
+  "method": 6,
+  "tsModule": {
+   "path": "src/generated/slicekit/controlsFrame.ts",
+   "typeImport": "@/ui/idleVillage/skins/primitives/sliceKitManifest",
+   "exportName": "controlsFrame"
+  }
+ },
+ "budgets": {
+  "maxPieces": 24,
+  "maxBytes": 1048576
+ },
+ "slices": [
+  {
+   "id": "round-normal",
+   "role": "ornament",
+   "anchor": "explicit",
+   "stretch": "none",
+   "crop": [
+    106,
+    112,
+    274,
+    280
+   ],
+   "displayScale": 0.18,
+   "pos": {
+    "left": 0,
+    "top": 0
+   },
+   "comment": "ring + well, analytic circle alpha; 168px square, halo is CSS"
+  },
+  {
+   "id": "round-hover",
+   "role": "ornament",
+   "anchor": "explicit",
+   "stretch": "none",
+   "crop": [
+    394,
+    113,
+    562,
+    281
+   ],
+   "displayScale": 0.18,
+   "pos": {
+    "left": 0,
+    "top": 0
+   },
+   "comment": "ring + well, analytic circle alpha; 168px square, halo is CSS"
+  },
+  {
+   "id": "round-pressed",
+   "role": "ornament",
+   "anchor": "explicit",
+   "stretch": "none",
+   "crop": [
+    685,
+    113,
+    853,
+    281
+   ],
+   "displayScale": 0.18,
+   "pos": {
+    "left": 0,
+    "top": 0
+   },
+   "comment": "ring + well, analytic circle alpha; 168px square, halo is CSS"
+  },
+  {
+   "id": "round-selected",
+   "role": "ornament",
+   "anchor": "explicit",
+   "stretch": "none",
+   "crop": [
+    974,
+    113,
+    1142,
+    281
+   ],
+   "displayScale": 0.18,
+   "pos": {
+    "left": 0,
+    "top": 0
+   },
+   "comment": "ring + well, analytic circle alpha; 168px square, halo is CSS"
+  },
+  {
+   "id": "round-disabled",
+   "role": "ornament",
+   "anchor": "explicit",
+   "stretch": "none",
+   "crop": [
+    1262,
+    109,
+    1430,
+    277
+   ],
+   "displayScale": 0.18,
+   "pos": {
+    "left": 0,
+    "top": 0
+   },
+   "comment": "ring + well, analytic circle alpha; 168px square, halo is CSS"
+  },
+  {
+   "id": "pill-normal-l",
+   "role": "ornament",
+   "anchor": "explicit",
+   "stretch": "none",
+   "crop": [
+    68,
+    557,
+    140,
+    665
+   ],
+   "displayScale": 0.27,
+   "pos": {
+    "left": 0,
+    "top": 0
+   },
+   "comment": "left semicircle cap"
+  },
+  {
+   "id": "pill-normal-r",
+   "role": "ornament",
+   "anchor": "explicit",
+   "stretch": "none",
+   "crop": [
+    241,
+    557,
+    313,
+    665
+   ],
+   "displayScale": 0.27,
+   "pos": {
+    "left": 0,
+    "top": 0
+   }
+  },
+  {
+   "id": "pill-normal-m",
+   "role": "edge-x",
+   "anchor": "top",
+   "stretch": "tile",
+   "tileSafe": true,
+   "crop": [
+    160,
+    557,
+    220,
+    665
+   ],
+   "wrapBlend": {
+    "overlap": 12
+   },
+   "displayScale": 0.27,
+   "span": [
+    0,
+    0
+   ],
+   "comment": "uniform centre strip (rims + well), repeat-x between the caps"
+  },
+  {
+   "id": "pill-hover-l",
+   "role": "ornament",
+   "anchor": "explicit",
+   "stretch": "none",
+   "crop": [
+    361,
+    559,
+    433,
+    667
+   ],
+   "displayScale": 0.27,
+   "pos": {
+    "left": 0,
+    "top": 0
+   },
+   "comment": "left semicircle cap"
+  },
+  {
+   "id": "pill-hover-r",
+   "role": "ornament",
+   "anchor": "explicit",
+   "stretch": "none",
+   "crop": [
+    530,
+    559,
+    602,
+    667
+   ],
+   "displayScale": 0.27,
+   "pos": {
+    "left": 0,
+    "top": 0
+   }
+  },
+  {
+   "id": "pill-hover-m",
+   "role": "edge-x",
+   "anchor": "top",
+   "stretch": "tile",
+   "tileSafe": true,
+   "crop": [
+    451,
+    559,
+    511,
+    667
+   ],
+   "wrapBlend": {
+    "overlap": 12
+   },
+   "displayScale": 0.27,
+   "span": [
+    0,
+    0
+   ],
+   "comment": "uniform centre strip (rims + well), repeat-x between the caps"
+  },
+  {
+   "id": "pill-pressed-l",
+   "role": "ornament",
+   "anchor": "explicit",
+   "stretch": "none",
+   "crop": [
+    652,
+    557,
+    724,
+    665
+   ],
+   "displayScale": 0.27,
+   "pos": {
+    "left": 0,
+    "top": 0
+   },
+   "comment": "left semicircle cap"
+  },
+  {
+   "id": "pill-pressed-r",
+   "role": "ornament",
+   "anchor": "explicit",
+   "stretch": "none",
+   "crop": [
+    815,
+    557,
+    887,
+    665
+   ],
+   "displayScale": 0.27,
+   "pos": {
+    "left": 0,
+    "top": 0
+   }
+  },
+  {
+   "id": "pill-pressed-m",
+   "role": "edge-x",
+   "anchor": "top",
+   "stretch": "tile",
+   "tileSafe": true,
+   "crop": [
+    739,
+    557,
+    799,
+    665
+   ],
+   "wrapBlend": {
+    "overlap": 12
+   },
+   "displayScale": 0.27,
+   "span": [
+    0,
+    0
+   ],
+   "comment": "uniform centre strip (rims + well), repeat-x between the caps"
+  },
+  {
+   "id": "pill-selected-l",
+   "role": "ornament",
+   "anchor": "explicit",
+   "stretch": "none",
+   "crop": [
+    937,
+    560,
+    1009,
+    668
+   ],
+   "displayScale": 0.27,
+   "pos": {
+    "left": 0,
+    "top": 0
+   },
+   "comment": "left semicircle cap"
+  },
+  {
+   "id": "pill-selected-r",
+   "role": "ornament",
+   "anchor": "explicit",
+   "stretch": "none",
+   "crop": [
+    1112,
+    560,
+    1184,
+    668
+   ],
+   "displayScale": 0.27,
+   "pos": {
+    "left": 0,
+    "top": 0
+   }
+  },
+  {
+   "id": "pill-selected-m",
+   "role": "edge-x",
+   "anchor": "top",
+   "stretch": "tile",
+   "tileSafe": true,
+   "crop": [
+    1030,
+    560,
+    1090,
+    668
+   ],
+   "wrapBlend": {
+    "overlap": 12
+   },
+   "displayScale": 0.27,
+   "span": [
+    0,
+    0
+   ],
+   "comment": "uniform centre strip (rims + well), repeat-x between the caps"
+  },
+  {
+   "id": "pill-disabled-l",
+   "role": "ornament",
+   "anchor": "explicit",
+   "stretch": "none",
+   "crop": [
+    1234,
+    557,
+    1306,
+    665
+   ],
+   "displayScale": 0.27,
+   "pos": {
+    "left": 0,
+    "top": 0
+   },
+   "comment": "left semicircle cap"
+  },
+  {
+   "id": "pill-disabled-r",
+   "role": "ornament",
+   "anchor": "explicit",
+   "stretch": "none",
+   "crop": [
+    1398,
+    557,
+    1470,
+    665
+   ],
+   "displayScale": 0.27,
+   "pos": {
+    "left": 0,
+    "top": 0
+   }
+  },
+  {
+   "id": "pill-disabled-m",
+   "role": "edge-x",
+   "anchor": "top",
+   "stretch": "tile",
+   "tileSafe": true,
+   "crop": [
+    1322,
+    557,
+    1382,
+    665
+   ],
+   "wrapBlend": {
+    "overlap": 12
+   },
+   "displayScale": 0.27,
+   "span": [
+    0,
+    0
+   ],
+   "comment": "uniform centre strip (rims + well), repeat-x between the caps"
+  }
+ ]
+}

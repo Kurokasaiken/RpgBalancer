@@ -1,0 +1,166 @@
+{
+  "surface": "cassetto",
+  "specVersion": 1,
+  "generator": "scripts/hud-real/slice-frame.py",
+  "generatedAt": "2026-11-18T20:40:13+00:00",
+  "source": {
+    "path": ".mw/specs/expedition-ui/refs/mockup-r357-cassetto-largo.png",
+    "sha256": "a5d84b697c5e345ef78e1bbff2a19ae5f605786deef88246eab590b62d9f6633"
+  },
+  "assetBase": "/assets/ui/hud-real/slicekit/cassetto/",
+  "pieces": [
+    {
+      "id": "rail-top",
+      "file": "rail-top.webp",
+      "role": "ornament",
+      "anchor": "tl",
+      "stretch": "none",
+      "nativeSize": [
+        100,
+        360
+      ],
+      "bytes": 27562
+    },
+    {
+      "id": "rail-mid",
+      "file": "rail-mid.webp",
+      "role": "edge-y",
+      "anchor": "left",
+      "stretch": "tile",
+      "nativeSize": [
+        100,
+        160
+      ],
+      "bytes": 12420,
+      "tileSafe": true
+    },
+    {
+      "id": "rail-bottom",
+      "file": "rail-bottom.webp",
+      "role": "ornament",
+      "anchor": "bl",
+      "stretch": "none",
+      "nativeSize": [
+        100,
+        376
+      ],
+      "bytes": 29162
+    },
+    {
+      "id": "frame-top",
+      "file": "frame-top.webp",
+      "role": "ornament",
+      "anchor": "top",
+      "stretch": "none",
+      "nativeSize": [
+        936,
+        24
+      ],
+      "bytes": 1748
+    },
+    {
+      "id": "vignette",
+      "file": "vignette.webp",
+      "role": "ornament",
+      "anchor": "top",
+      "stretch": "none",
+      "nativeSize": [
+        936,
+        262
+      ],
+      "bytes": 124590
+    },
+    {
+      "id": "skull",
+      "file": "skull.webp",
+      "role": "ornament",
+      "anchor": "explicit",
+      "stretch": "none",
+      "nativeSize": [
+        166,
+        166
+      ],
+      "bytes": 11940
+    },
+    {
+      "id": "chest",
+      "file": "chest.webp",
+      "role": "ornament",
+      "anchor": "explicit",
+      "stretch": "none",
+      "nativeSize": [
+        160,
+        160
+      ],
+      "bytes": 13798
+    },
+    {
+      "id": "cta-plaque",
+      "file": "cta-plaque.webp",
+      "role": "ornament",
+      "anchor": "bottom",
+      "stretch": "none",
+      "nativeSize": [
+        1500,
+        317
+      ],
+      "bytes": 129504,
+      "compositeMode": "hole-bound"
+    },
+    {
+      "id": "supply-bag",
+      "file": "supply-bag.webp",
+      "role": "ornament",
+      "anchor": "explicit",
+      "stretch": "none",
+      "nativeSize": [
+        192,
+        192
+      ],
+      "bytes": 30422
+    }
+  ],
+  "geometry": {
+    "outer": {
+      "x": 0,
+      "y": 0,
+      "w": 1024,
+      "h": 1536
+    },
+    "contentRect": {
+      "x": 88,
+      "y": 0,
+      "w": 936,
+      "h": 1536
+    },
+    "contentInsets": {
+      "top": 0,
+      "right": 0,
+      "bottom": 0,
+      "left": 88
+    },
+    "rimOverlapPx": 12,
+    "corners": {},
+    "edgeThickness": {
+      "left": 100
+    }
+  },
+  "ctaWindow": {
+    "shape": "sprite-mask",
+    "rect": [
+      124,
+      1344,
+      1004,
+      1530
+    ],
+    "inset": {
+      "left": 0.121094,
+      "top": 0.875,
+      "right": 0.019531,
+      "bottom": 0.003906
+    },
+    "marginPx": 14,
+    "maskRef": "cta-plaque.webp",
+    "id": "cta-window"
+  }
+}

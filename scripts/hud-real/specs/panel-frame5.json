@@ -1,0 +1,328 @@
+{
+  "specVersion": 2,
+  "surface": "panel-frame5",
+  "comment": "PLAN-127 — final spec for the R-357 frame set v5 (oracle scripts/build-panel-frame5-assets.py, golden mockup-r357-cornici-aperta.png sliced directly, case a of PLAN-127 §3.2). Minimal style: source.key carries the colour-class key once; corner|ornament inherit it and add despeckle+borderSoften (the oracle's keyart chain); edges opt out with key:{type:none} and emit opaque wrapBlend tiles. Evidence: night-shift 2026-11-19 (frame5-minimal/full findings, anti-DSL >=2-surface gate in SUMMARY.md). Render-side fields (displaySize/pos/span/variants/geometry.backings) added 2026-11-19 for the manifest-consumption path (OB-2): they reproduce EXACTLY the hand-tuned geometry PanelFrameOrnaments cornici/corniciStash ships today — evidence = the 2 real surfaces that consume it (Roster + Stash panels).",
+  "source": {
+    "path": ".mw/specs/expedition-ui/refs/mockup-r357-cornici-aperta.png",
+    "key": {
+      "type": "colorClassDelta",
+      "classes": [
+        {
+          "channel": "r",
+          "comment": "brass — r - max(g,b)"
+        },
+        {
+          "channel": "g",
+          "bias": -8,
+          "comment": "gem — g - max(r,b) - 8 (emerald needs stronger green)"
+        }
+      ],
+      "threshold": 6,
+      "gain": 18,
+      "comment": "oracle keyart(): keep = max(brass, gem-8); alpha = clip((keep-6)*18). Keys warm metal + emerald on the painted map/plaque ground where no flat sampleRect exists. corner|ornament only — edges opt out below."
+    }
+  },
+  "geometry": {
+    "outerRect": [
+      2,
+      96,
+      352,
+      464
+    ],
+    "contentRect": [
+      49,
+      147,
+      331,
+      449
+    ],
+    "rimOverlapPx": 1,
+    "backings": [
+      {
+        "anchor": "tl",
+        "w": 20,
+        "h": 18,
+        "radius": "0 0 16px 0",
+        "color": "#0f1b1f",
+        "comment": "corner-bite backings: the plaque's rounded corner arc leaves a crescent of backdrop between the bands' inner rims — a patch whose own rounded edge follows the plaque arc covers the wedge (PanelFrameOrnaments contract; roster + stash share it)"
+      },
+      {
+        "anchor": "tr",
+        "w": 20,
+        "h": 18,
+        "radius": "0 0 0 16px",
+        "color": "#0f1b1f"
+      },
+      {
+        "anchor": "bl",
+        "w": 20,
+        "h": 18,
+        "radius": "0 16px 0 0",
+        "color": "#0f1b1f"
+      },
+      {
+        "anchor": "br",
+        "w": 20,
+        "h": 18,
+        "radius": "16px 0 0 0",
+        "color": "#0f1b1f"
+      }
+    ],
+    "comment": "outerRect = frame art bbox on the golden; contentRect = interior inside the inner filets (inferred in panel-frame5-full.json from the oracle docstring: left spine x15-49, top band y108-147, right wire x331-338, bottom wire y449-453). NOT the golden's roster panel box (x14-340 y108-453): runtime placement is per-piece pos/span — authored data, not derived from these rects."
+  },
+  "output": {
+    "dir": "public/assets/ui/hud-real/slicekit/panel-frame5",
+    "manifest": "panelFrame5Frame.json",
+    "tsModule": {
+      "path": "src/generated/slicekit/panelFrame5Frame.ts",
+      "typeImport": "@/ui/idleVillage/skins/primitives/sliceKitManifest",
+      "exportName": "panelFrame5Frame"
+    }
+  },
+  "budgets": {
+    "maxPieces": 16,
+    "maxBytes": 1048576
+  },
+  "slices": [
+    {
+      "id": "corner-tl",
+      "role": "corner",
+      "anchor": "tl",
+      "crop": [
+        2,
+        96,
+        66,
+        156
+      ],
+      "stretch": "none",
+      "despeckle": {
+        "minNeighbors": 3
+      },
+      "borderSoften": {
+        "width": 3,
+        "minFactor": 0.25
+      },
+      "displaySize": [
+        50,
+        47
+      ],
+      "pos": {
+        "left": -22,
+        "top": -23
+      },
+      "comment": "acanthus+gem knuckle; displaySize/pos = PanelFrameOrnaments CORNER_PX.tl + authored offset (knuckle mass centred on the panel corner, not derivable from any hole rect)"
+    },
+    {
+      "id": "corner-tr",
+      "role": "corner",
+      "anchor": "tr",
+      "crop": [
+        306,
+        100,
+        352,
+        152
+      ],
+      "stretch": "none",
+      "despeckle": {
+        "minNeighbors": 3
+      },
+      "borderSoften": {
+        "width": 3,
+        "minFactor": 0.25
+      },
+      "displaySize": [
+        36,
+        40
+      ],
+      "pos": {
+        "right": -14,
+        "top": -22
+      }
+    },
+    {
+      "id": "corner-bl",
+      "role": "corner",
+      "anchor": "bl",
+      "crop": [
+        10,
+        432,
+        44,
+        464
+      ],
+      "stretch": "none",
+      "despeckle": {
+        "minNeighbors": 3
+      },
+      "borderSoften": {
+        "width": 3,
+        "minFactor": 0.25
+      },
+      "displaySize": [
+        22,
+        20
+      ],
+      "pos": {
+        "left": -10,
+        "bottom": -10
+      },
+      "comment": "gem stud — hand-tuned NON-UNIFORM scale (native 34x32 → 22x20): why displaySize, not displayScale"
+    },
+    {
+      "id": "corner-br",
+      "role": "corner",
+      "anchor": "br",
+      "crop": [
+        312,
+        432,
+        348,
+        464
+      ],
+      "stretch": "none",
+      "despeckle": {
+        "minNeighbors": 3
+      },
+      "borderSoften": {
+        "width": 3,
+        "minFactor": 0.25
+      },
+      "displaySize": [
+        22,
+        20
+      ],
+      "pos": {
+        "right": -10,
+        "bottom": -10
+      }
+    },
+    {
+      "id": "edge-top",
+      "role": "edge-x",
+      "anchor": "top",
+      "crop": [
+        155,
+        108,
+        300,
+        147
+      ],
+      "stretch": "tile",
+      "tileSafe": true,
+      "wrapBlend": {
+        "overlap": 30
+      },
+      "key": {
+        "type": "none"
+      },
+      "displayScale": 0.77,
+      "span": [
+        24,
+        24
+      ],
+      "comment": "engraved vine band; displayScale derives displaySize [112,30] — rim side derived: top = -(30 - rimOverlapPx) = -29"
+    },
+    {
+      "id": "edge-left",
+      "role": "edge-y",
+      "anchor": "left",
+      "crop": [
+        15,
+        155,
+        44,
+        405
+      ],
+      "stretch": "tile",
+      "tileSafe": true,
+      "wrapBlend": {
+        "overlap": 30
+      },
+      "key": {
+        "type": "none"
+      },
+      "displayScale": 0.83,
+      "span": [
+        24,
+        12
+      ],
+      "comment": "engraved lattice spine; asymmetric span (-24 top under the knuckle, -12 bottom over the stud)"
+    },
+    {
+      "id": "edge-right",
+      "role": "edge-y",
+      "anchor": "right",
+      "crop": [
+        329,
+        160,
+        341,
+        420
+      ],
+      "stretch": "tile",
+      "tileSafe": true,
+      "wrapBlend": {
+        "overlap": 30
+      },
+      "key": {
+        "type": "none"
+      },
+      "displayScale": 0.75,
+      "span": [
+        24,
+        12
+      ],
+      "comment": "plain wire"
+    },
+    {
+      "id": "edge-bottom",
+      "role": "edge-x",
+      "anchor": "bottom",
+      "crop": [
+        55,
+        447,
+        320,
+        457
+      ],
+      "stretch": "tile",
+      "tileSafe": true,
+      "wrapBlend": {
+        "overlap": 30
+      },
+      "key": {
+        "type": "none"
+      },
+      "displayScale": 0.7,
+      "span": [
+        12,
+        12
+      ],
+      "comment": "plain wire"
+    },
+    {
+      "id": "emblem-chest",
+      "role": "ornament",
+      "anchor": "explicit",
+      "crop": [
+        38,
+        458,
+        100,
+        504
+      ],
+      "stretch": "none",
+      "despeckle": {
+        "minNeighbors": 3
+      },
+      "borderSoften": {
+        "width": 3,
+        "minFactor": 0.25
+      },
+      "displaySize": [
+        54,
+        40
+      ],
+      "pos": {
+        "left": "16%",
+        "top": -44
+      },
+      "variants": [
+        "corniciStash"
+      ],
+      "comment": "R-357 golden: chest clasp seats ON the stash's top wire — pos.left '16%' reproduces PanelFrameOrnaments verbatim; roster variant ('cornici') filters it out via variants"
+    }
+  ]
+}
