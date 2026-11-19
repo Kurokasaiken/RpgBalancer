@@ -129,12 +129,15 @@ export default interface Resources {
       "actions": {
         "cancel": "Cancel",
         "collect": "Collect",
+        "collecting": "Collecting...",
         "start": "Start",
         "startPending": "Pending…"
       },
+      "defaultHalo": "POI",
       "devTools": {
         "validationTitle": "Skin Validation Errors"
       },
+      "dropHint": "Drop",
       "info": {
         "duration": "Duration",
         "eta": "ETA",
@@ -171,7 +174,8 @@ export default interface Resources {
         "maintenance": "Maintenance",
         "quest": "Quest",
         "training": "Training"
-      }
+      },
+      "workerAlt": "Worker"
     },
     "astrolabeV3": {
       "auto": "Auto",
@@ -428,6 +432,8 @@ export default interface Resources {
     },
     "floatingPanel": {
       "close": "Close panel",
+      "collapse": "Collapse panel",
+      "expand": "Expand panel",
       "minimize": "Minimise panel",
       "pin": "Pin panel open",
       "restore": "Restore panel",
@@ -453,7 +459,7 @@ export default interface Resources {
       },
       "cassetto": {
         "collapse": "Collapse the expedition drawer",
-        "confirm": "CONFIRM",
+        "confirm": "LAUNCH EXPEDITION",
         "confirmReason": {
           "partyIncomplete": "Party incomplete — fill the required slots",
           "unavailable": "Expedition not ready yet"
@@ -463,6 +469,7 @@ export default interface Resources {
           "subtitle": "Plan the expedition"
         },
         "expand": "Open the expedition planner",
+        "food": "Food",
         "journey": "Journey",
         "journeyTotal": "Total: {count, plural, one {# day} other {# days}}",
         "leg": {
@@ -471,9 +478,12 @@ export default interface Resources {
           "site": "At site"
         },
         "legDays": "{count, plural, one {# day} other {# days}}",
+        "openRoster": "Open the roster",
+        "openStash": "Open the stash",
         "party": "Party Slots",
         "risk": "Risk",
-        "riskRewards": "Risk & Rewards"
+        "riskRewards": "Risk & Rewards",
+        "supplies": "Supplies"
       },
       "compass": {
         "recenter": "Re-centre the map"
@@ -924,6 +934,9 @@ export default interface Resources {
           "placeholder": "Sort by…"
         },
         "title": "Roster",
+        "view": {
+          "ariaLabel": "Switch roster view"
+        },
         "zanara": {
           "expand": "Open the full roster",
           "listLabel": "Heroes",
@@ -970,6 +983,7 @@ export default interface Resources {
         "empty": "The shelf is empty — every copy is packed or away",
         "filterEmpty": "Nothing of this kind in store",
         "filterLabel": "Filter goods",
+        "goodsCount": "{count} of {max} goods",
         "notReady": "Store unavailable — ledger could not load",
         "openHint": "Open a quest planner to pack items into its bag",
         "pack": "Pack",
@@ -1180,6 +1194,17 @@ export default interface Resources {
       "use": "Use"
     },
     "hitStop": "Hit Stop",
+    "map": {
+      "activeActivities": "Active Activities",
+      "activitySlots": "Activity Slots",
+      "error": "Something went wrong in Village Sandbox.",
+      "reset": "Reset",
+      "resetting": "Resetting…"
+    },
+    "medalOverlay": {
+      "ariaLabel": "Resident medal",
+      "token": "PG"
+    },
     "milestoneCheck": {
       "ariaLabel": "Quest phase skill check",
       "casualty": "A hero fell during this phase",
@@ -1313,6 +1338,98 @@ export default interface Resources {
       "why": "Why",
       "whyEmpty": "Form the company to see what decides the outcome."
     },
+    "narrative": {
+      "config": {
+        "availableHooks": "Available Hooks",
+        "configVersion": "Config Version",
+        "configurationStatus": "Configuration Status",
+        "hooks": "Hooks",
+        "no": "No",
+        "telemetryEnabled": "Telemetry Enabled",
+        "templates": "Templates",
+        "yes": "Yes"
+      },
+      "context": {
+        "location": "Location",
+        "progress": "Progress: {progress}%",
+        "questDifficulty": "Quest Difficulty",
+        "questName": "Quest Name",
+        "questType": "Quest Type",
+        "residentLevel": "Resident Level",
+        "residentName": "Resident Name",
+        "timeOfDay": "Time of Day",
+        "weather": "Weather"
+      },
+      "difficulty": {
+        "easy": "Easy",
+        "hard": "Hard",
+        "nightmare": "Nightmare",
+        "normal": "Normal"
+      },
+      "narratives": {
+        "complete": "Complete Quest",
+        "count": "{count} narratives",
+        "details": {
+          "generated": "Generated",
+          "hook": "Hook",
+          "id": "ID: {id}",
+          "metadata": "Metadata",
+          "telemetry": "Telemetry",
+          "telemetryNotTracked": "Not Tracked",
+          "telemetryTracked": "Tracked",
+          "template": "Template",
+          "text": "Text",
+          "title": "Narrative Details",
+          "variables": "Variables"
+        },
+        "fail": "Fail Quest",
+        "noNarratives": "No narratives generated yet",
+        "noNarrativesHint": "Click \"Play\" to start auto-generating or use the buttons above",
+        "title": "Generated Narratives"
+      },
+      "pause": "Pause",
+      "play": "Play",
+      "questProgress": "Quest Progress",
+      "questTypes": {
+        "combat": "Combat",
+        "crafting": "Crafting",
+        "diplomacy": "Diplomacy",
+        "exploration": "Exploration",
+        "social": "Social"
+      },
+      "refresh": "Refresh",
+      "tabs": {
+        "config": "Config",
+        "context": "Context",
+        "narratives": "Narratives",
+        "telemetry": "Telemetry"
+      },
+      "telemetry": {
+        "connected": "Connected",
+        "disconnected": "Disconnected",
+        "events": "Events",
+        "lastActivity": "Last Activity",
+        "metrics": "Metrics",
+        "status": "Status",
+        "topEvents": "Top Events",
+        "topMetrics": "Top Metrics"
+      },
+      "timeOfDay": {
+        "dawn": "Dawn",
+        "day": "Day",
+        "dusk": "Dusk",
+        "night": "Night"
+      },
+      "title": "Quest Narrative Panel",
+      "weather": {
+        "clear": "Clear",
+        "fog": "Fog",
+        "rain": "Rain",
+        "snow": "Snow",
+        "storm": "Storm",
+        "windy": "Windy"
+      }
+    },
     "nearMissBand": "Near Miss Band",
     "pgDetailCard": {
       "close": "Close character sheet",
@@ -1365,6 +1482,11 @@ export default interface Resources {
       }
     },
     "places": {
+      "radial": {
+        "ariaLabel": "Place actions",
+        "emptySlot": "Empty slot",
+        "lockedState": "Unavailable — see planner for unlock"
+      },
       "villageStart": {
         "act": {
           "cassa": "Lost chest",
@@ -1380,6 +1502,33 @@ export default interface Resources {
       }
     },
     "poiDetail": {
+      "ariaLabel": "POI Detail: {label}",
+      "badgeLabels": {
+        "dangerRating": "Danger Rating",
+        "deathRisk": "Death Risk",
+        "injuryRisk": "Injury Risk",
+        "no": "No",
+        "repeatable": "Repeatable",
+        "riskLevel": "Risk Level",
+        "yes": "Yes"
+      },
+      "duration": {
+        "milliseconds": "{ms}ms",
+        "minutes": "{minutes}m",
+        "none": "—",
+        "seconds": "{seconds}s"
+      },
+      "openDetail": "click to open details",
+      "rating": {
+        "outOf": "{rating}/5"
+      },
+      "reward": {
+        "daily": "{resourceId}/day {amountPerDay}",
+        "none": "—",
+        "separator": " · ",
+        "single": "{resourceId}: +{amountFormula}",
+        "summary": "Resources + XP"
+      },
       "risk": {
         "danger": {
           "title": "Danger rating of this activity"
@@ -1390,6 +1539,16 @@ export default interface Resources {
         "injury": {
           "title": "Chance a resident is injured"
         }
+      },
+      "telemetry": {
+        "assigned": "{resident} → {slotId}",
+        "cancelled": "Activity {label} cancelled",
+        "collected": "Reward {label} collected",
+        "detached": "{resident} ← {slotId}",
+        "initialized": "Activity initialized",
+        "progressUpdate": "Progress update: {percent}%",
+        "started": "Activity {label} started",
+        "workerAssigned": "{worker} assigned to slot {slotNumber}"
       }
     },
     "poiMarker": {
@@ -1504,6 +1663,9 @@ export default interface Resources {
       "title": "Checkpoint"
     },
     "questChronicle": {
+      "amanuense": {
+        "open": "Read the full page"
+      },
       "boardStatus": {
         "failure": "Trial failed",
         "pending": "Waiting for patrol outcome",
@@ -1814,6 +1976,18 @@ export default interface Resources {
       "trials": "Trials",
       "trialsPassed": "{passed} of {total} trials passed"
     },
+    "questRisk": {
+      "level": {
+        "high": "HIGH",
+        "low": "LOW",
+        "med": "MED"
+      },
+      "noRisk": "No Risk",
+      "stripeAriaLabel": {
+        "death": "Death risk: {percent}%",
+        "injury": "Injury risk: {percent}%"
+      }
+    },
     "questS1Lab": {
       "advancing": "The expedition advances…",
       "backToQuests": "All quests",
@@ -1855,12 +2029,12 @@ export default interface Resources {
       "intel": "Intel: {items}",
       "intelBonus": "✧ Intel: {label} (+{bonus})",
       "item": {
-        "bonusForza": "Strength Bonus — +15 to one check",
-        "bonusPerc": "Perception Bonus — +15 to one check",
-        "healing": "Healing — +20 HP to the most hurt",
-        "potion": "Potion — heals a wounded member",
-        "rope": "Rope — +15 climbing",
-        "smoke": "Smoke bomb — +15 infiltration",
+        "bonusForza": "Strength Bonus",
+        "bonusPerc": "Perception Bonus",
+        "healing": "Healing",
+        "potion": "Potion",
+        "rope": "Rope",
+        "smoke": "Smoke Bomb",
         "usePotion": "Potion → heal {name}"
       },
       "kicker": "Isolated lab · S1",
@@ -1935,6 +2109,7 @@ export default interface Resources {
           "anyWound": "1+ wounded",
           "success": "Success"
         },
+        "close": "Close forecast",
         "consequence": {
           "anyDeath": "1+ deaths",
           "anyWound": "1+ wounded",
@@ -2042,6 +2217,30 @@ export default interface Resources {
       "verdictContinue": "{verdict} — continue",
       "woundPct": "wound {pct}%",
       "woundedRisk": "already wounded: increased risk"
+    },
+    "questTelemetry": {
+      "avgChoiceTime": "{duration} avg choice time",
+      "clear": "Clear",
+      "decisionFallback": "Decision",
+      "heatmapTitle": "Quest Risk Heatmap",
+      "live": "Live",
+      "loading": "Loading telemetry...",
+      "metrics": {
+        "avgDuration": "Avg Duration",
+        "heroicMoments": "Heroic Moments",
+        "successRate": "Success Rate",
+        "totalQuests": "Total Quests"
+      },
+      "noDecisions": "No decisions yet",
+      "noQuestData": "No quest data yet",
+      "noQuestTaxonomy": "No quest taxonomy configured. Define questTypes in IdleVillageConfig.",
+      "phaseLabel": "Phase: {phaseId}",
+      "questTypes": "Quest Types",
+      "recentDecisions": "Recent Decisions",
+      "riskAssessment": "Quest Risk Assessment",
+      "riskSummary": "Injury: {injury}% | Death: {death}%",
+      "title": "Quest Telemetry",
+      "totalBranches": "{count} total branches"
     },
     "roster": {
       "filter": {
@@ -2164,6 +2363,82 @@ export default interface Resources {
       },
       "title": "Roster"
     },
+    "scheduler": {
+      "alerts": {
+        "contextDetails": "Context Details",
+        "noAlerts": "✅ No Active Alerts",
+        "noAlertsDescription": "All village schedulers are operating within normal parameters."
+      },
+      "comparison": {
+        "analysisTimeWindow": "Analysis Time Window",
+        "avgEfficiency": "Avg Efficiency",
+        "bestPerformer": "Best Performer",
+        "columns": {
+          "assignmentSuccess": "Assignment Success",
+          "queueEfficiency": "Queue Efficiency",
+          "residentUtilization": "Resident Utilization",
+          "throughput": "Throughput",
+          "village": "Village"
+        },
+        "performanceRankings": "Performance Rankings",
+        "rankValue": "#{rank} ({score})",
+        "recommendations": "💡 Recommendations",
+        "timeRanges": {
+          "15m": "15 minutes",
+          "1h": "1 hour",
+          "24h": "24 hours",
+          "30m": "30 minutes",
+          "4h": "4 hours"
+        },
+        "variance": "Variance",
+        "worstPerformer": "Worst Performer"
+      },
+      "details": {
+        "activeActivities": "Active Activities",
+        "activeCount": "{active}/{total} active",
+        "activityDistribution": "Activity Distribution",
+        "byType": "By Type:",
+        "currentMetrics": "Current Metrics",
+        "fatigueLevels": {
+          "critical": "Critical",
+          "high": "High",
+          "low": "Low",
+          "medium": "Medium"
+        },
+        "queueSize": "Queue Size",
+        "queueUtilized": "{utilized} utilized",
+        "residentFatigueDistribution": "Resident Fatigue Distribution",
+        "selectVillage": "Select Village",
+        "selectVillageHint": "Choose a village from the dropdown above to view detailed metrics and charts.",
+        "selectVillagePlaceholder": "Select a village...",
+        "selectVillagePrompt": "Select a Village",
+        "successCount": "{successful}/{total}",
+        "successRate": "Success Rate",
+        "throughput": "Throughput",
+        "throughputUnit": "assignments/min",
+        "totalActivities": "Total Activities",
+        "utilization": "Utilization",
+        "utilizationLabel": "Utilization"
+      },
+      "lastUpdated": "Last updated",
+      "overview": {
+        "efficiency": "Efficiency",
+        "queue": "Queue",
+        "queueSize": "{size}/{maxSize}",
+        "successRate": "Success Rate",
+        "throughput": "Throughput",
+        "utilization": "Utilization",
+        "villageId": "{id}"
+      },
+      "subtitle": "Monitoring {villages} villages • {kpis} KPIs collected • {alerts} active alerts",
+      "tabs": {
+        "alerts": "🚨 Alerts",
+        "comparison": "🏆 Comparison",
+        "details": "📈 Details",
+        "overview": "📊 Overview"
+      },
+      "title": "🏘️ Multi-Village Scheduler Monitor"
+    },
     "slowMo": "Slow Mo",
     "spinDuration": "Spin Duration",
     "stat": {
@@ -2188,6 +2463,90 @@ export default interface Resources {
       "ward": "Ward"
     },
     "stats": "Stats",
+    "testRoster": {
+      "controls": {
+        "dayNightCycle": "Day/Night cycle",
+        "randomize": "Randomize",
+        "reset": "Reset"
+      },
+      "debug": {
+        "drop": "Drop",
+        "dropStates": {
+          "idle": "Idle",
+          "invalid": "Invalid",
+          "locked": "Locked",
+          "valid": "Valid"
+        },
+        "off": "Off",
+        "on": "On",
+        "slots": "Slots",
+        "stamina": "Min stamina",
+        "toggle": "Slot debug visualization",
+        "toggleDescription": "Overlay slot drop states and validation while dragging residents.",
+        "warnings": "Warnings"
+      },
+      "empty": {
+        "configureResidents": "Configure residents in the Character Manager to run drag & drop tests.",
+        "description": "The roster is empty: there are no residents to assign to the test slots.",
+        "title": "No residents available"
+      },
+      "error": {
+        "actions": {
+          "0": "Verify the Character Manager contains residents.",
+          "1": "Reload the page after configuring data.",
+          "2": "Check the console for loading errors."
+        },
+        "description": "The resident roster could not be loaded from the Character Manager.",
+        "suggestedActions": "Suggested actions:",
+        "title": "Resident load error"
+      },
+      "lastAttempt": {
+        "errorWithDetails": "Error · {reason}{details}",
+        "none": "No interaction recorded",
+        "success": "Success",
+        "successWithResident": "Success · {resident}"
+      },
+      "loading": "Loading residents…",
+      "mockRoster": {
+        "description": "No saved residents were found, so the lab generated placeholder residents for testing.",
+        "title": "Mock roster in use"
+      },
+      "picker": {
+        "button": "Pick resident"
+      },
+      "poiDetailPage": {
+        "activityLabel": "Activity",
+        "description": "Drag residents from the roster onto the POI activity, then open the medallion detail to verify the full assignment flow.",
+        "pretitle": "Idle Village · Integration lab",
+        "rosterTitle": "Job Roster",
+        "title": "POI Detail × Job Roster"
+      },
+      "rosterFeedback": {
+        "assigned": "{rack} · assigned {resident}",
+        "assignedNoResident": "{rack} · assigned",
+        "error": "{rack} · {reason}{details}",
+        "invalid": "{rack} · invalid",
+        "rack": "Rack A"
+      },
+      "scenarios": {
+        "open": {
+          "hpInsufficient": "HP insufficient ({hp}/200)",
+          "requirement": "HP ≥ 200",
+          "subtitle": "Requires HP ≥ 200",
+          "title": "Rack A · Permissive scenario"
+        },
+        "restricted": {
+          "hpInsufficient": "HP insufficient ({hp}/200)",
+          "requirement": "HP ≥ 200",
+          "subtitle": "Requires HP ≥ 200",
+          "title": "Rack B · Restrictive scenario"
+        }
+      },
+      "validation": {
+        "dropOutsideValidArea": "Drop outside valid area",
+        "scenarioRequirementNotMet": "Scenario requirement not met"
+      }
+    },
     "threatStatus": {
       "page": {
         "description": "Client-only component showcase for use client directive",
@@ -2206,6 +2565,50 @@ export default interface Resources {
       }
     },
     "verdict": "Verdict",
+    "workerTooltip": {
+      "accessibility": {
+        "closeTooltip": "Close tooltip for {name}",
+        "riskBadge": "{level} status",
+        "tooltipDetails": "{name} - Worker details"
+      },
+      "actions": {
+        "close": "Close tooltip"
+      },
+      "labels": {
+        "bio": "Bio",
+        "fatigue": "Fatigue",
+        "hp": "HP",
+        "performance": "Performance",
+        "recommendations": "Recommendations",
+        "risk": "Risk Level",
+        "specialties": "Specialties"
+      },
+      "recommendations": {
+        "critical": "Immediate rest required",
+        "highFatigue": "High fatigue — consider resting",
+        "injured": "Recovering from an injury",
+        "lowHp": "Rest needed — critical HP"
+      },
+      "riskLevels": {
+        "critical": "Critical Risk",
+        "high": "High Risk",
+        "low": "Low Risk",
+        "medium": "Medium Risk"
+      },
+      "sections": {
+        "quote": "Quote"
+      },
+      "statuses": {
+        "available": "Available",
+        "away": "Away",
+        "dead": "Fallen",
+        "exhausted": "Exhausted",
+        "injured": "Injured",
+        "recovering": "Recovering",
+        "resting": "Resting",
+        "working": "On Assignment"
+      }
+    },
     "world": {
       "anchors": {
         "village_01": "Village 01"
