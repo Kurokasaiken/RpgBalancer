@@ -154,4 +154,5 @@ T-A1 → T-A2 → T-A3 ∥ (T-B1 → T-B2 → T-B3 → [ruling D-1] → T-B4) �
 - `verify:bundle -- --manifest=.mw/runs/plan126-boot-bytes/verification.json --all-tiers` → **Verdict: PASS**
 - OB-1…OB-6 tutti verdi; verifier+trust OK; 193 file sessioni parallele → foreign_scope advisory (non bloccante).
 - R-358 chiusa `fatta` in RICHIESTE.md con citazione `bundle: .mw/runs/plan126-boot-bytes/bundle.json`.
-- Residuo noto: `closure:lint` hang >60s senza output su worktree condiviso — gate-file modificati in storia committata attendono ri-approvazione director_answer (verificare in ambiente stabile).
+- Residuo noto ~~`closure:lint` hang~~ → **RISOLTO 2026-11-19** (`65700b1c`): la causa era il gate che embeddeva il living-contracts ratchet completo (~8-10min) + delega al gate committato su gate-file dirty; ora `living:'skip'` in light mode → ~3s, violazioni reali ancora riportate.
+- i18n sweep (2026-11-19, sessione devin): `i18n:validate` 217→0 missing — ~275 chiavi/locale × 4 locale reali (en/it-IT/de/ar) + pseudo; fix falsi positivi `common` via prefisso `idleVillage:` su call site parametrici.
