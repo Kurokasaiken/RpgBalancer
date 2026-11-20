@@ -44,10 +44,19 @@ const recordPath = flag('--record')
 const journalPath = flag('--journal')
   ? resolve(REPO_ROOT, flag('--journal'))
   : join(REPO_ROOT, 'test-results', 'slicekit', `${surface}.journal.jsonl`);
+const specPath = join(REPO_ROOT, 'scripts', 'hud-real', 'specs', `${surface}.json`);
+const specManifest = (() => {
+  try {
+    const spec = JSON.parse(readFileSync(specPath, 'utf8'));
+    return typeof spec?.output?.manifest === 'string' ? spec.output.manifest : null;
+  } catch {
+    return null;
+  }
+})();
 const manifestPath = flag('--manifest')
   ? resolve(REPO_ROOT, flag('--manifest'))
   : join(REPO_ROOT, 'public', 'assets', 'ui', 'hud-real', 'slicekit',
-    surface, `${surface}Frame.json`);
+    surface, specManifest ?? `${surface}Frame.json`);
 
 const sha12 = (p) =>
   createHash('sha256').update(readFileSync(p)).digest('hex').slice(0, 12);

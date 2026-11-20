@@ -328,6 +328,10 @@ export const BASE_SKIN_CSS_VARS: SkinCssVarMap = {
   '--skin-hud-lacquer-base': '#09202a',
   '--skin-hud-lacquer-deep': '#060f16',
   '--skin-hud-lacquer-alpha': '0.9',
+  /* Emerald enamel — the canonical green interior of the painted panel frames (Roster/Stash, Director 2026-11-20). */
+  '--skin-hud-enamel-lift': '#00462f',
+  '--skin-hud-enamel-base': '#063427',
+  '--skin-hud-enamel-deep': '#091d15',
   '--skin-hud-seat': '#0b0a08',
   /* ── POI "Sigillo" (map markers, PLAN-058 T4.1/T4.2) ───────────────────
    * Double border + halo tones + sizes. Read by `PoiMatericV3_5` (prop `sigillo`).
@@ -370,6 +374,11 @@ export const BASE_SKIN_CSS_VARS: SkinCssVarMap = {
    * spacing, rows, controls and type scale, read by the Roster itself and by the
    * `data-hud-controls` role. Same values in every skin, so no preset overrides. */
   '--skin-hud-plaque-clearance': '12px',
+  /* R-363 (Director: «meno spazio tra il testo e pulsanti e la frame su»):
+   *  the header's clearance BELOW the painted frame band's inner rim — the
+   *  rim itself comes from the active slice-kit manifest
+   *  (`frameTopRimPx`), this token is the visual gap under it (~8px). */
+  '--skin-hud-frame-top': '8px',
   '--skin-hud-panel-padding': '10px',
   '--skin-hud-stack-gap': '8px',
   '--skin-hud-control-gap': '4px',

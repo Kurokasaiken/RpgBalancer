@@ -833,3 +833,47 @@ contraddicono la semantica config NON si portano (stamina ambrata > teal AI).
 - **Prior art:** nessun tool copre ≥60% del metodo (registro T0–T3 e giudizio su candidati montati restano differenziatori); top-5 tecniche assorbibili in `.mw/runs/plan128-review-2026-11-19/PRIOR-ART.md`.
 - **Non verificato:** slicewright non eseguito su `--insets`/spec esistente né integrato in `closure:lint`; capabilities degli altri tool da README.
 **Fonte:** sessione Devin 2026-11-19; prove in `.mw/runs/plan128-review-2026-11-19/` (preview `slicewright-preview-bronzo.png`).
+
+## 2026-11-20 — Fork visivi: tutti i mock prodotti vanno mostrati, nessuna pre-selezione
+**Decisione Director (verbatim):** *«la regola dice falli tutti e mostrami i mock tra cui scegliere. se nn c'è scritto esplicitamente deve essere aggiunto a queste strategie»*.
+- **Regola registrata:** ogni candidato generato/costruito per una decisione estetica è mostrato al Director come mock nel contesto d'uso — l'agente non pre-filtra. Il cap «opzioni default 2, max 3» di PLAN-047/v35 vale per la fork card, non per il numero di mock presentati.
+- **Dove:** aggiunto a `context/mockup-pipeline-profile.md` [P7] (primo bullet).
+- **Contesto:** ruling sulla fork card banda di scorrimento (`.mw/runs/20261120-scroll-band/visual-fork-scroll-band.md`, PLAN-125 Fase 7a / PLAN-127 N=3 #1) — i 3 candidati A/B/C erano già tutti mostrati.
+**Fonte:** sessione Devin 2026-11-20.
+
+## 2026-11-20 — Banda di scorrimento condivisa: ruling «Oro inciso» (B)
+**Decisione Director (verbatim):** *«Oro inciso»* — dopo richiesta *«mostramele insieme a tutto il resto del componente»* (mock montati sul roster vero di /game).
+- **Golden:** `.mw/specs/expedition-ui/refs/scroll-band-oro-inciso.png` (sha256 `99098b02…`, riga in REGISTERED.md). Baseline congelata `R-2026-11-20-scroll-band-B`.
+- **Design:** pozzetto inciso scuro + thumb ottone champagne con tacche incise + perni ai capi; condivisa Roster/Stash/Ledger (PLAN-125 Fase 7a, PLAN-127 N=3 #1).
+- **Note di processo:** bug 2a roster fixato (`data-hud-scroll` sulla lista); scrollbar dipinta non catturabile in headless-macOS (overlay scrollbars non si dipingono — limite ambiente, verifica su macchina Director).
+- **Residuo implementazione:** primitivo condiviso + mount Roster/Stash; ricevuta slice-kit `test-results/slicekit/scroll-band.json`.
+**Fonte:** sessione Devin 2026-11-20.
+
+## 2026-11-20 — Banda di scorrimento: ruling finale «A — smalto» sul componente reale
+**Decisione Director (verbatim):** *«A — smalto, la sfumatura nn so quanto sia corretta»* — scelta fatta sulle catture full-component (`.mw/runs/20261120-verify-frame7/full-{a,b,c}.png`, 1440×900 `?frame=thin&band=`).
+- **Effetto:** `hudScrollBandConfig.variant = 'a'` (default live); `?band=b|c` restano selezionabili in dev. Il thumb usa la stessa smalto teal della placca CTA (`--skin-cta-bg` `#2c7683→#113743`) — risposta al dubbio sulla sfumatura: è il materiale canonico CTA; se preferisce lo smeraldo degli anelli è un cambio di un gradiente.
+- **Supera:** il ruling precedente «Oro inciso» (B) registrato poco sopra — golden B resta congelato come baseline registrata (REG-registered), non cancellato.
+
+## 2026-11-20 — Pannelli stage: drag libero ovunque, senza snap né resize
+**Decisione Director (verbatim):** *«nn voglio questa distinzione secca d dove è una cosa in base a dov'è. tutti si può spostare ovunque senza snap, senza cambiare di dimensioni, ecc»*.
+- **Contratto nuovo:** il DROP committa il rect libero visto dal drag (posizione + dimensioni congelate in `placements{id:{x,y,w,h}}`); occupancy/zona non si trasferisce mai; il pannello resta della sua zona d'origine e fluttua clampato all'envelope di stage. Eccezione mantenuta: drop sul chrome strip (rail ali / tab row) → collassa a strip; strip trascinata sullo stage → ri-espande al punto. Doppio click = reset al dock.
+- **Pair roster+stash:** lo stack verticale nell'ala sinistra vale solo se NESSUNO dei due ha placement — chi è piazzato libero esce dallo stack, l'altro prende l'ala intera.
+- **Roster:** `widthMode: 'natural'` (bloccato ~400px, ruling precedente stesso messaggio) — il caso ~932px sparisce perché non esiste più cross-zone transfer.
+- **Test:** `stageZonesSolver.test.ts` sezione §D.1 riscritta sul nuovo contratto (23 test verdi).
+**Fonte:** sessione Devin 2026-11-20.
+
+## D-20261120-piastrina — Icone su piastrina: A = cornice hover (R-367, D-6)
+Il Director battezza il trattamento **A** (filetto ottone champagne + angoli
+acanto incisi) come firma della cornice-piastrina. La cornice è **stato
+hover/selected**, non chrome a riposo: a riposo la cella resta pozzetto lacca +
+icona dipinta (come `mockup-stash-grid.jpg`). Shelf stash a **2 righe** fisse.
+Nessun gap tra cornice e cella. Forziere header: assente nel frame7 live (era
+solo `emblem-chest` dei manifest frame5, non più montati).
+
+## 2026-11-21 — Pannelli Roster/Stash: consolidamento + fix controlli + shelf 3×2
+Stato congelato dal vivo (no query param, 1440×900 + 1280×720):
+- **Placca `field`**: campo smalto a filo cornice su Roster e Stash — il secondo rettangolo stondato (cartouche `shape="panel"`) e i 4 crescent `geometry.backings` di frame7 (spicchi scuri agli angoli) sono rimossi; spec `panel-frame7.json` risliced, audit verde.
+- **Banda A «gemma»**: thumb `#2ea377→#14705a→#0a3f30` (smeraldo delle gemme frame7, ruling Director «approvo gemma» — supera il teal CTA annotato sopra). Visibile solo con overflow reale (`scrollHeight - clientHeight > 1`): verificato Roster=visibile / Stash=nascosta.
+- **Fix controlli header (regressioni):** `RosterSortIcon` migrato a `data-ctl="round"` + `EngravedIcon cmd-sort` (era il disco vetroso legacy); `::before` speculare e `box-shadow` dei bottoni generici skin spenti sui controlli dipinti (`[data-ctl]`); `round-disabled` ripristinato nel blocco `[data-hud-controls]` (il base override lo mascherava).
+- **Shelf Stash 3×2 (D-20261120-piastrina implementata):** `panel.shelfColumns=3`, `shelfVisibleRows=2`, `shelfRowPx=46` in `villageStashConfig`; `naturalHeightPx` 340→400 (gameFrameConfig); `detailMinPanelHeightPx` 240→360 così la detail card convive con la griglia senza clip (a 1280 resta nascosta: griglia protagonista).
+**Fonte:** sessione Devin 2026-11-21.

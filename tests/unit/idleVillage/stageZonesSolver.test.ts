@@ -239,8 +239,8 @@ describe('BV-02 — determinism over random intent streams', () => {
   });
 });
 
-describe('DROP semantics (§D.1)', () => {
-  const dropOn = (s: StageZonesState, panelId: StagePanelId, pointerX: number, pointerY = 200) => {
+describe('DROP semantics (§D.1, free placement 2026-11-20)', () => {
+  const dropOn = (s: StageZonesState, panelId: StagePanelId, pointerX: number, pointerY = 200, size?: { w: number; h: number }) => {
     s = stageZonesReducer(cfg, s, { type: 'DRAG_START', panelId, pointerId: 1 });
     const layout = solve(s);
     return stageZonesReducer(cfg, s, {
@@ -248,45 +248,70 @@ describe('DROP semantics (§D.1)', () => {
       panelId,
       pointer: { x: pointerX, y: pointerY },
       point: { x: pointerX, y: pointerY },
+      size,
       zones: layout.zones,
       nominalZones: layout.nominalZones,
     });
   };
 
-  it('cross-zone drop onto an occupied non-pair zone lands as a strip, never suspends', () => {
+  /* Director ruling 2026-11-20 «tutti si può spostare ovunque senza snap,
+   *  senza cambiare di dimensioni»: drops never transfer occupancy — the
+   *  panel keeps its home zone and floats at the dropped point. */
+  it('cross-zone drop keeps the home zone and floats at the dropped point', () => {
     let s = initStageZones(cfg, VP, 'generic');
     s = stageZonesReducer(cfg, s, { type: 'OPEN', panelId: 'events' });
     s = stageZonesReducer(cfg, s, { type: 'OPEN', panelId: 'roster' });
     const layout = solve(s);
     const target = dropTargetZone(cfg, layout.nominalZones, layout.nominalZones.rightWing.x + 10);
     expect(target).toBe('rightWing');
-    s = dropOn(s, 'roster', layout.nominalZones.rightWing.x + 10);
+    const px = layout.nominalZones.rightWing.x + 10;
+    s = dropOn(s, 'roster', px, 200, { w: 300, h: 280 });
     const after = solve(s);
-    expect(after.panels.roster.zone).toBe('rightWing');
-    expect(after.panels.roster.presentationEffective).toBe('strip');
+    expect(after.panels.roster.zone).toBe('leftWing');
+    expect(after.panels.roster.presentationEffective).toBe('expanded');
+    expect(after.panels.roster.rect).toEqual({ x: px, y: 200, w: 300, h: 280 });
     expect(after.panels.events.suspended).toBe(false);
   });
 
-  it('cross-zone drop onto an empty zone lands expanded', () => {
+  it('drop onto an empty zone also floats free — occupancy never moves', () => {
     let s = initStageZones(cfg, VP, 'generic');
     s = stageZonesReducer(cfg, s, { type: 'OPEN', panelId: 'roster' });
     const layout = solve(s);
-    s = dropOn(s, 'roster', layout.nominalZones.centerStage.x + 10);
+    s = dropOn(s, 'roster', layout.nominalZones.centerStage.x + 10, 200, { w: 300, h: 280 });
     const after = solve(s);
-    expect(after.panels.roster.zone).toBe('centerStage');
+    expect(after.panels.roster.zone).toBe('leftWing');
     expect(after.panels.roster.presentationEffective).toBe('expanded');
+    expect(s.occupancy.centerStage.some((o) => o.panelId === 'roster')).toBe(false);
   });
 
-  it('drop onto a pinned expanded occupant lands as strip (pin resists displacement)', () => {
+  it('a placed panel keeps its committed size and never snaps (legacy point-only placement still solves)', () => {
+    let s = initStageZones(cfg, VP, 'generic');
+    s = stageZonesReducer(cfg, s, { type: 'OPEN', panelId: 'roster' });
+    s = stageZonesReducer(cfg, s, { type: 'OPEN', panelId: 'events' });
+    const layout = solve(s);
+    const dockedW = layout.panels.roster.rect!.w;
+    s = dropOn(s, 'roster', layout.envelope.x + 500, 300, { w: dockedW, h: layout.panels.roster.rect!.h });
+    const after = solve(s);
+    expect(after.panels.roster.rect).toEqual({ x: layout.envelope.x + 500, y: 300, w: dockedW, h: layout.panels.roster.rect!.h });
+    /* A point-only placement (no size) still resolves — size falls back to
+     *  the panel's solver width inside the envelope. */
+    s = dropOn(s, 'roster', layout.envelope.x + 600, 350);
+    const after2 = solve(s);
+    expect(after2.panels.roster.rect!.x).toBe(layout.envelope.x + 600);
+    expect(after2.panels.roster.rect!.w).toBe(dockedW);
+  });
+
+  it('drop over a pinned expanded occupant floats free — pin is never displaced', () => {
     let s = initStageZones(cfg, VP, 'generic');
     s = stageZonesReducer(cfg, s, { type: 'OPEN', panelId: 'events' });
     s = stageZonesReducer(cfg, s, { type: 'PIN', panelId: 'events' });
     s = stageZonesReducer(cfg, s, { type: 'OPEN', panelId: 'roster' });
     const layout = solve(s);
-    s = dropOn(s, 'roster', layout.nominalZones.rightWing.x + 10);
+    s = dropOn(s, 'roster', layout.nominalZones.rightWing.x + 10, 200, { w: 300, h: 280 });
     const after = solve(s);
     expect(after.panels.events.presentationEffective).toBe('expanded');
-    expect(after.panels.roster.presentationEffective).toBe('strip');
+    expect(after.panels.roster.presentationEffective).toBe('expanded');
+    expect(after.panels.roster.zone).toBe('leftWing');
   });
 
   it('drop onto the wing rail collapses the panel to a strip in place (§A.3b drag-to-strip)', () => {

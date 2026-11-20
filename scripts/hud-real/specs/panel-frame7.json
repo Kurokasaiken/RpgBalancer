@@ -1,149 +1,309 @@
 {
- "specVersion": 2,
- "surface": "panel-frame7",
- "comment": "PLAN-127/128 candidate: Director-designated smeraldo frame (Gemini 2026-11-19, .mw/specs/expedition-ui/refs/frame-smeraldo-gemini.png, 978x1024 — brass vine frame, emerald gems at 4 corners, dense top band + dense left lattice spine, thin right/bottom wires, flat dark-green interior, grey margin). Minimal style like frame5/6. Source = keyed derivative test-results/slicekit/frame-smeraldo/frame-smeraldo-keyed.png: interior flat green (11,53,39) painted bg grey [118,118,118] via colour rule g-r>=14 & g-b>=5 & max<=95 inside [86,136,940,1011] largest CC +1px dilation (frame6 prep pattern — lets flatBgMaxDiff key margin AND interior in one pass); shadow floor L<13->13 inside the 4 corner windows (Director 2026-11-19: black pockets read as holes). Render-side fields land on the SAME panel footprint as panel-frame6: displayScale 0.28, rimOverlapPx 1, crescent backings; corner pos derived as (contentRect corner - crop origin) * 0.28.",
- "source": {
-  "path": "test-results/slicekit/frame-smeraldo/frame-smeraldo-keyed.png",
-  "key": {
-   "type": "flatBgMaxDiff",
-   "sampleRect": [0, 0, 40, 40],
-   "threshold": 10,
-   "gain": 18,
-   "comment": "keyed copy of .mw/specs/expedition-ui/refs/frame-smeraldo-gemini.png: the flat interior green is painted bg grey so flatBgMaxDiff keys it away — no rectangular cutout needed (the interior is already a clean rectangle; corner vines wrap OUTSIDE it, unlike frame6's arcs that protruded onto the interior)."
-  }
- },
- "geometry": {
-  "outerRect": [13, 16, 961, 1024],
-  "contentRect": [86, 136, 940, 1012],
-  "rimOverlapPx": 1,
-  "backings": [
-   { "anchor": "tl", "w": 18, "h": 18, "shape": "crescent", "color": "var(--skin-hud-enamel-deep, #091d15)" },
-   { "anchor": "tr", "w": 18, "h": 18, "shape": "crescent", "color": "var(--skin-hud-enamel-deep, #091d15)" },
-   { "anchor": "bl", "w": 18, "h": 18, "shape": "crescent", "color": "var(--skin-hud-enamel-deep, #091d15)" },
-   { "anchor": "br", "w": 18, "h": 18, "shape": "crescent", "color": "var(--skin-hud-enamel-deep, #091d15)" }
-  ],
-  "comment": "outerRect = art bbox on the source; contentRect = interior green rect (x86..939, y136..1011). Backings = frame6 contract (crescent wedge behind the plaque's rounded corner arc)."
- },
- "output": {
-  "dir": "public/assets/ui/hud-real/slicekit/panel-frame7",
-  "manifest": "panelFrame7Frame.json",
-  "tsModule": {
-   "path": "src/generated/slicekit/panelFrame7Frame.ts",
-   "typeImport": "@/ui/idleVillage/skins/primitives/sliceKitManifest",
-   "exportName": "panelFrame7Frame"
+  "specVersion": 2,
+  "surface": "panel-frame7",
+  "comment": "PLAN-127/128 candidate: Director-designated smeraldo frame (Gemini 2026-11-19, .mw/specs/expedition-ui/refs/frame-smeraldo-gemini.png, 978x1024 — brass vine frame, emerald gems at 4 corners, dense top band + dense left lattice spine, thin right/bottom wires, flat dark-green interior, grey margin). Minimal style like frame5/6. Source = keyed derivative test-results/slicekit/frame-smeraldo/frame-smeraldo-keyed.png: interior flat green (11,53,39) painted bg grey [118,118,118] via colour rule g-r>=14 & g-b>=5 & max<=95 inside [86,136,940,1011] largest CC +1px dilation (frame6 prep pattern — lets flatBgMaxDiff key margin AND interior in one pass); shadow floor L<13->13 inside the 4 corner windows (Director 2026-11-19: black pockets read as holes). Render-side fields land on the SAME panel footprint as panel-frame6: displayScale 0.28, rimOverlapPx 1, crescent backings; corner pos derived as (contentRect corner - crop origin) * 0.28. | backings rimossi 2026-11-20: placca \"field\" a filo sotto la cornice — il crescent non serve più (era per la placca arrotondata)",
+  "source": {
+    "path": "test-results/slicekit/frame-smeraldo/frame-smeraldo-keyed.png",
+    "key": {
+      "type": "flatBgMaxDiff",
+      "sampleRect": [
+        0,
+        0,
+        40,
+        40
+      ],
+      "threshold": 10,
+      "gain": 18,
+      "comment": "keyed copy of .mw/specs/expedition-ui/refs/frame-smeraldo-gemini.png: the flat interior green is painted bg grey so flatBgMaxDiff keys it away — no rectangular cutout needed (the interior is already a clean rectangle; corner vines wrap OUTSIDE it, unlike frame6's arcs that protruded onto the interior)."
+    }
   },
-  "quality": 100,
-  "method": 6
- },
- "budgets": { "maxPieces": 16, "maxBytes": 1048576 },
- "slices": [
-  {
-   "id": "corner-tl",
-   "role": "corner",
-   "anchor": "tl",
-   "crop": [13, 16, 205, 215],
-   "stretch": "none",
-   "despeckle": { "minNeighbors": 3 },
-   "borderSoften": { "width": 3, "minFactor": 0.25 },
-   "displaySize": [54, 56],
-   "pos": { "left": -20, "top": -34 },
-   "tailFade": { "sides": "rb", "x": 44, "y": 16 },
-   "alphaOps": [{ "op": "minFilter", "size": 3 }],
-   "comment": "emerald + vine knuckle; interior corner (86,136) at local (73,120) x0.28 = (20.4,33.6) -> pos (-20,-34); fades r->top band, b->left spine"
+  "geometry": {
+    "outerRect": [
+      13,
+      16,
+      961,
+      1024
+    ],
+    "contentRect": [
+      86,
+      136,
+      940,
+      1012
+    ],
+    "rimOverlapPx": 1,
+    "comment": "outerRect = art bbox on the source; contentRect = interior green rect (x86..939, y136..1011). Backings = frame6 contract (crescent wedge behind the plaque's rounded corner arc)."
   },
-  {
-   "id": "corner-tr",
-   "role": "corner",
-   "anchor": "tr",
-   "crop": [770, 16, 963, 212],
-   "stretch": "none",
-   "despeckle": { "minNeighbors": 3 },
-   "borderSoften": { "width": 3, "minFactor": 0.25 },
-   "displaySize": [54, 55],
-   "pos": { "right": -6, "top": -34 },
-   "tailFade": { "sides": "lb", "x": 44, "y": 16 },
-   "alphaOps": [{ "op": "minFilter", "size": 3 }],
-   "comment": "interior corner (940,136) at local (170,120) x0.28 = (47.6,33.6) -> right -(54-47.6) = -6"
+  "output": {
+    "dir": "public/assets/ui/hud-real/slicekit/panel-frame7",
+    "manifest": "panelFrame7Frame.json",
+    "tsModule": {
+      "path": "src/generated/slicekit/panelFrame7Frame.ts",
+      "typeImport": "@/ui/idleVillage/skins/primitives/sliceKitManifest",
+      "exportName": "panelFrame7Frame"
+    },
+    "quality": 100,
+    "method": 6
   },
-  {
-   "id": "corner-bl",
-   "role": "corner",
-   "anchor": "bl",
-   "crop": [13, 815, 235, 1023],
-   "stretch": "none",
-   "despeckle": { "minNeighbors": 3 },
-   "borderSoften": { "width": 3, "minFactor": 0.25 },
-   "displaySize": [62, 58],
-   "pos": { "left": -20, "bottom": -3 },
-   "tailFade": { "sides": "rt", "x": 16, "y": 16 },
-   "alphaOps": [{ "op": "minFilter", "size": 3 }],
-   "comment": "wide crop keeps the authored vine sweep along the bottom (to ~x230); interior corner (86,1011) at local (73,196) x0.28 = (20.4,54.9) -> left -20, bottom -(58-54.9) = -3"
+  "budgets": {
+    "maxPieces": 16,
+    "maxBytes": 1048576
   },
-  {
-   "id": "corner-br",
-   "role": "corner",
-   "anchor": "br",
-   "crop": [772, 828, 963, 1023],
-   "stretch": "none",
-   "despeckle": { "minNeighbors": 3 },
-   "borderSoften": { "width": 3, "minFactor": 0.25 },
-   "displaySize": [53, 55],
-   "pos": { "right": -6, "bottom": -4 },
-   "tailFade": { "sides": "lt", "x": 16, "y": 16 },
-   "alphaOps": [{ "op": "minFilter", "size": 3 }],
-   "comment": "interior corner (940,1011) at local (168,183) x0.28 = (47.0,51.2) -> right -6, bottom -4"
-  },
-  {
-   "id": "edge-top",
-   "role": "edge-x",
-   "anchor": "top",
-   "crop": [320, 27, 558, 136],
-   "stretch": "tile",
-   "tileSafe": true,
-   "wrapBlend": { "overlap": 40 },
-   "key": { "type": "none" },
-   "displayScale": 0.28,
-   "span": [12, 4],
-   "comment": "engraved vine band; loop-closure window x0=320 W=238 (px err 27, best of sweep — organic wave, wrapBlend absorbs). Rows 27..135 fully art (band solid); row 136 = interior. span = frame6 footprint."
-  },
-  {
-   "id": "edge-left",
-   "role": "edge-y",
-   "anchor": "left",
-   "crop": [22, 280, 86, 462],
-   "stretch": "tile",
-   "tileSafe": true,
-   "wrapBlend": { "overlap": 40 },
-   "key": { "type": "none" },
-   "displayScale": 0.28,
-   "span": [24, 2],
-   "comment": "engraved lattice spine; loop-closure y0=280 H=182 (err 33 — irregular braid, no better window at any height). Cols 22..85 fully art; col 86 = interior."
-  },
-  {
-   "id": "edge-right",
-   "role": "edge-y",
-   "anchor": "right",
-   "crop": [941, 300, 953, 800],
-   "stretch": "tile",
-   "tileSafe": true,
-   "wrapBlend": { "overlap": 40 },
-   "key": { "type": "none" },
-   "displayScale": 0.28,
-   "span": [24, 2],
-   "comment": "plain wire; cols 941..952 fully art — col 953+ starts catching grey margin flecks (frame6 lesson: a grey stripe on the outer rim paints outside the panel)"
-  },
-  {
-   "id": "edge-bottom",
-   "role": "edge-x",
-   "anchor": "bottom",
-   "crop": [250, 1012, 650, 1024],
-   "stretch": "tile",
-   "tileSafe": true,
-   "wrapBlend": { "overlap": 40 },
-   "key": { "type": "none" },
-   "displayScale": 0.28,
-   "span": [8, 4],
-   "comment": "plain wire; rows 1012..1023 fully art (image bottom row 1023 is the frame's last row; interior ends y1011)"
-  }
- ]
+  "slices": [
+    {
+      "id": "corner-tl",
+      "role": "corner",
+      "anchor": "tl",
+      "crop": [
+        13,
+        16,
+        205,
+        215
+      ],
+      "stretch": "none",
+      "despeckle": {
+        "minNeighbors": 3
+      },
+      "borderSoften": {
+        "width": 3,
+        "minFactor": 0.25
+      },
+      "displaySize": [
+        54,
+        56
+      ],
+      "pos": {
+        "left": -20,
+        "top": -34
+      },
+      "tailFade": {
+        "sides": "rb",
+        "x": 44,
+        "y": 16
+      },
+      "alphaOps": [
+        {
+          "op": "minFilter",
+          "size": 3
+        }
+      ],
+      "comment": "emerald + vine knuckle; interior corner (86,136) at local (73,120) x0.28 = (20.4,33.6) -> pos (-20,-34); fades r->top band, b->left spine"
+    },
+    {
+      "id": "corner-tr",
+      "role": "corner",
+      "anchor": "tr",
+      "crop": [
+        770,
+        16,
+        963,
+        212
+      ],
+      "stretch": "none",
+      "despeckle": {
+        "minNeighbors": 3
+      },
+      "borderSoften": {
+        "width": 3,
+        "minFactor": 0.25
+      },
+      "displaySize": [
+        54,
+        55
+      ],
+      "pos": {
+        "right": -6,
+        "top": -34
+      },
+      "tailFade": {
+        "sides": "lb",
+        "x": 44,
+        "y": 16
+      },
+      "alphaOps": [
+        {
+          "op": "minFilter",
+          "size": 3
+        }
+      ],
+      "comment": "interior corner (940,136) at local (170,120) x0.28 = (47.6,33.6) -> right -(54-47.6) = -6"
+    },
+    {
+      "id": "corner-bl",
+      "role": "corner",
+      "anchor": "bl",
+      "crop": [
+        13,
+        815,
+        235,
+        1023
+      ],
+      "stretch": "none",
+      "despeckle": {
+        "minNeighbors": 3
+      },
+      "borderSoften": {
+        "width": 3,
+        "minFactor": 0.25
+      },
+      "displaySize": [
+        62,
+        58
+      ],
+      "pos": {
+        "left": -20,
+        "bottom": -3
+      },
+      "tailFade": {
+        "sides": "rt",
+        "x": 16,
+        "y": 16
+      },
+      "alphaOps": [
+        {
+          "op": "minFilter",
+          "size": 3
+        }
+      ],
+      "comment": "wide crop keeps the authored vine sweep along the bottom (to ~x230); interior corner (86,1011) at local (73,196) x0.28 = (20.4,54.9) -> left -20, bottom -(58-54.9) = -3"
+    },
+    {
+      "id": "corner-br",
+      "role": "corner",
+      "anchor": "br",
+      "crop": [
+        772,
+        828,
+        963,
+        1023
+      ],
+      "stretch": "none",
+      "despeckle": {
+        "minNeighbors": 3
+      },
+      "borderSoften": {
+        "width": 3,
+        "minFactor": 0.25
+      },
+      "displaySize": [
+        53,
+        55
+      ],
+      "pos": {
+        "right": -6,
+        "bottom": -4
+      },
+      "tailFade": {
+        "sides": "lt",
+        "x": 16,
+        "y": 16
+      },
+      "alphaOps": [
+        {
+          "op": "minFilter",
+          "size": 3
+        }
+      ],
+      "comment": "interior corner (940,1011) at local (168,183) x0.28 = (47.0,51.2) -> right -6, bottom -4"
+    },
+    {
+      "id": "edge-top",
+      "role": "edge-x",
+      "anchor": "top",
+      "crop": [
+        320,
+        27,
+        558,
+        136
+      ],
+      "stretch": "tile",
+      "tileSafe": true,
+      "wrapBlend": {
+        "overlap": 40
+      },
+      "key": {
+        "type": "none"
+      },
+      "displayScale": 0.28,
+      "span": [
+        12,
+        4
+      ],
+      "comment": "engraved vine band; loop-closure window x0=320 W=238 (px err 27, best of sweep — organic wave, wrapBlend absorbs). Rows 27..135 fully art (band solid); row 136 = interior. span = frame6 footprint."
+    },
+    {
+      "id": "edge-left",
+      "role": "edge-y",
+      "anchor": "left",
+      "crop": [
+        22,
+        280,
+        86,
+        462
+      ],
+      "stretch": "tile",
+      "tileSafe": true,
+      "wrapBlend": {
+        "overlap": 40
+      },
+      "key": {
+        "type": "none"
+      },
+      "displayScale": 0.28,
+      "span": [
+        24,
+        2
+      ],
+      "comment": "engraved lattice spine; loop-closure y0=280 H=182 (err 33 — irregular braid, no better window at any height). Cols 22..85 fully art; col 86 = interior."
+    },
+    {
+      "id": "edge-right",
+      "role": "edge-y",
+      "anchor": "right",
+      "crop": [
+        941,
+        300,
+        953,
+        800
+      ],
+      "stretch": "tile",
+      "tileSafe": true,
+      "wrapBlend": {
+        "overlap": 40
+      },
+      "key": {
+        "type": "none"
+      },
+      "displayScale": 0.28,
+      "span": [
+        24,
+        2
+      ],
+      "comment": "plain wire; cols 941..952 fully art — col 953+ starts catching grey margin flecks (frame6 lesson: a grey stripe on the outer rim paints outside the panel)"
+    },
+    {
+      "id": "edge-bottom",
+      "role": "edge-x",
+      "anchor": "bottom",
+      "crop": [
+        250,
+        1012,
+        650,
+        1024
+      ],
+      "stretch": "tile",
+      "tileSafe": true,
+      "wrapBlend": {
+        "overlap": 40
+      },
+      "key": {
+        "type": "none"
+      },
+      "displayScale": 0.28,
+      "span": [
+        8,
+        4
+      ],
+      "comment": "plain wire; rows 1012..1023 fully art (image bottom row 1023 is the frame's last row; interior ends y1011)"
+    }
+  ]
 }

@@ -133,6 +133,12 @@ T2 (ruling 2026-10-28).
 
 ## [P7] Approvazione e testimone
 
+- **Tutti i mock prodotti vanno mostrati al Director** (ruling 2026-11-20,
+  verbatim: *«la regola dice falli tutti e mostrami i mock tra cui scegliere.
+  se nn c'è scritto esplicitamente deve essere aggiunto a queste strategie»*).
+  Nessuna pre-selezione dell'agente: ogni candidato generato o costruito è
+  presentato come mock nel contesto d'uso; il "default 2, max 3" di PLAN-047
+  limita le **opzioni della fork card**, non il numero di mock mostrati.
 - **Golden:** visual-fork (PLAN-047) → ruling del Director →
   `.mw/specs/<area>/refs/REGISTERED.md`.
 - **Verdetto di Fase C:** riga nel record di conversione della superficie

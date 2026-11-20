@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { ROSTER_SORT_MODES } from '@/ui/idleVillage/config/rosterSortConfig';
 import type { RosterSortMode } from '@/ui/idleVillage/config/rosterSortConfig';
-import { GameIconChecklist } from './gameIcons';
+import { EngravedIcon } from './gameFrame/engravedIcons';
 
 /**
  * Props for the RosterSortIcon component
@@ -52,14 +52,17 @@ export function RosterSortIcon({
   
   return (
     <button
+      type="button"
       onClick={handleClick}
+      data-ctl="round"
       className={`rounded-full border border-white/15 bg-white/5 p-1 text-slate-200 transition hover:border-amber-300/70 hover:text-amber-200 ${className}`}
       title={tooltip}
       aria-label={tooltip}
       data-testid="roster-sort-icon"
     >
-      <GameIconChecklist
-        className={`h-3.5 w-3.5 text-slate-400 ${isAscending ? '' : 'rotate-180'}`}
+      <EngravedIcon
+        id="cmd-sort"
+        className={`h-3.5 w-3.5 ${isAscending ? '' : 'rotate-180'}`}
       />
     </button>
   );

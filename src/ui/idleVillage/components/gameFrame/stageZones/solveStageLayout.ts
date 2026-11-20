@@ -43,8 +43,10 @@ export interface StageOccupant {
 }
 
 export interface StageIntent {
-  /** Per-panel committed drop position (raw px, never clamped at rest). */
-  placements: Partial<Record<StagePanelId, { x: number; y: number } | null>>;
+  /** Per-panel committed drop rect (raw px, never clamped at rest). `w`/`h`
+   *  freeze the size the panel had at commit — a dragged panel never
+   *  resizes (Director ruling 2026-11-20: «senza cambiare di dimensioni»). */
+  placements: Partial<Record<StagePanelId, { x: number; y: number; w?: number; h?: number } | null>>;
   /** F5 cluster drag intent — the run-cluster's user-chosen center x. */
   userCenterX: number | null;
 }
@@ -131,11 +133,13 @@ function solveZoneWidths(config: StageZonesConfig, vw: number): Record<StageZone
 
 /** Zone x positions once the effective widths are known — residual slack goes
  *  to symmetric outer margins (never inflates zones past their caps). */
-function zoneRects(config: StageZonesConfig, vw: number, stageTop: number, stageH: number, widths: Record<StageZoneId, number>): Record<StageZoneId, StageRect> {
+function zoneRects(config: StageZonesConfig, vw: number, stageTop: number, stageH: number, widths: Record<StageZoneId, number>, onlyLeftWing = false): Record<StageZoneId, StageRect> {
   const { outer } = config;
   const zonesW = widths.leftWing + widths.centerStage + widths.rightWing;
   const residual = Math.max(0, vw - 2 * outer.edgePx - 2 * outer.gutterPx - zonesW);
-  const bandLeft = outer.edgePx + residual / 2;
+  /* Only the left wing is occupied (roster/stash): it hugs the left edge — centring a lone column on the map
+   *  put it over the playfield (Director 2026-11-20). Otherwise slack stays symmetric. */
+  const bandLeft = outer.edgePx + (onlyLeftWing ? 0 : residual / 2);
   const leftX = bandLeft;
   const centerX = leftX + widths.leftWing + outer.gutterPx;
   const rightX = centerX + widths.centerStage + outer.gutterPx;
@@ -284,8 +288,9 @@ export function solveStageLayout(config: StageZonesConfig, inputs: SolverInputs)
       ? 0
       : clamp(viewport.w - 2 * config.outer.edgePx - 2 * config.outer.gutterPx - effective.leftWing - effective.rightWing, config.zones.centerStage.minPx, config.zones.centerStage.maxPx);
 
-  const zones = zoneRects(config, viewport.w, stageTop, stageH, effective);
-  const nominalZones = zoneRects(config, viewport.w, stageTop, stageH, nominal);
+  const onlyLeftWing = effective.centerStage === 0 && effective.rightWing === 0;
+  const zones = zoneRects(config, viewport.w, stageTop, stageH, effective, onlyLeftWing);
+  const nominalZones = zoneRects(config, viewport.w, stageTop, stageH, nominal, onlyLeftWing);
 
   /* Center strips anchor the row at userCenterX (cluster drag intent) or the
    * stage center when unset. */
@@ -309,7 +314,14 @@ export function solveStageLayout(config: StageZonesConfig, inputs: SolverInputs)
       }
       return true;
     });
-    if (zone === 'leftWing' && expandedFinal.length === 2) {
+    /* The authorized-pair vertical stack only binds panels with no user
+     *  placement — a freely-placed member exits the stack and the remaining
+     *  one takes the wing alone (Director ruling 2026-11-20). */
+    const pairStack =
+      zone === 'leftWing' &&
+      expandedFinal.length === 2 &&
+      expandedFinal.every((o) => !intent.placements[o.panelId]);
+    if (pairStack) {
       const [a, b] = expandedFinal;
       const needed = config.panels[a.panelId].minHeightPx + config.outer.gutterPx + config.panels[b.panelId].minHeightPx;
       if (needed > zoneRect.h) {
@@ -328,7 +340,19 @@ export function solveStageLayout(config: StageZonesConfig, inputs: SolverInputs)
       const stripRect = stripRects.get(o.panelId) ?? null;
       const isSuspended = suspended.includes(o) || overflow.has(o.panelId) || (!isExpanded && !stripRect);
       if (isExpanded) {
-        if (zone === 'leftWing' && expandedFinal.length === 2) {
+        const place = intent.placements[o.panelId];
+        if (place) {
+          /* Free placement (Director ruling 2026-11-20 «senza snap, senza
+           *  cambiare di dimensioni»): the committed rect survives verbatim,
+           *  clamped to the stage envelope — never to a zone; the size is
+           *  the one the drag committed (solver fallback for legacy
+           *  point-only placements). */
+          const w = place.w ?? expandedWidth(config, o.panelId, zoneRect.w);
+          const x = clamp(place.x, envelope.x, Math.max(envelope.x, envelope.x + envelope.w - w));
+          const h = place.h ?? Math.min(panel.naturalHeightPx, Math.max(0, envelope.y + envelope.h - Math.max(place.y, envelope.y)));
+          const y = clamp(place.y, envelope.y, Math.max(envelope.y, envelope.y + envelope.h - h));
+          panels[o.panelId] = { rect: { x, y, w, h }, stripRect: null, presentationEffective: 'expanded', suspended: false, zone };
+        } else if (pairStack && expandedFinal.length === 2) {
           /* Authorized pair: vertical stack, roster on top (DIRECTOR R-184).
            *  Roster's slot takes its natural height; stash gets the rest. */
           const roster = expandedFinal.find((p) => p.panelId === 'roster') ?? expandedFinal[0];
@@ -336,20 +360,20 @@ export function solveStageLayout(config: StageZonesConfig, inputs: SolverInputs)
           const rosterH = clamp(panel.naturalHeightPx, panel.minHeightPx, zoneRect.h - config.outer.gutterPx - config.panels[stash.panelId].minHeightPx);
           const slots = new Map<StagePanelId, StageRect>([
             [roster.panelId, { x: zoneRect.x, y: zoneRect.y, w: zoneRect.w, h: rosterH }],
-            [stash.panelId, { x: zoneRect.x, y: zoneRect.y + rosterH + config.outer.gutterPx, w: zoneRect.w, h: Math.max(0, zoneRect.h - rosterH - config.outer.gutterPx) }],
+            [stash.panelId, { x: zoneRect.x, y: zoneRect.y + rosterH + config.outer.gutterPx, w: zoneRect.w, h: Math.max(0, Math.min(config.panels[stash.panelId].naturalHeightPx, zoneRect.h - rosterH - config.outer.gutterPx)) }],
           ]);
           for (const p of expandedFinal) {
             panels[p.panelId] = { rect: slots.get(p.panelId)!, stripRect: null, presentationEffective: 'expanded', suspended: false, zone };
           }
           break;
+        } else {
+          const w = expandedWidth(config, o.panelId, zoneRect.w);
+          const home = defaultPlacement(config, o.panelId, zone, zoneRect, w);
+          const x = panel.widthMode === 'zone-fill' ? zoneRect.x : clamp(home.x, zoneRect.x, Math.max(zoneRect.x, zoneRect.x + zoneRect.w - w));
+          const y = clamp(home.y, zoneRect.y, Math.max(zoneRect.y, zoneRect.y + zoneRect.h - panel.minHeightPx));
+          const h = Math.min(panel.naturalHeightPx, zoneRect.y + zoneRect.h - y);
+          panels[o.panelId] = { rect: { x, y, w, h }, stripRect: null, presentationEffective: 'expanded', suspended: false, zone };
         }
-        const w = expandedWidth(config, o.panelId, zoneRect.w);
-        const home = defaultPlacement(config, o.panelId, zone, zoneRect, w);
-        const place = intent.placements[o.panelId] ?? home;
-        const x = panel.widthMode === 'zone-fill' ? zoneRect.x : clamp(place.x, zoneRect.x, Math.max(zoneRect.x, zoneRect.x + zoneRect.w - w));
-        const y = clamp(place.y, zoneRect.y, Math.max(zoneRect.y, zoneRect.y + zoneRect.h - panel.minHeightPx));
-        const h = Math.min(panel.naturalHeightPx, zoneRect.y + zoneRect.h - y);
-        panels[o.panelId] = { rect: { x, y, w, h }, stripRect: null, presentationEffective: 'expanded', suspended: false, zone };
       } else if (stripRect) {
         panels[o.panelId] = { rect: null, stripRect, presentationEffective: 'strip', suspended: false, zone };
       } else {

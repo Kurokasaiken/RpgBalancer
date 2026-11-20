@@ -211,6 +211,115 @@
   background: color-mix(in srgb, var(--skin-icon-accent) 80%, var(--skin-surface-base));
 }
 
+/* ── Engraved scroll band (PLAN-125 Fase 7a / PLAN-127 N=3 #1): scrollers that
+   mount a `HudScrollBand` carry `data-hud-scroll-band` — the native bar is
+   hidden everywhere and the band component paints the well+thumb itself.
+   Scroll mechanics are untouched: wheel/keyboard/drag still hit the real
+   scroller. Visual grammar from the scroll-band fork
+   (.mw/runs/20261120-scroll-band/): variant A «smalto», B «oro inciso»,
+   C «filare» — `data-variant` on `[data-hud-band]`. */
+.skin-scope [data-hud-scroll-band] { scrollbar-width: none; }
+.skin-scope [data-hud-scroll-band]::-webkit-scrollbar { display: none; }
+
+.skin-scope [data-hud-band] { border-radius: 8px; pointer-events: auto; }
+.skin-scope [data-hud-band] .hb-well {
+  position: absolute; inset: 0;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #04141a 0%, #071e26 50%, #04141a 100%);
+  box-shadow:
+    inset 0 2px 4px rgba(0,0,0,0.85),
+    inset 0 -1px 1px rgba(216,189,120,0.14),
+    0 0 0 1px rgba(0,0,0,0.55);
+}
+.skin-scope [data-hud-band] .hb-well::before,
+.skin-scope [data-hud-band] .hb-well::after {
+  content: '';
+  position: absolute; top: 4px; bottom: 4px; width: 1px;
+  background: linear-gradient(180deg, transparent, rgba(216,189,120,0.38), transparent);
+}
+.skin-scope [data-hud-band] .hb-well::before { left: 1.5px; }
+.skin-scope [data-hud-band] .hb-well::after { right: 1.5px; }
+
+/* A — smalto: teal enamel thumb in a brass-rimmed well. */
+.skin-scope [data-hud-band][data-variant="a"] .hb-thumb {
+  position: absolute; left: 2px; right: 2px;
+  border-radius: 6px;
+  /* «gemma» (Director 2026-11-20): emerald jewel — same material as the
+   *  frame's corner gems, readable on the dark enamel field. */
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,240,200,0.18) 0%, transparent 55%),
+    linear-gradient(180deg, #2ea377 0%, #14705a 50%, #0a3f30 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(216,189,120,0.55),
+    inset 0 1px 0 rgba(255,255,255,0.22),
+    inset 0 -2px 3px rgba(0,0,0,0.5),
+    0 1px 3px rgba(0,0,0,0.6);
+}
+.skin-scope [data-hud-band][data-variant="a"] .hb-thumb::after {
+  content: '';
+  position: absolute; left: 3px; right: 3px; top: 50%; height: 1px;
+  background: rgba(216,189,120,0.45);
+  box-shadow: 0 -4px 0 rgba(216,189,120,0.22), 0 4px 0 rgba(216,189,120,0.22);
+}
+
+/* B — oro inciso: engraved champagne-brass thumb + stud caps on the well. */
+.skin-scope [data-hud-band][data-variant="b"] .hb-thumb {
+  position: absolute; left: 2px; right: 2px;
+  border-radius: 6px;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,0.14), transparent 30%, transparent 70%, rgba(0,0,0,0.28)),
+    linear-gradient(180deg, #d8bd78 0%, #c2a355 42%, #a0762f 78%, #71501f 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(60,38,10,0.6),
+    inset 0 1px 0 rgba(255,240,200,0.5),
+    inset 0 -2px 3px rgba(60,38,10,0.65),
+    0 1px 3px rgba(0,0,0,0.65);
+}
+.skin-scope [data-hud-band][data-variant="b"] .hb-thumb::after {
+  content: '';
+  position: absolute; left: 3px; right: 3px; top: 50%; height: 1px;
+  background: rgba(60,38,10,0.55);
+  box-shadow:
+    0 -4px 0 rgba(60,38,10,0.35), 0 4px 0 rgba(60,38,10,0.35),
+    0 -4.5px 0 rgba(255,240,200,0.25), 0 4.5px 0 rgba(255,240,200,0.25);
+}
+.skin-scope [data-hud-band][data-variant="b"] .hb-stud {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  width: 8px; height: 8px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #e8d094, #a0762f 70%, #5f3f16);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.7), inset 0 -1px 1px rgba(60,38,10,0.6);
+}
+.skin-scope [data-hud-band][data-variant="b"] .hb-stud-top { top: 3px; }
+.skin-scope [data-hud-band][data-variant="b"] .hb-stud-bot { bottom: 3px; }
+
+/* C — filare: hairline channel + sliding emerald lozenge. */
+.skin-scope [data-hud-band][data-variant="c"] .hb-channel {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  top: 0; bottom: 0; width: 2px;
+  background: linear-gradient(180deg, rgba(216,189,120,0.30), rgba(216,189,120,0.14), rgba(216,189,120,0.30));
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.4), inset 0 2px 3px rgba(0,0,0,0.7);
+  border-radius: 1px;
+}
+.skin-scope [data-hud-band][data-variant="c"] .hb-loz {
+  position: absolute; left: 50%;
+  width: 10px; height: 10px;
+  transform: translate(-50%, -50%) rotate(45deg);
+  border-radius: 2px;
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255,255,255,0.35), transparent 50%),
+    linear-gradient(135deg, #2c7683 0%, #1b5360 55%, #0f3844 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(216,189,120,0.75),
+    0 0 6px rgba(60,170,170,0.45),
+    0 1px 2px rgba(0,0,0,0.7);
+}
+.skin-scope [data-hud-band][data-variant="c"] .hb-loz::after {
+  content: '';
+  position: absolute; inset: 2.5px;
+  border-radius: 1px;
+  background: linear-gradient(135deg, #0f3844, #2c7683);
+}
+
 /* ── HUD controls: pills in the plaque's own material (tokens only, no brown) ───────────
    Used by the HUD roster and ledger headers: sort chips, status menu, icon buttons. */
 .skin-scope [data-hud-controls] button:not([data-skin="cta"]),
@@ -238,7 +347,7 @@
   cursor: pointer;
   transition: background 120ms ease-out, border-color 120ms ease-out, color 120ms ease-out;
 }
-.skin-scope [data-hud-controls] button:not([data-skin="cta"]):has(> svg:only-child) { width: var(--skin-hud-control-height); padding: 0; flex-shrink: 0; }
+.skin-scope [data-hud-controls] button:not([data-skin="cta"]):not([data-ctl]):has(> svg:only-child) { width: var(--skin-hud-control-height); padding: 0; flex-shrink: 0; }
 .skin-scope [data-hud-controls] button svg { width: var(--skin-hud-control-icon-size); height: var(--skin-hud-control-icon-size); }
 
 /* ── Corner buttons — bronze (PLAN-067 HUD-3 = P1, R-234) ──────────────────────────────────────
@@ -267,7 +376,8 @@
   background: color-mix(in srgb, var(--skin-icon-accent) 16%, var(--skin-surface-base));
   color: var(--skin-title-color);
 }
-.skin-scope [data-hud-controls] button[aria-pressed="true"] {
+.skin-scope [data-hud-controls] button[aria-pressed="true"],
+.skin-scope [data-hud-controls] button[aria-checked="true"] {
   border-color: var(--skin-surface-border);
   background: color-mix(in srgb, var(--skin-icon-accent) 30%, var(--skin-surface-base));
   color: var(--skin-title-color);
@@ -284,6 +394,170 @@
 .skin-scope [data-hud-controls] label:focus-within {
   outline: none;
   box-shadow: 0 0 0 1.25px var(--skin-hud-seat), 0 0 0 3px var(--skin-icon-accent);
+}
+
+/* ── PLAN-128 painted controls (slice-kit `controls` surface, R-363) ───────────
+   `data-ctl="pill"`: the 3-slice painted pill (left cap / tiled middle / right
+   cap) in the sheet's five states — used for the stash filter tabs under the
+   golden mockup grammar. `data-ctl="round"`: the round icon button in the same
+   five states. Art from the generated `controlsFrame` manifest
+   (`/assets/ui/hud-real/slicekit/controls/`); `preloadControlsArt()` warms the
+   state pieces so the first hover doesn't pop. Painted surface → no border,
+   no box-shadow, no token background. */
+.skin-scope [data-ctl="pill"] {
+  appearance: none;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  height: 29px;
+  padding: 0 14px;
+  border: 0;
+  box-shadow: none;
+  background-color: transparent;
+  background-image:
+    url('/assets/ui/hud-real/slicekit/controls/pill-normal-l.webp'),
+    url('/assets/ui/hud-real/slicekit/controls/pill-normal-r.webp'),
+    url('/assets/ui/hud-real/slicekit/controls/pill-normal-m.webp');
+  background-repeat: no-repeat, no-repeat, repeat-x;
+  background-position: left center, right center, left center;
+  background-size: 19px 29px, 19px 29px, 16px 29px;
+  color: var(--skin-title-color);
+  font-family: var(--skin-font-display);
+  font-size: var(--skin-hud-caps-size);
+  font-weight: var(--skin-hud-caps-weight);
+  letter-spacing: var(--skin-hud-caps-tracking);
+  line-height: 1;
+  text-transform: uppercase;
+  text-shadow: var(--skin-hud-engrave);
+  cursor: pointer;
+}
+.skin-scope [data-ctl="pill"] svg { width: 12px; height: 12px; }
+.skin-scope [data-ctl="pill"]:hover:not(:disabled):not([aria-checked="true"]) {
+  background-image:
+    url('/assets/ui/hud-real/slicekit/controls/pill-hover-l.webp'),
+    url('/assets/ui/hud-real/slicekit/controls/pill-hover-r.webp'),
+    url('/assets/ui/hud-real/slicekit/controls/pill-hover-m.webp');
+}
+.skin-scope [data-ctl="pill"]:active:not(:disabled) {
+  background-image:
+    url('/assets/ui/hud-real/slicekit/controls/pill-pressed-l.webp'),
+    url('/assets/ui/hud-real/slicekit/controls/pill-pressed-r.webp'),
+    url('/assets/ui/hud-real/slicekit/controls/pill-pressed-m.webp');
+}
+.skin-scope [data-ctl="pill"][aria-checked="true"],
+.skin-scope [data-ctl="pill"][data-state="selected"] {
+  background-image:
+    url('/assets/ui/hud-real/slicekit/controls/pill-selected-l.webp'),
+    url('/assets/ui/hud-real/slicekit/controls/pill-selected-r.webp'),
+    url('/assets/ui/hud-real/slicekit/controls/pill-selected-m.webp');
+}
+.skin-scope [data-ctl="pill"]:disabled {
+  background-image:
+    url('/assets/ui/hud-real/slicekit/controls/pill-disabled-l.webp'),
+    url('/assets/ui/hud-real/slicekit/controls/pill-disabled-r.webp'),
+    url('/assets/ui/hud-real/slicekit/controls/pill-disabled-m.webp');
+  cursor: default;
+}
+.skin-scope [data-ctl="pill"]:focus-visible {
+  outline: none;
+  filter: drop-shadow(0 0 3px var(--skin-icon-accent));
+}
+.skin-scope [data-ctl="round"] {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
+  flex-shrink: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background-color: transparent;
+  background-image: url('/assets/ui/hud-real/slicekit/controls/round-normal.webp');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 30px 30px;
+  color: var(--skin-title-color);
+  cursor: pointer;
+}
+/* painted art replaces the generic button material: kill the base-button
+   specular streak (::before) and sheen on painted controls */
+.skin-scope [data-ctl="round"]::before,
+.skin-scope [data-ctl="pill"]::before {
+  display: none;
+}
+.skin-scope [data-ctl="round"] svg { width: 14px; height: 14px; }
+.skin-scope [data-ctl="round"]:hover:not(:disabled) {
+  background-image: url('/assets/ui/hud-real/slicekit/controls/round-hover.webp');
+}
+.skin-scope [data-ctl="round"]:active:not(:disabled) {
+  background-image: url('/assets/ui/hud-real/slicekit/controls/round-pressed.webp');
+}
+.skin-scope [data-ctl="round"][aria-pressed="true"],
+.skin-scope [data-ctl="round"][data-state="selected"] {
+  background-image: url('/assets/ui/hud-real/slicekit/controls/round-selected.webp');
+}
+.skin-scope [data-ctl="round"]:disabled {
+  background-image: url('/assets/ui/hud-real/slicekit/controls/round-disabled.webp');
+  cursor: default;
+}
+.skin-scope [data-ctl="round"]:focus-visible {
+  outline: none;
+  filter: drop-shadow(0 0 3px var(--skin-icon-accent));
+}
+/* Icon-only menu ring (Roster filter / sort, Director 2026-11-20): the native select stays stretched over the
+   ring (see label select below) but the pill chrome, value text and chevron are gone — the state is the ring's. */
+.skin-scope [data-hud-controls] label[data-ctl="round"],
+.skin-scope [data-hud-controls] button[data-ctl="round"] {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
+  flex-shrink: 0;
+  max-width: none;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background-color: transparent;
+  background-image: url('/assets/ui/hud-real/slicekit/controls/round-normal.webp');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 30px 30px;
+  color: var(--skin-title-color);
+}
+.skin-scope [data-hud-controls] label[data-ctl="round"]::after { display: none; }
+.skin-scope [data-hud-controls] label[data-ctl="round"] [data-roster-pill-value] { display: none; }
+.skin-scope [data-hud-controls] label[data-ctl="round"]:hover,
+.skin-scope [data-hud-controls] button[data-ctl="round"]:hover:not(:disabled) {
+  background-image: url('/assets/ui/hud-real/slicekit/controls/round-hover.webp');
+}
+.skin-scope [data-hud-controls] button[data-ctl="round"]:active:not(:disabled) {
+  background-image: url('/assets/ui/hud-real/slicekit/controls/round-pressed.webp');
+}
+.skin-scope [data-hud-controls] button[data-ctl="round"][aria-pressed="true"],
+.skin-scope [data-hud-controls] button[data-ctl="round"][aria-checked="true"],
+.skin-scope [data-hud-controls] label[data-ctl="round"][data-state="selected"],
+.skin-scope [data-hud-controls] button[data-ctl="round"][data-state="selected"] {
+  background-image: url('/assets/ui/hud-real/slicekit/controls/round-selected.webp');
+}
+.skin-scope [data-hud-controls] button[data-ctl="round"]:disabled {
+  background-image: url('/assets/ui/hud-real/slicekit/controls/round-disabled.webp');
+  cursor: default;
+}
+.skin-scope [data-hud-controls] label[data-ctl="round"]:focus-within,
+.skin-scope [data-hud-controls] button[data-ctl="round"]:focus-visible {
+  box-shadow: none;
+  filter: drop-shadow(0 0 3px var(--skin-icon-accent));
 }
 /* The status menu is a pill with its own chevron; the native control is stripped. */
 .skin-scope [data-hud-controls] label { padding: 0 26px 0 12px; max-width: 120px; }
@@ -533,4 +807,16 @@
 .skin-scope [data-hud-choices] button[data-skin="choice"]:focus-visible [data-choice-index] {
   color: var(--skin-title-color);
   border-color: var(--skin-title-color);
+}
+
+/* Narrow viewports (≤1400px): the painted rings step down to 26px so the Roster title row (title + 5 rings) fits
+   inside the panel instead of pushing the close ring onto the frame (1280 capture, 2026-11-20). */
+@media (max-width: 1400px) {
+  .skin-scope [data-ctl="round"],
+  .skin-scope [data-hud-controls] label[data-ctl="round"] {
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    background-size: 26px 26px;
+  }
 }

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { WanderlustStatBar } from '@/ui/wanderlust-surface/layout/WanderlustStatBar';
 import { WanderlustPortrait } from '@/ui/wanderlust-surface/layout/WanderlustPortrait';
 import { C1Medallion } from '@/ui/idleVillage/components/C1Medallion';
+import { EngravedIcon } from '@/ui/idleVillage/components/gameFrame/engravedIcons';
 import type { ResidentCompatibilityState } from '../components/ResidentRosterTypes';
 
 /* ════════════════════════════════════════════════════════════════════════
@@ -380,16 +381,19 @@ const WanderlustRosterCardV2 = memo<WanderlustRosterCardV2Props>(({
            *  right — engraved hairline under each row, no boxed filet. The
            *  medallion carries `data-wanderlust-portrait` so HeroLevelDecor
            *  and the drag home-center measure the same bounds they always did. */
-          gridTemplateColumns: 'auto 34px minmax(0, 1fr) 116px',
-          gap: 'var(--skin-hud-row-column-gap)',
-          padding: '6px 10px',
+          gridTemplateColumns: '32px minmax(0, 1fr)',
+          gridTemplateRows: 'auto auto',
+          columnGap: 'var(--skin-hud-row-column-gap)',
+          rowGap: 'var(--skin-hud-bar-gap)',
+          alignItems: 'center',
+          minHeight: 42,
+          boxSizing: 'border-box',
+          padding: '4px 10px',
           borderRadius: 'var(--skin-hud-row-radius)',
-          border: '1px solid transparent',
-          background: isHovered ? 'rgba(240,207,106,0.05)' : 'rgba(6,15,22,0.35)',
-          boxShadow: isHovered
-            ? 'inset 0 1px 0 rgba(240,207,106,0.20), inset 0 -1px 0 rgba(0,0,0,0.45)'
-            : 'inset 0 -1px 0 rgba(0,0,0,0.45)',
-          transition: 'box-shadow 200ms ease, opacity 200ms ease, background-color 200ms ease',
+          border: '1px solid color-mix(in srgb, var(--skin-title-color) 14%, transparent)',
+          background: isHovered ? 'color-mix(in srgb, var(--skin-title-color) 7%, transparent)' : 'color-mix(in srgb, var(--skin-hud-enamel-deep) 55%, transparent)',
+          boxShadow: 'none',
+          transition: 'background-color 200ms ease, opacity 200ms ease',
         }}
         onClick={handleClick}
         onPointerDown={(e) => {
@@ -406,11 +410,14 @@ const WanderlustRosterCardV2 = memo<WanderlustRosterCardV2Props>(({
         data-compatibility={compatibilityState}
         data-density="compact"
       >
-        <span data-wanderlust-portrait style={{ display: 'inline-block', width: 50, height: 50, flexShrink: 0 }}>
-          <C1Medallion portraitUrl={portraitUrl} sizePx={50} isDragging={isDragging} />
+        {/* Dense row (Director 2026-11-20): small plain portrait, no medallion — the lit level ring is the only frame. */}
+        <span data-wanderlust-portrait style={{ gridRow: '1 / span 2', display: 'inline-block', width: 32, height: 32, flexShrink: 0 }}>
+          {portraitUrl ? (
+            <img src={portraitUrl} alt="" draggable={false} style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', display: 'block', pointerEvents: 'none' }} />
+          ) : (
+            <C1Medallion portraitUrl={portraitUrl} sizePx={32} isDragging={isDragging} />
+          )}
         </span>
-        {/* LV-badge column (mockup): the overlay decor renders chip+emblem here. */}
-        <span aria-hidden style={{ width: 34, flexShrink: 0 }} />
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--skin-hud-inline-gap)', minWidth: 0 }}>
           <span
             data-roster-name
@@ -453,12 +460,20 @@ const WanderlustRosterCardV2 = memo<WanderlustRosterCardV2Props>(({
             </span>
           )}
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--skin-hud-bar-gap)' }}>
-          <div title={`${t('roster.stats.hp')} ${hp}/${maxHp}`}>
-            <WanderlustStatBar label="HP" value={hp} maxValue={maxHp} variant="hp" size="md" hideLabel />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: 10, alignItems: 'center', minWidth: 0 }}>
+          <div title={`${t('roster.stats.hp')} ${hp}/${maxHp}`} style={{ minWidth: 0, display: 'flex', alignItems: 'center', gap: 4 }}>
+            {/* Reference grammar: engraved heart for HP, dot for stamina —
+             *  icon tinted by the bar's own token, never a label. */}
+            <EngravedIcon id="ico-salve" size={9} aria-hidden style={{ color: COLOR.hp, flexShrink: 0 }} />
+            <span style={{ flex: 1, minWidth: 0 }}>
+              <WanderlustStatBar label="HP" value={hp} maxValue={maxHp} variant="hp" size="sm" hideLabel />
+            </span>
           </div>
-          <div title={`${t('roster.stats.stamina')} ${100 - fatigue}/100`}>
-            <WanderlustStatBar label="Stamina" value={100 - fatigue} maxValue={100} variant="stamina" size="md" hideLabel />
+          <div title={`${t('roster.stats.stamina')} ${100 - fatigue}/100`} style={{ minWidth: 0, display: 'flex', alignItems: 'center', gap: 4 }}>
+            <EngravedIcon id="ico-dot" size={8} aria-hidden style={{ color: COLOR.stamina, flexShrink: 0 }} />
+            <span style={{ flex: 1, minWidth: 0 }}>
+              <WanderlustStatBar label="Stamina" value={100 - fatigue} maxValue={100} variant="stamina" size="sm" hideLabel />
+            </span>
           </div>
         </div>
       </div>

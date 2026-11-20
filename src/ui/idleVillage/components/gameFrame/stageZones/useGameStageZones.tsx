@@ -66,11 +66,12 @@ export interface GameStageApi {
   unpin: (panelId: StagePanelId) => void;
   /** Start the single stage drag — ignored while another drag is live. */
   beginDrag: (panelId: StagePanelId, pointerId: number) => void;
-  /** Commit a drop: reducer picks in-zone placement, strip collapse (pointer
-   *  on the target's rail/tab region), cross-zone landing or clamp-back.
-   *  `zones`/`nominalZones`/revision come from the committed layout snapshot
-   *  the drag saw — callers never supply them. */
-  drop: (panelId: StagePanelId, pointer: { x: number; y: number }, point: { x: number; y: number }) => void;
+  /** Commit a drop: reducer picks free placement (the committed point +
+   *  size, no snap — Director ruling 2026-11-20) or strip collapse (pointer
+   *  on the target's rail/tab region). `zones`/`nominalZones`/revision come
+   *  from the committed layout snapshot the drag saw — callers never
+   *  supply them. */
+  drop: (panelId: StagePanelId, pointer: { x: number; y: number }, point: { x: number; y: number }, size?: { w: number; h: number }) => void;
   cancelDrag: () => void;
   /** Double-click reset: the panel returns to its zone home. */
   resetPlacement: (panelId: StagePanelId) => void;
@@ -212,12 +213,13 @@ export function useGameStageZonesState(): GameStage {
       pin: (panelId) => dispatch({ type: 'PIN', panelId }),
       unpin: (panelId) => dispatch({ type: 'UNPIN', panelId }),
       beginDrag: (panelId, pointerId) => dispatch({ type: 'DRAG_START', panelId, pointerId }),
-      drop: (panelId, pointer, point) =>
+      drop: (panelId, pointer, point, size) =>
         dispatch({
           type: 'DROP',
           panelId,
           pointer,
           point,
+          size,
           zones: layoutRef.current.zones,
           nominalZones: layoutRef.current.nominalZones,
         }),
@@ -304,7 +306,7 @@ function useStagePanelDragClaim(
       window.removeEventListener('pointercancel', d.cancel);
       d.el.style.transform = '';
       setDragging(false);
-      if (commit) stage.api.drop(panelId, commit.pointer, commit.point);
+      if (commit) stage.api.drop(panelId, commit.pointer, commit.point, { w: d.baseRect.w, h: d.baseRect.h });
     },
     [panelId, stage.api],
   );

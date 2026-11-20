@@ -2,7 +2,7 @@
   "surface": "panel-frame7",
   "specVersion": 2,
   "generator": "scripts/hud-real/slice-frame.py",
-  "generatedAt": "2026-11-19T17:36:07+00:00",
+  "generatedAt": "2026-11-20T14:05:33+00:00",
   "source": {
     "path": "test-results/slicekit/frame-smeraldo/frame-smeraldo-keyed.png",
     "sha256": "578e4c41eca4ed4e0e5291e679f2edbc2c28251c20f36a46865e2a2da539221c"
@@ -221,36 +221,6 @@
       "left": 64,
       "right": 12,
       "bottom": 12
-    },
-    "backings": [
-      {
-        "anchor": "tl",
-        "w": 18,
-        "h": 18,
-        "shape": "crescent",
-        "color": "var(--skin-hud-enamel-deep, #091d15)"
-      },
-      {
-        "anchor": "tr",
-        "w": 18,
-        "h": 18,
-        "shape": "crescent",
-        "color": "var(--skin-hud-enamel-deep, #091d15)"
-      },
-      {
-        "anchor": "bl",
-        "w": 18,
-        "h": 18,
-        "shape": "crescent",
-        "color": "var(--skin-hud-enamel-deep, #091d15)"
-      },
-      {
-        "anchor": "br",
-        "w": 18,
-        "h": 18,
-        "shape": "crescent",
-        "color": "var(--skin-hud-enamel-deep, #091d15)"
-      }
-    ]
+    }
   }
 }
