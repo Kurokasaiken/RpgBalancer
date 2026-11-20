@@ -859,3 +859,16 @@ sulle 3 zone scroll (crew/rewards/echoes) anche sullo shipping: stessa banda dei
 variante **`a` smalto/gemma** confermata (succede alla B «oro inciso», che resta il golden
 registrato). Record conversione `test-results/slicekit/victory.json`; INV-6 permanente.
 **Fonte:** ruling Director 2026-11-20 (fork question in sessione).
+
+## 2026-11-20 — Quarantena dei file rotti del merge backup → main
+**Da:** merge `backup/main-pre-rebase-2026-11-20` in `main` (commit `00cd031d2`). Dodici file avevano
+errori di sintassi già presenti su `origin/main` e nel backup, identici in tutte le copie sul disco.
+Il type-check si fermava a questi errori, quindi nessun controllo di tipo copriva il resto del progetto.
+**Decisione (Director):** cancellare e quarantenare, scelta «quarantena + documentazione + verifica».
+Spostati 81 file fuori da `src/`, `tests/`, `scripts/` in `quarantine/2026-11-20-merge-broken/`
+(elenco e istruzioni di ripristino in `quarantine/2026-11-20-merge-broken/README.md`). Include i 12
+file rotti e le dipendenze dirette e indirette: profiler delle mappe, monitor multi-villaggio,
+sandbox/MapPage e relativi test.
+**Verifica:** `vite build` passa. Il type-check non ha più errori di sintassi, ma restano circa 3.900
+errori di tipo in 641 file, debito già presente e ora visibile. Nessun commit o push ancora.
+**Da fare:** decidere se ripristinare i file (`git mv` inverso) o cancellarli definitivamente.
