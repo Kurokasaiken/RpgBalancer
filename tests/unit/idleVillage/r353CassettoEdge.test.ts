@@ -28,43 +28,14 @@ describe('R-353 cassetto estratto — edge contract', () => {
     expect(WIDE).toBeCloseTo(4 / 3, 3);
   });
 
-  it.each(['1440', '1280'] as const)('extracted spec %s uses the baked wide -extracted asset and widened art', (key) => {
-    const spec = cassettoColumnSpec(key === '1440' ? CASSETTO_WIDE_BREAKPOINT + 40 : CASSETTO_WIDE_BREAKPOINT - 40);
-    const geo = CASSETTO_COLUMN_GEO[key];
-    const expectedArtW = (geo.artW - LEFT[key] - CLIP[key]) * WIDE;
-    expect(spec.src).toBe(`/assets/ui/hud-real/cassetto/column-${key}-extracted.webp`);
-    expect(spec.geo.artW).toBeCloseTo(expectedArtW, 4);
-    expect(spec.geo.artH).toBe(geo.artH);
-    expect(spec.aspect).toBeCloseTo(expectedArtW / geo.artH, 6);
-  });
-
-  it.each(['1440', '1280'] as const)('zones %s shift left by leftCut then scale with the stretch; unstretched zones stay 1:1 re-centered', (key) => {
-    const geo = CASSETTO_COLUMN_GEO[key];
-    const spec = cassettoColumnSpec(key === '1440' ? CASSETTO_WIDE_BREAKPOINT + 40 : CASSETTO_WIDE_BREAKPOINT - 40);
-    const unstretched = new Set(CASSETTO_LAYOUT_CONFIG.drawer.unstretchedZones);
-    for (const [name, z] of Object.entries(spec.geo.zones)) {
-      const src = geo.zones[name as keyof typeof geo.zones];
-      if (unstretched.has(name)) {
-        // zona proporzionata (Director: risorse/teschio/reward/confirm 1:1)
-        expect(z.w, `zone ${name} must keep original width`).toBeCloseTo(src.w, 4);
-        const cx = (src.x + src.w / 2 - LEFT[key]) * WIDE;
-        expect(z.x + z.w / 2, `zone ${name} center not on stretched center`).toBeCloseTo(cx, 1);
-      } else {
-        expect(z.x, `zone ${name} x not shifted+stretched`).toBeCloseTo(Math.max(0, (src.x - LEFT[key]) * WIDE), 2);
-      }
-      expect(z.y, `zone ${name} y must not change (horizontal stretch only)`).toBe(src.y);
-      expect(z.h, `zone ${name} h must not change (horizontal stretch only)`).toBe(src.h);
-      expect(z.x + z.w, `zone ${name} exits the visible art`).toBeLessThanOrEqual(spec.geo.artW + 0.5);
-    }
-  });
-
-  it('extracted column renders the surviving art stretched by wideFactor (honest insets)', () => {
-    const h = 900;
-    const extracted = cassettoColumnWidthFor(cassettoColumnSpec(1440), h);
-    const narrow = (CASSETTO_COLUMN_GEO['1440'].artW - LEFT['1440'] - CLIP['1440']) / CASSETTO_COLUMN_GEO['1440'].artH * h;
-    expect(extracted).toBeCloseTo(narrow * WIDE, 1);
-    expect(extracted).toBeGreaterThan(narrow);
-    expect(extracted).toBeLessThanOrEqual(CASSETTO_LAYOUT_CONFIG.drawer.widthMaxPxExtracted);
+  /* R-357 / PLAN-125 (Mode B-amend, `redfirst:retire`; re-applied 2026-11-20): the baked extracted column art and its zone mapping
+   * are retired — the drawer is rebuilt in DOM (cassettoColumn.ts is now `columnAspect × viewportH`). The edge spec stays only
+   * as the legacy bake input. */
+  it('the DOM drawer width is columnAspect × viewportH, flush right, capped (replaces the baked-art mapping)', () => {
+    const spec = cassettoColumnSpec(CASSETTO_WIDE_BREAKPOINT + 40);
+    expect(spec.aspect).toBeCloseTo(CASSETTO_LAYOUT_CONFIG.drawer.columnAspect, 6);
+    expect(cassettoColumnWidthFor(spec, 900)).toBeCloseTo(512, 0);
+    expect(cassettoColumnWidthFor(spec, 3000)).toBe(CASSETTO_LAYOUT_CONFIG.drawer.widthMaxPxExtracted);
   });
 
   it('recomposited pieces survive the left cut and stay inside the visible art', () => {

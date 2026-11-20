@@ -22,7 +22,7 @@
  * `bottomSheet.maxWidthPx` this component mounts `ExpeditionBottomSheet`
  * instead — the signed column and BOTH chips never mount in that band.
  */
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CASSETTO_LAYOUT_CONFIG } from '@/balancing/config/idleVillage/cassettoLayoutConfig';
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
@@ -38,6 +38,15 @@ import { ExpeditionBottomSheet, useExpeditionSheetMode } from './ExpeditionBotto
 
 const DRAWER = CASSETTO_LAYOUT_CONFIG.drawer;
 
+/* R-357 (INV:cassetto-slide-lateral): the whole expanded surface slides
+ *  from/to the right edge on `drawer.slideMs`; the fold commits only when
+ *  the slide-out finishes. Reduced-motion skips the keyframes entirely. */
+const SLIDE_CSS = `
+@keyframes cassettoSlideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+@keyframes cassettoSlideOut { from { transform: translateX(0); } to { transform: translateX(100%); } }
+`;
+const REDUCED_MOTION_MQ = '(prefers-reduced-motion: no-preference)';
+
 export interface ExpeditionDrawerProps extends HudRealCassettoProps {
   /** Host visibility — hidden/unmounted publishes 0 and renders nothing. */
   visible?: boolean;
@@ -52,6 +61,22 @@ export const ExpeditionDrawer: React.FC<ExpeditionDrawerProps> = ({ visible = tr
   /* T8: in the ≤`bottomSheet.maxWidthPx` band the sheet is the only
    *  expedition form — the column and both chips never mount. */
   const sheetMode = useExpeditionSheetMode();
+
+  /* Slide-out choreography: while `leaving` the surface animates toward the
+   *  edge and `expanded` stays true — the fold (and the chip swap) commits
+   *  only after `slideMs`. The flag resets whenever the surface refolds so
+   *  the next open replays the slide-in. */
+  const [leaving, setLeaving] = useState(false);
+  const slideTimer = useRef<number | undefined>(undefined);
+  const canAnimate = window.matchMedia?.(REDUCED_MOTION_MQ).matches ?? false;
+  useEffect(() => () => window.clearTimeout(slideTimer.current), []);
+  useEffect(() => { if (!expanded) setLeaving(false); }, [expanded]);
+  const requestFold = () => {
+    if (leaving) return;
+    if (!canAnimate) { setExpanded(false); return; }
+    setLeaving(true);
+    slideTimer.current = window.setTimeout(() => setExpanded(false), DRAWER.slideMs);
+  };
 
   /* Honest occupancy while folded: the chip publishes `chipWidthPx`. While
    *  expanded `insets.right` is owned by the column itself (its own effect,
@@ -76,7 +101,9 @@ export const ExpeditionDrawer: React.FC<ExpeditionDrawerProps> = ({ visible = tr
    *  `min(aspect × 100vh, widthMaxPx)` — the same width rule the column
    *  applies (`cassettoColumnWidthFor`), expressed in CSS so no second
    *  measure/resize listener is needed. */
-  const columnLeftEdge = `min(${spec.aspect} * 100vh, ${DRAWER.widthMaxPx}px)`;
+  /* The cap mirrors `cassettoColumnWidthFor`: in 'extracted' mode the
+   *  widened column stops at `widthMaxPxExtracted`, not `widthMaxPx`. */
+  const columnLeftEdge = `min(${spec.aspect} * 100vh, ${DRAWER.edgeMode === 'extracted' ? DRAWER.widthMaxPxExtracted : DRAWER.widthMaxPx}px)`;
 
   return (
     <div
@@ -84,8 +111,16 @@ export const ExpeditionDrawer: React.FC<ExpeditionDrawerProps> = ({ visible = tr
       data-expanded={expanded || undefined}
       style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}
     >
+      <style>{SLIDE_CSS}</style>
       {expanded ? (
-        <>
+        <div
+          data-testid="expedition-drawer-slide"
+          data-leaving={leaving || undefined}
+          style={{
+            position: 'absolute', inset: 0,
+            animation: canAnimate ? `${leaving ? 'cassettoSlideOut' : 'cassettoSlideIn'} ${DRAWER.slideMs}ms both` : undefined,
+          }}
+        >
           <HudRealCassetto {...cassettoProps} />
           {/* Fold chip — the only collapsed affordance (mirrors the rail's
            *  collapse chip): a mini-plaque on the column's left edge whose
@@ -94,7 +129,7 @@ export const ExpeditionDrawer: React.FC<ExpeditionDrawerProps> = ({ visible = tr
             type="button"
             data-testid="expedition-drawer-collapse"
             aria-label={t('gameFrame.cassetto.collapse')}
-            onClick={() => setExpanded(false)}
+            onClick={requestFold}
             style={{
               position: 'absolute',
               right: columnLeftEdge,
@@ -116,7 +151,7 @@ export const ExpeditionDrawer: React.FC<ExpeditionDrawerProps> = ({ visible = tr
           >
             <EngravedIcon id="cmd-chevron-right" size={12} aria-hidden />
           </button>
-        </>
+        </div>
       ) : (
         /* Folded form — a slim chip docked flush on the right edge (mirrors
          *  `rail-expand-chip`): pouch glyph for "the planner is in here" +

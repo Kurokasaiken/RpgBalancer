@@ -465,6 +465,12 @@
   outline: none;
   filter: drop-shadow(0 0 3px var(--skin-icon-accent));
 }
+/* Director 2026-11-21 «il pulsante si confonde col resto»: the stash
+ * inspector's Pack pill keeps a faint brass halo even at rest so it reads as
+ * a control, not a decoration, on the dark card. */
+.skin-scope [data-testid="stash-detail"] [data-ctl="pill"]:not(:disabled) {
+  filter: drop-shadow(0 1px 4px color-mix(in srgb, var(--skin-icon-accent) 50%, transparent));
+}
 .skin-scope [data-ctl="round"] {
   appearance: none;
   display: inline-flex;

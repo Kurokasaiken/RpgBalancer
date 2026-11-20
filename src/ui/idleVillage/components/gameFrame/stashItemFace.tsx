@@ -24,6 +24,29 @@ export const stashItemCovers = (itemId: string): string[] => {
   return stash?.stats?.map((s) => STAT_SHORT[s] ?? s) ?? [];
 };
 
+/**
+ * Stat-bonus payload of a stash item, for the detail card's stat line
+ * (R-363 golden grammar «+15 Strength»): catalog `engineFlag` → `QUEST_STASH`
+ * entry → check-bonus magnitude + covered stat codes. Same join as
+ * {@link stashItemCovers}; `null` when the item grants no check bonus.
+ */
+export const stashItemBonus = (itemId: string): { bonus: number; stats: string[] } | null => {
+  const flag = defaultQuestItems[itemId]?.engineFlag;
+  const stash = flag ? QUEST_STASH.items.find((i) => i.flag === flag) : undefined;
+  return stash?.bonus != null ? { bonus: stash.bonus, stats: stash.stats ?? [] } : null;
+};
+
+/** Item-name type for the stash DETAIL card — same engraved display treatment
+ *  the tooltip body uses for names, one step up so the card reads as the
+ *  inspector the mockup draws (R-363). */
+export const STASH_PANEL_NAME_STYLE: CSSProperties = {
+  fontFamily: 'var(--skin-font-display)',
+  fontSize: 14,
+  letterSpacing: '0.1em',
+  textTransform: 'uppercase',
+  color: 'var(--skin-title-color)',
+};
+
 /** Corner quantity badge — `×N` pinned bottom-right of the tile. */
 export const StashQtyBadge: React.FC<{ qty: number }> = ({ qty }) => (
   <span

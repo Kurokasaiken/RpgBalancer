@@ -75,6 +75,13 @@ export const cassettoLayoutSchema = z
       /** Hard cap for the extracted (widened) column — the framed R-323 cap
        *  `widthMaxPx` stays untouched; this is `widthMaxPx × wideFactor`. */
       widthMaxPxExtracted: z.number().positive(),
+      /** R-357: lateral slide duration (ms) — the drawer enters with
+       *  `cassettoSlideIn` and folds only after `cassettoSlideOut` finishes.
+       *  Skipped entirely under `prefers-reduced-motion`. */
+      slideMs: z.number().positive(),
+      /** R-357 / PLAN-125: the DOM drawer (golden `mockup-r357-cassetto-largo.png`) is `columnAspect × viewportHeight` wide,
+       *  capped by `widthMaxPxExtracted`: 0.5689 → 512 px at 1440×900. */
+      columnAspect: z.number().positive(),
     }),
     bottomSheet: z.object({
       /** Non-modal sheet detents (T8): peek height, half/full viewport fractions. */
@@ -117,6 +124,10 @@ export const cassettoLayoutSchema = z
         hoverTextGlow: z.string(),
         /** Focus-visible ring color. */
         focusRing: z.string(),
+        /** R-357: the CTA is the painted plaque; its states are FILTERS on the picture (+ label opacity). */
+        enamelHoverFilter: z.string(),
+        enamelPressFilter: z.string(),
+        enamelDisabled: z.string(),
       }),
     }),
     topChrome: z.object({
@@ -168,7 +179,7 @@ export const cassettoLayoutSchema = z
 export type CassettoLayoutConfig = z.infer<typeof cassettoLayoutSchema>;
 
 const RAW_CASSETTO_LAYOUT_CONFIG: CassettoLayoutConfig = {
-  drawer: { widthMinPx: 360, widthVwFraction: 0.23, widthMaxPx: 460, chipWidthPx: 40, edgeMode: 'extracted', edgeClipPx: cassettoExtractedEdgeSpec.edgeClipPx, leftCutPx: cassettoExtractedEdgeSpec.leftCutPx, wideFactor: cassettoExtractedEdgeSpec.wideFactor, unstretchedZones: cassettoExtractedEdgeSpec.unstretchedZones, widthMaxPxExtracted: 613 },
+  drawer: { widthMinPx: 360, widthVwFraction: 0.23, widthMaxPx: 460, chipWidthPx: 40, edgeMode: 'extracted', edgeClipPx: cassettoExtractedEdgeSpec.edgeClipPx, leftCutPx: cassettoExtractedEdgeSpec.leftCutPx, wideFactor: cassettoExtractedEdgeSpec.wideFactor, unstretchedZones: cassettoExtractedEdgeSpec.unstretchedZones, widthMaxPxExtracted: 613, slideMs: 260, columnAspect: 0.5689 },
   bottomSheet: { peekPx: 56, halfFraction: 0.5, fullFraction: 0.92, maxWidthPx: 1100, handlePx: 44, minTextPx: 16, slotPx: 48 },
   cta: {
     vars: {
@@ -182,6 +193,9 @@ const RAW_CASSETTO_LAYOUT_CONFIG: CassettoLayoutConfig = {
       pressTransform: 'var(--skin-cassetto-cta-press-transform)',
       hoverTextGlow: 'var(--skin-cassetto-cta-hover-text-glow)',
       focusRing: 'var(--skin-cassetto-cta-focus-ring)',
+      enamelHoverFilter: 'var(--skin-cassetto-cta-enamel-hover-filter)',
+      enamelPressFilter: 'var(--skin-cassetto-cta-enamel-press-filter)',
+      enamelDisabled: 'var(--skin-cassetto-cta-enamel-disabled)',
     },
   },
   topChrome: {

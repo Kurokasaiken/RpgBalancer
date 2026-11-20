@@ -183,7 +183,11 @@ export function useQuestExpeditionSession({
   const stashBag = useVillageStashStore((s) => s.bags[poi.id]);
   const stashBags = useVillageStashStore((s) => s.bags);
   const stashCommitted = useVillageStashStore((s) => s.committed);
-  const selectedItemIds = useMemo(() => (stashBag ?? emptyStashBag()).filter((id): id is string => Boolean(id)), [stashBag]);
+  /* Per-quest bag capacity (Director 2026-11-20): the authored POI wells
+   *  count, global stash default as fallback — same rule the ledger's
+   *  `capacityFor` applies at mutation time. */
+  const bagCapacity = poi.bagSlots ?? QUEST_STASH.bagSlots;
+  const selectedItemIds = useMemo(() => (stashBag ?? emptyStashBag(bagCapacity)).filter((id): id is string => Boolean(id)), [stashBag, bagCapacity]);
   /* The picker's stock badge reads the real pool: remaining copies worldwide,
    *  plus any copy already packed in THIS bag (it is returnable, so it still
    *  counts as available to its owner). */
@@ -720,7 +724,7 @@ export function useQuestExpeditionSession({
         if (stash.hydration === 'ready' && !(stash.bags[poi.id] ?? []).some(Boolean)) {
           (draft.items ?? [])
             .filter((id) => itemIds.has(id))
-            .slice(0, QUEST_STASH.bagSlots)
+            .slice(0, bagCapacity)
             .forEach((id) => stash.assign(poi.id, id));
         }
       }
@@ -1004,7 +1008,7 @@ export function useQuestExpeditionSession({
       const pack = QUEST_STASH.defaultLoadout
         .map((flag) => EXPEDITION_ITEMS.find((e) => toEngineFlag(e.item.id) === flag)?.item.id)
         .filter((id): id is string => Boolean(id))
-        .slice(0, QUEST_STASH.bagSlots);
+        .slice(0, bagCapacity);
       if (pack.length > 0) {
         /* Ledger assign — availability-gated like a real pack (PLAN-073). */
         const stash = useVillageStashStore.getState();

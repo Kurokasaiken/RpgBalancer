@@ -237,7 +237,7 @@ export const BASE_SKIN_CSS_VARS: SkinCssVarMap = {
    *  component. */
   '--skin-cassetto-cta-text': '#eafff5',
   '--skin-cassetto-cta-text-shadow': '0 1px 4px rgba(0,0,0,.9)',
-  '--skin-cassetto-cta-muted-opacity': '0.55',
+  '--skin-cassetto-cta-muted-opacity': '0.82', /* R-357: the muted label stayed unreadable at 0.55 */
   '--skin-cassetto-cta-sheen':
     'radial-gradient(ellipse at 50% 40%, rgba(170,255,214,0.55), rgba(90,225,150,0.22) 55%, transparent 78%)',
   '--skin-cassetto-cta-sheen-ring':
@@ -250,6 +250,10 @@ export const BASE_SKIN_CSS_VARS: SkinCssVarMap = {
   '--skin-cassetto-cta-hover-text-glow':
     '0 0 12px rgba(152,255,202,0.6), 0 1px 4px rgba(0,0,0,0.9)',
   '--skin-cassetto-cta-focus-ring': 'rgba(196,255,224,0.75)',
+  /* R-357: the CTA is the painted plaque (cassetto3/cta-plaque); hover/press/disabled are filters on it. */
+  '--skin-cassetto-cta-enamel-hover-filter': 'brightness(1.16) saturate(1.12) drop-shadow(0 0 10px rgba(60,230,160,.55))',
+  '--skin-cassetto-cta-enamel-press-filter': 'brightness(.88) saturate(1.05)',
+  '--skin-cassetto-cta-enamel-disabled': 'saturate(.72) brightness(.82)', /* dimmed, hues kept: grayscale turned the gold brown-grey (Director 2026-11-20 «colori strani») */
 
   /* Drag handle & draggable states */
   '--skin-drag-handle-color': 'rgba(223,184,87,0.50)',

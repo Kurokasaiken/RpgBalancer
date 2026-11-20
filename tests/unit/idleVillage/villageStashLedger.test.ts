@@ -20,6 +20,7 @@ vi.mock('@/shared/persistence/PersistenceService', () => ({
 
 import { VILLAGE_STASH_CONFIG } from '@/balancing/config/idleVillage/villageStashConfig';
 import { QUEST_STASH } from '@/balancing/config/idleVillage/quests/questStash';
+import { questPoiById } from '@/balancing/config/idleVillage/quests/questPois';
 import {
   STASH_LEDGER_KEY,
   countReservations,
@@ -134,7 +135,8 @@ describe('villageStash ledger — swap / releaseAll / commit', () => {
     S().assign(POI_B, ITEM2);
     S().releaseAll(POI_A);
     expect(S().bags[POI_A]).toBeUndefined();
-    expect(S().bags[POI_B]).toEqual([ITEM2, ...emptyStashBag().slice(1)]);
+    /* Per-quest wells (D 2026-11-20): POI_B is poi-rovine → 4 slots. */
+    expect(S().bags[POI_B]).toEqual([ITEM2, ...emptyStashBag(questPoiById(POI_B)!.bagSlots).slice(1)]);
   });
 
   it('commitRun freezes the owner bag under the run id and is idempotent', () => {

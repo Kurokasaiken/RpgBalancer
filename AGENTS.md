@@ -81,6 +81,14 @@ Questo progetto ha `CANON.md` come mappa delle autorità; fino a una revisione e
   - `RPG/.agents/skills/bugfix/SKILL.md` — workflow generico di bugfix.
 - **Output delle deliberazioni:** `RPG/.mw/runs/<timestamp>/` per i risultati di
   `mw-iterative-deliberate.py` e delle skill `learn`/`bugfix`.
+- **Delegazione free-first — DEFAULT proattivo (R-368, ruling 2026-11-20):** in
+  ogni sessione ogni task è valutato contro `mind-weaver/.mw/delegation-rules.md`
+  e quelli bounded vanno a quota free PRIMA della quota Devin, senza attesa di
+  richiesta esplicita. Inferenza → `python scripts/mw-ask.py --free-first`; task
+  implementativi bounded → `mind-weaver/scripts/mw-agy-task.py` (worktree isolato
+  + verify meccanica). Cooldown quota automatici via `.mw/quota-state.json` — mai
+  probe di quota. "Automatico" = valutazione per-task in sessione, MAI loop
+  orchestrato su `agy -p` (ToS consumer; via sanzionata = `agy acp`).
 
 ## Lane advisory (`context/auto/`) — PLAN-090
 

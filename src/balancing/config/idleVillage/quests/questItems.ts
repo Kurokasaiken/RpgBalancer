@@ -124,6 +124,50 @@ const RAW_DEFAULT_QUEST_ITEMS: Record<string, QuestItem> = {
     qty: 1,
     engineFlag: 'hasPozione',
   },
+  /* --------------------------------------------------------------------
+   * Village-stash shelf fillers (Director 2026-11-21 «crea altri 4»): four
+   * more consumables so the 3-column shelf shows a third row and the scroll
+   * band has something to do. DISPLAY-ONLY: their engineFlags are not in
+   * `QUEST_STASH.items`, so they render on the village shelf but cannot be
+   * packed into an expedition bag — wiring them into the engine catalog is
+   * a later decision. Emoji literals resolve to the engraved glyph set via
+   * `EMOJI_TO_ENGRAVED` (no painted asset yet). */
+  quest_consumable_essenza: {
+    id: 'quest_consumable_essenza',
+    labelKey: 'questS1Lab.item.essence',
+    icon: '🧪',
+    kind: 'consumable',
+    qty: 1,
+    engineFlag: 'hasEssenza',
+    descKey: 'questS1Lab.stash.desc.essence',
+  },
+  quest_consumable_talismano: {
+    id: 'quest_consumable_talismano',
+    labelKey: 'questS1Lab.item.talisman',
+    icon: '🪙',
+    kind: 'consumable',
+    qty: 1,
+    engineFlag: 'hasTalismano',
+    descKey: 'questS1Lab.stash.desc.talisman',
+  },
+  quest_consumable_lama: {
+    id: 'quest_consumable_lama',
+    labelKey: 'questS1Lab.item.blade',
+    icon: '🗡️',
+    kind: 'consumable',
+    qty: 1,
+    engineFlag: 'hasLama',
+    descKey: 'questS1Lab.stash.desc.blade',
+  },
+  quest_consumable_egida: {
+    id: 'quest_consumable_egida',
+    labelKey: 'questS1Lab.item.aegis',
+    icon: '🛡️',
+    kind: 'consumable',
+    qty: 1,
+    engineFlag: 'hasEgida',
+    descKey: 'questS1Lab.stash.desc.aegis',
+  },
 };
 
 /** Validated default quest item dictionary. */

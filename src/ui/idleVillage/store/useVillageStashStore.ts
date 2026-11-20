@@ -33,6 +33,7 @@ import { create } from 'zustand';
 import { z } from 'zod';
 import { VILLAGE_STASH_CONFIG } from '@/balancing/config/idleVillage/villageStashConfig';
 import { QUEST_STASH } from '@/balancing/config/idleVillage/quests/questStash';
+import { questPoiById } from '@/balancing/config/idleVillage/quests/questPois';
 import { clearData, loadData, saveData } from '@/shared/persistence/PersistenceService';
 
 /** Persistence key for the versioned ledger snapshot. */
@@ -102,7 +103,11 @@ export interface VillageStashState {
 
 /** Item ids stocked by the shelf — config is the only source. */
 const QTY_BY_ITEM = new Map(VILLAGE_STASH_CONFIG.items.map((i) => [i.itemId, i.qty]));
-const EMPTY_BAG = (): (string | null)[] => Array.from({ length: QUEST_STASH.bagSlots }, () => null);
+const EMPTY_BAG = (capacity = QUEST_STASH.bagSlots): (string | null)[] => Array.from({ length: capacity }, () => null);
+
+/* Director 2026-11-20 «le tasche variano per quest»: the authored POI
+ * `bagSlots` is the well count; absent → the global stash default. */
+const capacityFor = (poiId: string): number => questPoiById(poiId)?.bagSlots ?? QUEST_STASH.bagSlots;
 
 /** Total reservations per item id across every draft bag and committed run. */
 export function countReservations(
@@ -142,7 +147,7 @@ export function reconcileLedger(raw: StashLedgerV1): { bags: VillageStashState['
   };
   const committed: VillageStashState['committed'] = {};
   for (const [runId, c] of Object.entries(raw.committed)) {
-    const slots = EMPTY_BAG().map((_, i) => {
+    const slots = EMPTY_BAG(capacityFor(c.poiId)).map((_, i) => {
       const id = c.slots[i] ?? null;
       return id && QTY_BY_ITEM.has(id) && claim(id) ? id : null;
     });
@@ -151,7 +156,7 @@ export function reconcileLedger(raw: StashLedgerV1): { bags: VillageStashState['
   const bags: VillageStashState['bags'] = {};
   for (const [poiId, slots] of Object.entries(raw.bags)) {
     const seen = new Set<string>();
-    const bag = EMPTY_BAG().map((_, i) => {
+    const bag = EMPTY_BAG(capacityFor(poiId)).map((_, i) => {
       const id = slots[i] ?? null;
       if (!id || !QTY_BY_ITEM.has(id) || seen.has(id) || !claim(id)) return null;
       seen.add(id);
@@ -183,7 +188,7 @@ export const useVillageStashStore = create<VillageStashState>((set, get) => {
     };
     if (get().hydration !== 'ready') return fail('notReady');
     if (!QTY_BY_ITEM.has(itemId)) return fail('unavailable');
-    const bag = [...(get().bags[poiId] ?? EMPTY_BAG())];
+    const bag = [...(get().bags[poiId] ?? EMPTY_BAG(capacityFor(poiId)))];
     if (slotIndex !== null && (slotIndex < 0 || slotIndex >= bag.length)) return fail('unavailable');
     if (bag.includes(itemId)) return bag[slotIndex ?? -1] === itemId ? 'ok' : fail('alreadyInBag');
     if (remainingFor(itemId, get().bags, get().committed) <= 0) return fail('unavailable');
@@ -234,7 +239,7 @@ export const useVillageStashStore = create<VillageStashState>((set, get) => {
 
     release: (poiId, slotIndex) => {
       if (get().hydration !== 'ready') return false;
-      const bag = [...(get().bags[poiId] ?? EMPTY_BAG())];
+      const bag = [...(get().bags[poiId] ?? EMPTY_BAG(capacityFor(poiId)))];
       const itemId = bag[slotIndex];
       if (!itemId) return false;
       bag[slotIndex] = null;
@@ -263,7 +268,7 @@ export const useVillageStashStore = create<VillageStashState>((set, get) => {
 
     commitRun: (runId, poiId) => {
       if (get().hydration !== 'ready' || !runId) return false;
-      const bag = get().bags[poiId] ?? EMPTY_BAG();
+      const bag = get().bags[poiId] ?? EMPTY_BAG(capacityFor(poiId));
       set((s) => {
         const bags = { ...s.bags };
         delete bags[poiId];
@@ -309,7 +314,7 @@ export { EMPTY_BAG as emptyStashBag };
 
 /** Non-null bag contents of `poiId` in slot order — the planner's `selectedItemIds` view. */
 export const selectBagItemIds = (state: VillageStashState, poiId: string): string[] =>
-  (state.bags[poiId] ?? EMPTY_BAG()).filter((id): id is string => Boolean(id));
+  (state.bags[poiId] ?? EMPTY_BAG(capacityFor(poiId))).filter((id): id is string => Boolean(id));
 
 /** Reservations held by owners OTHER than `excludePoiId` — the warehouse's «N elsewhere» counter. */
 export const reservedElsewhereCount = (state: VillageStashState, excludePoiId: string | null): number => {

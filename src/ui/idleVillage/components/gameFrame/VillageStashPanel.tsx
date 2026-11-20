@@ -81,6 +81,32 @@ const panelFrameTopRim = frameTopRimPx(panelFrameActive);
  *  icon — the mockup's inspector grammar (round ornate icon mount). */
 const DETAIL_MEDALLION_SRC = '/assets/ui/hud-real/medaglione-battezzato-v3-frame.webp';
 
+/* D-6/R-367 piastrina (Director 2026-11-20): the ornate brass cornice is the
+ *  cell's HOVER/SELECTED treatment — it rides ON the well as an overlay, the
+ *  painted icon + ×N badge stay live DOM above it. At rest the shelf keeps
+ *  its plain wells; the cornice marks the cell whose item the card previews
+ *  (sticky preview = the mockup's selected cell). */
+const PIASTRINA_CORNICE_SRC = '/assets/ui/hud-real/piastrina/cornice-hover-a.webp';
+const PiastrinaCornice: React.FC<{ visible: boolean }> = ({ visible }) => (
+  <img
+    src={PIASTRINA_CORNICE_SRC}
+    alt=""
+    aria-hidden
+    data-piastrina-cornice=""
+    draggable={false}
+    style={{
+      position: 'absolute',
+      inset: -3,
+      width: 'calc(100% + 6px)',
+      height: 'calc(100% + 6px)',
+      objectFit: 'fill',
+      opacity: visible ? 1 : 0,
+      transition: 'opacity 140ms ease-out',
+      pointerEvents: 'none',
+    }}
+  />
+);
+
 /* Preload the painted-control art (PLAN-128 `controls` slice-kit: pill +
  *  round, 5 states each) so the tab strip's first hover doesn't pop. */
 preloadControlsArt();
@@ -114,7 +140,27 @@ const StashCellFace: React.FC<{ row: VillageStashRowView; iconPx: number }> = ({
   const { t } = useTranslation('idleVillage');
   return (
     <>
-      <span aria-hidden style={{ display: 'inline-flex', color: 'var(--skin-title-color)' }}>
+      {/* Director 2026-11-21 «si confonde col resto»: the painted/glyph icon
+       *  floats on a luminous coin — a small brass-rimmed seat lifts the art
+       *  off the dark lacquer instead of letting it drown in the well. */}
+      <span
+        aria-hidden
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          position: 'relative',
+          width: iconPx + 12,
+          height: iconPx + 12,
+          borderRadius: '50%',
+          border: '1px solid color-mix(in srgb, var(--skin-hud-brass-hi) 45%, transparent)',
+          background:
+            'radial-gradient(circle at 42% 36%, color-mix(in srgb, var(--skin-title-color) 16%, transparent), color-mix(in srgb, var(--skin-hud-lacquer-deep) 88%, transparent) 78%)',
+          boxShadow:
+            'inset 0 1px 2px color-mix(in srgb, var(--skin-title-color) 22%, transparent), inset 0 -2px 4px color-mix(in srgb, black 45%, transparent), 0 1px 3px color-mix(in srgb, black 55%, transparent)',
+          color: 'var(--skin-title-color)',
+        }}
+      >
         <VillageStashItemIcon icon={row.icon} size={iconPx} />
       </span>
       {row.qty != null && <StashQtyBadge qty={row.qty} />}
@@ -129,7 +175,7 @@ const StashCellFace: React.FC<{ row: VillageStashRowView; iconPx: number }> = ({
  *  lacquer ground sunk under a brass-rimmed border (inset shadow = the
  *  recess), the shared item tile inside carrying the ×N badge. The well is
  *  chrome only: interactivity lives on the cell's button/listitem. */
-const wellChrome = (rowPx: number): CSSProperties => ({
+const wellChrome = (rowPx: number, highlighted = false): CSSProperties => ({
   position: 'relative',
   display: 'flex',
   alignItems: 'center',
@@ -137,11 +183,18 @@ const wellChrome = (rowPx: number): CSSProperties => ({
   minWidth: 0,
   height: rowPx,
   borderRadius: 10,
-  border: '1px solid color-mix(in srgb, var(--skin-hud-brass-hi) 58%, transparent)',
+  /* Director 2026-11-21 «manca un frame x il consumable highlight»: the
+   *  painted piastrina alone reads as the plain well at 52px — the previewed
+   *  cell also lifts its rim to bright brass and throws an emerald glow so
+   *  the highlight is unmistakable. */
+  border: highlighted
+    ? '1px solid var(--skin-hud-brass-hi)'
+    : '1px solid color-mix(in srgb, var(--skin-hud-brass-hi) 58%, transparent)',
   background:
     'linear-gradient(180deg, color-mix(in srgb, black 40%, var(--skin-hud-lacquer-deep)), var(--skin-hud-lacquer-deep))',
-  boxShadow:
-    'inset 0 2px 6px color-mix(in srgb, black 62%, transparent), inset 0 -1px 0 color-mix(in srgb, var(--skin-hud-brass-hi) 28%, transparent), inset 0 1px 0 color-mix(in srgb, var(--skin-hud-brass-hi) 22%, transparent)',
+  boxShadow: highlighted
+    ? 'inset 0 2px 6px color-mix(in srgb, black 62%, transparent), inset 0 -1px 0 color-mix(in srgb, var(--skin-hud-brass-hi) 55%, transparent), inset 0 1px 0 color-mix(in srgb, var(--skin-hud-brass-hi) 48%, transparent), 0 0 0 1px color-mix(in srgb, black 34%, transparent), 0 0 10px 2px color-mix(in srgb, var(--skin-hud-brass-hi) 55%, transparent)'
+    : 'inset 0 2px 6px color-mix(in srgb, black 62%, transparent), inset 0 -1px 0 color-mix(in srgb, var(--skin-hud-brass-hi) 28%, transparent), inset 0 1px 0 color-mix(in srgb, var(--skin-hud-brass-hi) 22%, transparent), 0 0 0 1px color-mix(in srgb, black 34%, transparent), 0 1px 0 color-mix(in srgb, var(--skin-title-color) 8%, transparent)',
 });
 
 /**
@@ -224,11 +277,13 @@ const InteractiveStashCell: React.FC<{
   onPreview: (itemId: string) => void;
   rowPx: number;
   iconPx: number;
-}> = ({ row, assignState, onPreview, rowPx, iconPx }) => {
+  highlighted: boolean;
+}> = ({ row, assignState, onPreview, rowPx, iconPx, highlighted }) => {
   const { t } = useTranslation('idleVillage');
   const pack = useStashPack();
   return (
-    <div role="listitem" style={wellChrome(rowPx)}>
+    <div role="listitem" style={wellChrome(rowPx, highlighted)}>
+      <PiastrinaCornice visible={highlighted} />
       <StashRowTooltip row={row}>
         <button
           type="button"
@@ -440,6 +495,9 @@ export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, le
               })}
               </span>
             )}
+            {/* Director ruling 2026-11-20 (villageStash.test.tsx): NO «N/max»
+             *  counter in the panel — the mockup's «24/24» is intentionally
+             *  not reproduced. */}
             <span data-hud-controls="" style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--skin-hud-inline-gap)', flexShrink: 0 }}>
               <button type="button" data-ctl="round" data-panel-close="" aria-label={t('gameFrame.panels.close')} title={t('gameFrame.panels.close')} onClick={onClose}>
                 <EngravedIcon id="cmd-close" size={14} />
@@ -510,10 +568,12 @@ export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, le
                   onPreview={setDetailItemId}
                   rowPx={config.panel.shelfRowPx}
                   iconPx={config.panel.shelfIconPx}
+                  highlighted={detailRow?.itemId === row.itemId}
                 />
               ) : (
                 <StashRowTooltip key={row.itemId} row={row}>
-                  <div role="listitem" style={wellChrome(config.panel.shelfRowPx)} onMouseEnter={() => setDetailItemId(row.itemId)}>
+                  <div role="listitem" style={wellChrome(config.panel.shelfRowPx, detailRow?.itemId === row.itemId)} onMouseEnter={() => setDetailItemId(row.itemId)}>
+                    <PiastrinaCornice visible={detailRow?.itemId === row.itemId} />
                     <StashCellFace row={row} iconPx={config.panel.shelfIconPx} />
                   </div>
                 </StashRowTooltip>
@@ -541,10 +601,12 @@ export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, le
                 display: 'flex',
                 alignItems: 'center',
                 gap: 10,
+                /* Director 2026-11-20 «in grande»: the inspector's space is
+                 *  about the two item rows' — ~2 wells + the gap. */
+                minHeight: `calc(2 * ${config.panel.shelfRowPx}px + var(--skin-hud-stack-gap))`,
                 /* Tight zones (720p): the inspector compresses and clips its
                  *  own tail instead of pushing the plaque past the frame. */
                 flexShrink: 1,
-                minHeight: 0,
                 overflow: 'hidden',
                 borderRadius: 10,
                 border: '1px solid color-mix(in srgb, var(--skin-hud-brass-hi) 42%, transparent)',
@@ -555,10 +617,14 @@ export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, le
                 padding: '8px 10px',
               }}
             >
-              <span style={{ position: 'relative', width: 56, height: 56, flexShrink: 0 }}>
+              <span style={{ position: 'relative', width: 84, height: 84, flexShrink: 0 }}>
                 <img src={DETAIL_MEDALLION_SRC} alt="" aria-hidden style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
-                <span style={{ position: 'absolute', inset: '16%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--skin-title-color)' }}>
-                  <VillageStashItemIcon icon={detailRow.icon} size={28} />
+                {/* Director 2026-11-21 «sfondo uguale a quello di sotto, fa
+                 *  brutto»: the medallion's inner chamber gets its own gem
+                 *  seat — an emerald vignette distinct from the card's lacquer
+                 *  ground, ringed by a faint brass lip. */}
+                <span style={{ position: 'absolute', inset: '17%', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', background: 'radial-gradient(circle at 46% 38%, var(--skin-hud-enamel-lift) 0%, color-mix(in srgb, var(--skin-hud-enamel-base) 92%, black) 55%, var(--skin-hud-enamel-deep) 100%)', boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--skin-hud-brass-hi) 38%, transparent), inset 0 -6px 12px color-mix(in srgb, black 45%, transparent)', color: 'var(--skin-title-color)' }}>
+                  <VillageStashItemIcon icon={detailRow.icon} size={40} />
                 </span>
               </span>
               <div style={{ flex: 1, minWidth: 0 }}>
@@ -572,7 +638,7 @@ export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, le
                     {t('questExpedition.bag.covers')} {covers.join(' · ')}
                   </div>
                 ) : null}
-                <div style={{ font: '12px var(--skin-font-serif)', lineHeight: 1.3, color: 'var(--skin-text-secondary)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                <div style={{ font: '12px var(--skin-font-serif)', lineHeight: 1.3, color: 'var(--skin-text-secondary)', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                   {t(detailRow.descKey)}
                 </div>
                 <div style={{ marginTop: 4 }}>

@@ -150,4 +150,9 @@ export const POI_ZANARA_LAYERS = {
    *  punched-through green layer (Director ruling 2026-11-14). */
   top: { job: 'layers/poi-arc-top.webp', quest: 'layers/poi-quest-top.webp' },
   base: { job: 'layers/poi-job-base.webp', quest: 'layers/poi-quest-base.webp' },
+  /* Far-zoom "light" piece (PLAN-125 Fase 4a, Director 2026-11-21): same
+   *  marker, less complicated — engraved annulus flattened to a solid ring,
+   *  dome and corner gems identical. Swapped in via CSS under
+   *  `data-poi-zoom="far"`; canvas-aligned like every layer. Quest only. */
+  light: { quest: 'layers/poi-quest-light.webp' },
 } as const;

@@ -37,7 +37,7 @@ export const villageStashSchema = z
         }),
       )
       .min(3)
-      .max(6),
+      .max(12),
     /** Display-only "n/max" label in the panel footer (product choice, recorded). */
     capacityMax: z.number().int().positive(),
     /** Panel chrome: the row texts wrap instead of truncating inside this width. */
@@ -101,6 +101,13 @@ const RAW_VILLAGE_STASH_CONFIG = {
     { itemId: 'quest_consumable_corda', qty: 1 },
     { itemId: 'quest_consumable_cura', qty: 1 },
     { itemId: 'quest_consumable_pozione', qty: 1 },
+    /* Director 2026-11-21 «crea altri 4»: shelf fillers beyond the six
+     * engine-backed consumables — display-only (their flags are not in the
+     * engine's packable catalog, see questItems note). */
+    { itemId: 'quest_consumable_essenza', qty: 1 },
+    { itemId: 'quest_consumable_talismano', qty: 1 },
+    { itemId: 'quest_consumable_lama', qty: 1 },
+    { itemId: 'quest_consumable_egida', qty: 1 },
   ],
   /* One source (R-234, DN-1): the Warehouse's storage capacity at its current level — the panel
    * said 12 while the Warehouse tooltip said 24. */
@@ -113,7 +120,9 @@ const RAW_VILLAGE_STASH_CONFIG = {
    *  stash ~400px @1440 / ~220px @1280 / ~460px @1920 — the roster's fixed
    *  292px owns the rest. Tiles are sized so TWO rows + the detail card fit
    *  the 400 ceiling (~350 total): 3×2 squares of 52px. */
-  panel: { widthPx: 320, detailMinPanelHeightPx: 350, hintMinPanelHeightPx: 235, shelfColumns: 3, shelfRowPx: 52, shelfIconPx: 34, shelfVisibleRows: 2 },
+  /* Director 2026-11-21 «2 file da 4»: the shelf reads four wells wide, two
+   *  rows visible — the ten items scroll the rest under the band. */
+  panel: { widthPx: 320, detailMinPanelHeightPx: 350, hintMinPanelHeightPx: 235, shelfColumns: 4, shelfRowPx: 52, shelfIconPx: 34, shelfVisibleRows: 2 },
 };
 
 /** Validated village stash configuration. */

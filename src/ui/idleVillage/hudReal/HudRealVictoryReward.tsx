@@ -6,6 +6,15 @@
  * painted divider, painted CTA plaque. Every DOM zone sits on a painted
  * affordance (fork card `.mw/runs/20261116-r348-victory-ruling/`).
  *
+ * PLAN-125 Fase 7d / PLAN-127 N=3 fork (`?victory=` dev override):
+ * - `parchment` (default): the baptized pergamena as shipped.
+ * - `framed`: the same pergamena inside the shared baptized cornice
+ *   (panelFrame7 manifest via `PanelFrameOrnaments`) — «documento incorniciato».
+ * - `panel`: the report rebuilt in the panel language — enamel field
+ *   (`HudPlaque field`), same cornice, Nav palette on DOM, vignette + wax
+ *   seal re-mounted as pieces, shared `HudScrollBand` on the scrollers.
+ * The fork decides the shipping default; until then `parchment` stays.
+ *
  * Behaviour contract — identical to `QuestRewardPopup` (its stock counterpart,
  * still mounted on the legacy `/game-frame-pixi` route):
  * - NON-MODAL floating report over the map (radial veil like
@@ -22,6 +31,12 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { EngravedIcon, type EngravedIconId } from '@/ui/idleVillage/components/gameFrame/engravedIcons';
+import { HudScrollBand } from '@/ui/idleVillage/skins/primitives/HudScrollBand';
+import { PanelFrameOrnaments } from '@/ui/idleVillage/skins/primitives/PanelFrameOrnaments';
+import { HudPlaque } from '@/ui/idleVillage/skins/primitives/HudPlaque';
+import { panelFrame6Frame } from '@/generated/slicekit/panelFrame6Frame';
+import { panelFrame7Frame } from '@/generated/slicekit/panelFrame7Frame';
+import { thinFrameManifest, type SliceKitFrameManifest } from '@/ui/idleVillage/skins/primitives/sliceKitManifest';
 import type { QuestRunState, RuntimeMember } from '@/ui/idleVillage/questS1Lab/questRun';
 import type { QuestScenario } from '@/balancing/config/idleVillage/quests/questScenario.schema';
 import { buildQuestEpilogue } from '@/ui/idleVillage/quests/questEpilogue';
@@ -33,8 +48,33 @@ import { C1Medallion } from '@/ui/idleVillage/components/C1Medallion';
 import { SandboxTimingProvider, useSandboxTiming } from '@/ui/idleVillage/hooks/useSandboxTimingBridge';
 
 const FRAME_SRC = '/assets/ui/hud-real/victory/frame.webp';
+const VIGNETTE_SRC = '/assets/ui/hud-real/victory/vignette.webp';
+const SEAL_SRC = '/assets/ui/hud-real/victory/seal.webp';
 const ART_W = 1024;
 const ART_H = 745;
+
+/* PLAN-125 Fase 7d fork — `?victory=` picks the treatment in dev; the
+ * shipping default stays `parchment` until the Director rules. */
+type VictoryVariant = 'parchment' | 'framed' | 'panel';
+const resolveVariant = (): VictoryVariant => {
+  if (typeof window !== 'undefined' && import.meta.env?.DEV) {
+    const q = new URLSearchParams(window.location.search).get('victory');
+    if (q === 'framed' || q === 'panel' || q === 'parchment') return q;
+  }
+  return 'parchment';
+};
+
+/* The shared baptized cornice — same candidates and `?frame=` dev swap as
+ * Roster/Stash (PLAN-127): `thin` (frame7 ×0.5) is the panels' default. */
+const panelFrame7Thin = thinFrameManifest(panelFrame7Frame, 0.5);
+const panelFrame6Thin = thinFrameManifest(panelFrame6Frame, 0.5);
+const FRAME_CANDIDATES: ReadonlyArray<{ id: string; manifest: SliceKitFrameManifest }> = [
+  { id: 'thin', manifest: panelFrame7Thin },
+  { id: 'authored', manifest: panelFrame7Frame },
+  { id: 'frame6thin', manifest: panelFrame6Thin },
+];
+const frameParam = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('frame') : null;
+const victoryFrame = FRAME_CANDIDATES.find((c) => c.id === frameParam)?.manifest ?? panelFrame7Thin;
 
 const C = {
   ink: '#2e2118',
@@ -43,15 +83,28 @@ const C = {
   goldHi: '#f0d68a',
   wound: '#8a4a2a',
   fallen: '#5a4a3a',
-  rare: '#6a4a8a',
+} as const;
+
+/* Nav-palette ink for the `panel` variant — champagne/ivory on the enamel
+ * field (materials measured in `test-results/slicekit/material-palette-nav.json`). */
+const P = {
+  ink: '#f0e6c8',
+  inkSoft: '#cbbd97',
+  label: '#e3cf9e',
+  goldHi: '#f0d77e',
+  wound: '#d98a5a',
+  fallen: '#8a7f6a',
 } as const;
 
 interface Zone { x: number; y: number; w: number; h: number }
 /** Zones in art px on the 1024×745 baptized frame — measured on the approved
- *  mockup (v5): every rect covers a painted affordance, nothing floats. */
+ *  mockup (v5): every rect covers a painted affordance, nothing floats. The
+ *  `panel` variant reuses the same composition on the rect field; `vignette`
+ *  is the painted-scene cut that only the panel treatment re-mounts. */
 const Z = {
   title: { x: 330, y: 14, w: 364, h: 58 },
   ribbon: { x: 250, y: 96, w: 524, h: 58 },
+  vignette: { x: 124, y: 154, w: 778, h: 152 },
   chip: { x: 382, y: 300, w: 260, h: 26 },
   medal: { x: 148, y: 322, w: 156, h: 164 },
   crewLabel: { x: 326, y: 340, w: 240, h: 22 },
@@ -60,6 +113,7 @@ const Z = {
   rewardsRows: { x: 574, y: 362, w: 250, h: 140 },
   echoes: { x: 288, y: 510, w: 448, h: 92 },
   cta: { x: 320, y: 614, w: 400, h: 78 },
+  seal: { x: 840, y: 448, w: 112, h: 112 },
   close: { x: 950, y: 16, w: 52, h: 52 },
 } satisfies Record<string, Zone>;
 
@@ -101,7 +155,13 @@ const HudRealVictoryRewardInner: React.FC<HudRealVictoryRewardProps> = ({ run, s
   const { t } = useTranslation('idleVillage');
   const { scheduleTimeout } = useSandboxTiming();
   const shellRef = useRef<HTMLDivElement | null>(null);
+  const crewRef = useRef<HTMLDivElement | null>(null);
+  const rewardsRef = useRef<HTMLDivElement | null>(null);
+  const echoesRef = useRef<HTMLDivElement | null>(null);
   const restoreFocusTo = useRef<HTMLElement | null>(null);
+  const variant = resolveVariant();
+  const onParchment = variant !== 'panel';
+  const ink = onParchment ? C : P;
 
   /* art-px → css-px scale for px-prop components (C1Medallion): the container
    * is containerType-sized, so zones use % while the medallion needs real px. */
@@ -182,7 +242,9 @@ const HudRealVictoryRewardInner: React.FC<HudRealVictoryRewardProps> = ({ run, s
 
   return (
     <div
+      className="skin-scope"
       data-testid="hudreal-victory-reward"
+      data-victory-variant={variant}
       style={{
         position: 'fixed', inset: 0, zIndex: DEFAULT_GAME_FRAME_CONFIG.zLayers.reward,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -203,25 +265,67 @@ const HudRealVictoryRewardInner: React.FC<HudRealVictoryRewardProps> = ({ run, s
           cursor: done ? 'default' : 'pointer',
         }}
       >
-        <img src={FRAME_SRC} alt="" draggable={false} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', display: 'block' }} />
+        {/* Field: parchment art, or the enamel field of the panel language */}
+        {variant === 'panel' ? (
+          <HudPlaque shape="field" tone="enamel" bare style={{ position: 'absolute', inset: 0, zIndex: 0 }} />
+        ) : (
+          <img src={FRAME_SRC} alt="" draggable={false} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', display: 'block' }} />
+        )}
 
-        {/* Title on the painted top plaque */}
+        {/* Shared baptized cornice on the framed/panel treatments (the
+         *  panels' `?frame=` swap applies here too). */}
+        {variant !== 'parchment' && <PanelFrameOrnaments variant="cornici" manifest={victoryFrame} />}
+
+        {/* Painted scene — only the panel treatment re-mounts it as a piece. */}
+        {variant === 'panel' && (
+          <img
+            src={VIGNETTE_SRC}
+            alt=""
+            draggable={false}
+            style={{
+              ...pct(Z.vignette),
+              display: 'block', objectFit: 'cover', borderRadius: '0.6cqh',
+              border: '1px solid var(--skin-hud-brass-low)',
+              boxShadow: '0 2px 10px rgba(0,0,0,.55), inset 0 0 0 1px rgba(0,0,0,.4)',
+            }}
+          />
+        )}
+        {variant === 'panel' && stage >= 1 && (
+          <img
+            src={SEAL_SRC}
+            alt=""
+            draggable={false}
+            style={{ ...pct(Z.seal), display: 'block', filter: 'drop-shadow(0 3px 6px rgba(0,0,0,.6))' }}
+          />
+        )}
+
+        {/* Title on the painted top plaque / the cornice's top band */}
         <div style={{ ...pct(Z.title), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <span style={{
             fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: '2.6cqh', fontWeight: 800,
-            letterSpacing: '0.2em', textTransform: 'uppercase', color: '#16241f',
-            textShadow: '0 1px 0 rgba(255,235,180,.4)',
+            letterSpacing: '0.2em', textTransform: 'uppercase',
+            color: onParchment ? '#16241f' : 'var(--skin-title-color)',
+            textShadow: onParchment ? '0 1px 0 rgba(255,235,180,.4)' : 'var(--skin-incision-title)',
           }}>
             {t('gameFrame.questEpilogue.title')}
           </span>
         </div>
 
-        {/* Outcome on the painted teal ribbon — stage 0 */}
+        {/* Outcome on the painted teal ribbon / an enamel band — stage 0 */}
         <div style={{ ...pct(Z.ribbon), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <span style={{
             fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: '2.9cqh', fontWeight: 800,
             letterSpacing: '0.16em', textTransform: 'uppercase', color: '#e8dcc0',
             textShadow: '0 1px 3px rgba(0,0,0,.7)',
+            ...(variant === 'panel'
+              ? {
+                  padding: '0.6cqh 3.5cqw',
+                  background: 'linear-gradient(180deg, var(--skin-hud-enamel-lift), var(--skin-hud-enamel-base) 55%, var(--skin-hud-enamel-deep))',
+                  border: '1px solid var(--skin-hud-brass-low)',
+                  borderRadius: '0.8cqh',
+                  boxShadow: '0 3px 10px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.12)',
+                }
+              : {}),
           }}>
             {t(`questS1Lab.outcome.${run.outcome}`)}
           </span>
@@ -250,10 +354,15 @@ const HudRealVictoryRewardInner: React.FC<HudRealVictoryRewardProps> = ({ run, s
 
         {stage >= 1 && (
           <>
-            <span style={{ ...pct(Z.crewLabel), fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: '1.7cqh', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: C.label, display: 'flex', alignItems: 'center' }}>
+            <span style={{ ...pct(Z.crewLabel), fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: '1.7cqh', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: ink.label, display: 'flex', alignItems: 'center', ...(variant === 'panel' ? { textShadow: 'var(--skin-incision-label)' } : {}) }}>
               {t('gameFrame.questEpilogue.crewTitle')}
             </span>
-            <div data-testid="hudreal-victory-crew" style={{ ...pct(Z.crewRows), display: 'flex', flexDirection: 'column', justifyContent: 'space-evenly', overflowY: 'auto' }}>
+            <div
+              ref={crewRef}
+              data-testid="hudreal-victory-crew"
+              data-hud-scroll-band=""
+              style={{ ...pct(Z.crewRows), display: 'flex', flexDirection: 'column', justifyContent: 'space-evenly', overflowY: 'auto' }}
+            >
               <Tooltip.Provider delayDuration={200} skipDelayDuration={150}>
                 {run.party.map((m) => {
                   const state = stateOf(m);
@@ -279,7 +388,7 @@ const HudRealVictoryRewardInner: React.FC<HudRealVictoryRewardProps> = ({ run, s
                           </span>
                           <span style={{
                             fontFamily: '"EB Garamond", serif', fontSize: '1.75cqh', fontWeight: 700,
-                            color: state === 'fallen' ? C.fallen : C.ink, textDecoration: state === 'fallen' ? 'line-through' : undefined,
+                            color: state === 'fallen' ? ink.fallen : ink.ink, textDecoration: state === 'fallen' ? 'line-through' : undefined,
                             whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: '0 1 auto', minWidth: 0,
                             textShadow: '0 1px 0 rgba(255,240,200,.35)',
                           }}>
@@ -294,7 +403,7 @@ const HudRealVictoryRewardInner: React.FC<HudRealVictoryRewardProps> = ({ run, s
                             {t(`gameFrame.questEpilogue.crew${state === 'returned' ? 'Returned' : state === 'wounded' ? 'Wounded' : 'Fallen'}`)}
                           </span>
                           {xp !== undefined && (
-                            <span style={{ fontFamily: '"EB Garamond", serif', fontSize: '1.5cqh', fontWeight: 600, color: C.inkSoft, whiteSpace: 'nowrap' }}>
+                            <span style={{ fontFamily: '"EB Garamond", serif', fontSize: '1.5cqh', fontWeight: 600, color: ink.inkSoft, whiteSpace: 'nowrap' }}>
                               +{xp} XP
                             </span>
                           )}
@@ -334,10 +443,15 @@ const HudRealVictoryRewardInner: React.FC<HudRealVictoryRewardProps> = ({ run, s
         {/* Rewards column on the right writing field — stage 2 */}
         {stage >= 2 && (
           <>
-            <span style={{ ...pct(Z.rewardsLabel), fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: '1.7cqh', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: C.label, display: 'flex', alignItems: 'center' }}>
+            <span style={{ ...pct(Z.rewardsLabel), fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: '1.7cqh', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: ink.label, display: 'flex', alignItems: 'center', ...(variant === 'panel' ? { textShadow: 'var(--skin-incision-label)' } : {}) }}>
               {t('questReward.rewards')}
             </span>
-            <div data-testid="hudreal-victory-rewards" style={{ ...pct(Z.rewardsRows), display: 'flex', flexDirection: 'column', justifyContent: 'space-evenly', overflowY: 'auto' }}>
+            <div
+              ref={rewardsRef}
+              data-testid="hudreal-victory-rewards"
+              data-hud-scroll-band=""
+              style={{ ...pct(Z.rewardsRows), display: 'flex', flexDirection: 'column', justifyContent: 'space-evenly', overflowY: 'auto' }}
+            >
               {rewardRows.map((section) =>
                 section.lines.map((line, i) => (
                   <span
@@ -346,12 +460,12 @@ const HudRealVictoryRewardInner: React.FC<HudRealVictoryRewardProps> = ({ run, s
                     style={{
                       display: 'flex', alignItems: 'center', gap: '0.7cqw', minWidth: 0,
                       fontFamily: '"EB Garamond", serif', fontSize: '1.7cqh', fontWeight: 600,
-                      color: section.id === 'consumed' ? C.wound : C.ink,
+                      color: section.id === 'consumed' ? ink.wound : ink.ink,
                       textDecoration: section.id === 'consumed' ? 'line-through' : undefined,
                       textShadow: '0 1px 0 rgba(255,240,200,.3)',
                     }}
                   >
-                    <EngravedIcon id={ROW_ICON[section.id] ?? 'ico-pouch'} size={11} aria-hidden style={{ flexShrink: 0, color: C.inkSoft }} />
+                    <EngravedIcon id={ROW_ICON[section.id] ?? 'ico-pouch'} size={11} aria-hidden style={{ flexShrink: 0, color: ink.inkSoft }} />
                     <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {line.key ? t(line.key, line.params) : line.text}
                     </span>
@@ -364,32 +478,38 @@ const HudRealVictoryRewardInner: React.FC<HudRealVictoryRewardProps> = ({ run, s
 
         {/* Echoes under the painted divider — stage 3 */}
         {stage >= 3 && (
-          <div data-testid="hudreal-victory-echoes" style={{ ...pct(Z.echoes), display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.4cqh', overflowY: 'auto', textAlign: 'center' }}>
+          <div
+            ref={echoesRef}
+            data-testid="hudreal-victory-echoes"
+            data-hud-scroll-band=""
+            style={{ ...pct(Z.echoes), display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.4cqh', overflowY: 'auto', textAlign: 'center' }}
+          >
             {echoRows.length > 0 ? (
               echoRows.map((section) => (
                 <React.Fragment key={section.id}>
-                  <span style={{ fontFamily: 'Cinzel, serif', fontSize: '1.3cqh', fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: C.label }}>
+                  <span style={{ fontFamily: 'Cinzel, serif', fontSize: '1.3cqh', fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: ink.label }}>
                     {t(`gameFrame.questEpilogue.${section.id}`)}
                   </span>
                   {section.lines.map((line, i) => (
-                    <span key={i} style={{ fontFamily: '"EB Garamond", serif', fontStyle: 'italic', fontSize: '1.6cqh', color: C.inkSoft }}>
+                    <span key={i} style={{ fontFamily: '"EB Garamond", serif', fontStyle: 'italic', fontSize: '1.6cqh', color: ink.inkSoft }}>
                       {line.key ? t(line.key, line.params) : line.text}
                     </span>
                   ))}
                 </React.Fragment>
               ))
             ) : (
-              <span style={{ fontFamily: '"EB Garamond", serif', fontStyle: 'italic', fontSize: '1.6cqh', color: C.inkSoft }}>—</span>
+              <span style={{ fontFamily: '"EB Garamond", serif', fontStyle: 'italic', fontSize: '1.6cqh', color: ink.inkSoft }}>—</span>
             )}
             {!done && (
-              <span style={{ fontFamily: '"EB Garamond", serif', fontStyle: 'italic', fontSize: '1.4cqh', color: C.inkSoft }}>
+              <span style={{ fontFamily: '"EB Garamond", serif', fontStyle: 'italic', fontSize: '1.4cqh', color: ink.inkSoft }}>
                 {t('gameFrame.questWindow.rewardHint')}
               </span>
             )}
           </div>
         )}
 
-        {/* CTA on the painted bottom plaque — last stage */}
+        {/* CTA on the painted bottom plaque — last stage. `panel` gets the
+         *  green enamel plaque of the HUD's primary action (D-3 family). */}
         {done && (
           <button
             type="button"
@@ -399,20 +519,36 @@ const HudRealVictoryRewardInner: React.FC<HudRealVictoryRewardProps> = ({ run, s
               ...pct(Z.cta), padding: 0, border: 'none', background: 'transparent', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: '2.4cqh', fontWeight: 800,
-              letterSpacing: '0.22em', textTransform: 'uppercase', color: C.goldHi,
-              textShadow: '0 1px 4px rgba(0,0,0,.9)',
+              letterSpacing: '0.22em', textTransform: 'uppercase',
+              color: variant === 'panel' ? 'var(--skin-cassetto-cta-text)' : C.goldHi,
+              textShadow: variant === 'panel' ? 'var(--skin-cassetto-cta-text-shadow)' : '0 1px 4px rgba(0,0,0,.9)',
+              ...(variant === 'panel'
+                ? {
+                    background: 'linear-gradient(180deg, #0f5f42 0%, #0a4430 55%, #062c1f 100%)',
+                    border: '1px solid var(--skin-hud-brass-low)',
+                    borderRadius: '1cqh',
+                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,.16), inset 0 -3px 8px rgba(0,0,0,.5), 0 4px 14px rgba(0,0,0,.6)',
+                  }
+                : {}),
             }}
           >
             {t(isWipe ? 'questChronicle.closeReport' : 'questChronicle.collectRewards')}
           </button>
         )}
 
-        {/* Close X on the brass cap */}
+        {/* Shared engraved scroll band — same as the panels (variant from
+         *  `HUD_SCROLL_BAND`, the smalto/gemma ruling of 2026-11-20). */}
+        {stage >= 1 && <HudScrollBand scrollRef={crewRef} />}
+        {stage >= 2 && <HudScrollBand scrollRef={rewardsRef} />}
+        {stage >= 3 && <HudScrollBand scrollRef={echoesRef} />}
+
+        {/* Close X — brass cap on parchment, painted round ring on the cornice */}
         <button
           type="button"
           aria-label={t('gameFrame.questWindow.rewardClose')}
           title={t('gameFrame.questWindow.rewardClose')}
           onClick={(e) => { e.stopPropagation(); onClose(); }}
+          {...(variant === 'panel' ? { 'data-ctl': 'round', 'data-panel-close': '' } : {})}
           style={{
             ...pct(Z.close), padding: 0, border: 'none', background: 'transparent', cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',

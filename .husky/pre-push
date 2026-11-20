@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+# worktime-guard (personal repo work-hours block)
+GUARD="$HOME/.config/git-personal-guard/worktime-guard.sh"; [ -x "$GUARD" ] && "$GUARD" pre-push "$@" || exit 1
+exit 0

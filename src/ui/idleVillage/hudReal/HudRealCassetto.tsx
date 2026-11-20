@@ -1,18 +1,18 @@
 /**
- * HudRealCassetto — PLAN-113/114 family B: the quest planner drawer (dossier on map).
- * Director rulings 2026-11-06 — form + internals signed against `cassetto-rich-0.png`.
- * F3 art pass (2026-11-09) + PLAN-116 F1 column pass (2026-11-14): the frame is
- * the widened column art from `scripts/hud-real/build-cassetto-column.py`
- * (`column-1440.webp` / `column-1280.webp` — ruling R-323 "Dentro la cornice",
- * 420px @1440×900 / 400px @1280×800; ornaments never stretched, seams only in
- * neutral fields). Zone rects come from the generated `cassettoColumnGeometry`.
- * Zero opaque cover patches: live i18n text, the REAL certified ResidentSlotRack mount,
- * the REAL village stash bag, and the live CONFIRM button sit directly inside the
- * clean painted enamel/navy wells.
- * PLAN-119 T2: the interior is partitioned into the six named mockup blocks via
- * `display:contents` wrappers (`data-block` = quest-banner / party-slots /
- * bag-slots / journey-strip / risk-rewards / launch-cta) so the drawer's
- * structure is testable without moving a pixel of the signed zones.
+ * HudRealCassetto — the expedition planner drawer (dossier on map).
+ *
+ * R-357 / PLAN-125: DOM drawer rebuilt from the approved golden `.mw/specs/expedition-ui/refs/mockup-r357-cassetto-largo.png`
+ * (Director 2026-11-17: «È la base»). RESTORED 2026-11-20 after a parallel session had reverted it to the baked
+ * `column-*-extracted.webp` art (cut, stretched, absolute zones, no SUPPLIES block, no wide column).
+ * Only the pieces SLICED from the golden stay painted (left rail, north bar, vignette fallback, skull, chest, the CTA button built
+ * from the golden's clean right half mirrored — `scripts/build-cassetto3-assets.py`); everything else is live DOM: text, party rack,
+ * supplies niches, journey strip, CONFIRM label. No resources band (D-1), no «EXPEDITION CONSOLE», no cost cell (INV-5 amended).
+ * Features kept from the parallel session: × discards (adapter-owned), DEATHS%/SUCCESS%, per-quest vignette and pouch count,
+ * R-359 slot swap, lateral slide (ExpeditionDrawer).
+ *
+ * Geometry: a 1024-unit design width (`u`) rendered in `cqw`, column width = `drawer.columnAspect × viewportHeight` (512 px at
+ * 1440×900), flush with the screen's right edge. Blocks (`data-block`): quest-banner / party-slots / bag-slots (SUPPLIES) /
+ * journey-strip / risk-rewards / launch-cta.
  */
 import React, { useSyncExternalStore } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -20,20 +20,22 @@ import { useGameLayoutInsets } from '@/ui/idleVillage/store/useGameLayoutInsets'
 import { ResidentSlotRack } from '@/ui/idleVillage/components/ResidentSlotRack';
 import type { ResidentSlotViewModel, SlotSeatPhase } from '@/ui/idleVillage/slots/types';
 import { StashItemTile } from '@/ui/idleVillage/components/gameFrame/stashItemFace';
-import { EngravedIcon } from '@/ui/idleVillage/components/gameFrame/engravedIcons';
 import type { ResourceReadoutItem } from '@/ui/idleVillage/components/gameFrame/ResourceReadout';
-import { HUD_TONE_COLOR } from '@/ui/idleVillage/components/gameFrame/hudTones';
-import { ZanaraTooltip } from '@/ui/idleVillage/zanara/ZanaraTooltip';
 import { CASSETTO_LAYOUT_CONFIG } from '@/balancing/config/idleVillage/cassettoLayoutConfig';
 import { CASSETTO_WIDE_BREAKPOINT, cassettoColumnSpec, cassettoColumnWidthFor } from './layout/cassettoColumn';
-import type { CassettoZone } from './cassettoColumnGeometry';
 
 const C = {
   ink: '#f3e7c4',
   muted: '#8fb2a2',
-  goldHi: '#f0d68a',
-  emeraldGlow: '#2fd4a3',
+  goldHi: '#f1d88a', /* = HudRealNav C.gold */
+  gold: '#c2a355', /* = --skin-hud-brass-mid, the nav's brass */
+  /** R-357 palette (Director: «troppo Gold … il componente in basso al centro è il golden standard»): titles and numbers read
+   *  ivory/champagne like the bottom nav labels; gold stays for rims, icons and the frame. */
+  title: '#e6dcb8', /* = HudRealNav label ink */
+  titleSoft: '#c9d6c6',
   danger: '#e86a5e',
+  /** The skull emblem's own red (eyes #b70b05, brightened ~10% for legibility on the enamel) — the death % uses it (Director 2026-11-20). */
+  bordeaux: '#c9140b',
   shadow: '0 14px 44px rgba(0,0,0,.68)',
 } as const;
 
@@ -42,18 +44,25 @@ export interface CassettoQuest {
   title: string;
   subtitle?: string;
   briefing: string;
+  /** Director 2026-11-20 «vignetta da quest»: the quest's own cover art heads the column. Absent = the golden's default
+   *  vignette (`cassetto/vignette.webp`). */
+  vignette?: string;
   legs: CassettoLeg[];
-  /** R-339/PLAN-119 AC6: explicit total under the legs ("Total: N days"), from
-   *  the same quest config — the "2D" glyph alone read as a label, not a count. */
+  /** Explicit total under the legs ("Total: N days"), from the same quest config. */
   totalDays?: number;
   riskLabel: string;
+  /** Danger level 1..`riskLevelMax` (the band's index in DANGER_BANDS) → that many skulls light up under the death %. Absent = pending. */
+  riskLevel?: number;
+  riskLevelMax?: number;
+  /** The danger band only exists once the party is full and the forecast has run. While it does not, the value is NOT a danger
+   *  reading — it renders muted (INV:cassetto-risk-pending-muted). */
+  riskPending?: 'incomplete' | 'computing';
+  /** Director ruling 2026-11-20: "% morte" next to the risk value — the party sim's `anyDeathPct`. Absent while pending. */
+  deathPct?: number;
   rewards: { icon: string; qty: string }[];
-  /** R-339/PLAN-119 T3-S2 (artifact-r004 "consequence preview"): the food
-   *  cost the expedition drains over the journey, rendered in the reserved
-   *  `cassetto-cost-slot` cell between risk and rewards. `icon` is a
-   *  `res-*` resource id (same convention as `rewards[].icon`);
-   *  `insufficient` flips the value to the danger tone when the village
-   *  stock cannot cover it. Display-only — the cell never takes input. */
+  /** Director ruling 2026-11-20: "% riuscita" next to the reward — the sim's `outcomePct.reward`. */
+  successPct?: number;
+  /** DEPRECATED (hud-real-cassetto.INV-5 / cassetto-no-cost-cell): kept in the model for source compat, NEVER painted. */
   costPreview?: { icon: string; qty: string; insufficient?: boolean };
 }
 export interface CassettoLoadoutSlot {
@@ -64,12 +73,8 @@ export interface CassettoLoadoutSlot {
 }
 
 /**
- * The quest bag as SLOT FRAMES (R-337): `bagSlots` wells in order, `null` =
- * empty pouch. The cassetto never lists the stash catalogue — filling happens
- * by clicking items inside the bound warehouse (`VillageStashPanel`, the
- * magazzino), exactly like the stock planner's `QuestBagSlot` contract:
- * empty slot → `onOpenStash` (opens the bound magazzino), packed slot →
- * `onReleaseItem` returns the item to the shared pool.
+ * The quest bag as SLOT FRAMES (R-337): `bagSlots` niches in order, `null` = empty pouch. Items arrive ONLY by clicking rows in the
+ * bound magazzino (`VillageStashPanel`): an empty pouch opens it (`onOpenStash`), a packed tile releases its item (`onReleaseItem`).
  */
 export interface CassettoLoadout {
   slots: (CassettoLoadoutSlot | null)[];
@@ -81,41 +86,47 @@ export interface HudRealCassettoProps {
   quest: CassettoQuest;
   /** The REAL rack view models — the session's `controller.slots`, never lab fabrications. */
   slots: ResidentSlotViewModel[];
-  /** The REAL village resource readout — mounted inside the empty navy well the
-   *  signed frame paints at the top interior (Director 2026-11-14: «il mockup
-   *  aveva il componente risorse in alto al suo interno»). Without it the
-   *  drawer's body covers the page's own resources slot and the readout
-   *  "scompare" whenever the cassetto is open. */
+  /** @deprecated D-1 (R-357): the drawer carries no resources band. Accepted so callers compile. */
   resourceItems?: ResourceReadoutItem[];
   onSlotClick?: (slotId: string) => void;
   onSlotClear?: (slotId: string) => void;
+  /** R-357: pressing the › in the party block opens the roster panel. */
+  onOpenRoster?: () => void;
   suppressedResidentIds?: readonly string[];
-  /** R-359: seat-phase guard callback for slot-token swap/extract — the session
-   *  feeds `handleSlotPhaseChange`; without it the rack runs swap drags blind. */
+  /** R-359: seat-phase guard callback for slot-token swap/extract — without it the rack runs swap drags blind. */
   onSlotPhaseChange?: (slotId: string, phase: SlotSeatPhase) => void;
   loadout?: CassettoLoadout;
   canSend?: boolean;
-  /** R-339/PLAN-119 AC4: why CONFIRM is muted, shown inline just above the
-   *  plaque (stock detail parity — `quest-planner-reason-line`). Null/undefined
-   *  renders nothing. */
+  /** Why CONFIRM is muted, shown inline just above the button. Null/undefined renders nothing. */
   disabledReason?: string | null;
   onConfirm?: () => void;
+  /** Director ruling 2026-11-20 «× chiudi e perdi tutto»: the × button (and Esc) CLOSE the planner and the adapter owns the
+   *  discard — fold via the edge chip keeps the draft instead. Absent = no × mounts and Escape is inert. */
+  onClose?: () => void;
 }
 
-type Zone = CassettoZone;
+/** Design width of the golden in px; every `u(n)` is n/1024 of the column width. */
+const DESIGN_W = 1024;
+const u = (n: number) => `${(n / DESIGN_W) * 100}cqw`;
 
-const pct = (z: Zone, artW: number, artH: number): React.CSSProperties => ({
-  position: 'absolute',
-  left: `${(z.x / artW) * 100}%`,
-  top: `${(z.y / artH) * 100}%`,
-  width: `${(z.w / artW) * 100}%`,
-  height: `${(z.h / artH) * 100}%`,
-});
+/** The smallest legible size, in rendered CSS px, for any caption in the drawer (INV:cassetto-captions-min-size). */
+export const CASSETTO_MIN_LABEL_PX = 11;
+/** The party rack is rendered unscaled in the DOM drawer; its labels are un-scaled by this factor (kept for API/test compat). */
+export const CASSETTO_RACK_SCALE = 1;
+const fzMin = (n: number) => `max(${CASSETTO_MIN_LABEL_PX}px, ${u(n)})`;
 
-const cqw = (px: number, artW: number) => `${(px / artW) * 100}cqw`;
+/** Painted pieces sliced from the golden (PLAN-127 slice-kit location; identical bytes to `cassetto3/`). */
+const ASSET = '/assets/ui/hud-real/slicekit/cassetto';
+const RAIL_W = 100;
+const RAIL_TOP_H = 360;
+const RAIL_BOTTOM_H = 376;
+/** The CTA button asset (1500×317, both arrow tips, transparent ground) scaled to 880u: 12 px clear of the rail, 10 px of the edge. */
+const PLAQUE_W = 1500;
+const PLAQUE_H = 317;
+const CTA_W = 880, CTA_RIGHT_GAP = 20, CTA_BOTTOM_GAP = 30;  /* lifted: it no longer sits on the screen edge, the south frame bar closes the column under it */
+const CTA_H = CTA_W * PLAQUE_H / PLAQUE_W;
 
-/** Viewport-wide variant switch: ≥1360px → the '1440' column art (R-323 ruling
- *  420px @1440×900 / 400px @1280×800). matchMedia keeps it live on resize. */
+/** Viewport-wide variant switch kept for API compatibility (the art no longer varies). */
 const WIDE_MQ = `(min-width: ${CASSETTO_WIDE_BREAKPOINT}px)`;
 const subscribeWide = (cb: () => void) => {
   const mq = window.matchMedia(WIDE_MQ);
@@ -123,86 +134,156 @@ const subscribeWide = (cb: () => void) => {
   return () => mq.removeEventListener('change', cb);
 };
 const readWide = () => window.matchMedia(WIDE_MQ).matches;
-/** The live column spec for the current viewport width — shared with the
- *  T2 `ExpeditionDrawer` fold chip, which must sit at the column's left edge. */
+/** The live column spec for the current viewport width — shared with the `ExpeditionDrawer` fold chip. */
 export const useCassettoColumnSpec = () => {
   const wide = useSyncExternalStore(subscribeWide, readWide, () => true);
   return cassettoColumnSpec(wide ? 1440 : 1280);
 };
 
-/** Compact display for very large integers (123456 -> 123K) so a targhetta never overflows. */
-function compactRes(v: string | number): string {
-  const n = typeof v === 'number' ? v : Number(String(v).replace(/[^0-9.-]/g, ''));
-  if (!Number.isFinite(n) || Math.abs(n) < 100000) return String(v);
-  return new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 }).format(n);
-}
-
-/* R-339/PLAN-119 T1: the CONFIRM states read ONLY the skin tokens named in
- * `CASSETTO_LAYOUT_CONFIG.cta.vars` (values in BASE_SKIN_CSS_VARS) — no
- * literal color or opacity for the CTA anywhere in this component. */
+/* CONFIRM states read ONLY the skin tokens named in `CASSETTO_LAYOUT_CONFIG.cta.vars` (AC8). */
 const CTA_VARS = CASSETTO_LAYOUT_CONFIG.cta.vars;
 
-/* Force the 4 detail slots onto a single evenly-spaced 4-column row inside the Party Slots well */
 const RACK_SCOPED_CSS = `
 [data-hudreal-cassetto] [data-testid="resident-slot-rack"] {
   --slot-rack-gap: 10px;
   display: grid !important;
-  grid-template-columns: repeat(4, 72px) !important;
-  gap: 8px !important;
+  grid-auto-flow: column !important;
+  grid-auto-columns: 104px !important;
+  grid-template-columns: none !important;
+  gap: 6px !important;
   align-items: start !important;
   justify-items: center !important;
 }
-/* CONFIRM — the plaque is baked into the column art, so the feedback lives
-   on an invisible sheen + the text layer: hover ignites an emerald glow,
-   press sinks the text and darkens the plaque's face, focus gets a ring.
-   Every value below is a var(--skin-cassetto-cta-*) token (T1/AC8). */
-[data-hudreal-cassetto] [data-testid="cassetto-confirm"] .confirm-sheen {
-  position: absolute; inset: 8% 6%; border-radius: 999px;
-  background: ${CTA_VARS.sheen};
-  box-shadow: ${CTA_VARS.sheenRing};
-  opacity: 0; transition: opacity 160ms ease; pointer-events: none;
+/* The rack's 9px labels are raised to the legibility floor; two centered balanced lines are fine. */
+[data-hudreal-cassetto] [data-testid="resident-slot-rack"] p {
+  font-size: ${(CASSETTO_MIN_LABEL_PX / CASSETTO_RACK_SCALE).toFixed(2)}px !important;
+  letter-spacing: 0.04em !important;
+  line-height: 1.1 !important;
+  margin-top: 8px !important;
+  text-align: center !important;
+  text-wrap: balance;
+  white-space: normal !important;
 }
-[data-hudreal-cassetto] [data-testid="cassetto-confirm"]:not(:disabled):hover .confirm-sheen { opacity: 1; }
-[data-hudreal-cassetto] [data-testid="cassetto-confirm"]:not(:disabled):active .confirm-sheen {
-  opacity: 1;
-  background: ${CTA_VARS.pressSheen};
-  box-shadow: ${CTA_VARS.pressRing};
-}
-/* Muted state (T1): the disabled CONFIRM dims to the skin token — the
-   inline reason beside it is the component's job, the look is the token's. */
-[data-hudreal-cassetto] [data-testid="cassetto-confirm"]:disabled { opacity: ${CTA_VARS.mutedOpacity}; }
+/* CONFIRM — the button IS the painted plaque (label inpainted away) with a live DOM label. State looks are filters on the
+   picture (tokens); nothing is drawn over it except the text. */
+[data-hudreal-cassetto] [data-testid="cassetto-confirm"] .confirm-art { transition: filter 170ms ease; }
+[data-hudreal-cassetto] [data-testid="cassetto-confirm"]:not(:disabled):hover .confirm-art { filter: ${CTA_VARS.enamelHoverFilter}; }
+[data-hudreal-cassetto] [data-testid="cassetto-confirm"]:not(:disabled):active .confirm-art { filter: ${CTA_VARS.enamelPressFilter}; }
+[data-hudreal-cassetto] [data-testid="cassetto-confirm"]:disabled .confirm-art { filter: ${CTA_VARS.enamelDisabled}; }
 [data-hudreal-cassetto] [data-testid="cassetto-confirm"] .confirm-text {
   color: ${CTA_VARS.text};
   text-shadow: ${CTA_VARS.textShadow};
-  transition: transform 120ms cubic-bezier(0.25, 0.46, 0.45, 0.94), text-shadow 160ms ease;
+  transition: transform 110ms ease, text-shadow 170ms ease;
 }
-[data-hudreal-cassetto] [data-testid="cassetto-confirm"]:not(:disabled):hover .confirm-text {
-  text-shadow: ${CTA_VARS.hoverTextGlow};
-}
-[data-hudreal-cassetto] [data-testid="cassetto-confirm"]:not(:disabled):active .confirm-text { transform: ${CTA_VARS.pressTransform}; }
-[data-hudreal-cassetto] [data-testid="cassetto-confirm"]:focus-visible { outline: 2px solid ${CTA_VARS.focusRing}; outline-offset: -5px; border-radius: 14px; }
-/* Bag slots — pouch brightens on hover, packed tiles lift and glow. */
-[data-hudreal-cassetto] [data-testid^="bag-slot-empty-"] svg { transition: opacity 160ms ease, filter 160ms ease; }
-[data-hudreal-cassetto] [data-testid^="bag-slot-empty-"]:hover svg { opacity: 0.95 !important; filter: drop-shadow(0 0 6px rgba(223,184,87,0.6)); }
+[data-hudreal-cassetto] [data-testid="cassetto-confirm"]:disabled .confirm-text { opacity: ${CTA_VARS.mutedOpacity}; }
+[data-hudreal-cassetto] [data-testid="cassetto-confirm"]:not(:disabled):hover .confirm-text { text-shadow: ${CTA_VARS.hoverTextGlow}; }
+[data-hudreal-cassetto] [data-testid="cassetto-confirm"]:not(:disabled):active .confirm-text { transform: translateY(1px); }
+[data-hudreal-cassetto] [data-testid="cassetto-confirm"]:focus-visible { outline: 2px solid ${CTA_VARS.focusRing}; outline-offset: 3px; border-radius: 999px; }
+/* supplies scroller — slim brass scrollbar */
+[data-hudreal-cassetto] [data-cassetto-bag-scroll] { scrollbar-width: thin; scrollbar-color: #c2a355 transparent; }
+/* Arrows that open a tool (roster / stash): hover ignites them. */
+[data-hudreal-cassetto] [data-cassetto-opener] { transition: filter 160ms ease; }
+[data-hudreal-cassetto] [data-cassetto-opener]:hover { filter: brightness(1.2); }
+[data-hudreal-cassetto] [data-cassetto-opener]:focus-visible { outline: 2px solid ${C.goldHi}; outline-offset: 2px; border-radius: 6px; }
+/* Bag niches — pouch brightens on hover, packed tiles lift and glow. */
+[data-hudreal-cassetto] [data-testid^="bag-slot-empty-"] img { transition: opacity 160ms ease, filter 160ms ease; }
+[data-hudreal-cassetto] [data-testid^="bag-slot-empty-"]:hover img { opacity: 1 !important; filter: drop-shadow(0 0 6px rgba(223,184,87,0.6)) !important; }
 [data-hudreal-cassetto] [data-testid^="loadout-item-"] { transition: filter 160ms ease, transform 120ms ease; border-radius: 8px; }
 [data-hudreal-cassetto] [data-testid^="loadout-item-"]:hover { filter: brightness(1.18) drop-shadow(0 0 5px rgba(223,184,87,0.45)); transform: translateY(-1px); }
 [data-hudreal-cassetto] [data-testid^="loadout-item-"]:active { transform: translateY(0) scale(0.95); }
 `;
 
+const CINZEL = 'Cinzel, "EB Garamond", serif';
+
+/** A framed block (well): brass hairline, dark enamel fill. */
+const wellStyle: React.CSSProperties = {
+  position: 'relative',
+  border: `1px solid ${C.gold}55`,
+  borderRadius: u(20),
+  background: 'linear-gradient(180deg, rgba(4,40,30,.42), rgba(3,32,25,.52))',
+  boxShadow: 'inset 0 0 0 1px rgba(240,214,138,.08), inset 0 10px 24px rgba(0,0,0,.28)',
+};
+
+/** Small `›` in the corner of a block that opens a tool (roster / stash). The block has no text title (Director 2026-11-17); the
+ *  label stays as the accessible name. */
+const OpenerArrow: React.FC<{ onPress: (el: HTMLElement) => void; label: string; testId: string }> = ({ onPress, label, testId }) => (
+  <button
+    type="button"
+    data-cassetto-opener=""
+    data-testid={testId}
+    aria-label={label}
+    onClick={(e) => onPress(e.currentTarget)}
+    style={{ position: 'absolute', right: u(10), top: u(8), width: u(60), height: u(60), padding: 0, border: 'none', background: 'transparent', cursor: 'pointer', color: C.title, fontSize: fzMin(58), lineHeight: 1, fontFamily: CINZEL, pointerEvents: 'auto', zIndex: 3 }}
+  >›</button>
+);
+
+/** The % readout (Director 2026-11-20: a big number beside the emblem). Pending → a muted dash, same height. */
+const BigPct: React.FC<{ pct?: number; tone: 'danger' | 'gold'; label: string; testId: string; leading?: React.ReactNode }> = ({ pct, tone, label, testId, leading }) => {
+  const color = tone === 'danger' ? C.bordeaux : C.goldHi;
+  const known = pct != null;
+  return (
+    <span
+      data-testid={known ? testId : `${testId}-pending`}
+      role={known ? 'img' : undefined}
+      aria-label={known ? label : undefined}
+      aria-hidden={known ? undefined : true}
+      title={known ? label : undefined}
+      style={{ display: 'inline-flex', alignItems: 'center', gap: u(8), fontFamily: CINZEL, fontSize: fzMin(66), fontWeight: 700, letterSpacing: '0.02em', lineHeight: 1, color: known ? color : C.muted, opacity: known ? 1 : 0.55, textShadow: '0 1px 3px rgba(0,0,0,.85)', whiteSpace: 'nowrap' }}
+    >
+      {leading}
+      {known ? `${Math.round(pct as number)}%` : '—'}
+    </span>
+  );
+};
+
+/** Danger level as skulls: `level` of `max` lit (the small copy of the emblem), the rest dimmed. */
+const SkullLevel: React.FC<{ level?: number; max: number; label: string }> = ({ level, max, label }) => (
+  <span data-testid="cassetto-risk-value" role="img" aria-label={label} title={label} data-risk-level={level ?? 0} style={{ display: 'inline-flex', gap: u(6), alignItems: 'center' }}>
+    {Array.from({ length: max }, (_, i) => (
+      <img key={i} src={`${ASSET}/skull.webp`} alt="" draggable={false} data-skull={i < (level ?? 0) ? 'on' : 'off'} style={{ width: u(40), height: u(40), objectFit: 'contain', filter: i < (level ?? 0) ? 'none' : 'grayscale(1) brightness(.55)', opacity: i < (level ?? 0) ? 1 : 0.4 }} />
+    ))}
+  </span>
+);
+
+/** Party seats, THREE at a time, bigger (Director 2026-11-20: «mettine 3, più grandi e il pulsante per far vedere quello dopo»):
+ *  a clipped viewport of `PARTY_VISIBLE` columns that slides one seat per click; the arrows only mount when there are more seats than fit. */
+const PARTY_VISIBLE = 3;
+const PARTY_COL_PX = 104;
+const PARTY_GAP_PX = 6;
+const PartyPager: React.FC<{ count: number; children: React.ReactNode; prevLabel: string; nextLabel: string }> = ({ count, children, prevLabel, nextLabel }) => {
+  const [first, setFirst] = React.useState(0);
+  const max = Math.max(0, count - PARTY_VISIBLE);
+  const at = Math.min(first, max);
+  const arrow = (dir: -1 | 1, label: string, disabled: boolean): React.ReactNode => (
+    <button
+      type="button"
+      data-testid={dir < 0 ? 'cassetto-party-prev' : 'cassetto-party-next'}
+      aria-label={label}
+      title={label}
+      disabled={disabled}
+      onClick={() => setFirst(Math.max(0, Math.min(max, at + dir)))}
+      style={{ flexShrink: 0, width: u(58), height: u(58), borderRadius: '50%', padding: 0, border: `1.5px solid ${C.gold}`, color: C.title, fontFamily: CINZEL, fontSize: fzMin(40), lineHeight: 1, cursor: disabled ? 'default' : 'pointer', opacity: disabled ? 0.3 : 1, display: 'grid', placeItems: 'center', pointerEvents: 'auto', background: 'radial-gradient(circle at 35% 28%, #17503f, #08241d 75%)', boxShadow: '0 2px 6px rgba(0,0,0,.6), inset 0 0 0 1px rgba(240,214,138,.2)' }}
+    >{dir < 0 ? '‹' : '›'}</button>
+  );
+  return (
+    <div data-cassetto-party-pager="" data-first={at} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: u(6) }}>
+      {count > PARTY_VISIBLE && arrow(-1, prevLabel, at <= 0)}
+      <div style={{ width: PARTY_VISIBLE * PARTY_COL_PX + (PARTY_VISIBLE - 1) * PARTY_GAP_PX, overflow: 'hidden', zoom: 1.15, padding: '12px 0 4px' }}>
+        <div style={{ transform: `translateX(-${at * (PARTY_COL_PX + PARTY_GAP_PX)}px)`, transition: 'transform 220ms cubic-bezier(0.22, 1, 0.36, 1)', width: 'max-content' }}>{children}</div>
+      </div>
+      {count > PARTY_VISIBLE && arrow(1, nextLabel, at >= max)}
+    </div>
+  );
+};
+
 export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
-  quest, slots, resourceItems, onSlotClick, onSlotClear, suppressedResidentIds, onSlotPhaseChange, loadout, canSend = true, disabledReason, onConfirm,
+  quest, slots, onSlotClick, onSlotClear, onOpenRoster, suppressedResidentIds, onSlotPhaseChange, loadout, canSend = true, disabledReason, onConfirm, onClose,
 }) => {
   const { t } = useTranslation('idleVillage');
   const spec = useCassettoColumnSpec();
-  const Z = spec.geo.zones;
-  const { artW, artH } = spec.geo;
-  const zp = (z: Zone) => pct(z, artW, artH);
-  const fz = (px: number) => cqw(px, artW);
 
-  /* R-339/PLAN-119 D4: the docked drawer publishes the screen width it occupies
-   *  (`aspect × viewportHeight`) into the shared insets ledger; unmount restores
-   *  0 so the free-map rect is always live. Wiring safeFit/pan-clamp on /game is
-   *  the deferred step documented in the store file. */
+  /* The docked drawer publishes the screen width it occupies (`aspect × viewportHeight`, capped) into the shared insets ledger;
+   * unmount restores 0 (INV-4). */
   React.useEffect(() => {
     const publish = useGameLayoutInsets.getState().publish;
     const update = () => publish({ right: Math.round(cassettoColumnWidthFor(spec, window.innerHeight)) });
@@ -213,406 +294,294 @@ export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
       publish({ right: 0 });
     };
   }, [spec]);
+
+  /* INV:cassetto-close — Esc (and a click on the map, below) closes (same handler, same discard semantics owned by the adapter). Ignored when
+   * another handler already took the key (an open roster/stash menu) or while typing. No onClose → Esc is inert. */
+  React.useEffect(() => {
+    if (!onClose) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape' || e.defaultPrevented) return;
+      const el = document.activeElement as HTMLElement | null;
+      if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)) return;
+      onClose();
+    };
+    /* Director 2026-11-20: no × — the planner closes when you CLICK THE MAP outside it. Only a real click on the map canvas counts:
+     * a pan/drag (moved > 6 px or held > 500 ms) does not, nor does anything inside the cassetto, the floating panels, a POI marker
+     * or another HUD surface (those are DOM, the map is the only <canvas> under them). The adapter owns the discard (same as Esc). */
+    let down: { x: number; y: number; t: number } | null = null;
+    const onDown = (e: PointerEvent) => { down = { x: e.clientX, y: e.clientY, t: Date.now() }; };
+    const onUp = (e: PointerEvent) => {
+      const d = down; down = null;
+      if (!d || e.button !== 0) return;
+      if (Math.hypot(e.clientX - d.x, e.clientY - d.y) > 6 || Date.now() - d.t > 500) return;
+      const target = e.target as HTMLElement | null;
+      if (!(target instanceof HTMLCanvasElement) || target.closest('[data-hudreal-cassetto]')) return;
+      onClose();
+    };
+    window.addEventListener('keydown', onKey);
+    window.addEventListener('pointerdown', onDown, true);
+    window.addEventListener('pointerup', onUp, true);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      window.removeEventListener('pointerdown', onDown, true);
+      window.removeEventListener('pointerup', onUp, true);
+    };
+  }, [onClose]);
+
+  const cap = CASSETTO_LAYOUT_CONFIG.drawer.widthMaxPxExtracted;
+
   return (
     <div
       data-hudreal-cassetto=""
       style={{
         position: 'absolute', inset: 0,
-        display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
+        display: 'flex', alignItems: 'stretch', justifyContent: 'flex-end',
         fontFamily: '"EB Garamond", serif', color: C.ink,
         filter: `drop-shadow(${C.shadow})`,
         pointerEvents: 'none',
       }}
     >
       <style>{RACK_SCOPED_CSS}</style>
+      {/* `cqw` resolves against the nearest ANCESTOR container: the outer box is the container (width), the inner box carries the
+       *  `u()`-sized padding. */}
       <div
+        data-cassetto-column=""
         style={{
           position: 'relative',
-          /* T1 clamp: `min(100%, widthMaxPx / aspect)` — above the cap the
-           * column stops short of full height instead of stretching the art. */
-          height: `min(100%, ${CASSETTO_LAYOUT_CONFIG.drawer.widthMaxPx / spec.aspect}px)`,
-          aspectRatio: `${artW} / ${artH}`,
-          containerType: 'size',
+          width: `min(${spec.aspect} * 100vh, ${cap}px)`,
+          containerType: 'inline-size',
           pointerEvents: 'auto',
+          overflow: 'hidden',
         }}
       >
-        <img
-          src={spec.src}
-          alt=""
-          draggable={false}
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', display: 'block' }}
-        />
+        {/* enamel field — starts under the rail, NOT at the column edge (no green bar left of the frame) */}
+        <div aria-hidden style={{ position: 'absolute', left: u(36), right: 0, top: 0, bottom: 0, background: 'linear-gradient(90deg, #0a4a32 0%, #0c5439 45%, #0a4a33 100%)', pointerEvents: 'none' }} />
+        <div
+          style={{
+            position: 'absolute', inset: 0,
+            display: 'flex', flexDirection: 'column',
+            paddingLeft: u(RAIL_W - 12), paddingRight: u(30), paddingBottom: u(CTA_H + CTA_BOTTOM_GAP + 30),
+            boxSizing: 'border-box',
+          }}
+        >
+          {/* ---------- painted frame (sliced from the golden) ---------- */}
+          <div aria-hidden style={{ position: 'absolute', left: 0, top: u(RAIL_TOP_H - 4), bottom: u(RAIL_BOTTOM_H - 4), width: u(RAIL_W), backgroundImage: `url(${ASSET}/rail-mid.webp)`, backgroundRepeat: 'repeat-y', backgroundSize: `${u(RAIL_W)} auto`, pointerEvents: 'none' }} />
+          <img aria-hidden alt="" draggable={false} src={`${ASSET}/rail-top.webp`} style={{ position: 'absolute', left: 0, top: 0, width: u(RAIL_W), height: u(RAIL_TOP_H), pointerEvents: 'none' }} />
+          <img aria-hidden alt="" draggable={false} src={`${ASSET}/rail-bottom.webp`} style={{ position: 'absolute', left: 0, bottom: 0, width: u(RAIL_W), height: u(RAIL_BOTTOM_H), pointerEvents: 'none' }} />
 
-        {/* REAL resources targhette inside the cleaned header band — the
-            approved fork look (ruling "Dentro la cornice"): one dark-glass
-            plaque per resource, not the corner bar scaled down. */}
-        {resourceItems && (
-          <div
-            data-cassetto-resources=""
-            style={{ ...zp(Z.resources), display: 'flex', alignItems: 'stretch', gap: fz(9), padding: `${fz(5)} ${fz(7)}` }}
-          >
-            {resourceItems.map((item) => {
-              const danger = item.tone === 'danger';
-              const toneColor = item.tone ? HUD_TONE_COLOR[item.tone] : C.muted;
-              const description = item.description ?? `${item.label}: ${item.value}`;
-              const hint = [description !== item.label ? description : null, item.detail ? `${item.detail}` : null]
-                .filter(Boolean)
-                .join(' — ');
-              return (
-                <ZanaraTooltip key={item.id} label={item.label} hint={hint || undefined}>
-                  <div
-                    role="group"
-                    aria-label={description}
-                    tabIndex={0}
-                    data-cassetto-res={item.id}
-                    data-tone={item.tone}
-                    style={{
-                      flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: fz(9),
-                      padding: `0 ${fz(9)}`, borderRadius: fz(9), cursor: 'default',
-                      background: 'rgba(6, 20, 18, 0.66)',
-                      boxShadow: danger
-                        ? `inset 0 0 0 1px ${HUD_TONE_COLOR.danger}b8, inset 0 0 10px ${HUD_TONE_COLOR.danger}33, inset 0 0 0 1px rgba(240,214,138,.22)`
-                        : 'inset 0 0 0 1px rgba(240, 214, 138, 0.30), inset 0 -6px 12px rgba(0,0,0,.35)',
-                    }}
-                  >
-                    {/* brass socket — same grammar as the nav round buttons */}
-                    <div
-                      aria-hidden="true"
+
+          {/* south frame bar: the north bar mirrored vertically closes the frame under the button */}
+          <img aria-hidden alt="" draggable={false} src={`${ASSET}/frame-top.webp`} style={{ position: 'absolute', left: u(92), bottom: 0, width: u(932), height: u(24), transform: 'scaleY(-1)', pointerEvents: 'none', zIndex: 2 }} />
+          {/* north frame bar (sliced from the golden) — sits ABOVE the vignette, never cropped by it */}
+          <img aria-hidden alt="" draggable={false} src={`${ASSET}/frame-top.webp`} style={{ position: 'absolute', left: u(92), top: 0, width: u(932), height: u(24), pointerEvents: 'none', zIndex: 2 }} />
+
+          {/* ---------- quest-banner: vignette + title + briefing ---------- */}
+          <div data-block="quest-banner" style={{ display: 'contents' }}>
+            {/* Vignette: FIXED height in the golden's proportion (936×262 → a wide strip), thin champagne frame under it. A quest with its
+             *  own cover art is cropped to the same strip (centre). */}
+            {/* Bold champagne frame (Director 2026-11-20: «2 · Cornice più marcata»): a solid brass band like the left rail — bright
+             *  centre line between darker edges — with the golden's corner curls and the bottom gem riding on it. */}
+            <div data-cassetto-vignette-frame="" style={{ position: 'relative', flex: '0 0 auto', marginTop: u(32), marginLeft: u(6), marginRight: u(-14), padding: u(11), borderRadius: u(4),
+              background: 'linear-gradient(135deg, #f6e3a0 0%, #c8a95a 28%, #f1d88a 50%, #b89844 74%, #8f7330 100%)',
+              boxShadow: `0 3px 10px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,244,200,.55), inset 0 0 0 ${u(4)} rgba(122,90,30,.55)` }}>
+              <div style={{ position: 'relative', height: u(228), overflow: 'hidden', borderRadius: u(2), boxShadow: 'inset 0 0 0 1px rgba(20,12,4,.85), 0 0 0 1px rgba(20,12,4,.7)' }}>
+                <img
+                  alt="" aria-hidden draggable={false}
+                  data-cassetto-vignette=""
+                  src={quest.vignette ?? `${ASSET}/vignette.webp`}
+                  style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: quest.vignette ? 'center 18%' : 'left top' }}
+                />
+              </div>
+              {([['left', 'top', ''], ['right', 'top', 'scaleX(-1)'], ['left', 'bottom', 'scaleY(-1)'], ['right', 'bottom', 'scale(-1,-1)']] as const).map(([h, v, tf]) => (
+                <img key={`${h}${v}`} aria-hidden alt="" draggable={false} src={`${ASSET}/cart-corner.webp`} style={{ position: 'absolute', [h]: u(-8), [v]: u(-8), width: u(60), height: u(58), transform: tf || undefined, pointerEvents: 'none', filter: 'drop-shadow(0 1px 1px rgba(0,0,0,.6))' }} />
+              ))}
+              <img aria-hidden alt="" draggable={false} src={`${ASSET}/cart-gem.webp`} style={{ position: 'absolute', left: '50%', bottom: u(-24), width: u(132), height: u(42), transform: 'translateX(-50%)', pointerEvents: 'none', filter: 'drop-shadow(0 1px 1px rgba(0,0,0,.6))' }} />
+            </div>
+            {/* Title cartouche: one panel for title + briefing, double champagne filet, corner curls and the bottom gem from the golden,
+             *  a separator line between the two. */}
+            <div data-cassetto-cartouche="" style={{ position: 'relative', flex: '0 0 auto', marginTop: u(32), marginBottom: u(8), padding: `${u(14)} ${u(26)} ${u(20)}`, textAlign: 'center', border: `1px solid ${C.gold}cc`, background: 'linear-gradient(180deg, rgba(4,40,30,.45), rgba(3,30,24,.55))' }}>
+              <div aria-hidden style={{ position: 'absolute', inset: u(5), border: `1px solid ${C.gold}66`, pointerEvents: 'none' }} />
+              {([['left', 'top', ''], ['right', 'top', 'scaleX(-1)'], ['left', 'bottom', 'scaleY(-1)'], ['right', 'bottom', 'scale(-1,-1)']] as const).map(([h, v, tf]) => (
+                <img key={`${h}${v}`} aria-hidden alt="" draggable={false} src={`${ASSET}/cart-corner.webp`} style={{ position: 'absolute', [h]: u(-3), [v]: u(-3), width: u(56), height: u(54), transform: tf || undefined, pointerEvents: 'none' }} />
+              ))}
+              <img aria-hidden alt="" draggable={false} src={`${ASSET}/cart-gem.webp`} style={{ position: 'absolute', left: '50%', bottom: u(-22), width: u(132), height: u(42), transform: 'translateX(-50%)', pointerEvents: 'none' }} />
+              <div style={{ position: 'relative', fontFamily: CINZEL, fontSize: fzMin(50), fontWeight: 700, lineHeight: 1.12, letterSpacing: '0.05em', textTransform: 'uppercase', color: C.title, textShadow: '0 2px 4px rgba(0,0,0,.8)' }}>
+                {quest.title}
+              </div>
+              <div aria-hidden style={{ height: 1, margin: `${u(12)} ${u(8)}`, background: `linear-gradient(90deg, transparent, ${C.gold}, transparent)` }} />
+              <p style={{ position: 'relative', margin: 0, fontStyle: 'italic', fontSize: fzMin(36), lineHeight: 1.3, color: C.titleSoft }}>
+                {quest.briefing}
+              </p>
+            </div>
+          </div>
+
+          {/* ---------- party-slots ---------- */}
+          <div data-block="party-slots" style={{ ...wellStyle, marginTop: u(6), flex: '1 1 auto', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: u(200) }}>
+            {onOpenRoster && <OpenerArrow label={t('gameFrame.cassetto.openRoster', 'Open the roster')} testId="cassetto-party-title" onPress={() => onOpenRoster()} />}
+            <div data-cassetto-rack="" style={{ padding: `${u(20)} 0` }}>
+              <PartyPager count={slots.length} prevLabel={t('gameFrame.cassetto.prevSeat', 'Previous seats')} nextLabel={t('gameFrame.cassetto.nextSeat', 'Next seats')}>
+                <ResidentSlotRack
+                  slots={slots}
+                  layout="detail"
+                  slotSize={42}
+                  slotMaterial="hud-gold"
+                  slotVariant="hud64"
+                  bezelPreset="draghiGlifo"
+                  onSlotClick={onSlotClick}
+                  onSlotClear={onSlotClear}
+                  suppressedResidentIds={suppressedResidentIds}
+                  onSlotPhaseChange={onSlotPhaseChange}
+                  enableSlotSwap
+                />
+              </PartyPager>
+            </div>
+          </div>
+
+          {/* ---------- bag-slots: SUPPLIES (R-337 niches; per-quest count, scrolls sideways when they do not fit) ---------- */}
+          <div data-block="bag-slots" style={{ ...wellStyle, marginTop: u(10), paddingBottom: u(14), flexShrink: 0 }}>
+            {loadout && <OpenerArrow label={t('gameFrame.cassetto.openStash', 'Open the stash')} testId="cassetto-supplies-title" onPress={(el) => loadout.onOpenStash(el)} />}
+            <div data-cassetto-bag-scroll="" style={{ display: 'flex', padding: `${u(22)} ${u(28)} ${u(4)}`, overflowX: 'auto', overflowY: 'hidden' }}>
+              {loadout && (
+                <div data-cassetto-bag="" style={{ display: 'flex', gap: u(18), alignItems: 'center', margin: '0 auto', flexShrink: 0 }}>
+                  {loadout.slots.map((slot, i) => (
+                    <span
+                      key={i}
+                      data-testid={`bag-slot-${i}`}
                       style={{
-                        width: fz(58), height: fz(58), flex: 'none', borderRadius: '50%',
-                        display: 'grid', placeItems: 'center',
-                        background: 'radial-gradient(circle at 34% 26%, #33514a 0%, #14302b 55%, #0a1f1c 100%)',
-                        boxShadow: [
-                          'inset 0 1px 1px rgba(255, 236, 180, 0.22)',
-                          'inset 0 -2px 3px rgba(0, 0, 0, 0.6)',
-                          '0 0 0 1.5px #7a6230',
-                          '0 0 0 3px rgba(20, 12, 4, 0.9)',
-                          '0 1px 3px rgba(0, 0, 0, 0.75)',
-                        ].join(', '),
+                        width: u(170), height: u(104), flexShrink: 0, borderRadius: u(14),
+                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                        border: `1px solid ${C.gold}${slot ? '' : '88'}`,
+                        background: 'linear-gradient(180deg, rgba(4,28,26,.8), rgba(2,18,18,.8))',
+                        boxShadow: 'inset 0 0 0 1px rgba(240,214,138,.10), inset 0 4px 10px rgba(0,0,0,.45)',
                       }}
                     >
-                      <div style={{ width: fz(36), height: fz(36), display: 'grid', placeItems: 'center', filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.8))' }}>
-                        {item.icon}
-                      </div>
-                    </div>
-                    <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', position: 'relative' }}>
-                      <span
-                        style={{
-                          fontFamily: '"EB Garamond", serif', fontSize: fz(26), fontWeight: danger ? 700 : 600,
-                          lineHeight: 1.05, fontVariantNumeric: 'tabular-nums',
-                          color: danger ? HUD_TONE_COLOR.danger : '#f7efd8',
-                          textShadow: '0 1px 0 rgba(255,240,200,.16), 0 1px 2px rgba(3,26,30,.9)',
-                          whiteSpace: 'nowrap', display: 'flex', alignItems: 'baseline', gap: fz(4),
-                        }}
-                      >
-                        {compactRes(item.value)}
-                        {item.max !== undefined && String(item.value).length <= 3 && (
-                          <span style={{ fontSize: fz(17), fontWeight: 500, color: C.muted, opacity: 0.85 }}>/{item.max}</span>
-                        )}
-                      </span>
-                      <span
-                        style={{
-                          fontFamily: '"EB Garamond", serif', fontSize: fz(16), lineHeight: 1.15, color: toneColor,
-                          textShadow: '0 1px 2px rgba(3,26,30,.9)', whiteSpace: 'nowrap', overflow: 'hidden',
-                          textOverflow: 'ellipsis', letterSpacing: '0.06em',
-                        }}
-                      >
-                        {item.label}
-                      </span>
-                    </div>
+                      {slot ? (
+                        <button
+                          type="button"
+                          data-testid={`loadout-item-${slot.id}`}
+                          data-bag-slot-index={i}
+                          aria-label={t('questExpedition.bag.removeSlot', { item: slot.label })}
+                          title={slot.label}
+                          onClick={() => loadout.onReleaseItem(slot.id)}
+                          style={{ padding: 0, border: 'none', background: 'transparent', cursor: 'pointer', display: 'inline-flex' }}
+                        >
+                          <StashItemTile icon={slot.icon} qty={slot.qty} size={46} iconSize={26} />
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          data-testid={`bag-slot-empty-${i}`}
+                          aria-label={t('questExpedition.bag.emptySlot', { index: i + 1 })}
+                          onClick={(e) => loadout.onOpenStash(e.currentTarget)}
+                          style={{ width: '100%', height: '100%', padding: 0, border: 'none', background: 'transparent', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
+                        >
+                          <img src={`${ASSET}/supply-bag.webp`} alt="" draggable={false} aria-hidden style={{ width: u(78), height: u(78), opacity: 0.9, filter: 'drop-shadow(0 2px 3px rgba(0,0,0,.6))' }} />
+                        </button>
+                      )}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* ---------- journey-strip (no text title) ---------- */}
+          <div data-block="journey-strip" style={{ ...wellStyle, marginTop: u(10), padding: `${u(16)} 0 ${u(10)}`, flexShrink: 0 }}>
+            <div style={{ position: 'relative', margin: `0 ${u(22)}`, height: u(84) }}>
+              <svg viewBox="0 0 912 84" preserveAspectRatio="none" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} aria-hidden>
+                <defs>
+                  <linearGradient id="cas-leg-dark" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#1d4a43" /><stop offset="1" stopColor="#0d2a2a" /></linearGradient>
+                  <linearGradient id="cas-leg-lit" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#1fb978" /><stop offset="1" stopColor="#0b7a4e" /></linearGradient>
+                </defs>
+                <polygon points="2,42 36,4 304,4 344,42 304,80 36,80" fill="url(#cas-leg-dark)" stroke={C.gold} strokeWidth="2.5" strokeLinejoin="round" />
+                <polygon points="300,4 604,4 644,42 604,80 300,80 340,42" fill="url(#cas-leg-lit)" stroke={C.goldHi} strokeWidth="2.5" strokeLinejoin="round" />
+                <polygon points="600,4 874,4 910,42 874,80 600,80 640,42" fill="url(#cas-leg-dark)" stroke={C.gold} strokeWidth="2.5" strokeLinejoin="round" />
+              </svg>
+              <div style={{ position: 'absolute', inset: 0, display: 'flex' }}>
+                {quest.legs.map((leg, i) => (
+                  <div key={i} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <span style={{ fontFamily: CINZEL, fontSize: fzMin(36), fontWeight: 700, color: i === 1 ? '#eafff5' : C.title, textShadow: '0 1px 3px rgba(0,0,0,.9)' }}>
+                      {typeof leg.days === 'number' ? t('gameFrame.cassetto.legDays', { count: leg.days }) : leg.days}
+                    </span>
                   </div>
-                </ZanaraTooltip>
-              );
-            })}
-          </div>
-        )}
-
-        {/* T2 block `quest-banner` — title + subtitle + briefing. The
-         *  `display:contents` wrapper names the mockup block without
-         *  generating a box: children still position against the art
-         *  container (zero layout delta). Same convention for every block. */}
-        <div data-block="quest-banner" style={{ display: 'contents' }}>
-          {/* Title inside the clean emerald cartouche */}
-          <div style={{ ...zp(Z.title), display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 2%' }}>
-            <span style={{
-              fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: fz(27), fontWeight: 700,
-              letterSpacing: '0.05em', textTransform: 'uppercase', color: C.goldHi,
-              textShadow: '0 1px 3px rgba(0,0,0,.9)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-            }}>
-              {quest.title}
-            </span>
-          </div>
-
-          {/* Subtitle on the emerald band */}
-          <div style={{ ...zp(Z.subtitle), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ fontStyle: 'italic', fontSize: fz(21), color: C.muted, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {quest.subtitle}
-            </span>
-          </div>
-
-          {/* Briefing well */}
-          <div style={{ ...zp(Z.briefing), padding: '3.5% 4.5%', overflow: 'hidden' }}>
-            <p style={{ margin: 0, fontSize: fz(23), lineHeight: 1.42, color: C.ink }}>
-              {quest.briefing}
-            </p>
-          </div>
-        </div>
-
-        {/* T2 block `party-slots` — the well header + the REAL certified rack. */}
-        <div data-block="party-slots" style={{ display: 'contents' }}>
-          {/* Party Slots well header */}
-          <div style={{ ...zp(Z.partyLabel), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: fz(22), fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: C.goldHi }}>
-              {t('gameFrame.cassetto.party', 'Party Slots')}
-            </span>
-          </div>
-
-          {/* REAL certified ResidentSlotRack — all 4 seats fit cleanly inside the upper Party Slots well */}
-          <div
-            data-cassetto-rack=""
-            style={{ ...zp(Z.slots), display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'visible' }}
-          >
-          {/* R-335: the draghi bezels paint wider than their 44 px token boxes —
-           *  the painted band must stay clear of the well's margins on every side. */}
-          <div style={{ transform: 'scale(0.62)', transformOrigin: 'center center' }}>
-            <ResidentSlotRack
-              slots={slots}
-              layout="detail"
-              slotSize={42}
-              slotMaterial="hud-gold"
-              slotVariant="hud64"
-              bezelPreset="draghi"
-              onSlotClick={onSlotClick}
-              onSlotClear={onSlotClear}
-              suppressedResidentIds={suppressedResidentIds}
-              onSlotPhaseChange={onSlotPhaseChange}
-              enableSlotSwap
-            />
-          </div>
-          </div>
-        </div>
-
-        {/* T2 block `bag-slots` — the quest bag wells (R-337), display-only
-         *  assign is S2 per artifact-r004. */}
-        <div data-block="bag-slots" style={{ display: 'contents' }}>
-        {/* Quest bag — empty slot frames inside the lower Party Slots well
-            (R-337). Items arrive ONLY by clicking rows in the bound magazzino
-            (`VillageStashPanel` → `assign` on this POI's ledger bag): an empty
-            pouch opens it, a packed tile releases its item back to the pool —
-            same contract as the stock planner's `QuestBagSlot`/`PackedBagItem`,
-            including the `loadout-item-*` test id the shelf focuses after an
-            assign. */}
-        {loadout && (
-          <div data-cassetto-bag="" style={{ ...zp(Z.loadout), display: 'flex', gap: fz(14), justifyContent: 'center', alignItems: 'center' }}>
-            {loadout.slots.map((slot, i) => (
-              <span
-                key={i}
-                data-testid={`bag-slot-${i}`}
-                style={{
-                  width: fz(56), height: fz(56), flexShrink: 0, borderRadius: fz(14),
-                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                  border: slot ? 'none' : '1px solid rgba(240, 214, 138, 0.35)',
-                  background: slot ? 'none' : 'rgba(4, 22, 28, 0.55)',
-                }}
-              >
-                {slot ? (
-                  <button
-                    type="button"
-                    data-testid={`loadout-item-${slot.id}`}
-                    data-bag-slot-index={i}
-                    aria-label={t('questExpedition.bag.removeSlot', { item: slot.label })}
-                    title={slot.label}
-                    onClick={() => loadout.onReleaseItem(slot.id)}
-                    style={{ padding: 0, border: 'none', background: 'transparent', cursor: 'pointer', display: 'inline-flex' }}
-                  >
-                    <StashItemTile icon={slot.icon} qty={slot.qty} size={46} iconSize={26} />
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    data-testid={`bag-slot-empty-${i}`}
-                    aria-label={t('questExpedition.bag.emptySlot', { index: i + 1 })}
-                    onClick={(e) => loadout.onOpenStash(e.currentTarget)}
-                    style={{
-                      width: '100%', height: '100%', padding: 0, border: 'none', background: 'transparent',
-                      cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                    }}
-                  >
-                    <EngravedIcon id="ico-pouch" size={26} style={{ opacity: 0.45, color: C.goldHi }} aria-hidden />
-                  </button>
-                )}
-              </span>
-            ))}
-          </div>
-        )}
-        </div>
-
-        {/* T2 block `journey-strip` — header + 3 chevron legs + sub-labels +
-         *  the explicit total (AC6). */}
-        <div data-block="journey-strip" style={{ display: 'contents' }}>
-        {/* Journey header + 3 chevron legs + localized sub-labels */}
-        <div style={{ ...zp(Z.journeyLabel), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: fz(22), fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', color: C.goldHi }}>
-            {t('gameFrame.cassetto.journey', 'Journey')}
-          </span>
-        </div>
-        <div style={{ ...zp(Z.journeyLegs), display: 'flex' }}>
-          {quest.legs.map((leg, i) => (
-            <div key={i} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: fz(25), fontWeight: 700, color: i === 1 ? '#eafff5' : C.goldHi, textShadow: '0 1px 3px rgba(0,0,0,.9)' }}>
-                {typeof leg.days === 'number' ? t('gameFrame.cassetto.legDays', { count: leg.days }) : leg.days}
-              </span>
+                ))}
+              </div>
             </div>
-          ))}
-        </div>
-        <div style={{ ...zp(Z.journeySubs), display: 'flex' }}>
-          {quest.legs.map((leg, i) => (
-            <div key={i} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 2px' }}>
-              <span style={{ fontSize: fz(16), letterSpacing: '0.13em', textTransform: 'uppercase', color: C.muted, textAlign: 'center', lineHeight: 1.15 }}>
-                {leg.label}
-              </span>
+            <div style={{ display: 'flex', margin: `${u(8)} ${u(22)} 0` }}>
+              {quest.legs.map((leg, i) => (
+                <div key={i} style={{ flex: 1, textAlign: 'center' }}>
+                  <span style={{ fontSize: fzMin(28), letterSpacing: '0.13em', textTransform: 'uppercase', color: C.muted, lineHeight: 1.15 }}>{leg.label}</span>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-
-        {/* R-339/PLAN-119 AC6: explicit journey total — derived zone in the gap
-         *  between journeySubs and riskLabel (no generated-geometry edit). */}
-        {quest.totalDays != null && (
-          <div
-            data-testid="cassetto-journey-total"
-            style={{
-              ...zp({ x: Z.journeySubs.x, y: Z.journeySubs.y + Z.journeySubs.h + 4, w: Z.journeySubs.w, h: 30 }),
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}
-          >
-            <span style={{ fontSize: fz(15), letterSpacing: '0.12em', textTransform: 'uppercase', color: C.muted }}>
-              {t('gameFrame.cassetto.journeyTotal', { count: quest.totalDays })}
-            </span>
+            {quest.totalDays != null && (
+              <div data-testid="cassetto-journey-total" style={{ textAlign: 'center', marginTop: u(6) }}>
+                <span style={{ fontSize: fzMin(26), letterSpacing: '0.12em', textTransform: 'uppercase', color: C.muted }}>
+                  {t('gameFrame.cassetto.journeyTotal', { count: quest.totalDays })}
+                </span>
+              </div>
+            )}
           </div>
-        )}
-        </div>
 
-        {/* T2 block `risk-rewards` — header + risk value + rewards + the
-         *  reserved cost slot (artifact-r004: the future food-cost preview
-         *  of S2 lands here; flagged placeholder, intentionally empty). */}
-        <div data-block="risk-rewards" style={{ display: 'contents' }}>
-        {/* Risk & Rewards header + live values */}
-        <div style={{ ...zp(Z.riskLabel), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: fz(22), fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', color: C.goldHi }}>
-            {t('gameFrame.cassetto.riskRewards', 'Risk & Rewards')}
-          </span>
-        </div>
-        <div style={{ ...zp(Z.riskValue), display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ fontSize: fz(15), letterSpacing: '0.14em', textTransform: 'uppercase', color: C.muted }}>
-            {t('gameFrame.cassetto.risk', 'Risk')}
-          </span>
-          <span style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: fz(26), fontWeight: 800, color: C.danger, textTransform: 'uppercase' }}>
-            {quest.riskLabel}
-          </span>
-        </div>
-        <div style={{ ...zp(Z.rewards), display: 'flex', gap: fz(10), alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }}>
-          {quest.rewards.map((r) => (
-            <span key={r.icon} style={{ display: 'inline-flex', alignItems: 'center', gap: fz(6), fontSize: fz(24), fontWeight: 700, color: C.goldHi }}>
-              <img src={`/assets/ui/resources/res-${r.icon}-64.webp`} alt="" style={{ width: fz(32), height: fz(32) }} draggable={false} />
-              {r.qty}
-            </span>
-          ))}
-        </div>
+          {/* ---------- risk-rewards (no text title; NO cost cell — INV-5) ---------- */}
+          <div data-block="risk-rewards" style={{ ...wellStyle, marginTop: u(10), padding: `${u(16)} ${u(20)} ${u(16)}`, display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: u(14), justifyContent: 'center' }} data-risk-state={quest.riskPending ?? 'ready'}>
+              <img src={`${ASSET}/skull.webp`} alt="" draggable={false} style={{ width: u(150), height: u(150), flexShrink: 0 }} />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: u(12), alignItems: 'flex-start' }}>
+                <BigPct pct={quest.deathPct} tone="danger" testId="cassetto-death-pct" label={t('questExpedition.forecast.death', { pct: Math.round(quest.deathPct ?? 0) })} />
+                <SkullLevel level={quest.riskPending ? undefined : quest.riskLevel} max={quest.riskLevelMax ?? 4} label={`${t('gameFrame.cassetto.risk', 'Risk')}: ${quest.riskPending === 'computing' ? '…' : quest.riskLabel}`} />
+              </div>
+            </div>
+            <div aria-hidden style={{ width: 1, alignSelf: 'stretch', margin: `${u(8)} 0`, background: `linear-gradient(180deg, transparent, ${C.gold}99, transparent)` }} />
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: u(14), justifyContent: 'center' }}>
+              <img src={`${ASSET}/chest.webp`} alt="" draggable={false} style={{ width: u(150), height: u(150), flexShrink: 0 }} />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: u(12), alignItems: 'flex-start' }}>
+                <BigPct pct={quest.successPct} tone="gold" testId="cassetto-success-pct" label={t('questExpedition.forecast.reward', { pct: Math.round(quest.successPct ?? 0) })} leading={<img src={`${ASSET}/laurel.webp`} alt="" aria-hidden draggable={false} data-laurel="" style={{ width: u(66), height: u(66), flexShrink: 0, opacity: quest.successPct != null ? 1 : 0.4, filter: quest.successPct != null ? 'drop-shadow(0 1px 2px rgba(0,0,0,.6))' : 'grayscale(.8) brightness(.7)' }} />} />
+                <span role="group" aria-label={t('gameFrame.cassetto.reward', 'Reward')} style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: u(10) }}>
+                  {quest.rewards.map((r) => (
+                    <span key={r.icon} style={{ display: 'inline-flex', alignItems: 'center', gap: u(8), fontFamily: CINZEL, fontSize: fzMin(46), fontWeight: 700, color: C.title }}>
+                      <img src={`/assets/ui/resources/res-${r.icon}-64.webp`} alt="" style={{ width: u(40), height: u(40) }} draggable={false} />
+                      {r.qty}
+                    </span>
+                  ))}
+                </span>
+              </div>
+            </div>
+          </div>
 
-        {/* T2/T3-S2 reserved cost slot (artifact-r004 "reserved cost slot"):
-         *  the food-cost consequence preview lands here — the cell sits in
-         *  the gap between risk and rewards (derived from the measured
-         *  zones, variant-adaptive). Without `quest.costPreview` it stays a
-         *  flagged, empty placeholder; in both forms it never takes input —
-         *  nothing interactive is painted on the signed art. */}
-        <div
-          data-testid="cassetto-cost-slot"
-          data-placeholder={quest.costPreview ? undefined : 'cost-preview'}
-          aria-hidden={quest.costPreview ? undefined : true}
-          role="group"
-          aria-label={quest.costPreview ? t('gameFrame.cassetto.cost', 'Cost') : undefined}
-          style={{
-            ...zp({
-              x: Z.riskValue.x + Z.riskValue.w + 12,
-              y: Z.riskValue.y,
-              w: Math.max(0, Z.rewards.x - Z.riskValue.x - Z.riskValue.w - 24),
-              h: Z.riskValue.h,
-            }),
-            pointerEvents: 'none',
-            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-          }}
-        >
-          {quest.costPreview && (
-            <>
-              <span style={{ fontSize: fz(15), letterSpacing: '0.14em', textTransform: 'uppercase', color: C.muted }}>
-                {t('gameFrame.cassetto.cost', 'Cost')}
-              </span>
-              <span
-                data-testid="cassetto-cost-value"
-                data-tone={quest.costPreview.insufficient ? 'danger' : undefined}
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: fz(5),
-                  fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: fz(24), fontWeight: 700,
-                  color: quest.costPreview.insufficient ? C.danger : C.goldHi,
-                  textShadow: '0 1px 3px rgba(0,0,0,.9)',
-                }}
+          {/* ---------- launch-cta: inline reason + the CONFIRM button ---------- */}
+          <div data-block="launch-cta" style={{ display: 'contents' }}>
+            {!canSend && disabledReason && (
+              /* Director 2026-11-20: the line under the block is NOT painted. The reason stays in the DOM for the disabled button
+               * (aria-describedby, INV-2) but is visually hidden. */
+              <div
+                id="cassetto-confirm-reason"
+                data-testid="cassetto-confirm-reason"
+                style={{ position: 'absolute', width: 1, height: 1, margin: -1, padding: 0, overflow: 'hidden', clip: 'rect(0 0 0 0)', whiteSpace: 'nowrap', border: 0 }}
               >
-                <img
-                  src={`/assets/ui/resources/res-${quest.costPreview.icon}-64.webp`}
-                  alt=""
-                  style={{ width: fz(26), height: fz(26) }}
-                  draggable={false}
-                />
-                {quest.costPreview.qty}
+                {disabledReason}
+              </div>
+            )}
+            <button
+              type="button"
+              data-testid="cassetto-confirm"
+              onClick={onConfirm}
+              disabled={!canSend}
+              aria-label={t('gameFrame.cassetto.confirm', 'CONFIRM')}
+              aria-describedby={!canSend && disabledReason ? 'cassetto-confirm-reason' : undefined}
+              style={{
+                position: 'absolute', right: u(CTA_RIGHT_GAP), bottom: u(CTA_BOTTOM_GAP), width: u(CTA_W), height: u(CTA_H),
+                padding: 0, border: 'none', background: 'transparent',
+                cursor: canSend ? 'pointer' : 'default',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}
+            >
+              <img className="confirm-art" aria-hidden alt="" draggable={false} src={`${ASSET}/cta-plaque.webp`} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }} />
+              <span className="confirm-text" style={{ position: 'relative', fontFamily: CINZEL, fontSize: fzMin(36), fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
+                {t('gameFrame.cassetto.confirm', 'CONFIRM')}
               </span>
-            </>
-          )}
-        </div>
-        </div>
-
-        {/* T2 block `launch-cta` — inline reason + the CONFIRM plaque. */}
-        <div data-block="launch-cta" style={{ display: 'contents' }}>
-        {/* R-339/PLAN-119 AC4: inline reason above the muted plaque — the stock
-         *  detail carries `quest-planner-reason-line`; the drawer renders it in
-         *  the free band right above CONFIRM (derived zone, no geometry edit). */}
-        {!canSend && disabledReason && (
-          <div
-            id="cassetto-confirm-reason"
-            data-testid="cassetto-confirm-reason"
-            style={{
-              ...zp({ x: Z.confirm.x, y: Z.confirm.y - 46, w: Z.confirm.w, h: 40 }),
-              display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4%',
-            }}
-          >
-            <span style={{ fontSize: fz(17), fontStyle: 'italic', color: C.muted, textShadow: '0 1px 2px rgba(0,0,0,.85)', textAlign: 'center', lineHeight: 1.2 }}>
-              {disabledReason}
-            </span>
+            </button>
           </div>
-        )}
-
-        {/* CONFIRM — transparent hit button directly over the clean painted emerald plaque */}
-        <button
-          type="button"
-          data-testid="cassetto-confirm"
-          onClick={onConfirm}
-          disabled={!canSend}
-          aria-label={t('gameFrame.cassetto.confirm', 'CONFIRM')}
-          aria-describedby={!canSend && disabledReason ? 'cassetto-confirm-reason' : undefined}
-          style={{
-            ...zp(Z.confirm),
-            padding: 0, border: 'none', background: 'transparent',
-            cursor: canSend ? 'pointer' : 'default',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}
-        >
-          <span className="confirm-sheen" aria-hidden />
-          <span className="confirm-text" style={{
-            fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: fz(30), fontWeight: 800,
-            letterSpacing: '0.28em', textTransform: 'uppercase',
-          }}>
-            {t('gameFrame.cassetto.confirm', 'CONFIRM')}
-          </span>
-        </button>
         </div>
       </div>
     </div>

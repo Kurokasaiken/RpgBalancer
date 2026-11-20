@@ -941,6 +941,8 @@
       "ariaLabel": "Sezioni di gioco",
       "village": "Villaggio",
       "map": "Mappa",
+      "roster": "Roster",
+      "stash": "Magazzino",
       "workshop": "Officina",
       "tavern": "Taverna",
       "locked": "Non ancora",
@@ -1200,7 +1202,10 @@
       },
       "filterEmpty": "Niente di questo tipo in magazzino",
       "detailLabel": "Dettagli oggetto",
-      "pack": "Insacca"
+      "pack": "Insacca",
+      "capacityShort": "{count} / {max}",
+      "usableInExpeditions": "Usabile nelle spedizioni",
+      "viewToggle": "Cambia vista griglia / elenco"
     },
     "buildings": {
       "stash": {
@@ -1613,6 +1618,8 @@
     },
     "cassetto": {
       "party": "Slot del gruppo",
+      "prevSeat": "Posti precedenti",
+      "nextSeat": "Posti successivi",
       "supplies": "Provviste",
       "food": "Cibo",
       "openRoster": "Apri il roster",
@@ -1830,6 +1837,10 @@
       "bonusForza": "Bonus Forza",
       "bonusPerc": "Bonus Percezione",
       "healing": "Cura",
+      "essence": "Essenza di Vigore",
+      "talisman": "Talismano Fortunato",
+      "blade": "Lama del Duellante",
+      "aegis": "Sigillo Protettivo",
       "usePotion": "Pozione → cura {name}"
     },
     "loot": "Bottino: {items}",
@@ -2032,6 +2043,10 @@
         "rope": "+15 ai check di Forza o Costituzione",
         "healing": "+20 HP al membro più ferito — si usa prima di un check",
         "potion": "Cura completamente un membro ferito",
+        "essence": "+10 alle prove di Costituzione",
+        "talisman": "+10 alle prove di Carisma",
+        "blade": "+10 alle prove di Agilità",
+        "aegis": "+10 alle prove di Intelligenza",
         "banner": "Vessillo del Guardiano — lo porta il leader: −6% ferita, −4% morte per ogni altro membro finché resta in piedi"
       }
     },

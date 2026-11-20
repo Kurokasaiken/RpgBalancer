@@ -185,6 +185,13 @@ export const QuestPoiSchema = z
      */
     tier: z.enum(['normal', 'main']).optional(),
     /**
+     * Per-quest expedition bag capacity (Director 2026-11-20: «le tasche
+     * variano per quest»). Absent = the global `QUEST_STASH.bagSlots`
+     * default. The stash ledger stays a sparse per-POI array — this is the
+     * authored well COUNT the planner paints and `assign` enforces.
+     */
+    bagSlots: z.number().int().min(1).max(8).optional(),
+    /**
      * PLAN-053 journey contract — authored andata/svolgimento/ritorno fasi.
      * Optional and strictly additive: absent = legacy non-journey run
      * (`fasi === null` sentinel; the offer keeps current behaviour).
@@ -247,6 +254,8 @@ export const QUEST_POIS: readonly QuestPoi[] = z.array(QuestPoiSchema).parse([
       required: ['goblin-slot-leader'],
       optional: ['goblin-slot-member-1', 'goblin-slot-member-2', 'goblin-slot-bodyguard'],
     },
+    /* Nearby hunt — the standard 3 wells. */
+    bagSlots: 3,
     /* R-200 (D-1): the goblin camp is a repeatable hunt — its report never
      *  consumes the POI, so once a settled run is cleared the offer goes back
      *  to `available` and can be launched again (QUEST_RULES §lifecycle). */
@@ -273,6 +282,8 @@ export const QUEST_POIS: readonly QuestPoi[] = z.array(QuestPoiSchema).parse([
       required: ['rovine-slot-leader'],
       optional: ['rovine-slot-member-1', 'rovine-slot-member-2', 'rovine-slot-esploratore'],
     },
+    /* The ruins sit 3 days out — a deeper pack for the longer run. */
+    bagSlots: 4,
     /* PLAN-053 T-004: journey-enabled — 3 game days each leg (the ruins
      *  sit further out). The wounded man waits mid-route (parked decision),
      *  'rv-fine' lands at the village. */

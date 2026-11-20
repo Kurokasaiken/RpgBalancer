@@ -109,7 +109,9 @@ describe('R-337 — /game wiring feeds the REAL sparse ledger bag', () => {
     expect(src).toMatch(/onReleaseItem:\s*p\.onToggleItem/);
     expect(src).toMatch(/onOpenStash:\s*p\.onOpenStash/);
     /* The store bag is sparse — slots keep their position, never a dense
-     * re-index of `selectedItemIds`. */
-    expect(src).toMatch(/emptyStashBag\(\)\.map/);
+     * re-index of `selectedItemIds`. Per-quest capacity (D 2026-11-20):
+     * the well count comes from `poi.bagSlots`, so `emptyStashBag` is fed
+     * the resolved capacity, not the global default. */
+    expect(src).toMatch(/emptyStashBag\(capacity\)\.map/);
   });
 });

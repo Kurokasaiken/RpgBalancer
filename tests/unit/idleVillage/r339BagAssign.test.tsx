@@ -1,9 +1,10 @@
 /**
  * R-339 / PLAN-119 T3-S2 — «stash assignment + consequence preview».
  *
- * The expedition drawer's reserved cost cell (`cassetto-cost-slot`) now
- * paints the food-cost preview (party × days × per-resident rate, danger
- * tone when the village stock can't cover it), and the bound
+ * The expedition drawer paints NO dedicated cost cell (R-357 rebuild, D-1
+ * amended contract `cassetto-no-cost-cell`: the food cost lives in the
+ * planner's supplies flow, `expeditionFoodCost` stays the pure helper), and
+ * the bound
  * `VillageStashPanel` rows announce their assign eligibility BEFORE the
  * click (`data-assign-state`: eligible | packed | bagFull) plus a
  * localized bag-full hint — all read off the same sparse ledger bag the
@@ -101,7 +102,10 @@ describe('T3-S2 — bagAssignEligibility mirrors the ledger reject reasons', () 
   });
 });
 
-describe('T3-S2 — the reserved cost cell paints the preview', () => {
+// INV:cassetto-no-cost-cell — R-357 rebuild / D-1 (statement amended):
+// the cost lives in the planner's supplies flow — the cassetto paints NO
+// dedicated cell, even when `quest.costPreview` is provided.
+describe('T3-S2 → R-357 — no cost cell is ever painted (INV-5 amended)', () => {
   const renderCassetto = (quest: CassettoQuest) =>
     render(
       <div style={{ position: 'relative', width: 356, height: 900 }}>
@@ -109,27 +113,15 @@ describe('T3-S2 — the reserved cost cell paints the preview', () => {
       </div>,
     );
 
-  it('renders icon + qty inside cassetto-cost-slot when quest.costPreview is set', () => {
+  it('paints no cassetto-cost-slot / cassetto-cost-value with a costPreview', () => {
     renderCassetto({ ...QUEST, costPreview: { icon: 'food', qty: '12' } });
-    const cell = screen.getByTestId('cassetto-cost-slot');
-    const value = screen.getByTestId('cassetto-cost-value');
-    expect(cell).toContainElement(value);
-    expect(value).toHaveTextContent('12');
-    /* The filled cell is real content — the placeholder flag is lifted. */
-    expect(cell).not.toHaveAttribute('data-placeholder');
-    expect(cell).not.toHaveAttribute('aria-hidden');
+    expect(screen.queryByTestId('cassetto-cost-slot')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('cassetto-cost-value')).not.toBeInTheDocument();
   });
 
-  it('flags the danger tone when the village stock cannot cover the cost', () => {
-    renderCassetto({ ...QUEST, costPreview: { icon: 'food', qty: '30', insufficient: true } });
-    expect(screen.getByTestId('cassetto-cost-value')).toHaveAttribute('data-tone', 'danger');
-  });
-
-  it('stays a flagged empty placeholder without a costPreview', () => {
+  it('paints no cost cell without a costPreview either', () => {
     renderCassetto(QUEST);
-    const cell = screen.getByTestId('cassetto-cost-slot');
-    expect(cell).toHaveAttribute('data-placeholder', 'cost-preview');
-    expect(cell).toHaveAttribute('aria-hidden', 'true');
+    expect(screen.queryByTestId('cassetto-cost-slot')).not.toBeInTheDocument();
     expect(screen.queryByTestId('cassetto-cost-value')).not.toBeInTheDocument();
   });
 });
@@ -195,12 +187,15 @@ describe('T3-S2 — /game wiring feeds the REAL ledger and config rate', () => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     require('node:fs').readFileSync(require('node:path').resolve(__dirname, '../../../', p), 'utf8') as string;
 
-  it('HudRealCassettoDetail computes the preview from party × days × configured rate', () => {
+  // INV:hud-real-cassetto.INV-5 — the Detail no longer computes the
+  // dedicated cost cell (R-357 amended: cost lives in the supplies flow).
+  it('HudRealCassettoDetail paints no cost cell — the sim feeds risk %s instead', () => {
     const src = read('src/ui/idleVillage/hudReal/HudRealCassettoDetail.tsx');
-    expect(src).toMatch(/expeditionFoodCost\(/);
-    expect(src).toMatch(/foodConsumptionPerResidentPerDay/);
-    expect(src).toMatch(/costPreview/);
-    expect(src).toMatch(/insufficient/);
+    expect(src).not.toMatch(/expeditionFoodCost\(/);
+    expect(src).not.toMatch(/costPreview:\s*\{/);
+    /* Director 2026-11-20: the sim feeds % morte / % riuscita. */
+    expect(src).toMatch(/anyDeathPct/);
+    expect(src).toMatch(/outcomePct\.reward/);
   });
 
   it('VillageStashPanel derives eligibility from the shared helper — no second authority', () => {
@@ -210,9 +205,10 @@ describe('T3-S2 — /game wiring feeds the REAL ledger and config rate', () => {
     expect(src).toMatch(/stash-bag-full-hint/);
   });
 
-  it('the lab host wires the same costPreview semantics for witnesses', () => {
+  it('the lab host mirrors the same sim-derived fields (no costPreview)', () => {
     const src = read('src/ui/idleVillage/hudReal/HudRealCassettoHost.tsx');
-    expect(src).toMatch(/expeditionFoodCost\(/);
-    expect(src).toMatch(/costPreview/);
+    expect(src).not.toMatch(/expeditionFoodCost\(/);
+    expect(src).toMatch(/anyDeathPct/);
+    expect(src).toMatch(/outcomePct\.reward/);
   });
 });

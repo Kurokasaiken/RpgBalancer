@@ -1,4 +1,7 @@
 #!/usr/bin/env sh
+
+# worktime-guard (personal repo work-hours block)
+GUARD="$HOME/.config/git-personal-guard/worktime-guard.sh"; [ -x "$GUARD" ] && "$GUARD" pre-commit "$@" || exit 1
 # PLAN-122 T-4 — governance pre-commit gate.
 #
 # 1. lint-staged: eslint --fix on the configured globs (existing config, now wired).

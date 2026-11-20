@@ -94,7 +94,7 @@ export const SLOT_VARIANT_SPECS: Record<SlotVariant, SlotVariantSpec> = {
  * byte-identical. Presets other than `stock` are LAB-ONLY: do not pass them
  * from production surfaces until a Director ruling promotes one.
  */
-export type BezelPreset = 'stock' | 'a' | 'b' | 'c' | 'ab' | 'zanara' | 'zanara2' | 'draghi';
+export type BezelPreset = 'stock' | 'a' | 'b' | 'c' | 'ab' | 'zanara' | 'zanara2' | 'draghi' | 'draghiGlifo';
 
 /**
  * Resolved paint knobs for a bezel preset. All values are SVG units of the
@@ -211,6 +211,25 @@ export interface BezelKnobs {
   bandImageScale?: number;
 }
 
+/** R-357: the draghi knobs, shared by `draghi` (dragon emblem — SAVED, untouched) and `draghiGlifo`. */
+const DRAGHI_KNOBS: BezelKnobs = {
+    bandImageHref: '/assets/ui/hud-real/ghiera-draghi.webp',
+    bandImageHoleFrac: 0.651,
+    hidePaintedBand: true,
+    hideGemPointer: true,
+    toothAngles: [],
+    bezelOpenScale: 1.18,
+    /* Director-tuned ratio (lab sliders): the ring's gold inner edge lands on
+     * the medallion rim — RELATIVE factors, so the proportion holds at any
+     * slot size (cassetto reuse). Ghiera ×1.15 / medaglione ×0.9. */
+    portraitScale: 0.9,
+    bandImageScale: 1.15,
+    medallionImageHref: '/assets/ui/hud-real/medaglione-battezzato-v3-frame.webp',
+    medallionImageRingFrac: 0.743,
+    medallionImageHoleFrac: 0.674,
+    bandImageTopHref: '/assets/ui/hud-real/ghiera-draghi-top.webp',
+  };
+
 export const BEZEL_PRESETS: Record<BezelPreset, BezelKnobs> = {
   stock: {},
   /** A — optical rebalance: one claw per diagonal quadrant, mirrored rim light, centred shadow. */
@@ -274,23 +293,11 @@ export const BEZEL_PRESETS: Record<BezelPreset, BezelKnobs> = {
    *  approved castone composite (outer braid removed) mounted inside the real
    *  bezel group — same slam, same open pose (scale 1.18 / -30°), same tooth
    *  mechanics; teeth rest visible-retracted on the rim while open. */
-  draghi: {
-    bandImageHref: '/assets/ui/hud-real/ghiera-draghi.webp',
-    bandImageHoleFrac: 0.651,
-    hidePaintedBand: true,
-    hideGemPointer: true,
-    toothAngles: [],
-    bezelOpenScale: 1.18,
-    /* Director-tuned ratio (lab sliders): the ring's gold inner edge lands on
-     * the medallion rim — RELATIVE factors, so the proportion holds at any
-     * slot size (cassetto reuse). Ghiera ×1.15 / medaglione ×0.9. */
-    portraitScale: 0.9,
-    bandImageScale: 1.15,
-    medallionImageHref: '/assets/ui/hud-real/medaglione-battezzato-v3-frame.webp',
-    medallionImageRingFrac: 0.743,
-    medallionImageHoleFrac: 0.674,
-    bandImageTopHref: '/assets/ui/hud-real/ghiera-draghi-top.webp',
-  },
+  draghi: DRAGHI_KNOBS,
+  /** R-357 / PLAN-125 (Director 2026-11-17: «il drago al centro degli slot è bello, salviamolo … ma un simbolo al secondo del tipo slot è meglio»):
+   *  the same ghiera with the dragon painted out of the face disc and the gold graded onto the nav champagne
+   *  (`scripts/build-ghiera-glifo.py`), so the empty seat shows its role glyph. The dragon band stays archived as `draghi`. */
+  draghiGlifo: { ...DRAGHI_KNOBS, bandImageHref: '/assets/ui/hud-real/ghiera-glifo.webp', bandImageTopHref: '/assets/ui/hud-real/ghiera-glifo-top.webp' },
 };
 
 /** Blueprint `slot.role` → engraved glyph id for the empty hud64 cavity. */
@@ -1484,6 +1491,8 @@ export const SlotV12Renderer: React.FC<SlotV12RendererProps> = ({
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', overflow: 'visible', pointerEvents: 'none', zIndex: 20 }}
         >
           {seatCycle}
+          {/* R-357: with a painted band the face disc (z-5) covers the cavity glyph — repeat it above the disc. */}
+          {bezel.bandImageHref ? roleGlyph : null}
           {gemPointer}
           {debugViz && renderDebugLabel('GHIERA', -geometry.R_BZ_OUT - 26)}
         </svg>

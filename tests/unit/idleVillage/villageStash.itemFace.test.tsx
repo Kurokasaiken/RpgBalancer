@@ -43,13 +43,16 @@ const renderPanel = () =>
 // INV:village-stash-panel.INV-1 — ogni riga shelf mostra la stessa item-face
 // del planner (tile lacquer + badge angolare ×N) e il tooltip condiviso.
 describe('village stash — shared item-face (village-stash-panel.INV-1)', () => {
-  it('every shelf row shows the shared tile + corner ×N badge', () => {
+  it('every shelf row shows the painted icon + corner ×N badge (no inner tile — the well IS the frame)', () => {
     renderPanel();
     const list = screen.getByRole('list');
     const rows = within(list).getAllByRole('listitem');
     expect(rows).toHaveLength(VILLAGE_STASH_CONFIG.items.length);
     VILLAGE_STASH_CONFIG.items.forEach(({ itemId, qty }, i) => {
-      expect(within(rows[i]).getByTestId('stash-item-tile'), `${itemId} tile`).toBeInTheDocument();
+      /* Director 2026-11-20: no tile inside the well (no stacked squares) —
+       *  the face is the icon (painted img or engraved svg) + the ×N badge. */
+      expect(within(rows[i]).queryByTestId('stash-item-tile'), `${itemId} inner tile`).toBeNull();
+      expect(rows[i].querySelector('img,svg'), `${itemId} icon`).toBeTruthy();
       expect(within(rows[i]).getByTestId('stash-qty-badge'), `${itemId} badge`).toHaveTextContent(`×${qty}`);
     });
   });

@@ -101,7 +101,8 @@ describe('R-339 T2 — the drawer mounts the six named blocks of the mockup', ()
     expect(container.querySelector('[data-block="party-slots"] [data-testid="resident-slot-rack-stub"]')).toBeInTheDocument();
     expect(container.querySelector('[data-block="bag-slots"] [data-cassetto-bag]')).toBeInTheDocument();
     expect(container.querySelector('[data-block="journey-strip"] [data-testid="cassetto-journey-total"]')).toBeInTheDocument();
-    expect(container.querySelector('[data-block="risk-rewards"]')).toHaveTextContent('High');
+    // R-357 (2026-11-20): the risk is a row of skulls — its band name lives in the accessible name
+    expect(container.querySelector('[data-block="risk-rewards"] [data-testid="cassetto-risk-value"]')?.getAttribute('aria-label')).toContain('High');
     expect(container.querySelector('[data-block="launch-cta"] [data-testid="cassetto-confirm"]')).toBeInTheDocument();
   });
 

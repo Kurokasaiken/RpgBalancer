@@ -213,13 +213,13 @@ describe('R-339 T8 — same planner surface, six named blocks preserved', () => 
     expect(container.querySelector('[data-block="launch-cta"] [data-testid="cassetto-confirm"]')).toBeInTheDocument();
   });
 
-  // INV:expedition-bottom-sheet.INV-4
-  it('the reserved cost slot keeps its flagged-placeholder contract', () => {
+  /* INV:expedition-bottom-sheet.INV-4 (statement amended R-357/D-1,
+   *  sync:bug) — the sheet, like the column, paints no cost cell (the cost
+   *  lives in the supplies flow). */
+  it('paints no cost cell (INV-5 parity with the column)', () => {
     const { container } = renderSheet();
-    const slot = container.querySelector('[data-testid="cassetto-cost-slot"]');
-    expect(slot).toBeInTheDocument();
-    expect(slot).toHaveAttribute('data-placeholder', 'cost-preview');
-    expect(slot).toBeEmptyDOMElement();
+    expect(container.querySelector('[data-testid="cassetto-cost-slot"]')).not.toBeInTheDocument();
+    expect(container.querySelector('[data-testid="cassetto-cost-value"]')).not.toBeInTheDocument();
   });
 
   // INV:expedition-bottom-sheet.INV-4

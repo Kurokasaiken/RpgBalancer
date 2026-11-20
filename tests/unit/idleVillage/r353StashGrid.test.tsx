@@ -45,13 +45,15 @@ const renderPanel = () =>
 // the shared StashItemTile face + corner ×N badge + the item's name/description as
 // sr-only text; a radiogroup of kind tabs derived from the config filters the grid.
 describe('stash shelf grid (INV-3)', () => {
-  it('renders every shelf row as a tile cell carrying tile + qty badge + sr-only name/desc', () => {
+  it('renders every shelf row as a well cell carrying icon + qty badge + sr-only name/desc', () => {
     renderPanel();
     const list = screen.getByRole('list');
     const rows = within(list).getAllByRole('listitem');
     expect(rows).toHaveLength(CFG.items.length);
     rows.forEach((row) => {
-      expect(within(row).getByTestId('stash-item-tile')).toBeInTheDocument();
+      /* Director 2026-11-20: single-frame cell — no inner tile, icon + badge only. */
+      expect(within(row).queryByTestId('stash-item-tile')).toBeNull();
+      expect(row.querySelector('img,svg')).toBeTruthy();
       expect(within(row).getByTestId('stash-qty-badge')).toBeInTheDocument();
     });
     CFG.items.forEach(({ itemId, qty }, i) => {
@@ -91,8 +93,9 @@ describe('stash item detail card (INV-4)', () => {
     const detail = screen.getByTestId('stash-detail');
     const first = defaultQuestItems[CFG.items[0].itemId];
     expect(detail).toHaveTextContent(first.labelKey);
-    expect(detail).toHaveTextContent('questExpedition.bag.stock');
-    expect(within(detail).getByTestId('stash-qty-badge')).toHaveTextContent(`×${CFG.items[0].qty}`);
+    /* R-363 detail card: stock reads as the «N in store» line, not a badge. */
+    expect(detail).toHaveTextContent(`${CFG.items[0].qty} in store`);
+    expect(detail).toHaveTextContent('gameFrame.stash.usableInExpeditions');
   });
 
   it('updates the preview when a cell is hovered', () => {
@@ -129,6 +132,12 @@ describe('stash item detail card (INV-4)', () => {
     const frame = container.querySelector('[data-panel-frame="ornate"]') as HTMLElement;
     expect(frame).toBeTruthy();
     expect(frame.getAttribute('aria-hidden')).toBe('true');
-    expect(frame.querySelectorAll('img').length).toBe(5);
+    /* PLAN-127 slice-kit: the painted frame now renders from the generated
+     *  manifest (data-frame-manifest), not the legacy 5-img ornate set
+     *  (4 corners + chest clasp — clasp removed by ruling). */
+    expect(frame.getAttribute('data-frame-manifest')).toBeTruthy();
+    /* ≥4: the manifest's fixed corners; edges may be culled at jsdom's
+     *  zero-size rects. */
+    expect(frame.querySelectorAll('img').length).toBeGreaterThanOrEqual(4);
   });
 });

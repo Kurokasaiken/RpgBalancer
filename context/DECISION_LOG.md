@@ -877,3 +877,17 @@ Stato congelato dal vivo (no query param, 1440×900 + 1280×720):
 - **Fix controlli header (regressioni):** `RosterSortIcon` migrato a `data-ctl="round"` + `EngravedIcon cmd-sort` (era il disco vetroso legacy); `::before` speculare e `box-shadow` dei bottoni generici skin spenti sui controlli dipinti (`[data-ctl]`); `round-disabled` ripristinato nel blocco `[data-hud-controls]` (il base override lo mascherava).
 - **Shelf Stash 3×2 (D-20261120-piastrina implementata):** `panel.shelfColumns=3`, `shelfVisibleRows=2`, `shelfRowPx=46` in `villageStashConfig`; `naturalHeightPx` 340→400 (gameFrameConfig); `detailMinPanelHeightPx` 240→360 così la detail card convive con la griglia senza clip (a 1280 resta nascosta: griglia protagonista).
 **Fonte:** sessione Devin 2026-11-21.
+
+## 2026-11-20 — Victory/Reward (PLAN-125 7d): fork risolto «A — pergamena», banda condivisa montata
+
+**Da:** Fase 7d chiedeva «palette Nav + cornice nuova + banda condivisa» sul report di fine
+run; tre trattamenti candidati catturati live su `/game` da run reale
+(`.mw/runs/20261120-victory-fork/`): A pergamena firmata, B pergamena dentro la cornice
+condivisa, C report in lingua pannelli (campo smalto + cornice + pezzi rimontati).
+**A:** shipping = **A — pergamena battezzata** (INV-1 invariato, nessun amend); il fork
+resta dev-gated su `?victory=framed|panel` (+ swap `?frame=` come i pannelli) per
+iterazioni future — non genera mockup. La **banda condivisa** `HudScrollBand` è montata
+sulle 3 zone scroll (crew/rewards/echoes) anche sullo shipping: stessa banda dei pannelli,
+variante **`a` smalto/gemma** confermata (succede alla B «oro inciso», che resta il golden
+registrato). Record conversione `test-results/slicekit/victory.json`; INV-6 permanente.
+**Fonte:** ruling Director 2026-11-20 (fork question in sessione).

@@ -15,53 +15,44 @@ invariants:
     source: plan
     source_ref: PLAN-119
     statement: >-
-      Il bottom-sheet expedition è non-modale (AC9): nessuno scrim, nessun focus trap, mai
-      `role="dialog"`/`aria-modal`. Il wrapper copre il viewport con `pointer-events: none`
-      e solo il box dello sheet prende input (`pointer-events: auto`) — la mappa resta
-      interattiva ovunque fuori dallo sheet.
+      Il bottom-sheet expedition è non-modale (AC9): nessuno scrim, nessun focus trap, mai `role="dialog"`/`aria-modal`.
+      Il wrapper copre il viewport con `pointer-events: none` e solo il box dello sheet prende input (`pointer-events:
+      auto`) — la mappa resta interattiva ovunque fuori dallo sheet.
     test_refs:
       - tests/unit/idleVillage/r339ExpeditionSheet.test.tsx
   - id: expedition-bottom-sheet.INV-2
     source: plan
     source_ref: PLAN-119
     statement: >-
-      Lo sheet ha tre detent dai token `cassettoLayoutConfig.bottomSheet` (D5): `peek`
-      (`peekPx` + `env(safe-area-inset-bottom)` — la riga CTA visibile), `half`
-      (`halfFraction` vh), `full` (`fullFraction` vh). Il detent vive in `useExpeditionSheet`
-      (Zustand) e persiste tra remount come intenzione utente; il chevron della strip
-      toggla peek ⇄ expanded come affordance non-drag.
+      Lo sheet ha tre detent dai token `cassettoLayoutConfig.bottomSheet` (D5): `peek` (`peekPx` +
+      `env(safe-area-inset-bottom)` — la riga CTA visibile), `half` (`halfFraction` vh), `full` (`fullFraction` vh). Il
+      detent vive in `useExpeditionSheet` (Zustand) e persiste tra remount come intenzione utente; il chevron della
+      strip toggla peek ⇄ expanded come affordance non-drag.
     test_refs:
       - tests/unit/idleVillage/r339ExpeditionSheet.test.tsx
   - id: expedition-bottom-sheet.INV-3
     source: plan
     source_ref: PLAN-119
     statement: >-
-      Il drag esiste SOLO sulla strip handle+header (`touch-action: none`, ≥44px):
-      pointerdown sulla strip traccia il gesto (live height clampata peek↔full) e il
-      rilascio snap al detent più vicino. Il body scrolla e non dragga mai; i figli
-      interattivi della strip (CONFIRM, chevron) non iniziano un drag.
+      Il drag esiste SOLO sulla strip handle+header (`touch-action: none`, ≥44px): pointerdown sulla strip traccia il
+      gesto (live height clampata peek↔full) e il rilascio snap al detent più vicino. Il body scrolla e non dragga mai;
+      i figli interattivi della strip (CONFIRM, chevron) non iniziano un drag.
     test_refs:
       - tests/unit/idleVillage/r339ExpeditionSheet.test.tsx
   - id: expedition-bottom-sheet.INV-4
-    source: plan
-    source_ref: PLAN-119
+    source: director-spec
+    source_ref: R-357
     statement: >-
-      Stessa superficie planner del cassetto, stessi sei blocchi nominati `data-block`
-      (`quest-banner`, `party-slots`, `bag-slots`, `journey-strip`, `risk-rewards`,
-      `launch-cta`) e stessi testid (`cassetto-confirm`, `cassetto-confirm-reason`,
-      `cassetto-journey-total`, `cassetto-cost-slot`, `bag-slot-*`, `loadout-item-*`):
-      `launch-cta` (reason inline + CONFIRM con `--skin-cassetto-cta-*` da `cta.vars`)
-      siede nella strip sempre visibile, gli altri blocchi nel body scrollabile. La cella
-      costo mantiene il contratto segnaposto flaggato; rack `ResidentSlotRack` reale.
+      R-357/D-1 amended: nessuna cella costo nel sheet (il costo vive nel flusso supplies) — rimossa l'asserzione BASE
+      del placeholder flaggato
     test_refs:
       - tests/unit/idleVillage/r339ExpeditionSheet.test.tsx
   - id: expedition-bottom-sheet.INV-5
     source: plan
     source_ref: PLAN-119
     statement: >-
-      Occupazione onesta: l'altezza misurata dello sheet pubblica
-      `useGameLayoutInsets.insets.bottom` (fallback al token del detent quando la misura
-      non è disponibile); `insets.right` resta sempre 0 in questa banda (la superficie
+      Occupazione onesta: l'altezza misurata dello sheet pubblica `useGameLayoutInsets.insets.bottom` (fallback al token
+      del detent quando la misura non è disponibile); `insets.right` resta sempre 0 in questa banda (la superficie
       laterale non esiste); smontaggio o `visible=false` → 0.
     test_refs:
       - tests/unit/idleVillage/r339ExpeditionSheet.test.tsx
@@ -69,20 +60,18 @@ invariants:
     source: plan
     source_ref: PLAN-119
     statement: >-
-      Touch targets e testo da AC10: strip handle, CONFIRM e chevron ≥`handlePx` (44);
-      slot party/bag a `slotPx`; testo utente ≥`minTextPx` (16) in tutto lo sheet.
+      Touch targets e testo da AC10: strip handle, CONFIRM e chevron ≥`handlePx` (44); slot party/bag a `slotPx`; testo
+      utente ≥`minTextPx` (16) in tutto lo sheet.
     test_refs:
       - tests/unit/idleVillage/r339ExpeditionSheet.test.tsx
   - id: expedition-bottom-sheet.INV-7
     source: plan
     source_ref: PLAN-119
     statement: >-
-      Mutua esclusione delle superfici laterali ≤`bottomSheet.maxWidthPx` (1100,
-      boundary incluso — verificato a 1024 e 1100, AC10): `ExpeditionDrawer` in quella
-      banda monta lo sheet via `useExpeditionSheetMode` e la colonna firmata + entrambi
-      i chip non montano mai, anche con il drawer ripiegato; la pagina ne monte
-      aucune surface au repos (R-351, `ExpeditionEdgeTab` supprimé). Sopra 1100 il
-      drawer mantiene la colonna.
+      Mutua esclusione delle superfici laterali ≤`bottomSheet.maxWidthPx` (1100, boundary incluso — verificato a 1024 e
+      1100, AC10): `ExpeditionDrawer` in quella banda monta lo sheet via `useExpeditionSheetMode` e la colonna firmata +
+      entrambi i chip non montano mai, anche con il drawer ripiegato; la pagina ne monte aucune surface au repos (R-351,
+      `ExpeditionEdgeTab` supprimé). Sopra 1100 il drawer mantiene la colonna.
     test_refs:
       - tests/unit/idleVillage/r339ExpeditionSheet.test.tsx
 ---

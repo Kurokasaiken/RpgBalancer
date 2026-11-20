@@ -59,6 +59,17 @@ invariants:
       lore/info/titles/diseases party-level, tutto via i18n.
     test_refs:
       - tests/unit/idleVillage/hudRealVictoryReward.test.tsx
+  - id: hudreal-victory-reward.INV-6
+    source: plan
+    source_ref: PLAN-125
+    statement: >-
+      Le tre zone di scorrimento (crew rows, rewards rows, echoes) portano
+      `data-hud-scroll-band` e montano il `HudScrollBand` condiviso dei pannelli
+      come sibling dentro l'antenato posizionato `.skin-scope` — stessa banda,
+      stessa variante da `HUD_SCROLL_BAND` (ruling smalto/gemma A 2026-11-20);
+      la banda nativa resta nascosta e appare solo a overflow reale.
+    test_refs:
+      - tests/unit/idleVillage/hudRealVictoryReward.test.tsx
 ---
 # hudreal-victory-reward
 

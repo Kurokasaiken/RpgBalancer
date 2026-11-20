@@ -1,0 +1,1 @@
+../../../mind-weaver/docs/SLICEKIT.md
