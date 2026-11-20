@@ -1,0 +1,1 @@
+../../../mind-weaver/docs/MOCKUP-TO-COMPONENT.md

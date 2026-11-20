@@ -1,0 +1,84 @@
+{
+  "specVersion": 1,
+  "surface": "panel-frame5-minimal",
+  "comment": "PLAN-127 A/B strategy MINIMAL — reproduces scripts/build-panel-frame5-assets.py (R-357 frame set v5, path A: golden sliced directly) with the smallest field surface. Edges: opaque wrapBlend tiles, oracle-exact. Corners+emblem: oracle keyart() = colour-class key + despeckle + 4-side border soften — NOT expressible in specVersion 1; emitted opaque (no key) so the edges stay oracle-exact (source.key is global and would mis-key the opaque tiles). See test-results/slicekit/night-shift/frame5-minimal-findings.md.",
+  "source": {
+    "path": ".mw/specs/expedition-ui/refs/mockup-r357-cornici-aperta.png"
+  },
+  "output": {
+    "dir": "public/assets/ui/hud-real/slicekit/panel-frame5-minimal"
+  },
+  "slices": [
+    {
+      "id": "corner-tl",
+      "role": "corner",
+      "anchor": "tl",
+      "crop": [2, 96, 66, 156],
+      "stretch": "none"
+    },
+    {
+      "id": "corner-tr",
+      "role": "corner",
+      "anchor": "tr",
+      "crop": [306, 100, 352, 152],
+      "stretch": "none"
+    },
+    {
+      "id": "corner-bl",
+      "role": "corner",
+      "anchor": "bl",
+      "crop": [10, 432, 44, 464],
+      "stretch": "none"
+    },
+    {
+      "id": "corner-br",
+      "role": "corner",
+      "anchor": "br",
+      "crop": [312, 432, 348, 464],
+      "stretch": "none"
+    },
+    {
+      "id": "edge-top",
+      "role": "edge-x",
+      "anchor": "top",
+      "crop": [155, 108, 300, 147],
+      "stretch": "tile",
+      "tileSafe": true,
+      "wrapBlend": { "overlap": 30 }
+    },
+    {
+      "id": "edge-left",
+      "role": "edge-y",
+      "anchor": "left",
+      "crop": [15, 155, 44, 405],
+      "stretch": "tile",
+      "tileSafe": true,
+      "wrapBlend": { "overlap": 30 }
+    },
+    {
+      "id": "edge-right",
+      "role": "edge-y",
+      "anchor": "right",
+      "crop": [329, 160, 341, 420],
+      "stretch": "tile",
+      "tileSafe": true,
+      "wrapBlend": { "overlap": 30 }
+    },
+    {
+      "id": "edge-bottom",
+      "role": "edge-x",
+      "anchor": "bottom",
+      "crop": [55, 447, 320, 457],
+      "stretch": "tile",
+      "tileSafe": true,
+      "wrapBlend": { "overlap": 30 }
+    },
+    {
+      "id": "emblem-chest",
+      "role": "ornament",
+      "anchor": "explicit",
+      "crop": [38, 458, 100, 504],
+      "stretch": "none"
+    }
+  ]
+}

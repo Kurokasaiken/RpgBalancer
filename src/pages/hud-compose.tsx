@@ -246,7 +246,7 @@ export default function HudComposePage() {
           drawer's top-interior navy well (R-335), mounted by the host itself —
           no separate overlay. The host manages its own drawer geometry. */}
       {params.get('comp') === 'cassetto' && (
-        <div data-hudslot="cassetto" style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '50vh', zIndex: 7 }}>
+        <div data-hudslot="cassetto" style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '62vh', zIndex: 7 }}>
           <HudRealCassettoHost />
         </div>
       )}
@@ -480,5 +480,7 @@ const SLOTS_VIEWS: Record<string, HudView[]> = {
 
 function NavDemo({ onRecenter }: { onRecenter: () => void }) {
   const [active, setActive] = useState('map');
-  return <HudRealNav navItems={DEFAULT_GAME_FRAME_CONFIG.navItems} activeNavId={active} onNavSelect={setActive} onRecenter={onRecenter} />;
+  /* showLabels from gamePage config (false on /game) — the lab must mirror
+   * production: engraved nav labels are off, tooltips carry the voice. */
+  return <HudRealNav navItems={DEFAULT_GAME_FRAME_CONFIG.navItems} activeNavId={active} onNavSelect={setActive} onRecenter={onRecenter} showLabels={DEFAULT_GAME_FRAME_CONFIG.gamePage.navShowLabels} />;
 }

@@ -7,16 +7,16 @@
  * `resourceItems` is an extra prop the page injects (the REAL village resource
  * readout) — the signed frame paints its own header well for it.
  */
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { QuestExpeditionDetailProps } from '@/ui/idleVillage/quests/QuestExpeditionDetail';
 import { journeyFasiOf } from '@/ui/idleVillage/quests/questJourney';
 import { expeditionTotalDays } from '@/ui/idleVillage/quests/questExpedition';
 import { DEFAULT_IDLE_VILLAGE_CONFIG } from '@/balancing/config/idleVillage/defaultConfig';
 import { DANGER_BANDS } from '@/balancing/config/idleVillage/quests/questPois';
+import { QUEST_STASH } from '@/balancing/config/idleVillage/quests/questStash';
 import type { ResourceReadoutItem } from '@/ui/idleVillage/components/gameFrame/ResourceReadout';
 import { ExpeditionDrawer } from '@/ui/idleVillage/components/gameFrame/ExpeditionDrawer';
-import { expeditionFoodCost } from '@/ui/idleVillage/components/gameFrame/expeditionBagAssign';
 import { emptyStashBag, useVillageStashStore } from '@/ui/idleVillage/store/useVillageStashStore';
 import type { CassettoLoadout, CassettoQuest } from './HudRealCassetto';
 
@@ -43,6 +43,15 @@ export const HudRealCassettoDetail: React.FC<HudRealCassettoDetailProps> = (p) =
     /* Localized danger band — same `bandById` + i18nKey path the stock detail
      *  uses (was: the raw band id leaked through). */
     const dangerBand = bandId ? DANGER_BANDS.find((b) => b.id === bandId) : undefined;
+    /* R-357 2h + Director 2026-11-20: the party's own Monte Carlo sim is the
+     *  ONLY source for the pending state and the % readouts — `anyDeathPct`
+     *  lands next to the risk value ("morte"), `outcomePct.reward` next to
+     *  the reward ("riuscita"). While the sim is pending both stay absent
+     *  and the risk line paints muted (`riskPending`), never danger red. */
+    const sim =
+      estimate !== 'computing' && estimate !== 'incomplete' && 'sim' in estimate
+        ? estimate.sim
+        : undefined;
     /* Middle leg + explicit total = the REAL expedition estimate (same
      *  `expeditionTotalDays` the stock detail uses), never placeholders. */
     const { site: siteDays, total: totalDays } = expeditionTotalDays(
@@ -50,19 +59,6 @@ export const HudRealCassettoDetail: React.FC<HudRealCassettoDetailProps> = (p) =
       fasi?.travelDays ?? 0,
       DEFAULT_IDLE_VILLAGE_CONFIG.globalRules.dayLengthInTimeUnits,
     );
-    /* T3-S2 consequence preview (artifact-r004 "reserved cost slot"): food
-     *  the departing members consume over the whole journey — party seats
-     *  filled × total days × the engine's per-resident daily rate
-     *  (`globalRules.foodConsumptionPerResidentPerDay`). `insufficient`
-     *  marks the value when the live food readout cannot cover it. */
-    const partySize = p.slots.filter((s) => s.assignedResidentId).length;
-    const costFood = expeditionFoodCost(
-      partySize,
-      totalDays,
-      DEFAULT_IDLE_VILLAGE_CONFIG.globalRules.foodConsumptionPerResidentPerDay,
-    );
-    const foodItem = p.resourceItems?.find((item) => item.id === 'food');
-    const foodStock = foodItem !== undefined ? Number(foodItem.value) : NaN;
     return {
       title: p.scenario?.title ?? '',
       subtitle: t('gameFrame.cassetto.demo.subtitle', 'Pianifica la spedizione'),
@@ -74,14 +70,18 @@ export const HudRealCassettoDetail: React.FC<HudRealCassettoDetailProps> = (p) =
       ],
       totalDays,
       riskLabel: dangerBand ? t(stripNs(dangerBand.i18nKey)) : '—',
+      riskLevel: dangerBand ? DANGER_BANDS.indexOf(dangerBand) + 1 : undefined,
+      riskLevelMax: DANGER_BANDS.length,
+      riskPending: estimate === 'computing' ? 'computing' : sim ? undefined : 'incomplete',
+      deathPct: sim?.anyDeathPct,
       rewards: [{ icon: 'gold', qty: String(p.scenario?.rewardBase ?? 60) }],
-      costPreview: {
-        icon: 'food',
-        qty: String(costFood),
-        insufficient: Number.isFinite(foodStock) && costFood > foodStock,
-      },
+      successPct: sim?.outcomePct.reward,
+      /* Director 2026-11-20 «vignetta da quest»: the scenario's own cover
+       *  art — the per-quest painted illustration at the head of the
+       *  planner (offer.coverArt is the authored source). */
+      vignette: p.scenario?.offer.coverArt,
     };
-  }, [p.poi, p.scenario, p.estimate, p.expeditionDuration, p.slots, p.resourceItems, t]);
+  }, [p.poi, p.scenario, p.estimate, p.expeditionDuration, t]);
 
   /* Quest bag as SLOT FRAMES (R-337 contract): the ledger's sparse
    * `bags[poi.id]` is the authoritative slot layout — positions stay put,
@@ -91,9 +91,12 @@ export const HudRealCassettoDetail: React.FC<HudRealCassettoDetailProps> = (p) =
    * releases its item back to the shared pool via the real `toggleItem`. */
   const stashBag = useVillageStashStore((s) => s.bags[p.poi.id]);
   const loadout = useMemo<CassettoLoadout>(() => {
-    const bag = stashBag ?? emptyStashBag();
+    /* Per-quest well count (Director 2026-11-20) — same `capacityFor` rule
+     *  the ledger enforces at assign time. */
+    const capacity = p.poi.bagSlots ?? QUEST_STASH.bagSlots;
+    const bag = stashBag ?? emptyStashBag(capacity);
     return {
-      slots: emptyStashBag().map((_, i) => {
+      slots: emptyStashBag(capacity).map((_, i) => {
         const id = bag[i] ?? null;
         if (!id) return null;
         const entry = p.items.find((e) => e.item.id === id);
@@ -108,7 +111,18 @@ export const HudRealCassettoDetail: React.FC<HudRealCassettoDetailProps> = (p) =
       onReleaseItem: p.onToggleItem,
       onOpenStash: p.onOpenStash,
     };
-  }, [stashBag, p.items, p.onToggleItem, p.onOpenStash, t]);
+  }, [stashBag, p.items, p.onToggleItem, p.onOpenStash, p.poi.bagSlots, t]);
+
+  /* Director ruling 2026-11-20 «× chiudi e perdi tutto»: the cassetto's
+   *  close DISCARDS the draft — every filled seat clears through the real
+   *  R-248 clear path (flight + commit choreography), the bag releases to
+   *  the shared pool (per-owner `releaseAll`), and only then the planner
+   *  closes. The fold chip keeps the draft instead — fold ≠ close. */
+  const handleDiscardClose = useCallback(() => {
+    p.slots.forEach((s) => { if (s.assignedResidentId) p.onSlotClear(s.id); });
+    p.onReleaseAllItems?.();
+    p.onClose();
+  }, [p]);
 
   /* R-339/PLAN-119 T2: the mount is the `ExpeditionDrawer` primitive — the
    *  signed column plus its fold contract (collapse chip ⇄ right-edge chip).
@@ -119,6 +133,7 @@ export const HudRealCassettoDetail: React.FC<HudRealCassettoDetailProps> = (p) =
       slots={p.slots}
       resourceItems={p.resourceItems}
       onSlotClick={p.onOpenRoster ? () => p.onOpenRoster!() : undefined}
+      onOpenRoster={p.onOpenRoster}
       onSlotClear={p.onSlotClear}
       suppressedResidentIds={p.suppressedResidentIds}
       onSlotPhaseChange={p.onSlotPhaseChange}
@@ -126,6 +141,7 @@ export const HudRealCassettoDetail: React.FC<HudRealCassettoDetailProps> = (p) =
       canSend={p.canSend}
       disabledReason={p.canSend ? null : t('questExpedition.forecast.incomplete')}
       onConfirm={p.onSend}
+      onClose={handleDiscardClose}
     />
   );
 };

@@ -150,7 +150,15 @@ il "witness" deve vedere l'immagine NEL SUO CONTESTO, non solo averla generata.
 
 Fonte: `.mw/runs/r309-village-plates/pattern-candidate.md`
 
-## P-010 — Selettore imperativo orfano: il patch DOM punta al markup del predecessore (2026-11-18)
+## P-013 — PASS strutturale ≠ fedeltà al golden: metriche verdi su un risultato visivamente diverso (2026-11-19)
+
+**Candidata a trappola T-30** (registrata in `context/recurring-traps.md`); proposta citata in `context/DECISION_LOG.md` 2026-11-19.
+
+**Pattern.** La verifica meccanica della conversione mockup→componente può dare tutti i gate verdi (PASS strutturale, Δ metriche nei bound) mentre il rendering è visivamente diverso dal golden approvato — colori riportati in modo errato, materiali appiattiti, ornamenti mancanti. Le metriche aggregate **non sono una prova di fedeltà**: un gate verde prova solo le asserzioni che misura, non "è uguale al golden".
+
+**Contromisura.** Ogni claim di fedeltà al golden richiede confronto visivo per-regione su ritagli a pari composizione + testimone che guarda davvero l'artefatto (T-04); mai "i numeri sono a posto" come chiusura. Le metriche per-materiale (mediana + inviluppo di contrasto) segnalano, non bocciano. Fonte: `.mw/runs/20261119-learn-golden-fidelity/pattern-candidate.md` (learn R-361/PLAN-127).
+
+## P-014 — Selettore imperativo orfano: il patch DOM punta al markup del predecessore (2026-11-18)
 
 **Stato:** proposta — 2 istanze nella stessa superficie (warm node introdotto per R-238 come workaround, poi orfano del sostituto C1Medallion in R-359).
 **Pattern:** `.mw/runs/20261118-r359-learn/pattern-candidate.md` §"stale-imperative-selector".
@@ -160,7 +168,7 @@ Fonte: `.mw/runs/r309-village-plates/pattern-candidate.md`
 1. Quando un componente viene sostituito da un altro con markup diverso, grep dei selettori imperativi che puntano al suo subtree (`querySelector('image'|'img'|'.classe-figlia')`) e aggiornamento obbligatorio.
 2. Test di regressione che monta il componente reale e asserisce l'effetto del patch — il selettore nullo non deve passare in silenzio (INV `custom-drag-overlay.INV-2` come modello).
 
-## P-011 — Il probe che viola la tolleranza d'input misura il vincolo, non la feature (2026-11-18)
+## P-015 — Il probe che viola la tolleranza d'input misura il vincolo, non la feature (2026-11-18)
 
 **Stato:** proposta — 2 istanze nella stessa sessione.
 **Pattern:** `.mw/runs/20261118-r359-learn/pattern-candidate.md` §"probe-input-tolerance false-negative".
@@ -170,7 +178,7 @@ Fonte: `.mw/runs/r309-village-plates/pattern-candidate.md`
 1. Prima di scrivere un probe su una feature gestuale, leggere i vincoli d'input del componente (hold ms, tolerance px, debounce) e codificarli nel probe come assert espliciti.
 2. Un `flights:0`/`null` del probe è un dato del probe, non del sistema: rieseguire col vincolo rispettato prima di dichiarare il bug (T-04 complementare: il witness deve guardare la feature, non il suo stesso artefatto).
 
-## P-012 — Commit su worktree condiviso: index temporaneo + commit-tree, mai `git commit` nudo (2026-11-18)
+## P-016 — Commit su worktree condiviso: index temporaneo + commit-tree, mai `git commit` nudo (2026-11-18)
 
 **Stato:** proposta — tecnica usata in R-359 (commit `db93d793`/`d4614cf9`: 23 file propri, 0 file R-357, index altrui intatto).
 **Pattern:** `.mw/runs/20261118-r359-learn/pattern-candidate.md` §"shared-worktree temp-index commit".

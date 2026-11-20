@@ -16,6 +16,7 @@ export type HudIconId =
   | 'world'
   | 'settlement'
   | 'company'
+  | 'stash'
   | 'chronicle'
   | 'workshop'
   | 'tavern'
@@ -42,6 +43,7 @@ export const HUD_ICONS: Record<Exclude<HudIconId, PaintedHudIconId>, IconCompone
   world: engraved('nav-map'),
   settlement: engraved('nav-village'),
   company: engraved('nav-company'),
+  stash: engraved('nav-bag'),
   chronicle: engraved('nav-chronicle'),
   workshop: engraved('nav-shop'),
   tavern: engraved('nav-tavern'),

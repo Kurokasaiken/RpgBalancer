@@ -26,8 +26,10 @@ export interface StageZonesState {
   /** All open zone-managed panels per zone, ascending openSeq. */
   occupancy: Record<StageZoneId, StageOccupant[]>;
   pinned: ReadonlySet<StagePanelId>;
-  /** Committed drop positions, raw px — never clamped, never overwritten by geometry. */
-  placements: Partial<Record<StagePanelId, { x: number; y: number }>>;
+  /** Committed drop rects, raw px — never clamped, never overwritten by
+   *  geometry. `w`/`h` freeze the size the panel had when the drag
+   *  committed (Director 2026-11-20: no snap, no resize). */
+  placements: Partial<Record<StagePanelId, { x: number; y: number; w?: number; h?: number }>>;
   /** F5 cluster drag intent. */
   userCenterX: number | null;
   /** WS-4: vertical half of the cluster drag intent (companion to `userCenterX`). */
@@ -61,7 +63,7 @@ export type StageZonesAction =
   | { type: 'UNPIN'; panelId: StagePanelId }
   | { type: 'MINIMIZE'; panelId: StagePanelId }
   | { type: 'EXPAND'; panelId: StagePanelId }
-  | { type: 'DROP'; panelId: StagePanelId; pointer: { x: number; y: number }; point: { x: number; y: number }; zones: StageLayout['zones']; nominalZones: StageLayout['nominalZones'] }
+  | { type: 'DROP'; panelId: StagePanelId; pointer: { x: number; y: number }; point: { x: number; y: number }; size?: { w: number; h: number }; zones: StageLayout['zones']; nominalZones: StageLayout['nominalZones'] }
   | { type: 'VIEWPORT_CHANGED'; w: number; h: number }
   | { type: 'REGIME_CHANGED'; regime: StageRegime }
   | { type: 'DRAG_START'; panelId: StagePanelId; pointerId: number }
@@ -143,45 +145,6 @@ function pointerOnStripTarget(
   return pointer.y <= nom.y + hPx && pointer.x >= envCenterX - wPx / 2 && pointer.x <= envCenterX + wPx / 2;
 }
 
-/**
- * Drop-admission rules (§D.1): EXPANDED iff the target's expanded set stays
- * legal (single occupant or an authorized pair) AND `panel.minWidth ≤
- * zoneWidth` AND the height solver fits — and the target's expanded top is
- * not pinned (a pinned occupant is never displaced by a drop). Otherwise the
- * panel lands as a STRIP — never rejected; only a full strip rail clamps it
- * back to source.
- */
-function dropLanding(
-  config: StageZonesConfig,
-  state: StageZonesState,
-  zones: StageLayout['zones'],
-  panelId: StagePanelId,
-  targetZone: StageZoneId,
-): { presentation: PanelPresentation; allowed: boolean } {
-  const panel = config.panels[panelId];
-  const target = state.occupancy[targetZone];
-  const zoneW = zones[targetZone].w;
-  const stageH = zones[targetZone].h;
-  const topExpanded = target.filter((o) => o.presentationIntent === 'expanded').sort((a, b) => b.openSeq - a.openSeq)[0];
-  const targetPinned = topExpanded ? state.pinned.has(topExpanded.panelId) : false;
-
-  /* Simulated expanded set if this panel lands expanded (it becomes the most
-   *  recent expanded intent). */
-  const expandedIntents = [...target.filter((o) => o.presentationIntent === 'expanded').map((o) => o.panelId), panelId];
-  const legalExpanded =
-    expandedIntents.length <= 1 ||
-    config.authorizedPairs.some(([a, b]) => expandedIntents.length === 2 && ((expandedIntents[0] === a && expandedIntents[1] === b) || (expandedIntents[0] === b && expandedIntents[1] === a)));
-  const widthFits = panel.minWidthPx <= (targetZone === 'centerStage' ? zoneW : Math.max(zoneW, config.zones[targetZone].minPx));
-  const heightFits = expandedIntents.length <= 1 || expandedIntents.reduce((sum, id) => sum + config.panels[id].minHeightPx, 0) + config.outer.gutterPx * (expandedIntents.length - 1) <= stageH;
-
-  if (legalExpanded && widthFits && heightFits && !targetPinned && !state.collapsed[targetZone as 'leftWing' | 'rightWing']) {
-    return { presentation: 'expanded', allowed: true };
-  }
-  if (stripCapacityFree(config, state, targetZone)) {
-    return { presentation: 'strip', allowed: true };
-  }
-  return { presentation: 'expanded', allowed: false };
-}
 
 /**
  * §A.4/§D.2 run entry, applied to an already-bumped state (the SAME commit):
@@ -338,28 +301,26 @@ export function stageZonesReducer(config: StageZonesConfig, state: StageZonesSta
         return bump({ occupancy, openSeqCounter: seq, placements: { ...state.placements, [action.panelId]: action.point }, activeDrag: null });
       }
 
-      if (targetZone === sourceZone) {
-        /* In-zone reposition: commit the raw point as placement intent. */
-        return bump({ placements: { ...state.placements, [action.panelId]: action.point }, activeDrag: null });
+      /* Director ruling 2026-11-20 «tutti si può spostare ovunque senza
+       *  snap, senza cambiare di dimensioni»: a drop commits the free rect
+       *  the drag painted — the panel keeps its home zone and its size, it
+       *  never snaps into another zone. A strip dragged onto the stage
+       *  re-expands in place at the drop point (same gesture as before,
+       *  without the cross-zone transfer). */
+      const placement = action.size
+        ? { x: action.point.x, y: action.point.y, w: action.size.w, h: action.size.h }
+        : action.point;
+      const placements = { ...state.placements, [action.panelId]: placement };
+      if (occupant.presentationIntent === 'strip') {
+        const occupancy = {
+          ...state.occupancy,
+          [sourceZone]: state.occupancy[sourceZone].map((o) =>
+            o.panelId === action.panelId ? { ...o, presentationIntent: 'expanded' as const } : o,
+          ),
+        };
+        return bump({ occupancy, placements, activeDrag: null });
       }
-
-      /* Cross-zone transfer. A drop NEVER suspends another occupant — strip
-       *  landing or clamp-back are the only outcomes besides the transfer.
-       *  `action.zones` is the solver's committed snapshot the drag saw. */
-      /* Fit is checked against NOMINAL zone bounds (§D.1 rule b: `zoneWidth(vw)`
-       *  is the allocation, not the current effective shrink — an empty zone's
-       *  effective width is 0 yet still accepts an expanded landing). */
-      const landing = dropLanding(config, state, action.nominalZones, action.panelId, targetZone);
-      if (!landing.allowed) {
-        /* No strip capacity on the target rail — clamp back: the panel keeps
-         *  its source zone and its last committed placement (the raw point is
-         *  discarded — it was out of legal space). */
-        return bump({ activeDrag: null });
-      }
-      const occupancy = removeOccupant(state.occupancy, action.panelId);
-      const seq = state.openSeqCounter + 1;
-      occupancy[targetZone] = [...occupancy[targetZone], { ...occupant, presentationIntent: landing.presentation, openSeq: seq }];
-      return bump({ occupancy, openSeqCounter: seq, placements: { ...state.placements, [action.panelId]: action.point }, activeDrag: null });
+      return bump({ placements, activeDrag: null });
     }
 
     case 'VIEWPORT_CHANGED': {

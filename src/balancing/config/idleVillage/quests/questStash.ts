@@ -24,6 +24,9 @@ export const StashItemSchema = z.object({
   descKey: z.string().min(1),
   /** Lucide icon id (resolved via `@/ui/shared/statIconUtils`) on the picker chip and belt. */
   icon: z.string().min(1),
+  /** Painted icon asset (R-363 stash-icons sheet, Gemini gen 2026-11-19). When
+   *  present the HUD renders the painted art; `icon` stays the glyph fallback. */
+  iconAsset: z.string().optional(),
   /** 'check': armed before a check, +bonus when stats match.
    *  'action': used standalone from the belt at a decision node.
    *  'passive' (PLAN-019-S4 T-5): armed by being packed — the engine reads
@@ -56,6 +59,7 @@ const RAW_QUEST_STASH = {
       labelKey: 'questS1Lab.item.bonusForza',
       descKey: 'questS1Lab.stash.desc.bonusForza',
       icon: 'axe',
+      iconAsset: '/assets/ui/hud-real/stash-icons/hasBonusForza.webp',
       kind: 'check',
       bonus: 15,
       stats: ['str'],
@@ -65,6 +69,7 @@ const RAW_QUEST_STASH = {
       labelKey: 'questS1Lab.item.bonusPerc',
       descKey: 'questS1Lab.stash.desc.bonusPerc',
       icon: 'crosshair',
+      iconAsset: '/assets/ui/hud-real/stash-icons/hasBonusPerc.webp',
       kind: 'check',
       bonus: 15,
       stats: ['perc'],
@@ -74,6 +79,7 @@ const RAW_QUEST_STASH = {
       labelKey: 'questS1Lab.item.smoke',
       descKey: 'questS1Lab.stash.desc.smoke',
       icon: 'wind',
+      iconAsset: '/assets/ui/hud-real/stash-icons/hasFumogeno.webp',
       kind: 'check',
       bonus: 15,
       stats: ['agi'],
@@ -83,6 +89,7 @@ const RAW_QUEST_STASH = {
       labelKey: 'questS1Lab.item.rope',
       descKey: 'questS1Lab.stash.desc.rope',
       icon: 'cable',
+      iconAsset: '/assets/ui/hud-real/stash-icons/hasCorda.webp',
       kind: 'check',
       bonus: 15,
       stats: ['con', 'str'],
@@ -92,6 +99,7 @@ const RAW_QUEST_STASH = {
       labelKey: 'questS1Lab.item.healing',
       descKey: 'questS1Lab.stash.desc.healing',
       icon: 'heart',
+      iconAsset: '/assets/ui/hud-real/stash-icons/hasHealing.webp',
       kind: 'action',
     },
     {
@@ -99,6 +107,7 @@ const RAW_QUEST_STASH = {
       labelKey: 'questS1Lab.item.potion',
       descKey: 'questS1Lab.stash.desc.potion',
       icon: 'droplets',
+      iconAsset: '/assets/ui/hud-real/stash-icons/hasPozione.webp',
       kind: 'action',
     },
     {
@@ -109,6 +118,7 @@ const RAW_QUEST_STASH = {
       labelKey: 'missionPlanner.items.guardianBanner',
       descKey: 'questS1Lab.stash.desc.banner',
       icon: 'flag',
+      iconAsset: '/assets/ui/hud-real/stash-icons/hasGuardianBanner.webp',
       kind: 'passive',
     },
   ],

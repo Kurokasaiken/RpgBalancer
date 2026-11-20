@@ -5,7 +5,7 @@ description: "Hard rule (CTR-foreground-001): never open windows, apps or browse
 
 # No Foreground Windows (ALL SKILLS)
 
-Applies to **every skill, agent, plan, script, and task** that can open a window, browser, app, or preview — automated or interactive. This is the RPG port of Director ruling CTR-foreground-001 (Mind Weaver, `mind-weaver/.mw/contracts/ui-focus.md`, 2026-10-15), issued after an agent opened Chrome for Testing in the foreground.
+Applies to **every skill, agent, plan, script, and task** that can open a window, browser, app, or preview — automated or interactive. This is the RPG port of Director ruling CTR-foreground-001 (Mind Weaver, `mind-weaver/.mw/contracts/ui-focus.md`, 2026-10-15), issued after an agent opened Chrome for Testing in the foreground, extended to **every project and every external program** by the universal Director ruling 2026-11-20 (Ikemen Go explicitly named; global rule `~/.devin/rules/no-foreground-windows.md`).
 
 The Director must never lose the window he is watching. An agent must never steal focus.
 
@@ -19,7 +19,8 @@ The Director must never lose the window he is watching. An agent must never stea
   - `open` without `-g` on macOS, `xdg-open`, `start` (Windows);
   - `osascript -e 'tell application ... to activate'`, `Page.bringToFront`, `window.focus()`, `window.open` issued by automation;
   - **implicit activation**: attaching to a headed/visible browser (`connectOverCDP`, `puppeteer.connect`, CDP `Target.createTarget` without `background:true`, `newPage()` on an attached headed instance). Creating a tab activates it and raises the window even if the browser was launched hidden — the effect is forbidden, not just the explicit API (Mind Weaver REG-001 v3, `.mw/bugs/2026-10-16-cdp-newtab-focus/`);
-  - auto-opening a browser preview, Storybook, report HTML, or any OS window as a side effect of a command.
+  - auto-opening a browser preview, Storybook, report HTML, or any OS window as a side effect of a command;
+  - **launching external GUI programs** — Ikemen Go, game engines, emulators, native/Electron apps — so their window comes to front. They run hidden/background (`open -g -j`) or the launch is deferred to a manual Director step.
 
 ## Opt-in convention
 

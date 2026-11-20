@@ -118,17 +118,19 @@ describe('VillageStashPanel', () => {
     });
   });
 
-  it('shows the derived capacity in the footer and no interactive controls in rows', () => {
+  it('shows no counter and no interactive controls in rows', () => {
     renderPanel();
-    // R-234: the capacity is the Warehouse's (24 at level II), not a second literal.
-    expect(screen.getByText(`${CFG.items.reduce((sum, i) => sum + i.qty, 0)} of ${CFG.capacityMax}`)).toBeInTheDocument();
+    // Director 2026-11-20: no «N / max» counter anywhere in the panel.
+    expect(screen.queryByTestId('stash-count')).toBeNull();
     const list = screen.getByRole('list');
     expect(within(list).queryAllByRole('button')).toHaveLength(0);
     expect(within(list).queryAllByRole('checkbox')).toHaveLength(0);
     expect(within(list).queryAllByRole('textbox')).toHaveLength(0);
-    // The only buttons in the whole panel are the title-row minimise+close
-    // controls (R-246 minimise).
-    expect(screen.getAllByRole('button')).toHaveLength(2);
+    // The only buttons in the whole panel are the title-row close (the kind filters are radios in the same
+    // row) — never rows; no minimise, no view toggle (Director 2026-11-20).
+    expect(screen.queryByTestId('stash-minimise')).toBeNull();
+    expect(screen.queryByTestId('stash-view-toggle')).toBeNull();
+    expect(screen.getAllByRole('button').filter((b) => b.getAttribute('role') !== 'radio')).toHaveLength(1);
   });
 
   it('titles the panel via aria-labelledby', () => {
@@ -185,43 +187,12 @@ describe('VillageStashPanel — PLAN-073 dual mode', () => {
     expect(screen.queryByTestId(`stash-item-${reserved}`)).toBeNull();
   });
 
-  it('minimises to a title strip (icon + live capacity) and restores', () => {
+  it('cannot be folded to a strip: no minimise control, only close', () => {
     setLedger({ hydration: 'ready' });
     renderPanel();
-    /* R-251 bis: the expanded title row already uses the strip's content
-     *  insets (plaque 10 + row 12/8 = strip 22/18) — collapsing swaps the
-     *  toggle glyph, never the geometry. */
-    const titleRow = screen.getByTestId('stash-minimise').closest('[data-hud-drag-handle]') as HTMLElement;
-    expect(titleRow.style.paddingInline).toBe('12px 8px');
-    fireEvent.click(screen.getByTestId('stash-minimise'));
-    const strip = screen.getByTestId('stash-minimised');
-    expect(strip).toBeInTheDocument();
-    /* The shelf is folded away; the capacity count survives on the strip. */
-    expect(screen.queryByTestId('stash-shelf')).toBeNull();
-    expect(screen.getByTestId('stash-minimised-count')).toHaveTextContent(
-      `${CFG.items.reduce((s, i) => s + i.qty, 0)}/${CFG.capacityMax}`,
-    );
-    /* R-251: the strip keeps the expanded control slots — restore sits where
-     * minimise was and close keeps the edge, so no icon rides the hang
-     * plaque's bronze band; insets must stay deeper than the band (~6.5px). */
-    const controls = within(strip).getByTestId('stash-restore').closest('[data-hud-controls]') as HTMLElement;
-    expect(within(controls).getAllByRole('button').map((b) => b.dataset.testid ?? b.dataset.skin)).toEqual([
-      'stash-restore',
-      'close',
-    ]);
-    expect(strip.style.padding).toBe('10px 18px');
-    /* The restore pill sits exactly where minimise was — a fast second click
-     * is the double-click tail and must be swallowed, not a toggle back. */
-    vi.useFakeTimers();
-    try {
-      fireEvent.click(screen.getByTestId('stash-restore'));
-      expect(screen.getByTestId('stash-minimised')).toBeInTheDocument();
-      vi.advanceTimersByTime(400);
-      fireEvent.click(screen.getByTestId('stash-restore'));
-    } finally {
-      vi.useRealTimers();
-    }
-    expect(screen.getByTestId('stash-shelf')).toBeInTheDocument();
+    expect(screen.queryByTestId('stash-minimise')).toBeNull();
+    expect(screen.queryByTestId('stash-minimised')).toBeNull();
+    expect(screen.getByRole('button', { name: 'gameFrame.panels.close' })).toBeInTheDocument();
   });
 
   it('empty shelf shows the empty-state line', () => {

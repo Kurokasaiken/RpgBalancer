@@ -1,12 +1,14 @@
 # Current State — RpgBalancer
 
-**Ultimo aggiornamento:** 2026-11-15
+**Ultimo aggiornamento:** 2026-11-20 (catch-up audit: eventi fino al 2026-11-19 assorbiti)
 **Superficie canonica:** `/game` (Game Frame Pixi — raggiungibile dal link «Game» in `/test hub`; R-075 v2)
 **Repo remoto:** `https://github.com/Kurokasaiken/RpgBalancer`
 
 ## Stato di sintesi
 
 Il progetto è un **Village/incremental management RPG con drag & drop**, con un laboratorio di combat/balancing integrato. La superficie di gioco canonica è **`/game` (Game Frame Pixi)**: la vecchia superficie Idle Village è **deprecata** (Director 2026-10-05). Il lavoro attivo è sulla superficie `/game`, World Surface e POI Quest; `/minimal-gameplay` resta il riferimento della vertical slice. Il core loop completo non è ancora assemblato.
+
+**Delta 2026-11-15 → 2026-11-19:** R-358 `fatta` (PLAN-126 cold-boot chiuso: wire 14.38→10.23 MB, −29%); R-359 `fatta` (regressioni drag medaglioni: 5 root cause fixate, 18/18 test, regola D-300); R-361 esplorazione conclusa → PLAN-127 (slice-kit) + PLAN-128 (adattamento), entrambi rev.2 con split standard-MW/profilo-RPG (R-362 `fatta`, R-363 `fatta`); PLAN-125 rev.3 battezzato; R-365 `in corso` (pipeline esecutiva con ricevute per-passo); PLAN-124 `completed` (roster/stash separati — rail revertita). Dettagli in `RICHIESTE.md`.
 
 Questa è una fotografia; per lo stato più aggiornato verificare `SESSION_HANDOFF.md` (journal), `RICHIESTE.md` e i test. Regola di sync: `.windsurf/rules/70-state-docs-sync.md`.
 
@@ -76,6 +78,10 @@ Vedi `RICHIESTE.md` (file attivo; PLAN-121: open/chiuse antecedenti 2026-11-08 i
 - **PLAN-067** — chiuso con riserve (2026-10-23): riserve oneste nel plan doc.
 - **R-057** — World Surface: parallasse manina, teca di vetro, resto del piano.
 - **R-003** — World Surface mappa viva: sub-plan A.1/A.2/A.3 in draft, da riesaminare.
+- **PLAN-125** — HUD fix/restyling R-357: battezzato rev.3 2026-11-17, implementazione in corso.
+- **PLAN-127 + PLAN-128** — pipeline mockup→componente: rev.2 scritte (standard in `mind-weaver/docs/` + profilo `context/mockup-pipeline-profile.md`); PLAN-128 ribattezzato, PLAN-127 rev.2 in attesa di ribattesimo Director.
+- **R-365** — ricevute per-passo + `slice:gate`/`slice:audit` + skill `mw-slice-run`: in corso; ogni passo senza artefatto nel record non conta come fatto.
+- **PLAN-115** — mappa2 hi-res: obbligazioni bloccanti PASS; chiusura gated solo dai gate globali.
 
 ## Blocchi / limiti noti
 

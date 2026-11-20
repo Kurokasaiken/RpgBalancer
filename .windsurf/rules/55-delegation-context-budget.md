@@ -5,6 +5,31 @@ description: Context-budget and subagent delegation policy — when work must le
 
 # Context Budget & Delegation (ALWAYS ON)
 
+> **REVOCA — Director ruling D-228 (2026-11-20): MAI usare
+> `run_subagent`/subagent.** La quota settimanale ACU si è esaurita: ogni run
+> di subagent brucia quota anche su modello depinnato. Sostituti approvati:
+> lavoro inline con output compresso (`| tail`, grep mirato, overflow file),
+> shell in background (`shell_id`) per i run lunghi, script di verify che
+> stampano un verdetto compatto. Le sezioni "Delegate, don't hoard" e
+> "Subagent contract" qui sotto restano SOLO come storico — non applicarle
+> fino a nuovo ruling del Director.
+>
+> **Un solo implementer — Director ruling (2026-11-20):** TUTTA
+> l'implementazione è fatta dal singolo agente della sessione corrente —
+> niente implementer/executor paralleli. Gli agenti esterni MW restano
+> consultivi (testo in/out), mai autori di codice nel repo.
+>
+> **Sostituto multi-AI — Director ruling D-229 (2026-11-20):** per tutto il
+> lavoro "multi" (seconde opinioni, dibattiti avversari, ricerca su modello
+> esterno, task paralleli a provider) usare lo **stack mind-weaver**
+> (`/Users/faustoboni/progetti_personali/mind-weaver`):
+> `scripts/mw-ask.py --provider <p> --model <m>` (API key del Director —
+> groq, gemini, openrouter, codex), `mw-web-debate` (login web),
+> `mw-orchestrate.py`. **Zero ACU Devin** — verificato in sessione; restano
+> solo i rate-limit/quota dei singoli provider. I provider esterni sono
+> stateless: il contesto va iniettato nel prompt (l'agente raccoglie i file
+> rilevanti e li incolla).
+
 The main session's context window is a scarce resource. This rule defines how
 work is kept out of it.
 

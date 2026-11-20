@@ -101,7 +101,7 @@ Verificati sullo screenshot del Director (1474×745) e sui file, non su una catt
 | **Banda di scorrimento** (barra incisa, uguale su Roster/Stash/Ledger) | da fare |
 | **POI** (Sigillo, 3 varianti A/B/C sul banco `/lab/poi-luogo`; Director ha detto che i POI attuali non gli piacciono) | rientra nel plan solo come **mockup**; l'implementazione resta fuori finché non c'è il golden |
 | **Icone** (D-6, programma trasversale) | plan proprio, non scritto |
-| **Tipografia** (D-4, 3 prove) | da fare — nel cassetto Cinzel+EB Garamond «non piace» |
+| **Tipografia** (D-4, 3 prove) | prove prodotte 2026-11-20 (`.mw/runs/20261120-d4-typography/`): A Marcellus+Cardo, B Almendra SC+Almendra, C Carrois Gothic SC+IM Fell English (dress copperplate+label elisir) — **pendente ruling Director**, poi implementazione font import + dress CSS sui token |
 
 ## 1. Obiettivo
 
@@ -263,3 +263,118 @@ I bug della Fase 2 non dipendono dai mockup e possono partire subito dopo il bat
 visual-fork: skipped — rebuild HUD R-357 eseguito sotto supervisione live del Director (mockup e riferimenti approvati in sessione; nessuna fork aperta: baseline visiva già battezzata) — .mw/specs/expedition-ui/refs/
 
 Scope coperto dallo skip qui sopra: `src/ui/idleVillage/skins/primitives/sliceKitManifest.ts` (manifest slice-kit R-361, stesso lavoro approvato).
+
+## Fase 8 — investigazione 2026-11-20 (handoff, budget contesto)
+
+Stato dei punti aperti dopo pre-flight sui sorgenti correnti (worktree autoritativo; il rebuild R-357 non committato è andato perso — `HudRealCassetto.tsx` su disco è la versione corrente, 622 righe, senza `×`/Esc/vignetta: quelle erano nel rebuild perso e il riferimento «✅ feedback 2026-11-17» riguarda quel DOM).
+
+- **Tasche per quest** — FATTO DATO: `EMPTY_BAG` legge `QUEST_STASH.bagSlots` globale (=3, schema 1..8) in `useVillageStashStore.ts:105`; il ledger `bags[poiId]` è già per-POI ma a lunghezza globale; `useQuestExpeditionSession` taglia a `QUEST_STASH.bagSlots` (2 punti). `QuestPoiSchema` NON ha `bagSlots`. Implementazione possibile (additiva): campo opzionale `bagSlots` sul POI + threading `poiId` nei call site di `EMPTY_BAG` e nelle slice del session. Serve però il ruling Director: le tasche devono davvero variare per quest? `questStash.ts` è `M` in stage di sessione parallela → non toccare finché staged.
+- **Vignetta da quest** — `vignette.webp` esiste in `public/assets/ui/hud-real/slicekit/cassetto/` ma NON è referenziata in `src`. `QuestPoiSchema` non ha campo arte; `questId` enum = `cassa|goblin|rovine`. Azione minima possibile: montare la vignetta esistente nel cassetto (config-driven in `cassettoLayoutConfig`); per-quest vera serve arte per `cassa`/`goblin` + campo POI o mappa questId→asset.
+- **× vs bordo** — il rebuild perso aveva Esc+× (chiusura) con feedback Director 2026-11-17; chip `‹/›` = piega. Domanda residua già aperta: × chiudendo scarta o tiene selezione eroi/oggetti? **Serve ruling Director** — non deciso unilateralmente.
+- **% successo (richiesta Director 2026-11-20)** — fonte canonica trovata: `p.estimate` (quando non `computing`/`incomplete`) porta `sim: QuestSimResult` con `outcomePct.{reward|survived|fled|wipe}`, `anyDeathPct`, `zeroDeathsPct` (`questSimulation.ts:406`). Semantica da battezzare: «missione riuscita» = `outcomePct.reward`, «nessun morto» = `zeroDeathsPct` (complemento esatto della danger band). Nessuna decisione presa sul valore da mostrare.
+- **File puliti e toccabili** (T-13): `HudRealCassetto.tsx`, `HudRealCassettoDetail.tsx`, `questPois.ts`, `useVillageStashStore.ts`, `useQuestExpeditionSession.tsx` — tutti clean. `questStash.ts` staged altrove.
+- **Non fatto in questa sessione**: nessuna cattura headless (1280/≤1100/corner crops), nessun codice toccato, nessun test. Resume point: battezzare semantica % successo + ruling ×/tasche → poi implementare (quest model + Detail + render + i18n + test INV) → witness headless a 1440/1280/≤1100 con crop angoli-ombre-frecce vs `mockup-cassetto-v2.png`.
+
+## Fase 8 — esecuzione 2026-11-20 (ruling Director + witness T-04)
+
+**Ruling Director (in-session 2026-11-20):** «Accanto a difficoltà % morte, accanto al reward % di riuscita»; «X chiudi e perdi tutto». Risposte: tasche = pozzetti SUPPLIES del bag per-POI; vignetta = illustrazione in testa al cassetto (montaggio deciso sotto).
+
+### Implementato
+- **% readouts** — `CassettoQuest` +`riskPending?/deathPct?/successPct?`; `HudRealCassettoDetail` e `HudRealCassettoHost` derivano `sim.anyDeathPct` (accanto al risk, testid `cassetto-death-pct`, i18n `questExpedition.forecast.death`) e `sim.outcomePct.reward` (accanto al reward, `cassetto-success-pct`). Assenti mentre `computing`/`incomplete` — mai inventate; risk label muted con `data-risk-state`.
+- **× chiudi e perdi tutto** — `handleDiscardClose` (Detail) e mirror nell'Host lab: clear di ogni seat assegnato via `onSlotClear`/`handleSlotClear` (choreography reale R-248, fallback `controller.clearSlot` se volo in aria), `onReleaseAllItems`/`releaseAll(poiId)` per il bag, poi `onClose`/`closeDetail`. Esc = stesso handler. Chevron fold resta separato (tiene la bozza).
+- **No cost cell** — `cassetto-cost-slot`/`cassetto-cost-value` rimossi dalla colonna (INV-5) e dal bottom-sheet (INV-4 amended); il costo vive nel flusso supplies.
+- **Slide laterale** — `drawer.slideMs` (config Zod) + `expedition-drawer-slide`/`data-leaving`: fold committa dopo slide-out; reduced-motion istantaneo; chip edge a `widthMaxPxExtracted` in edgeMode `extracted`.
+- **Bottom sheet** — × in handle strip (stesso discard), risk/death + reward/success al posto della cost cell; unica superficie ≤1100 (mutual exclusion invariata).
+
+### Test (71/71 verdi, scope cassetto)
+`r335CassettoResources` 5, `r337CassettoBagSlots` 4, `r339ExpeditionDrawer` 7, `r339ExpeditionSheet` 19, `r339BagAssign` 15, `r339ExpeditionStates` 9, `r357CassettoLabels` 6, `r357DrawerSlide` 2, **nuovi** `r357CassettoDiscard` 2 (ordine discard: clear→releaseAll→close, seat vuoti non toccati, onReleaseAllItems opzionale) e `r357CassettoPcts` 2 (`// INV:cassetto-risk-reward-pcts` — valori presenti/absenti pending, mai fabbricati).
+
+### Witness T-04 (headless, /hud-compose?comp=cassetto — sessione reale)
+`test-results/r357-phase8-witness/`: w1440 + w1280 drawer-full + crop (close, risk, rewards, foldchip, journey, cta), after-close; w1050 sheet-full/peek/expanded/zoom. Verificato a occhio: `DEATHS 96%` sotto LETALE, `SUCCESS 4%` accanto a 60, × in header well e nella strip sheet, chevron fold sul bordo sx colonna, nessuna cost cell. **Discard a runtime: assigned 1→0, detailOpen true→false** (commit transition+flight ~3s headless). Probe supplementare `scripts/_tmp-dbg-discard.mjs` conferma.
+
+### Safeguard
+`lint` scope: pass (file ui in ignore-pattern — copertura tsc). `build:check`: PASS. `contracts:index-sync`: già sincronizzato. `contracts:check`: FAIL repo-wide su drift condiviso (317 file, source_ref BASE, village-stash-panel/amanuense paralleli); **residui task-local attesi by-design**: statement mutati su contratto BASE (`cassetto-close`, `cassetto-no-resources-band`, `expedition-bottom-sheet.INV-4`) + 3 asserzioni BASE ritirate sotto INV-4 — audit trail completo: `redfirst:retire` ×3, `sync:bug` INV-4, `sync-amend-override` in `mapping-approvals.jsonl` per tutti e tre gli INV (Director in-session). `closure:lint`: FAIL solo su file paralleli (nessun file task-local in elenco).
+
+### Non fatto / aperto
+- **Tasche per quest**: non implementato — `QUEST_STASH.bagSlots=3` globale resta la fonte; `questStash.ts` staged da sessione parallela (T-13). Il ruling utile manca ancora (variazione sì/no e su quali POI).
+- **Vignetta**: `slicekit/cassetto/vignette.webp` esiste (cassetto3/ assets committati, generator `scripts/build-cassetto3-assets.py`) ma non montata — decisione arte per cassa/goblin ancora aperta.
+- **Witness /game live**: il witness è su `/hud-compose` (stesso ExpeditionDrawer+session reale); la pagina `/game` con click POI non è stata catturata in questa sessione — il path Detail è coperto da test di wiring + discard unit test.
+- **contracts:check residui** (sopra) restano rossi finché il seal/BASE non avanza — stessa classe degli errori repo-wide pre-esistenti.
+- `r357CassettoFrame.test.ts` rosso per drift parallelo su `cassettoExtractedEdge.json` (`cleanup`→`leftTrim`/`pieces`) — territorio altrui, non toccato.
+- Nessun commit fatto (ruling: nessun commit senza richiesta).
+
+## Fase 9 — stash conformità mockup + piastrina A (R-367/D-6, 2026-11-20/21)
+
+**Ruling Director (in-session):** variante **A** battezzata («a va bene») — filetto ottone + acanto; cornice **solo hover/selected** («quella cornice solo in mouse over»), niente «buco»; «2 righe nel mockup, nn facciamo una riga sola»; card highlight ≈ spazio delle 2 righe («ingrandirla») con cornice propria più leggera della cornice pannello (gerarchia: cornice pesante → filetto card → medaglione item → hairline celle).
+
+### Implementato (`VillageStashPanel.tsx`)
+- **`PiastrinaCornice`**: overlay img `public/assets/ui/hud-real/piastrina/cornice-hover-a.webp` (A con interno lacca pieno — niente buco) a `inset:-3`, fade 140ms, montata su cella interattiva e read-only; `visible = detailRow.itemId === row.itemId` (sticky preview = cella selezionata del mockup). Icone/×badge restano DOM sopra la lamina (coin seat `position:relative` nel `StashCellFace`).
+- **Shelf 2 righe** da config (`shelfColumns=3`, `shelfVisibleRows=2`, `shelfRowPx=46` — tagli Director paralleli 2026-11-21).
+- **Detail card ingrandita**: `minHeight = 2×shelfRowPx + stack-gap`, medaglione 56→84px, icona 28→40px, descrizione clamp 2→3 righe.
+- **Contatore «24/24» NON riprodotto**: il test `villageStash.test.tsx` codifica il ruling Director «no N/max counter anywhere in the panel» — divergenza mockup intenzionale, registrata in-commento.
+
+### Witness T-04 (headless `/game`, 1440×900)
+`.mw/runs/20261120-piastrina-icone/gen/live-stash.png`: griglia 3×2, cornice A visibile solo sulla cella 1,1 (sticky preview), icone dipinte + ×badge sopra la lamina in tutte le celle, card ≈ 2 righe con filetto proprio, medaglione 84px, zero chest nel DOM live (era solo artefatto della cattura frame5 del 19/11). Probe DOM: `data-piastrina-cornice` presente, opacity 1 solo sulla selezionata.
+
+### Safeguard
+`test` stash scope: 45/45 verdi (5 file). `build:check`: PASS. `lint` file: ignored-by-pattern (copertura tsc). `closure:lint`: FAIL solo file paralleli Director (husky, poiZanara, controlsArt, R-362/363 closure lines) + warning advisory slice-kit — nessun file task-local.
+
+### Aperto per D-6
+- Cornice A resta il solo uso approvato della piastrina: le **icone a riposo** restano dipinte su coin seat nei pozzetti (ruling «a riposo pozzetti lisci»). Il montaggio piastrina-come-cella su altre superfici (POI, nav, risorse) è ancora da mockuppare per-icona.
+- Frame card = filetto CSS pulito; i diamantini sul filetto del mockup non riprodotti (distanza residua nota).
+- Nessun commit fatto.
+
+### Fase 8 — per-quest vignetta + tasche (2026-11-20, sera)
+
+Director ruling «Vignetta e tasche variano per quest dal loro config»:
+- `QuestPoiSchema.bagSlots?: int 1..8` (fallback `QUEST_STASH.bagSlots=3`); goblin=3, rovine=4.
+- Vignetta = `scenario.offer.coverArt` (già per-quest: totem-goblin / rovine-hero); strip img con fade in testa alla briefing well (`data-cassetto-vignette`).
+- Threading: `capacityFor(poiId)` nel ledger (reconcile/assign/release/commit/rollback/select), `bagCapacity` in session+stock detail+stash panel+cassetto host/detail.
+- Lab host: `?poi=` query param + scenario/questRun da `poi.questId` (era hardcoded 'goblin').
+- Witness headless `?comp=cassetto&poi=`: goblin=totem+3 pozzetti, rovine=rovine-hero+4 pozzetti — PNG in `test-results/witness-perquest/`.
+- Test: r337 regex + ledger expectation aggiornati (26/26 verdi); questBag/questExpeditionBag rossi su svg→img = drift parallelo staged (villageStashItemIcons) — non toccati per ruling Director.
+
+### Fase 8 — regressioni cassetto (Director 2026-11-20, sera tarda)
+
+Fix vs golden mockup-cassetto-v2 + refs registrate:
+- Pozzetti: `ico-pouch` inciso → `supply-bag.webp` dipinta (ref `icon-supply-bag.png`), dimmata a vuoto; `data-testid` invariati. Stessa sostituzione nel bottom-sheet.
+- Sedi pg: `slotSize` 42→64 + `CASSETTO_RACK_SCALE` 0.62→0.8 → glifi ruolo (sagome busto/corona/scudo/arco) leggibili; leader assegnato = ritratto reale.
+- Info pozzetti: `questExpedition.loadout` "BAG n/m" inline a fine riga (zona troppo bassa per una caption separata).
+- Risk/reward: layout golden — emblema dipinto del frame (teschio/baule) a sinistra, colonna testo a destra: label + valore + % (`DEATHS n%` danger / `SUCCESS n%` gold, nowrap); risk cell `paddingLeft:34%` per liberare il teschio.
+- Witness: `test-results/witness-perquest/` — goblin LETALE/DEATHS 96%/SUCCESS 4% + 3 pozzetti + vignetta totem; rovine BASSA/DEATHS 10%/SUCCESS 55% + 4 pozzetti + vignetta rovine-hero.
+- Test: suite scope verde; r357Labels aggiornato implicitamente (caption div non rompe il selettore `> span`).
+
+### Fase 7d — Victory/Reward (2026-11-20, fork in eye-review)
+
+- **Golden**: nessuno nuovo — pergamena battezzata R-348 (`approved-victory-pergamena-frame.png`) resta il riferimento; nessun mockup prodotto.
+- **DOM + ritagli**: pezzi derivati dal frame approvato, `public/assets/ui/hud-real/victory/vignette.webp` (scena dipinta) + `seal.webp` (sigillo cera) — ritagli, non generazioni.
+- **Palette Nav**: misurata su `test-results/slicekit/material-palette-nav.json`; ink/label/gold mappati su oro-smalto (`#f0d77e` famiglia) per la variante `panel`; `rare` viola rimosso dalla tavolozza del componente.
+- **Fork `?victory=`** (dev-only, default `parchment` fino a ruling): `parchment` (stato firmato), `framed` (pergamena dentro la cornice condivisa panelFrame7 via `PanelFrameOrnaments`, swap `?frame=` come i pannelli), `panel` (campo smalto `HudPlaque field` + cornice + vignetta/sigillo rimontati + CTA smalto verde famiglia D-3).
+- **Banda**: `HudScrollBand` condiviso montato sulle 3 zone scroll (crew/rewards/echoes) con `data-hud-scroll-band`, dentro `.skin-scope` — variante da `HUD_SCROLL_BAND` (ruling A smalto/gemma, che succede alla B «oro inciso» registrata come golden).
+- **Witness live** (headless, run reale guidata a `ended`): `.mw/runs/20261120-victory-fork/{parchment,framed,panel}/` — full + element + text dump, outcome wipe (esercita caduto/«CLOSE THE REPORT»). Ingrandimenti verificati: cornice montata, vignetta/sigillo a posto, tooltip crew vivo.
+- **Test**: `// INV:hudreal-victory-reward.INV-6` permanente (banda sulle 3 zone, variante da config) — suite 6/6 verde; lint `--no-ignore` pulito; `build:check` verde; `closure:lint` gate PASS.
+- **Ruling Director 2026-11-20**: shipping = **A — pergamena** (INV-1 invariato); fork dev-gated `?victory=` conservato per iterazioni future; banda condivisa variante `a` confermata. Record `test-results/slicekit/victory.json` scritto; DECISION_LOG aggiornato. Nessun commit (T-13).
+- **Residuo**: banda a overflow reale non witnessata (liste corte — meccanica coperta da INV-6); tooltip crew aperto in cattura (mouse-rest artefatto, script ora parcheggia il mouse).
+
+### Revert fix-regressioni (Director ruling 2026-11-20, sera)
+
+Il Director ha rilevato regressioni nel giro di correzioni successivo alle feature e ha
+ordinato il revert **solo dell'ultimo giro** (celle risk/rewards, journey, label posti,
+lab wrapper), tenendo le feature approvate: `×` discard, DEATHS%/SUCCESS%, tasche e
+vignetta per-quest, cost cell rimossa, slide.
+
+- `HudRealCassetto.tsx` ripristinato da Local History snapshot `8eZs` (stato
+  fine-thread = `RACK_SCALE 0.8`, vignetta 100% width, label posti complete,
+  celle risk/rewards con `paddingLeft:'34%'`, journey subs a fz 16/0.13em).
+- `hud-compose.tsx` → wrapper lab di nuovo `width:50vh`.
+- Quirk noti dello stato ripristinato (documentati per il re-fix): label
+  "Expedition Leader" e "OUTBOUND" clip ai bordi well; testo celle shiftato sul
+  bordo dx della zona (% padding → containing block = art 365px); banda morta
+  nel lab (wrapper 50vh vs colonna aspect×100vh = 365px a 900vh); banda
+  ornamentale sx cotta tagliata (repair `pieces`/`restore` = sessione parallela).
+- Verifica: tsc pulito, 10/10 test r357 scope verdi, witness
+  `test-results/witness-perquest/reverted-rovine-column.png` (vignetta rovine,
+  BAG — 0/4, DEATHS 10% / SUCCESS 55% visibili).
+- Width: colonna estratta = 365px@900vh ≈ proporzione golden v2 (~22%); framed
+  sarebbe 420px. Eventuale widening > framed richiede rebake (wideFactor ~1.6+)
+  o floor nella width rule — in attesa di ruling.

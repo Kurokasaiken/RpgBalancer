@@ -27,7 +27,7 @@ export type EngravedIconId =
   | 'role-leader' | 'role-member' | 'role-bodyguard' | 'role-scout' | 'status-wound' | 'status-fallen'
   // oggetti usati dalle finestre HUD
   | 'ico-scroll' | 'ico-axe' | 'ico-gust' | 'ico-chest' | 'ico-pouch' | 'ico-cup' | 'ico-vial' | 'ico-spark'
-  | 'ico-target' | 'ico-grapnel' | 'ico-salve' | 'ico-banner';
+  | 'ico-target' | 'ico-grapnel' | 'ico-salve' | 'ico-banner' | 'ico-dot';
 
 const EO = { fillRule: 'evenodd', clipRule: 'evenodd' } as const;
 
@@ -315,6 +315,9 @@ const GLYPHS: Record<EngravedIconId, React.ReactNode> = {
       <path d="M6 3h14l-3.4 4.5L20 12H6z" />
     </>
   ),
+  /* Plain marker dot — the Director's stamina glyph on roster bars
+   *  (reference: heart for HP, dot for stamina). */
+  'ico-dot': <circle cx="12" cy="12" r="5.4" />,
 
 };
 

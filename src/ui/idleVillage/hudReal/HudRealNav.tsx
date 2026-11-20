@@ -31,6 +31,8 @@ const SCOPED_CSS = `
 export interface HudRealNavProps {
   navItems: GameFrameNavItemConfig[];
   activeNavId: string;
+  /** Extra lit entries (panel toggles such as roster/stash stay lit while their panel is open, next to the current view). */
+  alsoActiveNavIds?: readonly string[];
   onNavSelect?: (id: string) => void;
   onRecenter: () => void;
   /** Narrow screens: outer labels move this many design px outwards and inner ones as much towards the compass, so the
@@ -50,7 +52,7 @@ function socketOrder(n: number): number[] {
   return out.sort((a, b) => a - b);
 }
 
-export function HudRealNav({ navItems, activeNavId, onNavSelect, onRecenter, labelSpread = 0, showLabels = true }: HudRealNavProps) {
+export function HudRealNav({ navItems, activeNavId, alsoActiveNavIds, onNavSelect, onRecenter, labelSpread = 0, showLabels = true }: HudRealNavProps) {
   const { t } = useTranslation('idleVillage');
   const order = socketOrder(navItems.length);
   const half = BAR.slots.length / 2;
@@ -66,7 +68,7 @@ export function HudRealNav({ navItems, activeNavId, onNavSelect, onRecenter, lab
       <img src={ASSET} alt="" draggable={false} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', display: 'block' }} />
       {navItems.slice(0, order.length).map((item, i) => {
         const slot = BAR.slots[order[i]];
-        const active = item.id === activeNavId;
+        const active = item.id === activeNavId || (alsoActiveNavIds?.includes(item.id) ?? false);
         const label = t(item.labelKey);
         return (
           <HudTooltip key={item.id} label={label} hint={item.locked ? t('gameFrame.nav.locked') : undefined} side="top" wrap when>
@@ -97,7 +99,7 @@ export function HudRealNav({ navItems, activeNavId, onNavSelect, onRecenter, lab
       })}
       {navItems.slice(0, order.length).map((item, i) => {
         const slot = BAR.slots[order[i]];
-        const active = item.id === activeNavId;
+        const active = item.id === activeNavId || (alsoActiveNavIds?.includes(item.id) ?? false);
         // outer labels move outwards, inner ones towards the compass (which carries no label): every pair separates
         const side = order[i] < half ? -1 : 1;
         const outer = order[i] === 0 || order[i] === BAR.slots.length - 1 ? side : -side;

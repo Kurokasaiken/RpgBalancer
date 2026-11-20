@@ -1,0 +1,116 @@
+{
+  "specVersion": 2,
+  "surface": "lab-frame",
+  "comment": "PLAN-127 night-shift lab pipeline test — NEW golden (Gemini web gen 2026-11-19, chat 30e2d454f7d55d22) 1024x1024 carved stone+brass+emerald frame on flat navy. flatBgMaxDiff keys everything (bg std ~1.2); interior window punched via cutouts. Geometry measured by test-results/slicekit/night-shift/lab/measure-frame.py: outer bbox x131-891 y131-893, interior window ~x275-748 y265-760.",
+  "source": {
+    "path": "test-results/slicekit/night-shift/lab/golden-lab-frame.png",
+    "key": {
+      "type": "flatBgMaxDiff",
+      "sampleRect": [0, 0, 40, 40],
+      "threshold": 8,
+      "gain": 18
+    },
+    "cutouts": [
+      {
+        "rect": [276, 266, 747, 759],
+        "apply": "zeroAlpha",
+        "comment": "interior window — DOM content lands here; any crop dipping in gets punched clean"
+      }
+    ]
+  },
+  "geometry": {
+    "outerRect": [131, 131, 892, 894],
+    "contentRect": [276, 266, 747, 759],
+    "rimOverlapPx": 1,
+    "comment": "outerRect = frame art bbox; contentRect = interior window (the panel edge the frame wraps, ~1px inner-rim overlap per Director ruling)"
+  },
+  "output": {
+    "dir": "public/assets/ui/hud-real/slicekit/lab-frame",
+    "format": "webp",
+    "quality": 92,
+    "alphaQuality": 100,
+    "manifest": "labFrame.json"
+  },
+  "budgets": {
+    "maxPieces": 16,
+    "maxBytes": 1048576
+  },
+  "slices": [
+    {
+      "id": "corner-tl",
+      "role": "corner",
+      "anchor": "tl",
+      "crop": [131, 131, 300, 300],
+      "stretch": "none",
+      "tailFade": { "sides": "rb", "x": 16, "y": 16 },
+      "comment": "acanthus+gem knuckle; scroll zone ends ~x293/y~300 per inner-edge scan"
+    },
+    {
+      "id": "corner-tr",
+      "role": "corner",
+      "anchor": "tr",
+      "crop": [724, 131, 891, 300],
+      "stretch": "none",
+      "tailFade": { "sides": "lb", "x": 16, "y": 16 }
+    },
+    {
+      "id": "corner-bl",
+      "role": "corner",
+      "anchor": "bl",
+      "crop": [131, 755, 300, 893],
+      "stretch": "none",
+      "tailFade": { "sides": "rt", "x": 16, "y": 16 }
+    },
+    {
+      "id": "corner-br",
+      "role": "corner",
+      "anchor": "br",
+      "crop": [724, 755, 891, 893],
+      "stretch": "none",
+      "tailFade": { "sides": "lt", "x": 16, "y": 16 }
+    },
+    {
+      "id": "edge-top",
+      "role": "edge-x",
+      "anchor": "top",
+      "crop": [270, 131, 726, 264],
+      "stretch": "tile",
+      "tileSafe": true,
+      "wrapBlend": { "overlap": 20 },
+      "displayScale": 0.32,
+      "comment": "starts 30px before the corner cut (x300) for phase continuity; ends ~10px under TR corner (x724)"
+    },
+    {
+      "id": "edge-bottom",
+      "role": "edge-x",
+      "anchor": "bottom",
+      "crop": [270, 760, 745, 893],
+      "stretch": "tile",
+      "tileSafe": true,
+      "wrapBlend": { "overlap": 20 },
+      "displayScale": 0.32,
+      "comment": "same span logic; reaches 21px under BR corner (x724)"
+    },
+    {
+      "id": "edge-left",
+      "role": "edge-y",
+      "anchor": "left",
+      "crop": [131, 270, 274, 740],
+      "stretch": "tile",
+      "tileSafe": true,
+      "wrapBlend": { "overlap": 20 },
+      "displayScale": 0.32,
+      "comment": "y 270 overlaps corner-tl cut (300) by 30; wraps to 760 = 5px under BL corner (755)"
+    },
+    {
+      "id": "edge-right",
+      "role": "edge-y",
+      "anchor": "right",
+      "crop": [749, 270, 891, 740],
+      "stretch": "tile",
+      "tileSafe": true,
+      "wrapBlend": { "overlap": 20 },
+      "displayScale": 0.32
+    }
+  ]
+}

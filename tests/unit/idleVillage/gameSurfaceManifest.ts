@@ -428,6 +428,7 @@ export const GAME_SURFACE_FILES = [
   'src/ui/idleVillage/skins/activityCapsuleDetail/ActivityCapsuleDetailSkinSchema.ts',
   'src/ui/idleVillage/skins/activityPoiSkinConfig.ts',
   'src/ui/idleVillage/skins/amanuenseSkinConfig.ts',
+  'src/ui/idleVillage/skins/controlsArt.ts',
   'src/ui/idleVillage/skins/converted/slotWildernessBronzeConfig.ts',
   'src/ui/idleVillage/skins/dayNightPoiSkinConfig.ts',
   'src/ui/idleVillage/skins/jobPoiSkinConfig.ts',
@@ -436,6 +437,7 @@ export const GAME_SURFACE_FILES = [
   'src/ui/idleVillage/skins/poi/poiDetailSkinConfig.ts',
   'src/ui/idleVillage/skins/primitives/HudPanel.tsx',
   'src/ui/idleVillage/skins/primitives/HudPlaque.tsx',
+  'src/ui/idleVillage/skins/primitives/HudScrollBand.tsx',
   'src/ui/idleVillage/skins/primitives/PanelFrameOrnaments.tsx',
   'src/ui/idleVillage/skins/primitives/SkinBadge.tsx',
   'src/ui/idleVillage/skins/primitives/SkinButton.tsx',
@@ -445,6 +447,7 @@ export const GAME_SURFACE_FILES = [
   'src/ui/idleVillage/skins/primitives/cinemaFx.tsx',
   'src/ui/idleVillage/skins/primitives/hudBand.ts',
   'src/ui/idleVillage/skins/primitives/index.ts',
+  'src/ui/idleVillage/skins/primitives/sliceKitManifest.ts',
   'src/ui/idleVillage/skins/questChronicleSkinConfig.ts',
   'src/ui/idleVillage/skins/questPoiSkinConfig.ts',
   'src/ui/idleVillage/skins/resolveInitialSkin.ts',
@@ -540,7 +543,7 @@ export const GAME_SURFACE_LUCIDE_FILES: readonly string[] = [
 
 /**
  * Pre-existing guard debt on the discovered surface — recorded at baseline
- * (2026-11-18T14:07:26.812Z). The ratchet rule: entries here pass once; any NEW
+ * (2026-11-20T12:00:08.352Z). The ratchet rule: entries here pass once; any NEW
  * violation (new file in the list, or a new offense inside a listed file)
  * fails the hudGuards surface checks. Debt entries are tracked as WS-5
  * defect records and burn down during implementation.
@@ -630,7 +633,6 @@ export const GAME_SURFACE_VIOLATION_BASELINE: Record<
   'src/ui/idleVillage/rosterV2/WanderlustRosterCardV2.tsx': { colorLiterals: ["#7bc96f", "#e07a5f", "#e3b04b", "#d8b13e", "#f0cf6a", "#c9a84e", "#9a8246", "#F5F2E8", "rgba(", "#e0b23e", "#f0d99a", "#d8bd78", "#a0762f", "#71501f", "#d98a4a", "#9e5a4a", "#6b3a2a"], smallFonts: ["fontSize: '10px'"] },
   'src/ui/idleVillage/skins/activityCapsuleDetail/ActivityCapsuleDetailSkinAware.tsx': { colorLiterals: ["rgba(", "#060f16", "#7bc96f", "#f0cf6a", "#d98a4a", "#f5f2e8", "#9a8246"], smallFonts: ["fontSize: '11px'", "fontSize: '11px'", "font-size: 11px", "font-size: 11px", "font-size: 11px", "font-size: 11px", "font-size: 10px", "font-size: 8px", "font-size: 10px"] },
   'src/ui/idleVillage/skins/primitives/HudPanel.tsx': { colorLiterals: ["#060f16", "#0f4a52", "rgba("] },
-  'src/ui/idleVillage/skins/primitives/PanelFrameOrnaments.tsx': { colorLiterals: ["#0f1b1f"] },
   'src/ui/idleVillage/skins/primitives/cinemaFx.tsx': { colorLiterals: ["rgba("] },
   'src/ui/styleLab/StyleLabSurface.tsx': { colorLiterals: ["rgba("] },
   'src/ui/visualFidelityLab/CarvedBar.tsx': { colorLiterals: ["#8fe0a8", "#3fa86a", "#1f6e42", "rgba(", "#ffd98a", "#e8a838", "#a86e1c", "#d9b0f2", "#9a5fd0", "#5f2f9c", "#f2d485", "#d3a63e", "#9c6c22", "#ffb478", "#e8551f", "#8a2a0c", "#c9b48a", "#9a8556", "#6a5836", "#05101c", "#02070f", "#c9a84e"], smallFonts: ["fontSize: 10", "fontSize: 11"] },

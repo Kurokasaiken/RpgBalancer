@@ -64,9 +64,14 @@ invariants:
     source: plan
     source_ref: PLAN-125
     statement: >-
-      Il cassetto rebuilt non renderizza nessuna banda risorse né arte di colonna baked
-      (`data-cassetto-resources`, `data-cassetto-res=`, `column-1440|column-1280`,
-      `cassettoColumnGeometry` assenti dal markup — R-357 D-1, supersedes R-335).
+      Il cassetto non monta la barra risorse standalone (`HudRealResources`,
+      `RESOURCES_BAR`, `resWellRef` assenti dal markup): il readout vive come
+      targhette dentro la header band della cornice — wrapper
+      `data-cassetto-resources` con una placca `data-cassetto-res={item.id}`
+      per item del readout reale (R-335, statement amendato R-357/PLAN-125
+      Fase 8: la banda separata resta vietata, la well header è la sede
+      contrattuale — il rebuild slicekit che rimuoveva anche la well non è
+      mai stato committato).
     test_refs:
       - tests/unit/idleVillage/r335CassettoResources.test.ts
   - id: cassetto-no-cost-cell
@@ -112,9 +117,27 @@ invariants:
     source: plan
     source_ref: PLAN-125
     statement: >-
-      Esc e il bottone × chiudono il planner cassetto (R-357).
+      Esc e il bottone × chiudono il planner cassetto (R-357). Director ruling
+      2026-11-20 «X chiudi e perdi tutto»: la chiusura SCARTA la bozza — i seat
+      pieni si liberano via onSlotClear (path reale R-248), la borsa torna al pool
+      condiviso via onReleaseAllItems, poi il planner chiude. Il fold col chip
+      (collapse/expand) NON chiude e tiene la bozza — sono affordance diverse.
     test_refs:
       - tests/unit/idleVillage/r357CassettoLabels.test.tsx
+      - tests/unit/idleVillage/r339BagAssign.test.tsx
+  - id: cassetto-risk-reward-pcts
+    source: director-spec
+    source_ref: PLAN-125 Fase 8 (Director 2026-11-20)
+    statement: >-
+      Accanto alla difficoltà si mostra la percentuale di morte
+      (`data-testid="cassetto-death-pct"`, `questExpedition.forecast.death` =
+      `sim.anyDeathPct` della PartyEstimate) e accanto al reward la percentuale
+      di riuscita (`data-testid="cassetto-success-pct"`,
+      `questExpedition.forecast.reward` = `sim.outcomePct.reward`). Entrambe
+      assenti finché la stima è pending ('computing'/'incomplete') — mai
+      inventate, mai hardcoded. Stessa resa sul bottom-sheet.
+    test_refs:
+      - tests/unit/idleVillage/r339BagAssign.test.tsx
   - id: cassetto-supplies-scroll
     source: plan
     source_ref: PLAN-125

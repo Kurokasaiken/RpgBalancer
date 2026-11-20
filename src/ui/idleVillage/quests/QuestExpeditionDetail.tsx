@@ -554,6 +554,7 @@ const QuestExpeditionDetailComponent: React.FC<QuestExpeditionDetailProps> = ({
    *  out+back. The planner's seal and the run's per-leg journey strip now
    *  project the same total. */
   const journeyFasi = journeyFasiOf(poi);
+  const bagCapacity = poi.bagSlots ?? QUEST_STASH.bagSlots;
   const { site: siteDaysWhole, total: durationDays } = expeditionTotalDays(
     expeditionDuration.estimatedTicks,
     journeyFasi?.travelDays ?? 0,
@@ -1085,7 +1086,7 @@ const QuestExpeditionDetailComponent: React.FC<QuestExpeditionDetailProps> = ({
                     </button>
                   </HudTooltip>
                   <span data-testid="quest-expedition-bag-count" style={{ ...SECTION_LABEL, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {t('questExpedition.loadout', { count: selectedItemIds.length, max: QUEST_STASH.bagSlots })}
+                    {t('questExpedition.loadout', { count: selectedItemIds.length, max: bagCapacity })}
                   </span>
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0, whiteSpace: 'nowrap' }}>
                     {onReleaseAllItems && selectedItemIds.length > 0 && (
@@ -1129,7 +1130,7 @@ const QuestExpeditionDetailComponent: React.FC<QuestExpeditionDetailProps> = ({
                   )}
                 </div>
                 <div data-hud-controls="" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  {Array.from({ length: QUEST_STASH.bagSlots }, (_, i) => {
+                  {Array.from({ length: bagCapacity }, (_, i) => {
                     const id = selectedItemIds[i];
                     const entry = id ? items.find((e) => e.item.id === id) : undefined;
                     return (
@@ -1196,7 +1197,7 @@ const QuestExpeditionDetailComponent: React.FC<QuestExpeditionDetailProps> = ({
                       {items.map((entry) => {
                         const { item, qty } = entry;
                         const selected = selectedItemIds.includes(item.id);
-                        const full = !selected && selectedItemIds.length >= QUEST_STASH.bagSlots;
+                        const full = !selected && selectedItemIds.length >= bagCapacity;
                         return (
                           <Tooltip.Root key={item.id} delayDuration={120}>
                             <Tooltip.Trigger asChild>

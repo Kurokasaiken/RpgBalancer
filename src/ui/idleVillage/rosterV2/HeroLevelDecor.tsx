@@ -88,7 +88,7 @@ export const HeroLevelDecor: React.FC<HeroLevelDecorProps> = ({ resident }) => {
   const slotRef = useRef<HTMLSpanElement>(null);
   const [portraitRect, setPortraitRect] = useState<Rect | null>(null);
   /** Badge right edge (wrapper-relative) and the wrapper width it is measured against. */
-  const [badgeAnchor, setBadgeAnchor] = useState<{ right: number; wrapperWidth: number } | null>(null);
+  const [badgeAnchor, setBadgeAnchor] = useState<{ right: number; wrapperWidth: number; nameMidY?: number } | null>(null);
   const [isCompactBadge, setIsCompactBadge] = useState(false);
   const [flare, setFlare] = useState<HeroLevelUpEvent | null>(null);
   const [floater, setFloater] = useState<{ eventId: string; text: string; rect: Rect } | null>(null);
@@ -120,7 +120,10 @@ export const HeroLevelDecor: React.FC<HeroLevelDecorProps> = ({ resident }) => {
        *  the ring. The top-right contract stays for other densities. */
       const isCompact = wrapper.querySelector('[data-density="compact"]') !== null;
       if (isCompact) {
-        setBadgeAnchor({ right: pr.right - wr.left + 32, wrapperWidth: wr.width });
+        const nameEl = wrapper.querySelector<HTMLElement>('[data-roster-name]');
+        const nr = nameEl?.getBoundingClientRect();
+        /* Dense row: the LV chip sits at the right end of the NAME line (Director 2026-11-20). */
+        setBadgeAnchor({ right: wr.width - 10, wrapperWidth: wr.width, nameMidY: nr ? nr.top - wr.top + nr.height / 2 : undefined });
         setIsCompactBadge(true);
         return;
       }
@@ -208,7 +211,7 @@ export const HeroLevelDecor: React.FC<HeroLevelDecorProps> = ({ resident }) => {
               style={{
                 position: 'absolute',
                 right: badgeAnchor ? badgeAnchor.wrapperWidth - badgeAnchor.right : undefined,
-                top: isCompactBadge ? portraitRect.top + portraitRect.height / 2 - 18 : portraitRect.top - 7,
+                top: isCompactBadge ? (badgeAnchor?.nameMidY ?? portraitRect.top + portraitRect.height / 2) - 7 : portraitRect.top - 7,
                 whiteSpace: 'nowrap',
                 fontFamily: 'var(--skin-font-display)',
                 fontSize: isCompactBadge ? 9 : 12,
@@ -239,39 +242,6 @@ export const HeroLevelDecor: React.FC<HeroLevelDecorProps> = ({ resident }) => {
                     }}
                   >
                     {t('gameFrame.heroLevel.badge', { n: level })}
-                  </span>
-                  {/* Emblem shield under the chip (mockup): gold rim, lacquer
-                   *  field, engraved diamond. */}
-                  <span
-                    aria-hidden
-                    style={{
-                      position: 'relative',
-                      width: 16,
-                      height: 19,
-                      clipPath: 'polygon(0 0, 100% 0, 100% 60%, 50% 100%, 0 60%)',
-                      background: 'var(--skin-icon-color)',
-                      display: 'block',
-                    }}
-                  >
-                    <span
-                      style={{
-                        position: 'absolute',
-                        inset: 1.5,
-                        clipPath: 'polygon(0 0, 100% 0, 100% 60%, 50% 100%, 0 60%)',
-                        background: 'var(--skin-hud-lacquer-deep)',
-                      }}
-                    />
-                    <span
-                      style={{
-                        position: 'absolute',
-                        left: '50%',
-                        top: '38%',
-                        width: 5,
-                        height: 5,
-                        transform: 'translate(-50%, -50%) rotate(45deg)',
-                        background: 'var(--skin-icon-color)',
-                      }}
-                    />
                   </span>
                 </>
               ) : (

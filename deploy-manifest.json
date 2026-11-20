@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-17T20:53:28.744Z",
+  "generated": "2026-11-20T18:48:37.082Z",
   "generator": "scripts/deploy/deployManifest.mjs",
   "profile": "slim",
   "keptRoutes": [
@@ -213,8 +213,8 @@
     "/world-surface-demo": "registry"
   },
   "public": {
-    "totalFiles": 3175,
-    "referencedCount": 325,
+    "totalFiles": 3272,
+    "referencedCount": 354,
     "dynamicPrefixes": [
       "/assets/atmosphere/",
       "/assets/atmosphere/fog/mask-",
@@ -955,6 +955,10 @@
         "bytes": 131436
       },
       {
+        "path": "/assets/ui/hud-real/slicekit/cassetto/cta-plaque.webp",
+        "bytes": 129504
+      },
+      {
         "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_RGBA_4.png",
         "bytes": 124912
       },
@@ -1017,6 +1021,10 @@
       {
         "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_RGBA_0.png",
         "bytes": 124870
+      },
+      {
+        "path": "/assets/ui/hud-real/slicekit/cassetto/vignette.webp",
+        "bytes": 124590
       },
       {
         "path": "/assets/quest-goblin/razzia.jpg",
@@ -1643,6 +1651,10 @@
         "bytes": 31346
       },
       {
+        "path": "/assets/ui/hud-real/slicekit/cassetto/supply-bag.webp",
+        "bytes": 30422
+      },
+      {
         "path": "/assets/ui/poi-radial/cards/plate-empty.webp",
         "bytes": 30422
       },
@@ -1653,6 +1665,10 @@
       {
         "path": "/assets/ui/poi-radial/cards/plate-amethyst.webp",
         "bytes": 29812
+      },
+      {
+        "path": "/assets/ui/hud-real/slicekit/cassetto/rail-bottom.webp",
+        "bytes": 29162
       },
       {
         "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_56.png",
@@ -1911,6 +1927,10 @@
         "bytes": 28260
       },
       {
+        "path": "/assets/ui/hud-real/slicekit/cassetto/rail-top.webp",
+        "bytes": 27562
+      },
+      {
         "path": "/assets/characters/prototypes/fantasy_vector/knight_blade/character_run_1.png",
         "bytes": 27006
       },
@@ -1997,6 +2017,18 @@
       {
         "path": "/assets/ui/zanara/roster/plaque-mid.png",
         "bytes": 22378
+      },
+      {
+        "path": "/assets/ui/hud-real/slicekit/lab-frame/edge-right.webp",
+        "bytes": 22190
+      },
+      {
+        "path": "/assets/ui/hud-real/slicekit/panel-frame6/corner-tl.webp",
+        "bytes": 22128
+      },
+      {
+        "path": "/assets/ui/hud-real/slicekit/lab-frame/edge-left.webp",
+        "bytes": 22122
       },
       {
         "path": "/assets/ui/hud-real/poi/layers/poi-arc-inc.webp",
@@ -2267,12 +2299,48 @@
         "bytes": 21247
       },
       {
+        "path": "/assets/ui/hud-real/slicekit/panel-frame7/corner-tl.webp",
+        "bytes": 21198
+      },
+      {
+        "path": "/assets/ui/hud-real/slicekit/lab-frame/edge-top.webp",
+        "bytes": 20936
+      },
+      {
         "path": "/docs/prompts/prompt_library.md",
         "bytes": 19979
       },
       {
+        "path": "/assets/ui/hud-real/slicekit/lab-frame/edge-bottom.webp",
+        "bytes": 19126
+      },
+      {
+        "path": "/assets/ui/hud-real/slicekit/panel-frame6/edge-top.webp",
+        "bytes": 17910
+      },
+      {
+        "path": "/assets/ui/hud-real/slicekit/cornici/corner-tl.webp",
+        "bytes": 17692
+      },
+      {
         "path": "/assets/ui/hud-real/poi/layers/poi-arc-tube.webp",
         "bytes": 17430
+      },
+      {
+        "path": "/assets/ui/hud-real/slicekit/panel-frame7/corner-tr.webp",
+        "bytes": 17262
+      },
+      {
+        "path": "/assets/ui/hud-real/slicekit/panel-frame7/edge-top.webp",
+        "bytes": 17036
+      },
+      {
+        "path": "/assets/ui/hud-real/slicekit/panel-frame6/edge-left.webp",
+        "bytes": 17012
+      },
+      {
+        "path": "/assets/ui/hud-real/slicekit/panel-frame6/corner-tr.webp",
+        "bytes": 16762
       },
       {
         "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_0.png",
@@ -2281,76 +2349,8 @@
       {
         "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_1.png",
         "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_10.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_11.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_12.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_13.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_14.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_15.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_16.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_17.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_18.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_19.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_2.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_20.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_21.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_22.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_23.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_24.png",
-        "bytes": 16521
-      },
-      {
-        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_25.png",
-        "bytes": 16521
       }
     ],
-    "orphanBytes": 182136533
+    "orphanBytes": 182975861
   }
 }

@@ -1,0 +1,288 @@
+{
+  "surface": "panel-frame6",
+  "specVersion": 2,
+  "generator": "scripts/hud-real/slice-frame.py",
+  "generatedAt": "2026-11-19T17:01:13+00:00",
+  "source": {
+    "path": ".mw/specs/expedition-ui/refs/candidate-cornici-bronzo-r1-keyed.png",
+    "sha256": "ceaeab2d96b9c121ce05b50b6eeeb8f85c157adffa7b238e28bb9cccc72e6de2"
+  },
+  "assetBase": "/assets/ui/hud-real/slicekit/panel-frame6/",
+  "pieces": [
+    {
+      "id": "corner-tl",
+      "file": "corner-tl.webp",
+      "role": "corner",
+      "anchor": "tl",
+      "stretch": "none",
+      "nativeSize": [
+        190,
+        194
+      ],
+      "bytes": 22128,
+      "displaySize": [
+        53,
+        54
+      ],
+      "pos": {
+        "left": -21,
+        "top": -34
+      },
+      "holeCornerPx": [
+        82,
+        122
+      ]
+    },
+    {
+      "id": "corner-tr",
+      "file": "corner-tr.webp",
+      "role": "corner",
+      "anchor": "tr",
+      "stretch": "none",
+      "nativeSize": [
+        176,
+        186
+      ],
+      "bytes": 16762,
+      "displaySize": [
+        49,
+        52
+      ],
+      "pos": {
+        "right": -7,
+        "top": -34
+      },
+      "holeCornerPx": [
+        -551,
+        122
+      ]
+    },
+    {
+      "id": "corner-bl",
+      "file": "corner-bl.webp",
+      "role": "corner",
+      "anchor": "bl",
+      "stretch": "none",
+      "nativeSize": [
+        170,
+        177
+      ],
+      "bytes": 11554,
+      "displaySize": [
+        48,
+        50
+      ],
+      "pos": {
+        "left": -21,
+        "bottom": -4
+      },
+      "holeCornerPx": [
+        82,
+        -631
+      ]
+    },
+    {
+      "id": "corner-br",
+      "file": "corner-br.webp",
+      "role": "corner",
+      "anchor": "br",
+      "stretch": "none",
+      "nativeSize": [
+        162,
+        143
+      ],
+      "bytes": 6142,
+      "displaySize": [
+        45,
+        40
+      ],
+      "pos": {
+        "right": -7,
+        "bottom": -4
+      },
+      "holeCornerPx": [
+        -565,
+        -665
+      ]
+    },
+    {
+      "id": "edge-top",
+      "file": "edge-top.webp",
+      "role": "edge-x",
+      "anchor": "top",
+      "stretch": "tile",
+      "nativeSize": [
+        238,
+        108
+      ],
+      "bytes": 17910,
+      "tileSafe": true,
+      "displayScale": 0.28,
+      "displaySize": [
+        67,
+        30
+      ],
+      "span": [
+        12,
+        4
+      ],
+      "holeBoundary": {
+        "side": "bottom",
+        "offsetPx": -1
+      }
+    },
+    {
+      "id": "edge-left",
+      "file": "edge-left.webp",
+      "role": "edge-y",
+      "anchor": "left",
+      "stretch": "tile",
+      "nativeSize": [
+        67,
+        408
+      ],
+      "bytes": 17012,
+      "tileSafe": true,
+      "displayScale": 0.28,
+      "displaySize": [
+        19,
+        114
+      ],
+      "span": [
+        24,
+        2
+      ],
+      "holeBoundary": {
+        "side": "right",
+        "offsetPx": -6
+      }
+    },
+    {
+      "id": "edge-right",
+      "file": "edge-right.webp",
+      "role": "edge-y",
+      "anchor": "right",
+      "stretch": "tile",
+      "nativeSize": [
+        16,
+        500
+      ],
+      "bytes": 2516,
+      "tileSafe": true,
+      "displayScale": 0.28,
+      "displaySize": [
+        4,
+        140
+      ],
+      "span": [
+        24,
+        2
+      ],
+      "holeBoundary": {
+        "side": "left",
+        "offsetPx": -703
+      }
+    },
+    {
+      "id": "edge-bottom",
+      "file": "edge-bottom.webp",
+      "role": "edge-x",
+      "anchor": "bottom",
+      "stretch": "tile",
+      "nativeSize": [
+        400,
+        13
+      ],
+      "bytes": 1354,
+      "tileSafe": true,
+      "displayScale": 0.28,
+      "displaySize": [
+        112,
+        4
+      ],
+      "span": [
+        8,
+        4
+      ],
+      "holeBoundary": {
+        "side": "top",
+        "offsetPx": -795
+      }
+    }
+  ],
+  "geometry": {
+    "outer": {
+      "x": 12,
+      "y": 16,
+      "w": 947,
+      "h": 1007
+    },
+    "contentRect": {
+      "x": 86,
+      "y": 135,
+      "w": 850,
+      "h": 874
+    },
+    "contentInsets": {
+      "top": 119,
+      "right": 23,
+      "bottom": 14,
+      "left": 74
+    },
+    "rimOverlapPx": 1,
+    "corners": {
+      "tl": {
+        "w": 190,
+        "h": 194
+      },
+      "tr": {
+        "w": 176,
+        "h": 186
+      },
+      "bl": {
+        "w": 170,
+        "h": 177
+      },
+      "br": {
+        "w": 162,
+        "h": 143
+      }
+    },
+    "edgeThickness": {
+      "top": 108,
+      "left": 67,
+      "right": 16,
+      "bottom": 13
+    },
+    "backings": [
+      {
+        "anchor": "tl",
+        "w": 18,
+        "h": 18,
+        "shape": "crescent",
+        "color": "var(--skin-hud-enamel-deep, #091d15)"
+      },
+      {
+        "anchor": "tr",
+        "w": 18,
+        "h": 18,
+        "shape": "crescent",
+        "color": "var(--skin-hud-enamel-deep, #091d15)"
+      },
+      {
+        "anchor": "bl",
+        "w": 18,
+        "h": 18,
+        "shape": "crescent",
+        "color": "var(--skin-hud-enamel-deep, #091d15)"
+      },
+      {
+        "anchor": "br",
+        "w": 18,
+        "h": 18,
+        "shape": "crescent",
+        "color": "var(--skin-hud-enamel-deep, #091d15)"
+      }
+    ]
+  }
+}

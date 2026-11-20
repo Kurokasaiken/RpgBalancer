@@ -112,6 +112,7 @@ export const ExpeditionBottomSheet: React.FC<ExpeditionBottomSheetProps> = ({
   canSend = true,
   disabledReason,
   onConfirm,
+  onClose,
 }) => {
   const { t } = useTranslation('idleVillage');
   const detent = useExpeditionSheet((s) => s.detent);
@@ -318,6 +319,31 @@ export const ExpeditionBottomSheet: React.FC<ExpeditionBottomSheetProps> = ({
               style={{ transform: detent === 'peek' ? 'rotate(-90deg)' : 'rotate(90deg)' }}
             />
           </button>
+          {/* Same × as the column (Director 2026-11-20 «chiudi e perdi
+           *  tutto»): closes the planner and the adapter owns the discard —
+           *  the detents only fold. */}
+          {onClose && (
+            <button
+              type="button"
+              data-testid="cassetto-close"
+              aria-label={t('floatingPanel.close')}
+              title={t('floatingPanel.close')}
+              onClick={onClose}
+              style={{
+                flex: 'none',
+                width: SHEET.handlePx,
+                height: SHEET.handlePx,
+                display: 'grid',
+                placeItems: 'center',
+                border: 'none',
+                background: 'transparent',
+                color: 'var(--skin-text-secondary)',
+                cursor: 'pointer',
+              }}
+            >
+              <EngravedIcon id="cmd-close" size={14} aria-hidden />
+            </button>
+          )}
           {/* Grab pill — the visual drag affordance, centered on the strip. */}
           <span
             aria-hidden="true"
@@ -438,7 +464,13 @@ export const ExpeditionBottomSheet: React.FC<ExpeditionBottomSheetProps> = ({
                           justifyContent: 'center',
                         }}
                       >
-                        <EngravedIcon id="ico-pouch" size={22} style={{ opacity: 0.45, color: 'var(--skin-hud-brass-hi)' }} aria-hidden />
+                        {/* Painted supply-bag (refs/icon-supply-bag.png) — same
+                         *  symbol the drawer wells carry, dimmed while empty. */}
+                        <img
+                          src="/assets/ui/hud-real/slicekit/cassetto/supply-bag.webp"
+                          alt="" draggable={false} aria-hidden
+                          style={{ width: '82%', height: '82%', objectFit: 'contain', opacity: 0.4, filter: 'saturate(0.7)' }}
+                        />
                       </button>
                     )}
                   </span>
@@ -507,41 +539,40 @@ export const ExpeditionBottomSheet: React.FC<ExpeditionBottomSheetProps> = ({
                 <span style={{ fontSize: SHEET.minTextPx, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--skin-text-secondary)' }}>
                   {t('gameFrame.cassetto.risk', 'Risk')}
                 </span>
-                <span style={{ fontFamily: 'var(--skin-font-display)', fontSize: SHEET.minTextPx, fontWeight: 800, color: 'var(--skin-text-primary)', textTransform: 'uppercase' }}>
+                <span
+                  data-testid="cassetto-risk-value"
+                  data-risk-state={quest.riskPending ?? 'ready'}
+                  style={{
+                    fontFamily: 'var(--skin-font-display)', fontSize: SHEET.minTextPx, fontWeight: 800, textTransform: 'uppercase',
+                    color: quest.riskPending ? 'var(--skin-text-secondary)' : 'var(--skin-text-primary)',
+                  }}
+                >
                   {quest.riskLabel}
                 </span>
-              </span>
-              <div
-                data-testid="cassetto-cost-slot"
-                data-placeholder={quest.costPreview ? undefined : 'cost-preview'}
-                aria-hidden={quest.costPreview ? undefined : true}
-                role="group"
-                aria-label={quest.costPreview ? t('gameFrame.cassetto.cost', 'Cost') : undefined}
-                style={{ pointerEvents: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}
-              >
-                {quest.costPreview && (
-                  <>
-                    <span style={{ fontSize: SHEET.minTextPx, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--skin-text-secondary)' }}>
-                      {t('gameFrame.cassetto.cost', 'Cost')}
-                    </span>
-                    <span
-                      data-testid="cassetto-cost-value"
-                      data-tone={quest.costPreview.insufficient ? 'danger' : undefined}
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontFamily: 'var(--skin-font-display)', fontSize: SHEET.minTextPx, fontWeight: 700, color: 'var(--skin-text-primary)' }}
-                    >
-                      <img src={`/assets/ui/resources/res-${quest.costPreview.icon}-64.webp`} alt="" style={{ width: 20, height: 20 }} draggable={false} />
-                      {quest.costPreview.qty}
-                    </span>
-                  </>
-                )}
-              </div>
-              <span style={{ display: 'inline-flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
-                {quest.rewards.map((r) => (
-                  <span key={r.icon} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: SHEET.minTextPx, fontWeight: 700, color: 'var(--skin-title-color)' }}>
-                    <img src={`/assets/ui/resources/res-${r.icon}-64.webp`} alt="" style={{ width: 20, height: 20 }} draggable={false} />
-                    {r.qty}
+                {/* Director 2026-11-20: % morte next to the risk value. */}
+                {quest.deathPct != null && (
+                  <span data-testid="cassetto-death-pct" style={{ fontSize: SHEET.minTextPx, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--skin-text-secondary)' }}>
+                    {t('questExpedition.forecast.death', { pct: Math.round(quest.deathPct) })}
                   </span>
-                ))}
+                )}
+              </span>
+              {/* INV:cassetto-no-cost-cell — no cost cell on the sheet either
+               *  (the cost lives in the supplies flow). */}
+              <span style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                <span style={{ display: 'inline-flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+                  {quest.rewards.map((r) => (
+                    <span key={r.icon} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: SHEET.minTextPx, fontWeight: 700, color: 'var(--skin-title-color)' }}>
+                      <img src={`/assets/ui/resources/res-${r.icon}-64.webp`} alt="" style={{ width: 20, height: 20 }} draggable={false} />
+                      {r.qty}
+                    </span>
+                  ))}
+                </span>
+                {/* Director 2026-11-20: % riuscita next to the reward. */}
+                {quest.successPct != null && (
+                  <span data-testid="cassetto-success-pct" style={{ fontSize: SHEET.minTextPx, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--skin-title-color)' }}>
+                    {t('questExpedition.forecast.reward', { pct: Math.round(quest.successPct) })}
+                  </span>
+                )}
               </span>
             </div>
           </div>

@@ -8,6 +8,7 @@ import { checkManifestBaseSha, readSyncSeal } from './verification/livingSyncGat
 import { checkVisualForkGate } from './verification/visualForkGate';
 import { checkIntentGate } from './verification/intentGate';
 import { checkResourceLifecycleGate } from './verification/resourceLifecycleGate';
+import { checkSliceKitGate } from './verification/sliceKitGate';
 import { RICHIESTE_UNION_PARTS } from './verification/richiesteUnion';
 
 /**
@@ -179,6 +180,15 @@ async function main() {
   const resGate = checkResourceLifecycleGate(process.cwd());
   errors.push(...resGate.errors);
   for (const w of resGate.warnings) {
+    console.error(` ⚠ ${w}`);
+  }
+
+  // Gate slice-kit receipts (PLAN-127 OB-12, scoped r002): se la diff tocca
+  // spec/manifest/primitivo slice-kit (path pattern meccanico), le superfici
+  // coinvolte devono avere ricevute complete — skip/stale/tripwire → rosso.
+  const sliceKitGate = checkSliceKitGate(process.cwd(), { changedFiles });
+  errors.push(...sliceKitGate.errors);
+  for (const w of sliceKitGate.warnings) {
     console.error(` ⚠ ${w}`);
   }
 

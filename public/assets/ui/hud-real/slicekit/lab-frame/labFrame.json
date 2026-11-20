@@ -1,0 +1,194 @@
+{
+  "surface": "lab-frame",
+  "specVersion": 2,
+  "generator": "scripts/hud-real/slice-frame.py",
+  "generatedAt": "2026-11-18T21:03:54+00:00",
+  "source": {
+    "path": "test-results/slicekit/night-shift/lab/golden-lab-frame.png",
+    "sha256": "ce5ae50d1635298ccc6fcca5c534f295f80251182b1839d1e0d48954348110b7"
+  },
+  "assetBase": "/assets/ui/hud-real/slicekit/lab-frame/",
+  "pieces": [
+    {
+      "id": "corner-tl",
+      "file": "corner-tl.webp",
+      "role": "corner",
+      "anchor": "tl",
+      "stretch": "none",
+      "nativeSize": [
+        169,
+        169
+      ],
+      "bytes": 10428,
+      "holeCornerPx": [
+        145,
+        135
+      ]
+    },
+    {
+      "id": "corner-tr",
+      "file": "corner-tr.webp",
+      "role": "corner",
+      "anchor": "tr",
+      "stretch": "none",
+      "nativeSize": [
+        167,
+        169
+      ],
+      "bytes": 10196,
+      "holeCornerPx": [
+        23,
+        135
+      ]
+    },
+    {
+      "id": "corner-bl",
+      "file": "corner-bl.webp",
+      "role": "corner",
+      "anchor": "bl",
+      "stretch": "none",
+      "nativeSize": [
+        169,
+        138
+      ],
+      "bytes": 8682,
+      "holeCornerPx": [
+        145,
+        4
+      ]
+    },
+    {
+      "id": "corner-br",
+      "file": "corner-br.webp",
+      "role": "corner",
+      "anchor": "br",
+      "stretch": "none",
+      "nativeSize": [
+        167,
+        138
+      ],
+      "bytes": 9086,
+      "holeCornerPx": [
+        23,
+        4
+      ]
+    },
+    {
+      "id": "edge-top",
+      "file": "edge-top.webp",
+      "role": "edge-x",
+      "anchor": "top",
+      "stretch": "tile",
+      "nativeSize": [
+        456,
+        133
+      ],
+      "bytes": 20936,
+      "tileSafe": true,
+      "displayScale": 0.32,
+      "holeBoundary": {
+        "side": "bottom",
+        "offsetPx": -2
+      }
+    },
+    {
+      "id": "edge-bottom",
+      "file": "edge-bottom.webp",
+      "role": "edge-x",
+      "anchor": "bottom",
+      "stretch": "tile",
+      "nativeSize": [
+        475,
+        133
+      ],
+      "bytes": 19126,
+      "tileSafe": true,
+      "displayScale": 0.32,
+      "holeBoundary": {
+        "side": "top",
+        "offsetPx": -1
+      }
+    },
+    {
+      "id": "edge-left",
+      "file": "edge-left.webp",
+      "role": "edge-y",
+      "anchor": "left",
+      "stretch": "tile",
+      "nativeSize": [
+        143,
+        470
+      ],
+      "bytes": 22122,
+      "tileSafe": true,
+      "displayScale": 0.32,
+      "holeBoundary": {
+        "side": "right",
+        "offsetPx": -2
+      }
+    },
+    {
+      "id": "edge-right",
+      "file": "edge-right.webp",
+      "role": "edge-y",
+      "anchor": "right",
+      "stretch": "tile",
+      "nativeSize": [
+        142,
+        470
+      ],
+      "bytes": 22190,
+      "tileSafe": true,
+      "displayScale": 0.32,
+      "holeBoundary": {
+        "side": "left",
+        "offsetPx": -2
+      }
+    }
+  ],
+  "geometry": {
+    "outer": {
+      "x": 131,
+      "y": 131,
+      "w": 761,
+      "h": 763
+    },
+    "contentRect": {
+      "x": 276,
+      "y": 266,
+      "w": 471,
+      "h": 493
+    },
+    "contentInsets": {
+      "top": 135,
+      "right": 145,
+      "bottom": 135,
+      "left": 145
+    },
+    "rimOverlapPx": 1,
+    "corners": {
+      "tl": {
+        "w": 169,
+        "h": 169
+      },
+      "tr": {
+        "w": 167,
+        "h": 169
+      },
+      "bl": {
+        "w": 169,
+        "h": 138
+      },
+      "br": {
+        "w": 167,
+        "h": 138
+      }
+    },
+    "edgeThickness": {
+      "top": 133,
+      "bottom": 133,
+      "left": 143,
+      "right": 142
+    }
+  }
+}

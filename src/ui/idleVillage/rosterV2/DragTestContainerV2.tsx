@@ -18,7 +18,34 @@ import { useMatericSkin } from '@/ui/wanderlust-surface/MatericSkinContext';
 import { MATERIC_SKIN_CONFIG } from '@/ui/wanderlust-surface/matericSkinConfig';
 import { BezelMolding, WellBronzeBezel } from '@/ui/visualFidelityLab/plateVariants';
 import { useTranslation } from 'react-i18next';
-import { HudPlaque, PanelFrameOrnaments } from '@/ui/idleVillage/skins/primitives';
+import { HudPlaque, HudScrollBand, PanelFrameOrnaments } from '@/ui/idleVillage/skins/primitives';
+import { panelFrame6Frame } from '@/generated/slicekit/panelFrame6Frame';
+import { panelFrame7Frame } from '@/generated/slicekit/panelFrame7Frame';
+import { frameTopRimPx, thinFrameManifest, type SliceKitFrameManifest } from '@/ui/idleVillage/skins/primitives/sliceKitManifest';
+import { preloadControlsArt } from '@/ui/idleVillage/skins/controlsArt';
+
+/* PLAN-127 slice-kit frame candidates (R-362 frame-smeraldo + R-363 thin
+ *  default): `?frame=` picks the painted frame on the HUD-plaque surface —
+ *  `authored` keeps the emitted geometry, `thin`/`frame6thin` scale the
+ *  pieces ×0.5 for a denser panel. Same art in every candidate, only the
+ *  DISPLAY weight changes; the header clearance below the band derives from
+ *  the active manifest (`frameTopRimPx`), never a hand constant. */
+type PanelFrameId = 'authored' | 'thin' | 'frame6thin';
+const panelFrame7Thin = thinFrameManifest(panelFrame7Frame, 0.5);
+const panelFrame6Thin = thinFrameManifest(panelFrame6Frame, 0.5);
+const PANEL_FRAME_CANDIDATES: ReadonlyArray<{ id: PanelFrameId; manifest: SliceKitFrameManifest }> = [
+  { id: 'thin', manifest: panelFrame7Thin },
+  { id: 'authored', manifest: panelFrame7Frame },
+  { id: 'frame6thin', manifest: panelFrame6Thin },
+];
+const panelFrameParam = new URLSearchParams(window.location.search).get('frame');
+const panelFrameActive =
+  PANEL_FRAME_CANDIDATES.find((c) => c.id === panelFrameParam)?.manifest ?? PANEL_FRAME_CANDIDATES[0].manifest;
+const panelFrameTopRim = frameTopRimPx(panelFrameActive);
+
+/* Preload the painted-control art (PLAN-128 `controls` slice-kit: round +
+ *  pill, 5 states each) so the first hover doesn't pop. */
+preloadControlsArt();
 
 /** QoL-9 (R-281): eligibility reasons with a dedicated roster copy key —
  *  anything else (raw producer strings, e.g. the POI session's legacy
@@ -224,7 +251,7 @@ function DragTestContainerV2({
   // V2: the compact roster is a HUD plaque (same material as the other HUD pieces), not a bezel on its own fill.
   const hudSurface = useWanderlustSkin && isCompact;
   /** Row pitch used by virtualization; must match the rendered card height + gap. */
-  const itemPitchPx = isCompact ? 36 : cardVariant === 'horizontal' ? 80 : 140;
+  const itemPitchPx = isCompact ? 46 : cardVariant === 'horizontal' ? 80 : 140;
   const isMateric = useMatericSkin();
   const [draggingResidentId, setDraggingResidentId] = useState<string | null>(null);
   const [dragStartTime, setDragStartTime] = useState<number | null>(null);
@@ -253,10 +280,22 @@ function DragTestContainerV2({
   }, [sortSelection, t]);
   const [heroFlashIds, setHeroFlashIds] = useState<string[]>([]);
   const [recentlyDraggedResidentId, setRecentlyDraggedResidentId] = useState<string | null>(null);
-  const [isRosterCollapsed, setIsRosterCollapsed] = useState(false);
+  /* The roster is never folded to a strip (Director 2026-11-20): kept as a constant so the list styles stay one path. */
+  const isRosterCollapsed = false as boolean;
   const isInlineLayout = layout === 'inline';
   const isGridLayout = layout === 'grid';
   const listMaxHeightPx = listMaxHeight ?? (isInlineLayout ? 184 : 400);
+  /* Inter-row gap in the list — must match `listWrapperClassName`
+   *  (`space-y-(--skin-hud-row-gap)` compact / `space-y-2` otherwise).
+   *  Measured: the compact card renders 46px tall, gap 4 → row pitch 50. */
+  const listRowGapPx = isCompact ? 4 : 8;
+  const listRowPitchPx = itemPitchPx + listRowGapPx;
+  /* PLAN-125: no half-cut rows — the visible window rounds to the nearest
+   *  whole row (N rows paint N·pitch − trailing gap), never mid-row. */
+  const listVisibleHeightPx = Math.max(
+    itemPitchPx,
+    Math.round((listMaxHeightPx + listRowGapPx) / listRowPitchPx) * listRowPitchPx - listRowGapPx,
+  );
 
   // Initialize diagnostics logger
   const diagnostics = createSandboxDiagnostics('DragTestContainerV2', 'drag-test-container');
@@ -455,8 +494,8 @@ function DragTestContainerV2({
   
   const virtualConfig = useVirtualization({
     itemCount: sortedResidents.length,
-    itemHeight: itemPitchPx,
-    containerHeight: listMaxHeightPx,
+    itemHeight: listRowPitchPx,
+    containerHeight: listVisibleHeightPx,
     overscan: 3,
   });
 
@@ -985,7 +1024,6 @@ function DragTestContainerV2({
   /* T-23/R-251 convention: restore sits in the minimise slot, so the second
    *  click of a fast double-click would toggle straight back — timestamps in
    *  ms let the expand ignore tails <350ms (Date.now: vitest fake timers). */
-  const collapsedAtRef = useRef(0);
   const activePointerIdRef = useRef<number | null>(null);
   const FALLBACK_POINTER_ID = -1;
   const containerRef = useRef<HTMLDivElement>(null);
@@ -1186,17 +1224,26 @@ function DragTestContainerV2({
       )}
       {hudSurface ? (
         <>
-          <HudPlaque shape="panel" aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+          <HudPlaque shape="field" tone="enamel" aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
             {null}
           </HudPlaque>
-          {/* R-353 mockup frame: painted acanthus corners + inner filet over
-           *  the plaque edge — decoration only, same layer as the seat line. */}
-          <PanelFrameOrnaments variant="roster" />
+          {/* PLAN-127 slice-kit frame (R-362/363): the painted smeraldo frame
+           *  drawn from the active candidate manifest — `?frame=` swaps the
+           *  weight, `thin` ×0.5 is the default. Decoration only, same layer
+           *  as the seat line. */}
+          <PanelFrameOrnaments variant="cornici" manifest={panelFrameActive} />
         </>
       ) : (
         useWanderlustSkin && <WellBronzeBezel band={2} rx={19} flush />
       )}
-      <div className={`relative z-10 ${isCompact ? (isRosterCollapsed ? 'px-(--skin-hud-panel-padding) py-1.5' : 'space-y-(--skin-hud-stack-gap) p-(--skin-hud-panel-padding)') : `space-y-4 ${useWanderlustSkin ? 'p-6' : 'p-4'}`} ${isRosterCollapsed ? 'overflow-hidden' : ''}`.trim()}>
+      {/* R-363: on the HUD surface the header's clearance below the painted
+       *  frame band's inner rim = `--skin-hud-frame-top` token + the active
+       *  manifest's rim reach (`frameTopRimPx`) — not a hand constant, it
+       *  scales with the `?frame=` weight. */}
+      <div
+        className={`relative z-10 ${isCompact ? (isRosterCollapsed ? 'px-(--skin-hud-panel-padding) py-1.5' : 'space-y-(--skin-hud-stack-gap) p-(--skin-hud-panel-padding)') : `space-y-4 ${useWanderlustSkin ? 'p-6' : 'p-4'}`} ${isRosterCollapsed ? 'overflow-hidden' : ''}`.trim()}
+        style={hudSurface ? { paddingTop: `calc(var(--skin-hud-frame-top) + ${panelFrameTopRim}px)` } : undefined}
+      >
         {useWanderlustSkin && !isCompact && (
           <div 
             className="block h-px mx-2 mb-5"
@@ -1227,20 +1274,13 @@ function DragTestContainerV2({
         >
           <div className={_headerTextClassName} style={useWanderlustSkin && isCompact ? HUD_TITLE_STYLE : undefined}>
             <span style={useWanderlustSkin ? { fontFamily: 'var(--wl-font-display, "Cinzel", "Trajan Pro", serif)' } : {}}>{t('gameFrame.roster.title')}</span>
-            <span 
-              className={useWanderlustSkin ? 'text-[var(--skin-title-color)]' : 'text-[var(--skin-text-primary)]'}
-              aria-label={`Filtered residents: ${sortedResidents.length} of ${residents.length}`}
-              data-testid="resident-count"
-            >
-              {`${sortedResidents.length}/${residents.length}`}
-            </span>
           </div>
           <div className={isCompact ? 'flex min-w-0 items-center gap-(--skin-hud-control-gap)' : 'flex items-center gap-1'} data-hud-controls={isCompact ? '' : undefined} data-collapsed={isCompact && isRosterCollapsed ? '' : undefined}>
             {/* INV:drag-test-container-v2.INV-1 — the native select is stretched
                 over the whole pill (see skinScope.css) so every point of the
                 visible control opens the picker; the value text is rendered by
                 the replica span since the select itself is transparent. */}
-            <label>
+            <label data-ctl="round" data-state={filters.status !== 'all' ? 'selected' : undefined} title={t(`gameFrame.roster.filter.${filters.status}`)}>
               <EngravedIcon id="cmd-filter" className="h-3 w-3 shrink-0" />
               <span data-roster-pill-value aria-hidden="true">
                 {t(`gameFrame.roster.filter.${filters.status}`)}
@@ -1264,7 +1304,7 @@ function DragTestContainerV2({
             {/* Ordering control: restores the V1 surface — the four rosterSortConfig
                 modes plus dynamic statSnapshot stats, applied after status filtering
                 and inside the hero/active/blocked groups. */}
-            <label>
+            <label data-ctl="round" data-state={sortSelection ? 'selected' : undefined} title={sortSelectionLabel}>
               <EngravedIcon id="cmd-menu" className="h-3 w-3 shrink-0" />
               <span data-roster-pill-value aria-hidden="true">{sortSelectionLabel}</span>
               <select
@@ -1295,7 +1335,7 @@ function DragTestContainerV2({
               type="button"
               onClick={() => setStatSortDirection((d) => (d === 'asc' ? 'desc' : 'asc'))}
               disabled={!sortSelection.startsWith('stat:')}
-              className={_controlButtonClassName}
+              data-ctl="round"
               aria-label={statSortDirection === 'asc' ? t('gameFrame.roster.sort.asc') : t('gameFrame.roster.sort.desc')}
               data-testid="roster-stat-sort-direction"
             >
@@ -1303,39 +1343,21 @@ function DragTestContainerV2({
             </button>
 
             {headerControls}
-            <button
-              type="button"
-              onClick={() => {
-                const now = Date.now();
-                if (isRosterCollapsed && now - collapsedAtRef.current < 350) return;
-                if (!isRosterCollapsed) collapsedAtRef.current = now;
-                const newState = !isRosterCollapsed;
-                setIsRosterCollapsed(newState);
-
-                diagnostics.debug('roster_collapsed_toggled', {
-                  isCollapsed: newState,
-                  timestamp: Date.now(),
-                  location: 'DragTestContainerV2',
-                  payload: {
-                    isCollapsed: newState,
-                    filteredCount: filteredResidents.length,
-                  },
-                }, ['ui', 'toggle']);
-              }}
-              className={_controlButtonClassName}
-              aria-label={isRosterCollapsed ? t('gameFrame.roster.show') : t('gameFrame.roster.hide')}
-              aria-pressed={isRosterCollapsed}
-              data-keep=""
-            >
-              <EngravedIcon id={isRosterCollapsed ? 'cmd-panels' : 'cmd-minimize'} className="h-3.5 w-3.5" />
-            </button>
             {onClose && (
-              <button type="button" onClick={onClose} aria-label={t('gameFrame.panels.close')} title={t('gameFrame.panels.close')} data-keep="">
+              <button type="button" onClick={onClose} data-ctl="round" data-panel-close="" aria-label={t('gameFrame.panels.close')} title={t('gameFrame.panels.close')} data-keep="">
                 <EngravedIcon id="cmd-close" className="h-3.5 w-3.5" />
               </button>
             )}
           </div>
         </div>
+
+        {/* Engraved rule under the title — the mockups' divider grammar
+         *  (line · diamond · line), Director 2026-11-21 depth pass. */}
+        {useWanderlustSkin && (
+          <div data-skin="titlesep" aria-hidden style={{ margin: '1px 0 0' }}>
+            <span style={{ color: 'var(--skin-titlesep-diamond-color)', textShadow: 'var(--skin-titlesep-diamond-glow)', fontSize: 7, lineHeight: 1 }}>◆</span>
+          </div>
+        )}
 
         {useWanderlustSkin && (
           <style>{`
@@ -1376,10 +1398,13 @@ function DragTestContainerV2({
           ref={listRef}
           className={listWrapperClassName}
           style={{
-            maxHeight: isRosterCollapsed ? 0 : listMaxHeightPx,
+            maxHeight: isRosterCollapsed ? 0 : listVisibleHeightPx,
             opacity: isRosterCollapsed ? 0 : 1,
             overflowY: isRosterCollapsed ? 'hidden' : 'auto',
             overflowX: 'hidden',
+            /* The engraved band overlays this gutter — overlay scrollbars
+             *  reserve nothing, so pad it explicitly (PLAN-125 Fase 7a). */
+            paddingRight: 18,
             visibility: isRosterCollapsed ? 'hidden' : 'visible',
             pointerEvents: isRosterCollapsed ? 'none' : 'auto',
             marginTop: isRosterCollapsed ? 0 : undefined,
@@ -1388,6 +1413,7 @@ function DragTestContainerV2({
           onScroll={virtualConfig.onScroll}
           data-resident-count={sortedResidents.length}
           data-virtualized={shouldVirtualize}
+          data-hud-scroll-band=""
         >
             {filteredResidents.length === 0 ? (
               <div className="py-8 text-center text-sm italic text-slate-400">
@@ -1406,6 +1432,9 @@ function DragTestContainerV2({
               sortedResidents.map((resident) => renderResidentCard(resident))
             )}
         </div>
+        {/* Shared engraved scroll band (PLAN-125 Fase 7a): sibling overlay on
+         *  the list's right gutter — the list keeps its real scroll. */}
+        <HudScrollBand scrollRef={listRef} />
       </div>
     </section>
   );

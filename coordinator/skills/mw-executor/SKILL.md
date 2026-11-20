@@ -27,6 +27,7 @@ Use for single, well-defined implementation tasks.
 - No stubs, TODOs without implementation, debug `console.log`, or commented-out code.
 - Resolve the cause, not the symptom.
 - If scope grows during execution, stop and report instead of silently expanding.
+- **Delegazione free-first (R-368, default proattivo):** valuta ogni unità bounded contro `mind-weaver/.mw/delegation-rules.md` — le delegabili vanno a `python scripts/mw-agy-task.py` (worktree+verify+patch) o `mw-ask --free-first`; giudizio, trusted/frozen e superfici visuali restano in sessione.
 - Never open a window/app/browser in the foreground automatically — all automated browser/test runs are headless or background; a visible window requires explicit Director opt-in in-session (`.windsurf/rules/16-no-foreground-windows.md`).
 - Run the relevant safeguards (`npm run lint -- <scope>`, `npm run test -- <scope>`, `npm run build:check`, `npm run closure:lint`) before declaring done.
 - A chiusura: `verify:bundle` sul manifest del task e voce `RICHIESTE.md` a `fatta` con `bundle:` — niente righe kanban né dispatch (in pausa, R-208). Se il manifest dichiara `decision_report: true`, la run dir deve contenere `decision-report.json` con i campi `resolved`/`open`/`escalated` come array (schema-check meccanico; contenuto advisory — il giudizio LLM va lì, mai in `verifier.json`).

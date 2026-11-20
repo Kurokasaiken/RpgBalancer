@@ -114,7 +114,24 @@ export const PoiZanara: React.FC<PoiZanaraProps> = ({ family, fraction, sizePx, 
  *  swaps to the luminous family tone (legible at distance) and the runes
  *  hide, since they would be illegible noise anyway. All CSS, no re-render. */
 [data-poi-zoom='far'] .poi-band { stroke: var(--poi-band-far); }
-[data-poi-zoom='far'] .poi-rune { opacity: 0; }`}</style>
+[data-poi-zoom='far'] .poi-rune { opacity: 0; }
+/* Far LOD of the piece itself (Director 2026-11-21): below the fit-zoom
+ *  threshold the detailed layers hide and a flattened "light" piece shows —
+ *  same footprint, solid ring, identical dome/gems. */
+.poi-light { display: none; }
+[data-poi-zoom='far'] .poi-light { display: block; }
+[data-poi-zoom='far'] .poi-detail { display: none; }
+/* Halo reads BEHIND the piece in far LOD (Director 2026-11-21): a soft
+ *  radial glow sits under the whole marker and the crisp band is diffused,
+ *  so the marker is planted on a pool of light instead of wearing a neon
+ *  ring pasted on the map. */
+.poi-glow { display: none; position: absolute; inset: -18%; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(closest-side,
+    color-mix(in srgb, var(--poi-band-far) 55%, transparent) 0%,
+    color-mix(in srgb, var(--poi-band-far) 22%, transparent) 52%,
+    transparent 78%); }
+[data-poi-zoom='far'] .poi-glow { display: block; }
+[data-poi-zoom='far'] .poi-halo { opacity: 0.55; filter: blur(1.6px); }`}</style>
       {/* Magic-circle halo (sigillo language): time writes a solid band of
        *  runes hugging the frame's outer edge FROM OUTSIDE — one track,
        *  cardinal sparks, liquid head bead — tinted in the family colour,
@@ -125,6 +142,7 @@ export const PoiZanara: React.FC<PoiZanaraProps> = ({ family, fraction, sizePx, 
        *  ruling 2026-11-14: «l'halo sotto e basta»). */}
       {CFG.haloOuterRailPx[family] > 0 && f > 0 ? (
         <div
+          className="poi-halo"
           style={{
             /* --poi-band-far: luminous LOD tone — urgent overrides it so the
              *  countdown still lands vermilion even at resting fit. */
@@ -137,6 +155,7 @@ export const PoiZanara: React.FC<PoiZanaraProps> = ({ family, fraction, sizePx, 
             pointerEvents: 'none',
           }}
         >
+          <div className="poi-glow" />
           <PoiMagicCircle
             progress={f}
             sweep={family === 'job' ? 1 : -1}
@@ -147,9 +166,12 @@ export const PoiZanara: React.FC<PoiZanaraProps> = ({ family, fraction, sizePx, 
           />
         </div>
       ) : null}
-      <img src={`${CFG.assetBase}${POI_ZANARA_LAYERS.base[family]}`} alt="" draggable={false} style={LAYER_STYLE} />
-      <img src={`${CFG.assetBase}${POI_ZANARA_LAYERS.incision}`} alt="" draggable={false} style={LAYER_STYLE} />
-      <img src={`${CFG.assetBase}${POI_ZANARA_LAYERS.top[family]}`} alt="" draggable={false} style={LAYER_STYLE} />
+      {family === 'quest' && (
+        <img className="poi-light" src={`${CFG.assetBase}${POI_ZANARA_LAYERS.light.quest}`} alt="" draggable={false} style={LAYER_STYLE} />
+      )}
+      <img className="poi-detail" src={`${CFG.assetBase}${POI_ZANARA_LAYERS.base[family]}`} alt="" draggable={false} style={LAYER_STYLE} />
+      <img className="poi-detail" src={`${CFG.assetBase}${POI_ZANARA_LAYERS.incision}`} alt="" draggable={false} style={LAYER_STYLE} />
+      <img className="poi-detail" src={`${CFG.assetBase}${POI_ZANARA_LAYERS.top[family]}`} alt="" draggable={false} style={LAYER_STYLE} />
       {iconImg}
     </div>
   );

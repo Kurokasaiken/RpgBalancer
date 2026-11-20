@@ -10,7 +10,7 @@ import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuestRun } from '@/ui/idleVillage/questS1Lab/useQuestRun';
 import { useQuestExpeditionSession } from '@/ui/idleVillage/quests/useQuestExpeditionSession';
-import { questPoiById } from '@/balancing/config/idleVillage/quests/questPois';
+import { questPoiById, DANGER_BANDS } from '@/balancing/config/idleVillage/quests/questPois';
 import { useVillageStashStore } from '@/ui/idleVillage/store/useVillageStashStore';
 import { villageStashViewModel } from '@/ui/idleVillage/components/gameFrame/villageStashViewModel';
 import { VILLAGE_STASH_CONFIG } from '@/balancing/config/idleVillage/villageStashConfig';
@@ -23,10 +23,11 @@ import { SkinScope } from '@/ui/idleVillage/skins/primitives';
 import { selectResourceOutlook, useMinimalGameplayWithIdleVillageConfig } from '@/store/useMinimalGameplay';
 import { buildResourceReadoutItems } from '@/ui/idleVillage/components/gameFrame';
 import { ExpeditionDrawer } from '@/ui/idleVillage/components/gameFrame/ExpeditionDrawer';
-import { expeditionFoodCost } from '@/ui/idleVillage/components/gameFrame/expeditionBagAssign';
 import type { CassettoQuest, CassettoLoadout } from './HudRealCassetto';
 
-const POI_ID = 'poi-goblin';
+/* Lab-only POI picker (Director 2026-11-20): `?poi=poi-rovine` swaps the
+ *  bound quest so the witness can compare per-quest vignette/bagSlots. */
+const POI_ID = new URLSearchParams(window.location.search).get('poi') ?? 'poi-goblin';
 /** Stable empty bag — inline `?? []` inside the store selector mints a new array
  *  per snapshot and trips getSnapshot's infinite-loop guard. */
 const EMPTY_BAG: readonly (string | null)[] = [];
@@ -42,7 +43,7 @@ export const HudRealCassettoHost: React.FC = () => {
     [gpState, gpConfig, t],
   );
   const poi = useMemo(() => questPoiById(POI_ID), []);
-  const questRun = useQuestRun('goblin');
+  const questRun = useQuestRun(poi?.questId ?? 'goblin');
   const activeRuns = useMemo(() => [questRun.run].filter((r): r is NonNullable<typeof r> => Boolean(r)), [questRun.run]);
 
   /* The real stash ledger — hydrate once, then the bag is authoritative. */
@@ -73,15 +74,30 @@ export const HudRealCassettoHost: React.FC = () => {
 
 
 
-  const scenario = useMemo(() => scenarioForQuest('goblin'), []);
+  const scenario = useMemo(() => scenarioForQuest(poi?.questId ?? 'goblin'), [poi?.questId]);
 
+  /* Lab-only witness hook: `?pcts=96,4` paints the % readouts without a full party (this host is the /hud-compose lab, not /game). */
+  const witnessPcts = useMemo(() => {
+    const m = /[?&]pcts=(\d+),(\d+)/.exec(typeof window !== 'undefined' ? window.location.search : '');
+    return m ? ([Number(m[1]), Number(m[2])] as const) : null;
+  }, []);
+  const witnessRisk = useMemo(() => {
+    const m = /[?&]risk=(\d)/.exec(typeof window !== 'undefined' ? window.location.search : '');
+    return m ? Number(m[1]) : null;
+  }, []);
   const quest: CassettoQuest = useMemo(() => {
     const fasi = poi ? journeyFasiOf(poi) : null;
     const label = session.poiView?.activity?.label ?? scenario?.title ?? 'Spedizione';
-    const estimate = session.estimate;
+    const estimate = session.estimate?.value ?? null;
     const danger =
       estimate && estimate !== 'incomplete' && 'bands' in estimate
         ? estimate.bands.danger
+        : undefined;
+    /* Same sim-derived fields as the /game adapter (R-357 + Director
+     *  2026-11-20): pending muted risk, % morte, % riuscita. */
+    const sim =
+      estimate && estimate !== 'incomplete' && 'sim' in estimate
+        ? estimate.sim
         : undefined;
     const legs = [
       { label: t('gameFrame.cassetto.leg.outbound', 'Outbound'), days: fasi?.travelDays ?? 0 },
@@ -94,36 +110,29 @@ export const HudRealCassettoHost: React.FC = () => {
       briefing: scenario?.offer.dispatch ?? scenario?.offer.objective ?? '',
       legs,
       totalDays: legs.reduce((sum, leg) => sum + (typeof leg.days === 'number' ? leg.days : 0), 0),
-      riskLabel: danger ?? '—',
+      riskLabel: danger ?? (witnessRisk ? DANGER_BANDS[witnessRisk - 1]?.id ?? '—' : '—'),
+      riskLevel: witnessRisk ?? (danger ? DANGER_BANDS.findIndex((b) => b.id === danger) + 1 || undefined : undefined),
+      riskLevelMax: DANGER_BANDS.length,
+      riskPending: witnessRisk ? undefined : estimate === null ? 'computing' : sim ? undefined : 'incomplete',
+      deathPct: witnessPcts?.[0] ?? sim?.anyDeathPct,
       rewards: [
         { icon: 'gold', qty: String(scenario?.rewardBase ?? 60) },
       ],
+      successPct: witnessPcts?.[1] ?? sim?.outcomePct.reward,
+      /* Director 2026-11-20: the quest's own cover art as the cassetto
+       *  vignette — same `offer.coverArt` source the /game adapter uses. */
+      vignette: scenario?.offer.coverArt,
     };
-  }, [poi, scenario, session.poiView, session.estimate, t]);
+  }, [poi, scenario, session.poiView, session.estimate, t, witnessPcts, witnessRisk]);
 
   const slots = session.controller.slots as unknown as import('@/ui/idleVillage/slots/types').ResidentSlotViewModel[];
-
-  /* T3-S2 consequence preview — same formula as the /game adapter
-   *  (party × days × per-resident daily rate, insufficient vs the live
-   *  food readout) so the lab shows the reserved cost cell populated. */
-  const costPreview = useMemo(() => {
-    const partySize = slots.filter((s) => s.assignedResidentId).length;
-    const cost = expeditionFoodCost(
-      partySize,
-      quest.totalDays ?? 0,
-      gpConfig.globalRules?.foodConsumptionPerResidentPerDay ?? 0,
-    );
-    const foodItem = resourceItems.find((item) => item.id === 'food');
-    const foodStock = foodItem !== undefined ? Number(foodItem.value) : NaN;
-    return { icon: 'food', qty: String(cost), insufficient: Number.isFinite(foodStock) && cost > foodStock };
-  }, [slots, quest.totalDays, gpConfig, resourceItems]);
 
   /* Quest bag as SLOT FRAMES (R-337): the sparse ledger bag, not a catalogue
    *  list — empty slots open the (bound) stash affordance, packed slots release. */
   const loadout: CassettoLoadout = useMemo(() => {
     const rows = villageStashViewModel(VILLAGE_STASH_CONFIG).rows;
     return {
-      slots: Array.from({ length: QUEST_STASH.bagSlots }, (_, i) => {
+      slots: Array.from({ length: poi?.bagSlots ?? QUEST_STASH.bagSlots }, (_, i) => {
         const id = bag[i] ?? null;
         if (!id) return null;
         const row = rows.find((r) => r.itemId === id);
@@ -181,7 +190,7 @@ export const HudRealCassettoHost: React.FC = () => {
       {/* R-339/PLAN-119 T2: same mount as /game — the ExpeditionDrawer
        *  primitive owns the column + the collapse chip. */}
       <ExpeditionDrawer
-        quest={{ ...quest, costPreview }}
+        quest={quest}
         slots={slots}
         resourceItems={resourceItems}
         onSlotClear={(slotId) => session.handleSlotClear(slotId)}
@@ -196,6 +205,14 @@ export const HudRealCassettoHost: React.FC = () => {
             : t(session.requiredFilled ? 'gameFrame.cassetto.confirmReason.unavailable' : 'gameFrame.cassetto.confirmReason.partyIncomplete')
         }
         onConfirm={() => session.send()}
+        /* Same discard semantics as the /game adapter (Director 2026-11-20
+         *  «× chiudi e perdi tutto»): seats clear via the real path, the bag
+         *  releases to the pool, then the detail closes. */
+        onClose={() => {
+          slots.forEach((s) => { if (s.assignedResidentId) session.handleSlotClear(s.id); });
+          stashState.releaseAll(POI_ID);
+          session.closeDetail();
+        }}
       />
       {/* The session's flight/extraction overlays — without them the medal
           flight never lands and the assignment never commits (the same layer

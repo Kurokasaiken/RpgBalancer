@@ -946,6 +946,8 @@
       "ariaLabel": "Game sections",
       "village": "Village",
       "map": "Map",
+      "roster": "Roster",
+      "stash": "Stash",
       "workshop": "Workshop",
       "tavern": "Tavern",
       "locked": "Not yet",
@@ -1205,7 +1207,10 @@
       },
       "filterEmpty": "Nothing of this kind in store",
       "detailLabel": "Item details",
-      "pack": "Pack"
+      "pack": "Pack",
+      "capacityShort": "{count} / {max}",
+      "usableInExpeditions": "Usable in expeditions",
+      "viewToggle": "Switch grid / list view"
     },
     "buildings": {
       "stash": {
@@ -1618,6 +1623,8 @@
     },
     "cassetto": {
       "party": "Party Slots",
+      "prevSeat": "Previous seats",
+      "nextSeat": "Next seats",
       "supplies": "Supplies",
       "food": "Food",
       "openRoster": "Open the roster",
@@ -1810,6 +1817,10 @@
       "bonusForza": "Strength Bonus",
       "bonusPerc": "Perception Bonus",
       "healing": "Healing",
+      "essence": "Vigor Essence",
+      "talisman": "Lucky Talisman",
+      "blade": "Duelist's Blade",
+      "aegis": "Ward Charm",
       "usePotion": "Potion → heal {name}"
     },
     "loot": "Loot: {items}",
@@ -2012,6 +2023,10 @@
         "rope": "+15 to Strength or Constitution checks",
         "healing": "+20 HP to the most hurt member — usable before a check",
         "potion": "Fully heals one wounded member",
+        "essence": "+10 to Constitution checks",
+        "talisman": "+10 to Charisma checks",
+        "blade": "+10 to Agility checks",
+        "aegis": "+10 to Intelligence checks",
         "banner": "Guardian banner — the leader bears it: −6% wound, −4% death for every other member while he stands"
       }
     },

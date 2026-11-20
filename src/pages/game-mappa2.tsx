@@ -1458,9 +1458,15 @@ export default function GameMappa2Page() {
           <HudRealNav
             navItems={DEFAULT_GAME_FRAME_CONFIG.navItems}
             activeNavId={view}
+            alsoActiveNavIds={[...(panels.visible.roster ? ['roster'] : []), ...(panels.visible.villageStash ? ['villageStash'] : [])]}
             /* R-331: il pulsante MAPPA glissa la camera sul villaggio allo zoom di default
              * (cover fit) — zoom/pan utente stanti non sopravvivono (INV-11). */
             onNavSelect={(id) => {
+              /* Roster / Stash are panel toggles, not views (Director 2026-11-20): the nav opens or closes them. */
+              if (id === 'roster' || id === 'villageStash') {
+                panels.toggle(id);
+                return;
+              }
               setView(id === 'village' ? 'village' : 'map');
               if (id === 'map') {
                 const vp = placeById('place_village_start')?.worldPoint ?? MAPPA2_VILLAGE_ORIGIN;
@@ -1534,8 +1540,11 @@ export default function GameMappa2Page() {
       {/* R-325: the old game's panels, stage-managed — the solver owns the
        *  zone rect; shortcuts come from the registry via useHudPanels
        *  (intercepted to `stage.api`), the menu lists the same ids. */}
+      {/* The painted panel frame overhangs the panel rect (band above, spine and gems beside it): the stage frame's
+       *  default `overflowY:auto` clipped it away entirely, so the thin frame was in the DOM but invisible
+       *  (2026-11-20 probe). The roster list scrolls inside itself, so the wrapper can let the frame out. */}
       {panels.visible.roster && (
-        <StagePanelFrame panelId="roster">
+        <StagePanelFrame panelId="roster" style={{ overflow: 'visible', overflowY: 'visible' }}>
         <div data-panel="roster" className="skin-scope" ref={heroSheet.railRef} {...heroSheet.railProps}>
           <MatericRosterComponentV2
             componentId="game-mappa2-roster"

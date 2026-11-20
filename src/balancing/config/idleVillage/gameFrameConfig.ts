@@ -895,6 +895,8 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
   navItems: [
     { id: 'village', labelKey: 'gameFrame.nav.village', icon: 'settlement', locked: false },
     { id: 'map', labelKey: 'gameFrame.nav.map', icon: 'world', locked: false },
+    { id: 'roster', labelKey: 'gameFrame.nav.roster', icon: 'company', locked: false },
+    { id: 'villageStash', labelKey: 'gameFrame.nav.stash', icon: 'stash', locked: false },
     { id: 'workshop', labelKey: 'gameFrame.nav.workshop', icon: 'workshop', locked: true },
     { id: 'tavern', labelKey: 'gameFrame.nav.tavern', icon: 'tavern', locked: true },
   ],
@@ -1106,7 +1108,9 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
         priority: 0,
         runPolicy: 'suspend',
         minWidthPx: 200,
-        widthMode: 'zone-fill',
+        /* Director ruling 2026-11-20: natural width — a dragged roster keeps
+         *  ~400px instead of stretching to the free-wing width (~932px). */
+        widthMode: 'natural',
         naturalWidthPx: 400,
         minHeightPx: 240,
         naturalHeightPx: 300,
@@ -1120,7 +1124,11 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
         widthMode: 'zone-fill',
         naturalWidthPx: 320,
         minHeightPx: 200,
-        naturalHeightPx: 360,
+        /* R-357 ruling + Director 2026-11-21 «due righe insieme» + depth pass
+         *  (square 76px tiles → shelf 160px): room for the two-row shelf +
+         *  the R-363 detail card — the zone cap still decides at small
+         *  viewports. */
+        naturalHeightPx: 460,
       },
       events: {
         zone: 'rightWing',

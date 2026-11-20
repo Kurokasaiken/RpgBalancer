@@ -1,0 +1,23 @@
+# GPT (codex gpt-5.6-terra) — beautify production Zanara POI, 2026-11-21
+
+**1. Sun-Compass Aperture — strongest.**
+Turn the marker into a brass astrolabe framing a smaller icon-bearing enamel aperture. **Change:** reduce the dome to ~55–60% of total width; thicken the outer brass silhouette and south tail; replace four equal sapphire blades with three tiny brass cardinal notches plus one decisive south spear. Put the timer in a broad, recessed ivory-edged channel immediately around the dome. Brass: ~55%, enamel: ~30%, gem/accent: ~15%.
+**Why:** the south pin and brass ring survive downscaling as one clear shape; the dome stops swallowing the whole marker, while the timer becomes legible as a clean band.
+**Prompt fragment:** `ornate dark-fantasy map pin, sun-bronze astrolabe ring, one long south spear, small cardinal brass notches, compact deep-enamel icon aperture, broad recessed timer channel with ivory edge, painted metal and enamel, controlled teal accents, solid chroma background, no purple, no brown, no grey`
+
+**2. Reliquary Seal — best baroque/HUD match.**
+Make it a small circular reliquary: an ivory-painted place-icon sits on a flatter blue/teal enamel plaque, enclosed by a heavy brass seal with four raised bezel claws, the southern claw extending into the pin. **Change:** flatten the dome markedly, use a dark obsidian inner bevel around the icon, give the brass rim only four large engraved rays rather than many filigree marks, and make the timer a segmented halo outside the icon bezel. Brass ~50%, enamel ~25%, obsidian/ivory/icon contrast ~20%, gems ~5%.
+**Why:** it reads as a sealed object rather than a blue orb; the icon gets a deliberate high-contrast stage at 24px, and the four-claw silhouette remains visible against both terrain values.
+**Prompt fragment:** `baroque brass reliquary map marker, circular seal with four raised bezel claws and elongated south pin, shallow cobalt enamel icon plaque, ivory painted central emblem, obsidian bevel, segmented outer timer halo, engraved sun rays, hand-painted fantasy UI asset, solid chroma background, no purple, no brown, no grey`
+
+**3. Gilded Ocular — clearest icon-first version.**
+Treat the centre as an "observatory lens," but make the lens visibly mounted rather than bulbous. **Change:** use an oval vertical aperture with a narrow blue enamel field, ivory place-icon painted large within it, two brass retaining bands at east/west, and a thick outer brass crescent whose bottom resolves into the pin tail. Keep only two small teal/sapphire studs at north and south; the timer is a high-contrast arc in the outer crescent. Brass ~60%, enamel ~25%, teal/gem ~10%, ivory ~5%.
+**Why:** the tall oval and heavy bottom crescent improve map-pin recognition immediately; the icon survives because it occupies a flatter, bounded field rather than a luminous globe.
+**Prompt fragment:** `gilded observatory ocular map pin, vertical oval enamel lens with large ivory painted place icon, heavy sun-bronze retaining crescent and long south tail, two restrained teal gem studs, luminous timer arc inset in brass, ornate dark-fantasy HUD material, solid chroma background, no purple, no brown, no grey`
+
+**4. Four-Point Mandala — retain the current identity, simplify it.**
+Keep the compass ring and sapphire points, but reorganize them into fewer, bolder masses. **Change:** enlarge the south point by ~35%, make east/west points shorter and wholly brass with tiny teal inset facets, reduce the north point to a crown-like cap, and swap the full blue dome for a dark blue enamel disc with an ivory painted icon and a broad exposed brass rim. The timer becomes a single uninterrupted outer track. Brass ~50%, enamel ~35%, gem/teal ~10%, ivory ~5%.
+**Why:** it preserves the shipped language while eliminating the tiny high-frequency ornament that turns to noise; directional hierarchy becomes readable before colour does.
+**Prompt fragment:** `refined four-point brass compass map pin, dominant elongated south point, short east-west brass points with teal inset facets, dark cobalt enamel icon disc, ivory painted emblem, broad uninterrupted timer track, ornate gilded observatory HUD artifact, solid chroma background, no purple, no brown, no grey`
+
+**Current weakest point from afar:** the marker has no hierarchy beyond "large blue circle." At 24px, the dense gold engraving, timer channel, sapphire blades, dome shading, and place-icon area collapse into the same small cluster, while the blue dome retains nearly all the visual weight. The south tail is too visually similar to the other points to establish a reliable pin read, and the rim is too thin to give the silhouette enough authority on light terrain.

@@ -37,11 +37,29 @@ export const villageStashSchema = z
         }),
       )
       .min(3)
-      .max(6),
+      .max(12),
     /** Display-only "n/max" label in the panel footer (product choice, recorded). */
     capacityMax: z.number().int().positive(),
     /** Panel chrome: the row texts wrap instead of truncating inside this width. */
-    panel: z.object({ widthPx: z.number().positive() }),
+    panel: z.object({
+      widthPx: z.number().positive(),
+      /** Zones shorter than this drop the "in grande" detail inspector so the
+       *  shelf keeps its tiles — a half-clipped card reads as broken (720p). */
+      detailMinPanelHeightPx: z.number().positive(),
+      /** Below this rect height the read-only mode hint line is dropped too
+       *  (720p wing gives ~220px — the shelf keeps its two tile rows). */
+      hintMinPanelHeightPx: z.number().positive(),
+      /** Fixed grid grammar (Director 2026-11-21 «due righe insieme»): the
+       *  shelf always shows `shelfVisibleRows` tile rows of `shelfColumns`
+       *  cells — six consumables fill a full 3×2 block. */
+      shelfColumns: z.number().int().positive(),
+      /** Well size — the tile is a SQUARE recessed slot (fixed side, grid
+       *  centred) so six consumables read as the mockup's tile block. */
+      shelfRowPx: z.number().positive(),
+      /** Painted icon size inside the well — icon-dominant, not a chip. */
+      shelfIconPx: z.number().positive(),
+      shelfVisibleRows: z.number().int().positive(),
+    }),
   })
   .superRefine((cfg, ctx) => {
     const seen = new Set<string>();
@@ -83,11 +101,28 @@ const RAW_VILLAGE_STASH_CONFIG = {
     { itemId: 'quest_consumable_corda', qty: 1 },
     { itemId: 'quest_consumable_cura', qty: 1 },
     { itemId: 'quest_consumable_pozione', qty: 1 },
+    /* Director 2026-11-21 «crea altri 4»: shelf fillers beyond the six
+     * engine-backed consumables — display-only (their flags are not in the
+     * engine's packable catalog, see questItems note). */
+    { itemId: 'quest_consumable_essenza', qty: 1 },
+    { itemId: 'quest_consumable_talismano', qty: 1 },
+    { itemId: 'quest_consumable_lama', qty: 1 },
+    { itemId: 'quest_consumable_egida', qty: 1 },
   ],
   /* One source (R-234, DN-1): the Warehouse's storage capacity at its current level — the panel
    * said 12 while the Warehouse tooltip said 24. */
   capacityMax: WAREHOUSE_STORAGE_CAPACITY,
-  panel: { widthPx: 320 },
+  /* Below this rect height the R-363 detail card is sacrificed (1280 → grid
+   *  only); above it the inspector renders next to the shelf (1440+). The
+   *  360 floor guarantees the card + the two-row shelf fit together —
+   *  below it the shelf would clip the card. */
+  /* Wing ceilings measured live (Director 2026-11-21): the leftWing grants
+   *  stash ~400px @1440 / ~220px @1280 / ~460px @1920 — the roster's fixed
+   *  292px owns the rest. Tiles are sized so TWO rows + the detail card fit
+   *  the 400 ceiling (~350 total): 3×2 squares of 46px. */
+  /* Director 2026-11-21 «2 file da 4»: the shelf reads four wells wide, two
+   *  rows visible — the ten items scroll the rest under the band. */
+  panel: { widthPx: 320, detailMinPanelHeightPx: 360, hintMinPanelHeightPx: 235, shelfColumns: 3, shelfRowPx: 46, shelfIconPx: 34, shelfVisibleRows: 2 },
 };
 
 /** Validated village stash configuration. */

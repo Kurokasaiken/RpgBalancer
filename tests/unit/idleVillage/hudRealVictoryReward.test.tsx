@@ -12,6 +12,7 @@ import { applyChoice, availableOptions, createRun, type QuestRunState } from '@/
 import { GOBLIN_PRESETS } from '@/ui/idleVillage/questS1Lab/questLabPresets';
 import { GOBLIN_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/goblin';
 import { HudRealVictoryReward } from '@/ui/idleVillage/hudReal/HudRealVictoryReward';
+import { HUD_SCROLL_BAND } from '@/balancing/config/idleVillage/hudScrollBandConfig';
 
 const PRESET = GOBLIN_PRESETS[0].id;
 const STAGE_MS = 400;
@@ -123,6 +124,26 @@ describe('HudRealVictoryReward — baptized pergamena report (R-348)', () => {
       expect(text.trim().length).toBeGreaterThan(0);
       expect(text).not.toMatch(/placeholder|lorem|TODO/i);
       expect(screen.getByTestId('hudreal-victory-echoes')).toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  // INV:hudreal-victory-reward.INV-6
+  it('mounts the shared HudScrollBand on the three scroll zones (PLAN-125 7d)', () => {
+    vi.useFakeTimers();
+    try {
+      renderReward(endedRun(7));
+      revealAll();
+      const root = screen.getByTestId('hudreal-victory-reward');
+      for (const id of ['hudreal-victory-crew', 'hudreal-victory-rewards', 'hudreal-victory-echoes']) {
+        expect(screen.getByTestId(id).hasAttribute('data-hud-scroll-band')).toBe(true);
+      }
+      const bands = root.querySelectorAll('[data-hud-band]');
+      expect(bands.length).toBe(3);
+      for (const band of bands) {
+        expect(band.getAttribute('data-variant')).toBe(HUD_SCROLL_BAND.variant);
+      }
     } finally {
       vi.useRealTimers();
     }

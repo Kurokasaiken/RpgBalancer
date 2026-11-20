@@ -53,6 +53,12 @@ invariants:
       `launch-cta` (reason inline + CONFIRM con `--skin-cassetto-cta-*` da `cta.vars`)
       siede nella strip sempre visibile, gli altri blocchi nel body scrollabile. La cella
       costo mantiene il contratto segnaposto flaggato; rack `ResidentSlotRack` reale.
+  - id: expedition-bottom-sheet.INV-8
+    source: director-spec
+    source_ref: R-357
+    statement: >-
+      R-357/D-1 amended: nessuna cella costo nel sheet (il costo vive nel flusso supplies) — rimossa l'asserzione BASE
+      del placeholder flaggato
     test_refs:
       - tests/unit/idleVillage/r339ExpeditionSheet.test.tsx
   - id: expedition-bottom-sheet.INV-5

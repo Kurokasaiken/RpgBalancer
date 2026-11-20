@@ -721,3 +721,141 @@ contraddicono la semantica config NON si portano (stamina ambrata > teal AI).
 **Verificato:** cache catalogo `~/.cache/devin/cli/model_configs_v7` — `swe-1-6-fast` rimosso dal catalogo; unico flag "free" = sidekick SWE-2 Medium nei modelli Fusion. La quota settimanale copre tutti i modelli: a quota esaurita fallisce qualunque chiamata.
 **Decisione Director:** i subagent non devono puntare a un modello hardcoded — "quello gratuito o quello che stiamo usando". Rimosso `model:` dai 6 profili (`~/.config/devin/agents/*`, `.devin/agents/rpg-*`) e `agent.subagent_model` da `~/.config/devin/config.json`; i custom ora vanno al router di default (si auto-adatta al catalogo). `subagent_general` resta l'unico profilo che eredita il modello del parent → profilo preferito quando il subagent deve girare sul modello in uso. Aggiornate `.windsurf/rules/55-delegation-context-budget.md` e `~/.devin/rules/delegation-context-budget.md`.
 **Fonte:** log `devin_20261118-083841_5267.log`, `devin doctor` (6 profili OK dopo fix).
+
+## 2026-11-18 — R-357 / PLAN-125: pulsante LAUNCH EXPEDITION del cassetto approvato (forma e metodo)
+**Da:** pulsante ritagliato dal golden (punte tagliate, rettangolo scuro, «un colore con una scritta sopra»), poi due rigenerazioni Gemini che peggioravano a ogni giro.
+**A (verbatim Director):** *«questo era il lato pulito, sa di AI slop, quindi deve essere prima fixato, poi usato per fare anche la parte a sinistra che stai peggiorando ad ogni iterazione»* → *«Sì, è giusta»* (forma).
+- **Metodo duraturo:** per i pezzi simmetrici si usa **solo il lato pulito del golden**, ripulito e **specchiato**; niente rigenerazione web-AI iterata (ogni giro diverge). Implementato in `scripts/build-cassetto3-assets.py` (inpaint scritta → asse → metà destra → 2× + denoise + unsharp → specchio → chiave del fondo).
+- **Asset:** `public/assets/ui/hud-real/cassetto3/cta-plaque.webp` (1500×317, trasparente); guardia `r357CassettoFrame.test.ts` (`// INV:cassetto-cta-tips-intact`). Le versioni Gemini sono archiviate in `.mw/runs/20261118-cta-button-gemini/`, non usate.
+- **Non coperto:** nitidezza (limite del golden 1024 px: asset a piena risoluzione o ridisegno vettoriale dalle estremità, a carico del Director/futuro), filetti agli angoli alti, commit.
+**Fonte:** `RICHIESTE.md` R-357.
+## 2026-11-19 — R-361 / PLAN-128: due ori nella HUD, canonico solo quello della Nav
+**Da:** misura per materiale (`scripts/hud-real/material_palette.py`, `test-results/slicekit/material-palette-nav.{json,png}`): sulla stessa schermata convivono l'*oro filetto* (Nav, barre Risorse/Tempo; ΔE00 mediana vs Nav 2–5) e l'*oro filigrana champagne* (cornici Roster/Stash, cassetto, fascia sotto Risorse; ΔE00 9–24, più chiaro e con ombre meno profonde), confermati a occhio a 3×.
+**Decisione Director (verbatim):** *«Due ruoli e x dare un po' di varietà, solo gold penso sarebbe opprimente. ma solo quello della nav è canonico, gli altri "ci sto lavorando su".»*
+- **Riferimento canonico:** l'oro della Nav (e il resto dei suoi materiali) è il riferimento in `context/mockup-pipeline-profile.md` [P3].
+- **Secondo oro:** il ruolo "filigrana" è voluto, ma la sua resa attuale **non** è un riferimento: è lavoro in corso; non si tara nessuna fascia su di essa.
+- **Non coperto:** come si definisce il secondo oro rispetto al canonico (stessa luce? stessa scala d'ornamento?) — aperto.
+**Fonte:** sessione Claude Code 2026-11-19.
+## 2026-11-19 — R-361 / PLAN-128: cornice pannelli rigenerata — gemme e interno sui materiali Nav
+**Da:** cornice panel-frame5 rigenerata con Gemini (`.mw/runs/20261119-panel-frame5-regen/`, candidato nuovo golden, non ancora battezzato) montata su `/game`.
+**Decisione Director (verbatim):** *«il gold m sembra diverso, ma nn abbastanza diverso da sembrare voluto, gemme nav va bene, anche l'interno direi che deve essere il verde "canonico"»*
+- **Secondo oro:** deve differire dall'oro Nav in modo **evidente e voluto** (una differenza piccola sembra un errore). In prova: champagne (legge come argento antico) e bronzo (legge come rame), entrambi a ΔE00 8–9 dalla Nav con le stesse ombre profonde.
+- **Gemme:** colore delle gemme della Nav (`material-palette-nav.json`, materiale «gemma»).
+- **Interno dei pannelli:** smalto smeraldo della Nav al posto della lacca petrolio. Oggi nessun token lo esprime (profilo [P3]): in prova i token `--skin-hud-lacquer-*` ridefiniti solo dentro Roster/Stash.
+- **Metallo (Director, verbatim «Bronzo»):** il secondo oro delle cornici è il **bronzo** (`gen/frame-g1-bronzo.png`).
+- **Non coperto:** gli spicchi d'angolo (`backings` del manifest, colore fisso `#0f1b1f`) restano petrolio; battesimo della cornice.
+## 2026-11-19 — R-361 / PLAN-128: Roster e Stash — interno smeraldo, X sulla fascia, niente versioni ridotte
+**Da:** il Director ha approvato gli angoli della cornice bronzo («Sì, avanti») e ha chiesto di proseguire con la lista: interno nel verde canonico, X non «sotto il frame», niente versione ridotta, e rifare pulsanti/filtri.
+**Decisioni (verbatim del Director dove citato):** *«niente versioni ridotte x quei 2, va bene in quella barra»* (Roster e Stash si aprono dai pulsanti della barra in basso) · *«anche l'interno direi che deve essere il verde "canonico"»*.
+- **Interno:** nuovi token `--skin-hud-enamel-{lift,base,deep}` = smalto della Nav (`#00462f` / `#063427` / `#091d15`, misurati da `nav/bar.webp`), letti da `HudPlaque tone="enamel"` per Roster e Stash; riempimento card e «cuneo» d'angolo seguono lo smalto. I riquadri scuri (oggetti, pulsanti tondi, chip livello) restano lacca petrolio: sono i «pozzetti», come nella Nav.
+- **X:** il pulsante di chiusura sta sulla fascia alta, a destra, 22 px (`data-panel-close`); tolti «riduci/ripristina» dallo Stash (stato, strip, test R-246) e «Hide roster» dal Roster.
+- **Test:** `villageStash.test.tsx` aggiornato (un solo pulsante, nessuna modalità ridotta); il vecchio test «minimises to a title strip» è sostituito.
+- **Non coperto:** pulsanti tondi e filtri (da rifare), pulsanti Roster/Stash nella barra in basso, scelta gemme tonde vs diamanti Nav, battesimo della cornice.
+**Fonte:** sessione Claude Code 2026-11-19; `.mw/runs/20261119-panel-frame5-regen/`.
+## 2026-11-19 — R-361 / PLAN-128: controlli HUD — golden `controls-sheet-g2` approvato e montato su Roster/Stash
+**Da:** il Director ha chiesto di rifare i pulsanti, i filtri e i componenti dei filtri di Roster e Stash e di far generare i nuovi controlli a GPT.
+**Decisione Director (verbatim):** *«Sì, invia»* (brief) · *«Sì, giro 2»* · *«Sì, approvo»* → il foglio del giro 2 (`.mw/specs/expedition-ui/refs/controls-sheet-g2.png`) è il **golden dei controlli** (registrato in `REGISTERED.md`).
+- **Cosa c'è nel golden:** 4 tipi × 5 stati (tondo, ovale, pillola-filtro, selettore; normale/hover/premuto/selezionato/disabilitato); anello d'oro Nav, pozzetto petrolio vuoto, alone smeraldo solo sul selezionato; senza testo/icone/gemme.
+- **Montaggio:** `slicekit/controls` (20 pezzi, ~105 KB): tondo = 1 pezzo per stato; pillola = capo sx + capo dx + striscia centrale ripetibile per stato. Le toolbar `data-hud-oval` (Roster, X) usano il tondo; le linguette dello Stash usano `data-ctl="pill"`. Gli aloni hover/selezionato sono `box-shadow` con token (`--skin-hud-gem` nuovo), non raster.
+- **Non coperto:** ovale e selettore (nel golden, non tagliati: «minimo asset»); i selettori dell'intestazione del Roster (restano nel look vecchio finché non si taglia la riga «selettore»); stati hover/premuto/selezionato non ancora visti in cattura reale; V2/V3 e corsia Tauri; icone nuove (piano a parte).
+**Fonte:** sessione Claude Code 2026-11-19; `test-results/slicekit/controls.json`, `.mw/runs/20261119-hud-controls-gpt/`.
+## 2026-11-19 — R-361 / PLAN-128: anelli meno arancio, Stash come Roster, niente contatori X/Y
+**Decisione Director (verbatim):** *«troppo arancio quei ring, stash voglio che sia come roster, possibilmente. nn mettiamo X/Y, nn credo servira mai»*.
+- **Anelli:** ricolorati sulla tinta/croma dell'oro Nav (misura: 64–75°/63–75 → 78–84°/38–47); il golden registrato resta l'originale ChatGPT, la deviazione è nel derivato `controls-sheet-g2-keyed.png` (script `prep_controls_keyed.py`) e nel record.
+- **Stash come Roster:** intestazione = titolo a sinistra + toolbar di pulsanti tondi a destra; il filtro per tipo diventa pulsanti tondi solo-icona (stessi `role=radio`/testid; etichetta in `aria-label`/`title`) e la X chiude. Via la riga delle linguette.
+- **Contatori:** tolti «6/6» (Roster V2), «6 of 24 goods» (intestazione Stash) e «6 of 24 goods in store» (piè Stash). Interpretazione: «X/Y» = i contatori, non il pulsante X di chiusura (che deve restare). La capacità resta nel view-model, solo non disegnata.
+- **Precarico:** `preloadControlsArt()` — gli stati hover/premuto/selezionato/disabilitato sono immagini CSS scaricate al primo uso.
+- **Test:** `villageStash.test.tsx` aggiornato (niente contatori, filtro e X nella riga del titolo).
+## 2026-11-19 — R-361 / PLAN-128: testi e spaziature dello Stash allineati al Roster
+**Decisione Director (verbatim):** *«si, allinea anche il testo di Stash a quello del roster, diamo una spaziatura corretta, ecc»* (dopo la conferma di «X/Y» = contatori e del filtro tondo).
+- **Misurato (stili calcolati, stessa cattura):** titolo Roster 600 12px Cinzel, spaziatura 2,4px, avorio `--skin-body-color`; Stash aveva 700 13px oro. Margine interno Roster 22px (`plaque-clearance` 12 + `panel-padding` 10); Stash 10px (titolo a 44px per sfuggire al nodo d'angolo).
+- **Fatto:** Stash usa gli stessi token — titolo (`--skin-hud-title-*`, `--skin-body-color`), margine interno `calc(plaque-clearance + panel-padding)`, riga d'intestazione senza padding proprio; nome dell'oggetto nel dettaglio = stile dei nomi del Roster (`StashItemTooltipBody tone="panel"`, i suggerimenti restano com'erano); griglia a tessere minimo 46px (ne entrano 6 nei 356px). Verifica: riga d'intestazione e bordo destro dei controlli identici ai due pannelli (x 534, larghezza 356, bordo 378).
+- **Non toccato:** le righe di descrizione (EB Garamond 12px, il Roster non ha testo corrente da confrontare); il vuoto verticale dello Stash (modifica non in staging di un'altra sessione).
+## 2026-11-19 — R-361 / PLAN-128: Roster e Stash a sinistra, Stash corto, contenuto adattabile
+**Decisione Director (verbatim):** *«nn li voglio vedere centrali, stash fallo + "corto" meno alto, e i componenti dentro stash, nn so, li facciamo adattabili alla pagina? fallo circa delle stesse dimensioni del roster»*.
+- **Causa del «centrale»:** `zoneRects` del solver centra la banda delle tre zone con margini simmetrici; con solo la zona sinistra occupata (centro e destra a larghezza 0) il Roster/Stash finiva al centro dello schermo. Fix: una zona sinistra **sola** si appoggia al bordo sinistro (`edgePx`); con un'altra zona occupata i margini restano simmetrici come prima. Test: `stageZonesSolver.test.ts` (3 nuovi).
+- **Stash corto:** nella coppia Roster+Stash lo Stash prendeva tutto il resto della colonna (400 px a 1440×900). Ora `min(resto, naturalHeightPx)` con `villageStash.naturalHeightPx` 360 → **300** (= Roster). Il contenuto si adatta: la griglia è `auto-fill` (a 1280 va su 2 righe × 3).
+- **INCIDENTE T-13 (stato condiviso):** durante questo lavoro 4 miei file sul Roster denso (`WanderlustRosterCardV2.tsx`, `HeroLevelDecor.tsx`, `WanderlustStatBar.tsx`, il passo 46 in `DragTestContainerV2.tsx`) sono tornati alla versione precedente (riscrittura da un'altra sessione sugli stessi file — nel working tree c'erano anche suoi cambi, es. soglia 11px in `WanderlustStatBar`); le altre mie modifiche erano intatte. Riapplicate e verificate con un marcatore per file, prima e dopo la cattura. Causa esatta non accertata.
+- **Non coperto:** a 1280 px (zona 260 px) la barra del Roster mostra meno controlli del solito (non indagato); barra di scorrimento dipinta; contorno/stati della card; riferimento «originale» del Roster.
+## 2026-11-19 — R-361 / PLAN-128: cornice dei pannelli più sottile
+**Decisione Director (verbatim):** *«cornice + sottile»* (dopo il confronto con e senza cornice sulla HUD vera).
+- **Fatto:** `thinFrameManifest(panelFrame6Frame, 0.6)` (in `sliceKitManifest.ts`) riduce della stessa proporzione dimensioni, scostamenti, span e fascia di tutti i pezzi; l'arte e la specifica restano invariate. Roster e Stash la usano.
+- **Verificato:** cattura a 1440×900 della HUD vera; angolo alto-sinistra ingrandito, nodo con gemma in posizione, bordo più leggero.
+- **Non verificato:** a 1280 px e 1920 px con la cornice sottile; hover e stati; Tauri.
+## 2026-11-19 — R-361 / PLAN-128: cornice sottile anche sopra, meno vuoto nei pannelli
+**Decisione Director (verbatim):** *«cornice sottile anche "sopra", riadatta gli spazi (meno spazio vuoto)»*.
+- **Fascia superiore:** scala propria 0,4 (era 0,6): banda da 18 a 12 px; angoli alti spostati in proporzione (`thinFrameManifest(m, 0.6, 0.4)`).
+- **Spazio sopra il titolo:** da 28 a 12 px nei due pannelli (token nuovo `--skin-hud-frame-top` = 6 px, usato da Roster e Stash).
+- **Stash:** altezza naturale 300 → 260 px (sotto il Roster); il dettaglio resta visibile per intero a 1440×900.
+- **Barra in alto:** non toccata. È già la variante sottile (`resources/bar-slim`, 58 px); ridurla ancora vuol dire ritagliare o ridipingere il pezzo, non ridurre la scala (il testo andrebbe sotto il minimo di 11 px).
+## 2026-11-19 — R-361 / PLAN-128: errori agli angoli alti della cornice sottile (corretti)
+**Decisione Director (verbatim):** *«questi sn gli errori della barra che vanno fixati, nn toccare il componente delle risorse»* (due ritagli degli angoli alti). «Barra» = la fascia alta della cornice dei pannelli; la barra risorse NON è stata toccata (il brief GPT per ridipingerla non è stato inviato).
+- **Correzione di quanto avevo fatto:** la scala separata della fascia alta (0,4) era sbagliata per questa arte: il ritaglio dell'angolo contiene un tratto di fascia a altezza piena. Ora una sola scala uniforme 0,5 per tutta la cornice (fascia ~15 px, montanti ~9 px).
+- **Altro:** sfumatura dell'angolo verso la fascia 16→44; minimo di luminosità (L≥13) per le ombre dentro gli angoli (la curva C-1b le rendeva nere); montanti laterali accorciati (span 30→24) per non sporgere sopra la fascia.
+- **Non fatto:** ridipingere le barre in alto (da riformulare con entrambe le barre, vedi richiesta separata).
+## 2026-11-19 — R-361 / PLAN-128: angoli della cornice sottile — posizione dei gioielli, ali sul verde, forziere tolto
+**Decisione Director (verbatim):** *«cn sn ancora gli angoli sotto che sporgono sul verde, e i componenti degli angoli sul frame ora sono dentro il frame... inoltre elimina il simbolo dello stash dalla cornice»* e *«anche la parte del gioiello deve essere nel posto giusto»*.
+- **Bug mio:** l'offset verticale degli angoli alti era scalato due volte → gioielli 8,4 px dentro il frame (da quando esiste la cornice sottile). Corretto; misurato dal DOM: i 4 angoli coincidono con il golden entro 0,1 px.
+- **Ali sul verde:** tagliate (cutouts nella spec); cuneo d'angolo non più scalato (l'arco del pannello è fisso a 18 px).
+- **Forziere:** tolto dalla cornice dello Stash (pezzo, asset, variante, test 5→4 immagini).
+- **Non verificato:** a 1280/1920; in Tauri.
+## 2026-11-19 — PASS strutturale ≠ fedeltà al golden (learn, bocciatura Director)
+**Da:** probe V2 FAIL→PASS + metriche DOM presentati come «4/4 fix chiusi e verificati».
+**A:** su superfici con golden, nessuno stato si dichiara senza pair golden-vs-live nel bundle + divergenze classificate; il report nomina il pass soddisfatto (V2 contratto ≠ Pass 1 fedeltà ≠ Pass 3 harmony).
+**Motivo:** Director: «hai fato un lavoro pessimo, non vedi quanto sono diverse le cose che hai fatto rispetto all'originale» — reliquary/stash/roster restano scheletri vs la grammatica del golden nonostante i fix meccanici verdi. Seconda istanza del pattern (prima: slicer byte-identico su componente sorgente sbagliato).
+**Fonte:** `.mw/runs/20261119-learn-golden-fidelity/pattern-candidate.md`; proposta P-013 (trappola candidata T-30).
+## 2026-11-19 — PLAN-128: slicewright adottato come gate di affettabilità pre-slice
+**Decisione Director (verbatim):** *«procedi»* (dopo prior-art research e prova reale sul golden).
+- **Adozione:** `npx -y slicewright inspect` diventa il gate di affettabilità in Fase A (nuovo Passo 1ter in `SLICEKIT.md`): misura span stirabili, smearing, bordi ripetuti, cuciture e padding-contenuto **prima** del taglio.
+- **Prova sul golden reale:** sul candidato bronzo `candidate-cornici-bronzo-r1.png` rileva span stirabili di 1 px per asse (`stretch.x/y.short`, `insets.large`) — la stessa diagnosi della causa dei ~6 respingimenti sugli angoli, prodotta in secondi. Rimedi prescritti = quelli convergenti col Director (inset autoriali / bordi più puliti).
+- **Prior art:** nessun tool copre ≥60% del metodo (registro T0–T3 e giudizio su candidati montati restano differenziatori); top-5 tecniche assorbibili in `.mw/runs/plan128-review-2026-11-19/PRIOR-ART.md`.
+- **Non verificato:** slicewright non eseguito su `--insets`/spec esistente né integrato in `closure:lint`; capabilities degli altri tool da README.
+**Fonte:** sessione Devin 2026-11-19; prove in `.mw/runs/plan128-review-2026-11-19/` (preview `slicewright-preview-bronzo.png`).
+## 2026-11-20 — Fork visivi: tutti i mock prodotti vanno mostrati, nessuna pre-selezione
+**Decisione Director (verbatim):** *«la regola dice falli tutti e mostrami i mock tra cui scegliere. se nn c'è scritto esplicitamente deve essere aggiunto a queste strategie»*.
+- **Regola registrata:** ogni candidato generato/costruito per una decisione estetica è mostrato al Director come mock nel contesto d'uso — l'agente non pre-filtra. Il cap «opzioni default 2, max 3» di PLAN-047/v35 vale per la fork card, non per il numero di mock presentati.
+- **Dove:** aggiunto a `context/mockup-pipeline-profile.md` [P7] (primo bullet).
+- **Contesto:** ruling sulla fork card banda di scorrimento (`.mw/runs/20261120-scroll-band/visual-fork-scroll-band.md`, PLAN-125 Fase 7a / PLAN-127 N=3 #1) — i 3 candidati A/B/C erano già tutti mostrati.
+**Fonte:** sessione Devin 2026-11-20.
+## 2026-11-20 — Banda di scorrimento condivisa: ruling «Oro inciso» (B)
+**Decisione Director (verbatim):** *«Oro inciso»* — dopo richiesta *«mostramele insieme a tutto il resto del componente»* (mock montati sul roster vero di /game).
+- **Golden:** `.mw/specs/expedition-ui/refs/scroll-band-oro-inciso.png` (sha256 `99098b02…`, riga in REGISTERED.md). Baseline congelata `R-2026-11-20-scroll-band-B`.
+- **Design:** pozzetto inciso scuro + thumb ottone champagne con tacche incise + perni ai capi; condivisa Roster/Stash/Ledger (PLAN-125 Fase 7a, PLAN-127 N=3 #1).
+- **Note di processo:** bug 2a roster fixato (`data-hud-scroll` sulla lista); scrollbar dipinta non catturabile in headless-macOS (overlay scrollbars non si dipingono — limite ambiente, verifica su macchina Director).
+- **Residuo implementazione:** primitivo condiviso + mount Roster/Stash; ricevuta slice-kit `test-results/slicekit/scroll-band.json`.
+## 2026-11-20 — Banda di scorrimento: ruling finale «A — smalto» sul componente reale
+**Decisione Director (verbatim):** *«A — smalto, la sfumatura nn so quanto sia corretta»* — scelta fatta sulle catture full-component (`.mw/runs/20261120-verify-frame7/full-{a,b,c}.png`, 1440×900 `?frame=thin&band=`).
+- **Effetto:** `hudScrollBandConfig.variant = 'a'` (default live); `?band=b|c` restano selezionabili in dev. Il thumb usa la stessa smalto teal della placca CTA (`--skin-cta-bg` `#2c7683→#113743`) — risposta al dubbio sulla sfumatura: è il materiale canonico CTA; se preferisce lo smeraldo degli anelli è un cambio di un gradiente.
+- **Supera:** il ruling precedente «Oro inciso» (B) registrato poco sopra — golden B resta congelato come baseline registrata (REG-registered), non cancellato.
+## 2026-11-20 — Pannelli stage: drag libero ovunque, senza snap né resize
+**Decisione Director (verbatim):** *«nn voglio questa distinzione secca d dove è una cosa in base a dov'è. tutti si può spostare ovunque senza snap, senza cambiare di dimensioni, ecc»*.
+- **Contratto nuovo:** il DROP committa il rect libero visto dal drag (posizione + dimensioni congelate in `placements{id:{x,y,w,h}}`); occupancy/zona non si trasferisce mai; il pannello resta della sua zona d'origine e fluttua clampato all'envelope di stage. Eccezione mantenuta: drop sul chrome strip (rail ali / tab row) → collassa a strip; strip trascinata sullo stage → ri-espande al punto. Doppio click = reset al dock.
+- **Pair roster+stash:** lo stack verticale nell'ala sinistra vale solo se NESSUNO dei due ha placement — chi è piazzato libero esce dallo stack, l'altro prende l'ala intera.
+- **Roster:** `widthMode: 'natural'` (bloccato ~400px, ruling precedente stesso messaggio) — il caso ~932px sparisce perché non esiste più cross-zone transfer.
+- **Test:** `stageZonesSolver.test.ts` sezione §D.1 riscritta sul nuovo contratto (23 test verdi).
+## D-20261120-piastrina — Icone su piastrina: A = cornice hover (R-367, D-6)
+Il Director battezza il trattamento **A** (filetto ottone champagne + angoli
+acanto incisi) come firma della cornice-piastrina. La cornice è **stato
+hover/selected**, non chrome a riposo: a riposo la cella resta pozzetto lacca +
+icona dipinta (come `mockup-stash-grid.jpg`). Shelf stash a **2 righe** fisse.
+Nessun gap tra cornice e cella. Forziere header: assente nel frame7 live (era
+solo `emblem-chest` dei manifest frame5, non più montati).
+## 2026-11-21 — Pannelli Roster/Stash: consolidamento + fix controlli + shelf 3×2
+Stato congelato dal vivo (no query param, 1440×900 + 1280×720):
+- **Placca `field`**: campo smalto a filo cornice su Roster e Stash — il secondo rettangolo stondato (cartouche `shape="panel"`) e i 4 crescent `geometry.backings` di frame7 (spicchi scuri agli angoli) sono rimossi; spec `panel-frame7.json` risliced, audit verde.
+- **Banda A «gemma»**: thumb `#2ea377→#14705a→#0a3f30` (smeraldo delle gemme frame7, ruling Director «approvo gemma» — supera il teal CTA annotato sopra). Visibile solo con overflow reale (`scrollHeight - clientHeight > 1`): verificato Roster=visibile / Stash=nascosta.
+- **Fix controlli header (regressioni):** `RosterSortIcon` migrato a `data-ctl="round"` + `EngravedIcon cmd-sort` (era il disco vetroso legacy); `::before` speculare e `box-shadow` dei bottoni generici skin spenti sui controlli dipinti (`[data-ctl]`); `round-disabled` ripristinato nel blocco `[data-hud-controls]` (il base override lo mascherava).
+- **Shelf Stash 3×2 (D-20261120-piastrina implementata):** `panel.shelfColumns=3`, `shelfVisibleRows=2`, `shelfRowPx=46` in `villageStashConfig`; `naturalHeightPx` 340→400 (gameFrameConfig); `detailMinPanelHeightPx` 240→360 così la detail card convive con la griglia senza clip (a 1280 resta nascosta: griglia protagonista).
+**Fonte:** sessione Devin 2026-11-21.
+## 2026-11-20 — Victory/Reward (PLAN-125 7d): fork risolto «A — pergamena», banda condivisa montata
+**Da:** Fase 7d chiedeva «palette Nav + cornice nuova + banda condivisa» sul report di fine
+run; tre trattamenti candidati catturati live su `/game` da run reale
+(`.mw/runs/20261120-victory-fork/`): A pergamena firmata, B pergamena dentro la cornice
+condivisa, C report in lingua pannelli (campo smalto + cornice + pezzi rimontati).
+**A:** shipping = **A — pergamena battezzata** (INV-1 invariato, nessun amend); il fork
+resta dev-gated su `?victory=framed|panel` (+ swap `?frame=` come i pannelli) per
+iterazioni future — non genera mockup. La **banda condivisa** `HudScrollBand` è montata
+sulle 3 zone scroll (crew/rewards/echoes) anche sullo shipping: stessa banda dei pannelli,
+variante **`a` smalto/gemma** confermata (succede alla B «oro inciso», che resta il golden
+registrato). Record conversione `test-results/slicekit/victory.json`; INV-6 permanente.
+**Fonte:** ruling Director 2026-11-20 (fork question in sessione).

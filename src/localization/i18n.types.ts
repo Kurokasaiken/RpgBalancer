@@ -478,9 +478,11 @@ export default interface Resources {
           "site": "At site"
         },
         "legDays": "{count, plural, one {# day} other {# days}}",
+        "nextSeat": "Next seats",
         "openRoster": "Open the roster",
         "openStash": "Open the stash",
         "party": "Party Slots",
+        "prevSeat": "Previous seats",
         "risk": "Risk",
         "riskRewards": "Risk & Rewards",
         "supplies": "Supplies"
@@ -702,6 +704,8 @@ export default interface Resources {
         "locked": "Not yet",
         "map": "Map",
         "more": "More",
+        "roster": "Roster",
+        "stash": "Stash",
         "tavern": "Tavern",
         "village": "Village",
         "workshop": "Workshop"
@@ -978,6 +982,7 @@ export default interface Resources {
         "bagFull": "The expedition bag is full",
         "bagFullHint": "Bag full — release an item to pack another",
         "capacity": "{count} of {max} goods in store",
+        "capacityShort": "{count} / {max}",
         "detailLabel": "Item details",
         "elsewhere": "{count} packed or committed elsewhere",
         "empty": "The shelf is empty — every copy is packed or away",
@@ -994,7 +999,9 @@ export default interface Resources {
           "equipment": "Equipment"
         },
         "title": "Village stash",
-        "unavailable": "No copies left in the store"
+        "unavailable": "No copies left in the store",
+        "usableInExpeditions": "Usable in expeditions",
+        "viewToggle": "Switch grid / list view"
       },
       "status": {
         "dayLabel": "Day",
@@ -2029,12 +2036,16 @@ export default interface Resources {
       "intel": "Intel: {items}",
       "intelBonus": "✧ Intel: {label} (+{bonus})",
       "item": {
+        "aegis": "Ward Charm",
+        "blade": "Duelist's Blade",
         "bonusForza": "Strength Bonus",
         "bonusPerc": "Perception Bonus",
+        "essence": "Vigor Essence",
         "healing": "Healing",
         "potion": "Potion",
         "rope": "Rope",
         "smoke": "Smoke Bomb",
+        "talisman": "Lucky Talisman",
         "usePotion": "Potion → heal {name}"
       },
       "kicker": "Isolated lab · S1",
@@ -2188,13 +2199,17 @@ export default interface Resources {
       "stash": {
         "coverage": "Covers",
         "desc": {
+          "aegis": "+10 to Intelligence checks",
           "banner": "Guardian banner — the leader bears it: −6% wound, −4% death for every other member while he stands",
+          "blade": "+10 to Agility checks",
           "bonusForza": "+15 to Strength checks",
           "bonusPerc": "+15 to Perception checks",
+          "essence": "+10 to Constitution checks",
           "healing": "+20 HP to the most hurt member — usable before a check",
           "potion": "Fully heals one wounded member",
           "rope": "+15 to Strength or Constitution checks",
-          "smoke": "+15 to Agility checks"
+          "smoke": "+15 to Agility checks",
+          "talisman": "+10 to Charisma checks"
         },
         "hint": "Pick what to pack — {used}/{slots} slots",
         "title": "The bag"

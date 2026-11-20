@@ -1,4 +1,13 @@
-# Session Handoff — 2026-10-14 (ultima voce: 2026-11-18)
+# Session Handoff — 2026-10-14 (ultima voce: 2026-11-19)
+
+## 2026-11-19 — Split standard/profilo pipeline + ricevute R-365 + trappole T-30/31/32 + audit doc
+
+- **R-361 → PLAN-127/PLAN-128 rev.2**: metodo mockup→componente diviso (R-362) in standard generici `mind-weaver/docs/SLICEKIT.md` (Fase A, spec `specVersion` 2) + `mind-weaver/docs/MOCKUP-TO-COMPONENT.md` (nucleo 3 fasi, punti aperti [P1]–[P11]) e profilo `RPG/context/mockup-pipeline-profile.md`; consumati in RPG via symlink `context/shared/`. Rev.1 congelate in `mind-weaver/.mw/runs/20261119-plan127-split/` e `20261119-hudreal-adaptation-layer/`. PLAN-128 rev.2 **ribattezzato** (stamp 2026-11-19T09:05Z); **PLAN-127 rev.2 attende ribattesimo** — include assorbimento del draft PLAN-129 (eliminato).
+- **R-365 (in corso)**: pipeline esecutiva con ricevute per-passo — ogni passo scrive nel record `test-results/slicekit/<surface>.json`; un passo senza artefatto non è fatto. Tooling: `slice:gate --record`, `slice:audit` (exit 1 su record incompleto), skill `mw-slice-run` con STOP conditions. Causale: retrospettiva pilota `.mw/runs/plan128-review-2026-11-19/` — il protocollo esisteva ed è stato saltato.
+- **Trappole**: T-30 (PASS strutturale ≠ fedeltà al golden — metriche aggregate non provano; proposta P-013), T-31 (riferimenti Director ambigui → 2 opzioni e stop), T-32 (assemblare arte tagliata: ≥3 patch = rigenerare).
+- **R-363 `fatta`**: cherry-pick frontend-design nel nucleo (guida contenuto vivo Fase A + «Segnali di genericità» §4.6).
+- **Materiali Nav misurati** (profilo [P3]): `scripts/hud-real/material_palette.py` → `test-results/slicekit/material-palette-nav.{json,png}`; oro Nav canonico, filigrana = work in corso (ruling); smalto senza token.
+- **Residui**: R-364 = buco di numbering (voce mai registrata); `slice:audit`/`slice:gate` wiring in `closure:lint` = decisione aperta; Roster min-testo ancora rosso (120 testi a 10px) prima del pilota PLAN-128.
 
 ## 2026-11-18 — R-359: regressioni drag medaglioni /game fixate + deployate + witness prod
 
@@ -8,7 +17,7 @@
 - **Regola Director (D-300)**: ogni bug fixato → test permanente + test_refs obbligatori a ogni modifica del componente.
 - **Tecnica commit condivisa**: `GIT_INDEX_FILE`+`commit-tree` — 23 file propri, 0 file R-357; index riparato dopo (`git reset HEAD -- <miei>`).
 - **Residui**: swap vero a 2 slot occupati coperto solo a livello sessione (ReturnFlight test), mai E2E dal probe; `hud-real-cassetto` non ha riga nella tabella generata di COMPONENT_MASTER_INDEX (dominio plan054); PLAN-126 OB-5/OB-6 ancora pendenti (probe prod bytes + verify:bundle).
-- **Doc aggiornate**: `roster_drag_trusted.md` (R-359 evidence), `interaction_core_spec.md` §4 (P12-P16), `COMPONENT_MASTER_INDEX.md` (righe 21/23/142 + count), `context/DECISION_LOG.md` (2026-11-18), `context/INDEX.md` (learn run), `PROPOSALS.md` (P-010/011/012), `.mw/runs/20261118-r359-learn/pattern-candidate.md`.
+- **Doc aggiornate**: `roster_drag_trusted.md` (R-359 evidence), `interaction_core_spec.md` §4 (P12-P16), `COMPONENT_MASTER_INDEX.md` (righe 21/23/142 + count), `context/DECISION_LOG.md` (2026-11-18), `context/INDEX.md` (learn run), `PROPOSALS.md` (P-014/015/016), `.mw/runs/20261118-r359-learn/pattern-candidate.md`.
 
 ## 2026-10-23 — Audit `/game`: test non verdi classificati, doc e contratti risincronizzati
 
