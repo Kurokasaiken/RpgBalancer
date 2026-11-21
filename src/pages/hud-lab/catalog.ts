@@ -204,7 +204,7 @@ export const LAB_CATALOG: readonly LabEntry[] = [
     id: 'scroll-band-x',
     kind: 'piece',
     title: 'Banda di scorrimento orizzontale (oro inciso, smalto)',
-    status: 'candidato',
+    status: 'battezzato',
     family: 'controlli',
     host: 'piece-bandx',
     provenance: {
@@ -229,7 +229,7 @@ export const LAB_CATALOG: readonly LabEntry[] = [
     id: 'cta-confirm',
     kind: 'piece',
     title: 'CTA CONFIRM (placca dipinta, rigenerata)',
-    status: 'candidato',
+    status: 'battezzato',
     family: 'controlli',
     host: 'piece-cta',
     provenance: {
@@ -275,7 +275,7 @@ export const LAB_CATALOG: readonly LabEntry[] = [
     id: 'ground-marmo',
     kind: 'piece',
     title: 'Sfondo marmo smeraldo (ground)',
-    status: 'candidato',
+    status: 'battezzato',
     family: 'materiali',
     host: 'piece-ground',
     provenance: {
@@ -288,7 +288,7 @@ export const LAB_CATALOG: readonly LabEntry[] = [
     id: 'box-frame-oro',
     kind: 'piece',
     title: 'Cornice riquadro (doppio bordo oro + angoli)',
-    status: 'candidato',
+    status: 'battezzato',
     family: 'cornici',
     host: 'piece-boxframe',
     provenance: {
@@ -301,7 +301,7 @@ export const LAB_CATALOG: readonly LabEntry[] = [
     id: 'niche-oro',
     kind: 'piece',
     title: 'Nicchia inventario (cornice oro spessa)',
-    status: 'candidato',
+    status: 'battezzato',
     family: 'cornici',
     host: 'piece-niche',
     provenance: {
@@ -314,7 +314,7 @@ export const LAB_CATALOG: readonly LabEntry[] = [
     id: 'rim-oro',
     kind: 'piece',
     title: 'Bordo basso oro (fascia vera del mockup)',
-    status: 'candidato',
+    status: 'battezzato',
     family: 'cornici',
     host: 'piece-rim',
     provenance: {
@@ -335,5 +335,45 @@ export const LAB_CATALOG: readonly LabEntry[] = [
       ref: 'public/assets/ui/hud-real/slicekit/cassetto/seat-ring.webp',
     },
     notes: 'NON montato su /game: lì resta la ghiera a draghi approvata. Oro con quattro smeraldi e centro vuoto, utilizzabile da componenti futuri che vogliano l\'anello del mockup.',
+  },
+
+  {
+    id: 'cornice-cassetto',
+    kind: 'piece',
+    title: 'Cornice esterna cassetto (angoli + rotaia)',
+    status: 'battezzato',
+    family: 'cornici',
+    host: 'piece-cassettoframe',
+    provenance: {
+      ruling: 'Director 2026-11-21 — cassetto nuovo battezzato (commit afec2a6f9)',
+      ref: 'public/assets/ui/hud-real/slicekit/cassetto/frame-corner-{tl,bl}.webp + rail-mid-fold.webp',
+    },
+    notes: 'Angoli oro generati standalone (non ritagli dal golden): tl e bl, specchiati per i lati dx; rotaia mediana piegata fra i due angoli. Registry: frame-corner-tl-v1 / frame-corner-bl-v1 / rail-mid-fold-v1.',
+  },
+  {
+    id: 'cartiglio-vignetta',
+    kind: 'piece',
+    title: 'Cartiglio vignetta (angoli + gemma)',
+    status: 'battezzato',
+    family: 'cornici',
+    host: 'piece-cartouche',
+    provenance: {
+      ruling: 'Director 2026-11-21 — cassetto nuovo battezzato (commit afec2a6f9)',
+      ref: 'public/assets/ui/hud-real/slicekit/cassetto/cart-corner.webp + cart-gem.webp',
+    },
+    notes: 'Affettati dal golden mockup-r357-cassetto-largo: 4 angoli specchiati + gemma smeraldo sotto il riquadro vignetta. Registry: cart-corner-v1 / cart-gem-v1.',
+  },
+  {
+    id: 'emblemi-cassetto',
+    kind: 'piece',
+    title: 'Emblemi (teschio / forziere / alloro)',
+    status: 'battezzato',
+    family: 'emblemi',
+    host: 'piece-emblems',
+    provenance: {
+      ruling: 'Director 2026-11-21 — cassetto nuovo battezzato (commit afec2a6f9)',
+      ref: 'public/assets/ui/hud-real/slicekit/cassetto/{skull,chest,laurel}.webp',
+    },
+    notes: 'Affettati dal golden: teschio (death%/rischio, scala di livelli lit/dimmed), forziere (reward), alloro (success%). Registry: skull-v1 / chest-v1 / laurel-v1.',
   },
 ];

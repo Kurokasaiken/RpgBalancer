@@ -201,7 +201,8 @@
     "catalog:document": "tsx scripts/catalog/documentComponent.mts",
     "catalog:critique": "tsx scripts/catalog/critiqueComponent.mts",
     "slice:gate": "node scripts/hud-real/sliceability-gate.mjs",
-    "slice:audit": "node scripts/hud-real/slice-audit.mjs"
+    "slice:audit": "node scripts/hud-real/slice-audit.mjs",
+    "pieces:check": "tsx scripts/piecesCheck.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

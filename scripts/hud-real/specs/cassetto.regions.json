@@ -1,0 +1,162 @@
+{
+  "surface": "cassetto",
+  "family": "hud-real",
+  "regions": [
+    {
+      "region": "panel-ground",
+      "expectedRole": "panelGround",
+      "expectedDialect": "nav-filetto",
+      "strategy": "reuse",
+      "pieceId": "cassetto-ground-v1"
+    },
+    {
+      "region": "section-frames",
+      "expectedRole": "sectionFrame",
+      "expectedDialect": "nav-filetto",
+      "expectedScale": 0.4,
+      "strategy": "reuse",
+      "pieceId": "box-frame-v1"
+    },
+    {
+      "region": "cta-plaque",
+      "expectedRole": "ctaWindow",
+      "expectedDialect": "nav-filetto",
+      "strategy": "reuse",
+      "pieceId": "cta-plaque-v1"
+    },
+    {
+      "region": "cta-enamel-layer",
+      "expectedRole": "ctaWindow",
+      "expectedDialect": "nav-filetto",
+      "strategy": "reuse",
+      "pieceId": "cta-plaque-enamel-v1"
+    },
+    {
+      "region": "niche",
+      "expectedRole": "nicheFrame",
+      "expectedDialect": "nav-filetto",
+      "expectedScale": 0.4,
+      "strategy": "reuse",
+      "pieceId": "niche-v1"
+    },
+    {
+      "region": "frame-corner-tl",
+      "expectedRole": "cornerOrnament",
+      "expectedDialect": "nav-filetto",
+      "expectedScale": 0.24,
+      "strategy": "reuse",
+      "pieceId": "frame-corner-tl-v1"
+    },
+    {
+      "region": "frame-corner-bl",
+      "expectedRole": "cornerOrnament",
+      "expectedDialect": "nav-filetto",
+      "expectedScale": 0.24,
+      "strategy": "reuse",
+      "pieceId": "frame-corner-bl-v1"
+    },
+    {
+      "region": "frame-rail-mid",
+      "expectedRole": "railOrnament",
+      "expectedDialect": "nav-filetto",
+      "expectedScale": 0.24,
+      "strategy": "reuse",
+      "pieceId": "rail-mid-fold-v1"
+    },
+    {
+      "region": "rim-bottom",
+      "expectedRole": "engravedBand",
+      "expectedDialect": "nav-filetto",
+      "strategy": "reuse",
+      "pieceId": "cassetto-rim-v1"
+    },
+    {
+      "region": "cartouche-corners",
+      "expectedRole": "cornerOrnament",
+      "expectedDialect": "nav-filetto",
+      "expectedScale": 0.24,
+      "strategy": "reuse",
+      "pieceId": "cart-corner-v1"
+    },
+    {
+      "region": "cartouche-gem",
+      "expectedRole": "gem",
+      "expectedDialect": "nav-filetto",
+      "expectedScale": 0.24,
+      "strategy": "reuse",
+      "pieceId": "cart-gem-v1"
+    },
+    {
+      "region": "risk-emblem",
+      "expectedRole": "skull",
+      "expectedDialect": "nav-filetto",
+      "expectedScale": 1.0,
+      "strategy": "reuse",
+      "pieceId": "skull-v1"
+    },
+    {
+      "region": "reward-emblem",
+      "expectedRole": "supplyIcon",
+      "expectedDialect": "nav-filetto",
+      "expectedScale": 1.0,
+      "strategy": "reuse",
+      "pieceId": "chest-v1"
+    },
+    {
+      "region": "success-laurel",
+      "expectedRole": "laurel",
+      "expectedDialect": "nav-filetto",
+      "expectedScale": 1.0,
+      "strategy": "reuse",
+      "pieceId": "laurel-v1"
+    },
+    {
+      "region": "vignette-art",
+      "expectedRole": "componentGround",
+      "expectedDialect": "nav-filetto",
+      "strategy": "existing-component",
+      "reason": "arte per-quest (`quest.vignette`, default cassetto/vignette.webp): dato della superficie, non vocabolario riusabile"
+    },
+    {
+      "region": "party-data",
+      "expectedRole": "panelGround",
+      "strategy": "dom-css",
+      "reason": "slot party, etichette e stati sono DOM vivo"
+    },
+    {
+      "region": "risk-reward-data",
+      "expectedRole": "panelGround",
+      "strategy": "dom-css",
+      "reason": "numeri %, livelli, oro — dati vivi"
+    },
+    {
+      "region": "journey-band",
+      "expectedRole": "engravedBand",
+      "expectedDialect": "nav-filetto",
+      "strategy": "dom-css",
+      "reason": "barra viaggio = ricetta CSS (bordo champagne + gemme), niente raster dedicato"
+    },
+    {
+      "region": "title-desc",
+      "expectedRole": "titleBand",
+      "expectedDialect": "nav-filetto",
+      "strategy": "dom-css",
+      "reason": "titolo quest + briefing: DOM vivo (token tipografici)"
+    },
+    {
+      "region": "scroll-band-x",
+      "expectedRole": "engravedBand",
+      "expectedDialect": "nav-filetto",
+      "strategy": "existing-component",
+      "reason": "HudScrollBandX: controllo DOM battezzato montato sul cassetto, vocabolario PLAN-129"
+    },
+    {
+      "region": "seat-rack",
+      "expectedRole": "seatRing",
+      "expectedDialect": "nav-filetto",
+      "strategy": "existing-component",
+      "reason": "ghiera a draghi approvata (resident-slot-rack condiviso); seat-ring-v1 resta candidato non montato",
+      "expectedScale": 1.0
+    }
+  ]
+}

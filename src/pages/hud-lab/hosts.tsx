@@ -275,6 +275,54 @@ export const SeatRingPiece: Host = () => (
   </div>
 );
 
+const CASSETTO_PIECES = '/assets/ui/hud-real/slicekit/cassetto';
+
+export const CassettoFramePiece: Host = () => (
+  <div style={{ ...paintedGround(), padding: 14 }}>
+    <div style={{ position: 'relative', height: 150, borderRadius: 4, overflow: 'hidden', background: 'linear-gradient(180deg, rgba(4,40,30,.5), rgba(3,32,25,.6))' }}>
+      <img src={`${CASSETTO_PIECES}/frame-corner-tl.webp`} alt="" aria-hidden draggable={false} style={{ position: 'absolute', top: -4, left: -4, width: 90, pointerEvents: 'none' }} />
+      <img src={`${CASSETTO_PIECES}/frame-corner-tl.webp`} alt="" aria-hidden draggable={false} style={{ position: 'absolute', top: -4, right: -4, width: 90, transform: 'scaleX(-1)', pointerEvents: 'none' }} />
+      <img src={`${CASSETTO_PIECES}/frame-corner-bl.webp`} alt="" aria-hidden draggable={false} style={{ position: 'absolute', bottom: -4, left: -4, width: 90, pointerEvents: 'none' }} />
+      <img src={`${CASSETTO_PIECES}/frame-corner-bl.webp`} alt="" aria-hidden draggable={false} style={{ position: 'absolute', bottom: -4, right: -4, width: 90, transform: 'scaleX(-1)', pointerEvents: 'none' }} />
+      <img src={`${CASSETTO_PIECES}/rail-mid-fold.webp`} alt="" aria-hidden draggable={false} style={{ position: 'absolute', left: '50%', top: '50%', width: 70, transform: 'translate(-50%,-50%)', pointerEvents: 'none' }} />
+    </div>
+    <p style={{ margin: '8px 0 0', fontSize: 11, color: '#d8e6dc', fontFamily: 'Cinzel, serif', textAlign: 'center' }}>
+      tl/bl specchiati + rotaia mediana piegata — la cornice esterna del cassetto
+    </p>
+  </div>
+);
+
+export const CartouchePiece: Host = () => (
+  <div style={{ ...paintedGround(), padding: 14 }}>
+    <div style={{ position: 'relative', height: 120, margin: '0 10px 14px', borderRadius: 4, background: 'linear-gradient(180deg, rgba(6,50,38,.55), rgba(4,36,28,.65))' }}>
+      {(['top-left', 'top-right', 'bottom-left', 'bottom-right'] as const).map((pos) => (
+        <img key={pos} src={`${CASSETTO_PIECES}/cart-corner.webp`} alt="" aria-hidden draggable={false}
+          style={{
+            position: 'absolute', width: 40, pointerEvents: 'none',
+            top: pos.startsWith('top') ? -3 : undefined, bottom: pos.startsWith('bottom') ? -3 : undefined,
+            left: pos.endsWith('left') ? -3 : undefined, right: pos.endsWith('right') ? -3 : undefined,
+            transform: `${pos.endsWith('right') ? 'scaleX(-1)' : ''} ${pos.startsWith('bottom') ? 'scaleY(-1)' : ''}`.trim() || undefined,
+          }} />
+      ))}
+      <img src={`${CASSETTO_PIECES}/cart-gem.webp`} alt="" aria-hidden draggable={false} style={{ position: 'absolute', left: '50%', bottom: -12, width: 66, transform: 'translateX(-50%)', pointerEvents: 'none' }} />
+    </div>
+    <p style={{ margin: 0, fontSize: 11, color: '#d8e6dc', fontFamily: 'Cinzel, serif', textAlign: 'center' }}>
+      angoli cartiglio ×4 + gemma — il riquadro della vignetta quest
+    </p>
+  </div>
+);
+
+export const EmblemsPiece: Host = () => (
+  <div style={{ ...paintedGround(), padding: 14, display: 'flex', gap: 18, justifyContent: 'center', alignItems: 'center' }}>
+    {(['skull', 'chest', 'laurel'] as const).map((id) => (
+      <figure key={id} style={{ margin: 0, textAlign: 'center' }}>
+        <img src={`${CASSETTO_PIECES}/${id}.webp`} alt="" aria-hidden draggable={false} style={{ width: 64, height: 64, objectFit: 'contain' }} />
+        <figcaption style={{ fontSize: 10, color: '#d8e6dc', fontFamily: 'Cinzel, serif', marginTop: 4 }}>{id}</figcaption>
+      </figure>
+    ))}
+  </div>
+);
+
 export const TabsPiece: Host = () => {
   const { t } = useTranslation('idleVillage');
   return (

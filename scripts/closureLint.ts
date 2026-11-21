@@ -9,6 +9,7 @@ import { checkVisualForkGate } from './verification/visualForkGate';
 import { checkIntentGate } from './verification/intentGate';
 import { checkResourceLifecycleGate } from './verification/resourceLifecycleGate';
 import { checkSliceKitGate } from './verification/sliceKitGate';
+import { checkPiecesGate } from './verification/piecesGate';
 import { RICHIESTE_UNION_PARTS } from './verification/richiesteUnion';
 
 /**
@@ -189,6 +190,16 @@ async function main() {
   const sliceKitGate = checkSliceKitGate(process.cwd(), { changedFiles });
   errors.push(...sliceKitGate.errors);
   for (const w of sliceKitGate.warnings) {
+    console.error(` ⚠ ${w}`);
+  }
+
+  // Gate piece-kit (PLAN-130 OB-2, globale): integrità registry
+  // src/config/hud/pieces.json — schema, sha provenance, vocabolari,
+  // supersedes, doppioni baptized, riferimenti barrel/manifest/regions
+  // a pezzi candidate|retired → rosso.
+  const piecesGate = checkPiecesGate(process.cwd());
+  errors.push(...piecesGate.errors);
+  for (const w of piecesGate.warnings) {
     console.error(` ⚠ ${w}`);
   }
 

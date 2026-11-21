@@ -1,0 +1,608 @@
+{
+  "version": 1,
+  "matching": {
+    "tolerance": 0.25
+  },
+  "dialects": [
+    "nav-filetto",
+    "champagne-filigrana"
+  ],
+  "materials": [
+    "oro-filetto",
+    "champagne",
+    "bronzo",
+    "ottone",
+    "smalto-smeraldo",
+    "gemma-smeraldo",
+    "osso",
+    "smalto-rosso"
+  ],
+  "pieces": [
+    {
+      "id": "controls-frame-v1",
+      "kind": "frame",
+      "source": "slice-kit",
+      "scope": "hud",
+      "status": "baptized",
+      "role": "controlsFrame",
+      "dialect": "nav-filetto",
+      "materials": [
+        "oro-filetto"
+      ],
+      "ornamentScale": 0.18,
+      "specRef": "scripts/hud-real/specs/controls.json",
+      "provenance": {
+        "golden": ".mw/specs/expedition-ui/refs/controls-sheet-g2-keyed.png",
+        "sha256": "a673eb979c993208378e345739e136f9c4a4628a379f6db57a3201bb51b2b9b5",
+        "ruling": "PLAN-128, Director «Sì, approvo» 2026-11-19",
+        "date": "2026-11-19",
+        "partialFields": [
+          "generator",
+          "promptPath"
+        ]
+      }
+    },
+    {
+      "id": "panel-frame5-v1",
+      "kind": "frame",
+      "source": "slice-kit",
+      "scope": "hud",
+      "status": "baptized",
+      "role": "outerFrame",
+      "dialect": "champagne-filigrana",
+      "materials": [
+        "oro-filetto",
+        "champagne"
+      ],
+      "ornamentScale": 0.28,
+      "specRef": "scripts/hud-real/specs/panel-frame5.json",
+      "nonFusionReason": "golden R-357 cornici-aperta v5 pinnato sulle superfici che lo montano; frame6/7 sono golden diversi (designato smeraldo), non fusioni dello stesso pezzo",
+      "provenance": {
+        "golden": ".mw/specs/expedition-ui/refs/mockup-r357-cornici-aperta.png",
+        "sha256": "8a22ed0e5c3a940255dc417f60afe7f0f0c5dc770abf8d7f247c095c635c0f1a",
+        "ruling": "R-357 frame set v5",
+        "date": "2026-11-19",
+        "partialFields": [
+          "generator",
+          "promptPath"
+        ]
+      }
+    },
+    {
+      "id": "panel-frame6-v1",
+      "kind": "frame",
+      "source": "slice-kit",
+      "scope": "hud",
+      "status": "candidate",
+      "role": "outerFrame",
+      "dialect": "nav-filetto",
+      "materials": [
+        "bronzo",
+        "gemma-smeraldo"
+      ],
+      "ornamentScale": 0.28,
+      "specRef": "scripts/hud-real/specs/panel-frame6.json",
+      "provenance": {
+        "golden": ".mw/specs/expedition-ui/refs/candidate-cornici-bronzo-r1-keyed.png",
+        "sha256": "1064d4860c1b7b27be0197785f7a26abceef7bc81a7d6c9c4aad497ae8e605ba",
+        "ruling": "PLAN-128 candidate, non battezzato (spec comment)",
+        "generator": "Gemini web 2026-11-19 (.mw/runs/20261119-panel-frame5-regen/provenance.md)",
+        "date": "2026-11-19"
+      }
+    },
+    {
+      "id": "panel-frame7-v1",
+      "kind": "frame",
+      "source": "slice-kit",
+      "scope": "hud",
+      "status": "baptized",
+      "role": "outerFrame",
+      "dialect": "champagne-filigrana",
+      "materials": [
+        "ottone",
+        "gemma-smeraldo",
+        "smalto-smeraldo"
+      ],
+      "ornamentScale": 0.28,
+      "specRef": "scripts/hud-real/specs/panel-frame7.json",
+      "nonFusionReason": "frame-smeraldo-gemini designato dal Director e montato su stash (golden diverso da frame5, non una revisione dello stesso pezzo)",
+      "provenance": {
+        "golden": ".mw/specs/expedition-ui/refs/frame-smeraldo-gemini.png",
+        "sha256": "f5984a91fc8deeba740f23c47c3fe8f01ce2ef2d4556ef2774d225c5ec473b07",
+        "ruling": "PLAN-127/128 Director-designated smeraldo frame; montato su VillageStashPanel",
+        "generator": "Gemini web 2026-11-19",
+        "date": "2026-11-19",
+        "partialFields": [
+          "promptPath"
+        ]
+      }
+    },
+    {
+      "id": "cassetto-ground-v1",
+      "kind": "ground",
+      "scope": "hud",
+      "status": "baptized",
+      "role": "panelGround",
+      "dialect": "nav-filetto",
+      "materials": [
+        "smalto-smeraldo"
+      ],
+      "assets": {
+        "master": "public/assets/ui/hud-real/slicekit/cassetto/ground.webp"
+      },
+      "provenance": {
+        "golden": ".mw/runs/20261121-cassetto-components/out (batch Gemini standalone)",
+        "sha256": "53d7672606fdf38420123395ee86a9c8174a2b55994a49ed7052121385ab199d",
+        "ruling": "Director 2026-11-21: cassetto nuovo battezzato — pezzo montato sul componente approvato",
+        "generator": "Gemini web (.mw/runs/20261121-cassetto-components)",
+        "date": "2026-11-21",
+        "promptPath": ".mw/runs/20261121-cassetto-components/p2-ground.txt"
+      }
+    },
+    {
+      "id": "box-frame-v1",
+      "kind": "frame",
+      "scope": "hud",
+      "status": "baptized",
+      "role": "sectionFrame",
+      "dialect": "nav-filetto",
+      "materials": [
+        "ottone",
+        "oro-filetto"
+      ],
+      "assets": {
+        "master": "public/assets/ui/hud-real/slicekit/cassetto/box-frame.webp"
+      },
+      "provenance": {
+        "golden": ".mw/runs/20261121-cassetto-components/out (rigenerato batch Claude Code, commit afec2a6f9)",
+        "sha256": "ff7e702a392f1dad46f915c98c9be837435fb6da76cbd51b21ac67a1d85d3563",
+        "ruling": "Director 2026-11-21: cassetto nuovo battezzato — pezzo montato sul componente approvato",
+        "generator": "Gemini web (.mw/runs/20261121-cassetto-components)",
+        "date": "2026-11-21",
+        "promptPath": ".mw/runs/20261121-cassetto-components/p3-box.txt"
+      },
+      "source": "standalone",
+      "ornamentScale": 0.4
+    },
+    {
+      "id": "cta-plaque-v1",
+      "kind": "button-plate",
+      "scope": "hud",
+      "status": "baptized",
+      "role": "ctaWindow",
+      "dialect": "nav-filetto",
+      "materials": [
+        "ottone",
+        "smalto-smeraldo",
+        "gemma-smeraldo"
+      ],
+      "assets": {
+        "master": "public/assets/ui/hud-real/slicekit/cassetto/cta-plaque.webp"
+      },
+      "provenance": {
+        "golden": ".mw/runs/20261121-cassetto-components/out (rigenerato batch Claude Code, commit afec2a6f9)",
+        "sha256": "4f7edc3923fb99a0a72d09ba0dbb6377d3f5edcbaada6ab9efe1aa8605bf1f90",
+        "ruling": "Director 2026-11-21: cassetto nuovo battezzato — pezzo montato sul componente approvato",
+        "generator": "Gemini web (.mw/runs/20261121-cassetto-components)",
+        "date": "2026-11-21",
+        "promptPath": ".mw/runs/20261121-cassetto-components/p1-button.txt"
+      }
+    },
+    {
+      "id": "cta-plaque-enamel-v1",
+      "kind": "button-plate",
+      "scope": "hud",
+      "status": "baptized",
+      "role": "ctaWindow",
+      "dialect": "nav-filetto",
+      "materials": [
+        "smalto-smeraldo"
+      ],
+      "assets": {
+        "master": "public/assets/ui/hud-real/slicekit/cassetto/cta-plaque-enamel.webp"
+      },
+      "provenance": {
+        "golden": ".mw/runs/20261121-cassetto-components/out (rigenerato batch Claude Code, commit afec2a6f9)",
+        "sha256": "6e1eaf3a0fa892ca030fcd2998707c88e97240d7cd5beb372c7c14c62dcdcb86",
+        "ruling": "Director 2026-11-21: cassetto nuovo battezzato — pezzo montato sul componente approvato",
+        "generator": "Gemini web (.mw/runs/20261121-cassetto-components)",
+        "date": "2026-11-21",
+        "promptPath": ".mw/runs/20261121-cassetto-components/p1-button.txt"
+      },
+      "nonFusionReason": "layer separato dello stesso cta-plaque-v1 per i filtri di stato — non un'alternativa"
+    },
+    {
+      "id": "niche-v1",
+      "kind": "frame",
+      "scope": "hud",
+      "status": "baptized",
+      "role": "nicheFrame",
+      "dialect": "nav-filetto",
+      "materials": [
+        "ottone",
+        "smalto-smeraldo"
+      ],
+      "assets": {
+        "master": "public/assets/ui/hud-real/slicekit/cassetto/niche.webp"
+      },
+      "provenance": {
+        "golden": ".mw/runs/20261121-cassetto-components/out (rigenerato batch Claude Code, commit afec2a6f9)",
+        "sha256": "d6ee1db10790cbe1243da6873b86a54fc265e6f17ad2c00724e332579e07d12f",
+        "ruling": "Director 2026-11-21: cassetto nuovo battezzato — pezzo montato sul componente approvato",
+        "generator": "Gemini web (.mw/runs/20261121-cassetto-components)",
+        "date": "2026-11-21",
+        "promptPath": ".mw/runs/20261121-cassetto-components/p5b-niche.txt"
+      },
+      "source": "standalone",
+      "ornamentScale": 0.4
+    },
+    {
+      "id": "seat-ring-v1",
+      "kind": "ornament",
+      "scope": "hud",
+      "status": "candidate",
+      "role": "seatRing",
+      "dialect": "nav-filetto",
+      "materials": [
+        "ottone",
+        "gemma-smeraldo"
+      ],
+      "assets": {
+        "master": "public/assets/ui/hud-real/slicekit/cassetto/seat-ring.webp"
+      },
+      "provenance": {
+        "golden": ".mw/runs/20261121-cassetto-components/out (batch Gemini standalone)",
+        "sha256": "ae4f412d0fa13b26b43f20f59b10c9a1f73b8c1c437e03592e0d1451a8318e85",
+        "ruling": "in attesa di battezzo Director (pilota PLAN-130)",
+        "generator": "Gemini web (.mw/runs/20261121-cassetto-components)",
+        "date": "2026-11-21",
+        "promptPath": ".mw/runs/20261121-cassetto-components/p4-seat.txt"
+      },
+      "ornamentScale": 1.0
+    },
+    {
+      "id": "frame-corner-tl-v1",
+      "kind": "ornament",
+      "scope": "hud",
+      "status": "baptized",
+      "role": "cornerOrnament",
+      "dialect": "nav-filetto",
+      "materials": [
+        "ottone"
+      ],
+      "assets": {
+        "master": "public/assets/ui/hud-real/slicekit/cassetto/frame-corner-tl.webp"
+      },
+      "provenance": {
+        "golden": ".mw/runs/20261121-cassetto-components/out (batch Gemini standalone)",
+        "sha256": "385d8871502e3de8f1dbf7769481e534f80ad171d79d09e3d5a1049944f1ce3e",
+        "ruling": "Director 2026-11-21: cassetto nuovo battezzato — pezzo montato sul componente approvato",
+        "generator": "Gemini web (.mw/runs/20261121-cassetto-components)",
+        "date": "2026-11-21",
+        "promptPath": ".mw/runs/20261121-cassetto-components/p8g-corner-tl.txt"
+      },
+      "ornamentScale": 0.24,
+      "nonFusionReason": "angoli distinti dello stesso frame esterno, non varianti dello stesso pezzo"
+    },
+    {
+      "id": "frame-corner-bl-v1",
+      "kind": "ornament",
+      "scope": "hud",
+      "status": "baptized",
+      "role": "cornerOrnament",
+      "dialect": "nav-filetto",
+      "materials": [
+        "ottone"
+      ],
+      "assets": {
+        "master": "public/assets/ui/hud-real/slicekit/cassetto/frame-corner-bl.webp"
+      },
+      "provenance": {
+        "golden": ".mw/runs/20261121-cassetto-components/out (batch Gemini standalone)",
+        "sha256": "c8068d2a2364ec7d7f40bfd06fc75b06a6def98b9254701dbd5e2f0eb2552c75",
+        "ruling": "Director 2026-11-21: cassetto nuovo battezzato — pezzo montato sul componente approvato",
+        "generator": "Gemini web (.mw/runs/20261121-cassetto-components)",
+        "date": "2026-11-21",
+        "promptPath": ".mw/runs/20261121-cassetto-components/p7g-corner-bl.txt"
+      },
+      "ornamentScale": 0.24,
+      "nonFusionReason": "angoli distinti dello stesso frame esterno"
+    },
+    {
+      "id": "rail-mid-fold-v1",
+      "kind": "ornament",
+      "scope": "hud",
+      "status": "baptized",
+      "role": "railOrnament",
+      "dialect": "nav-filetto",
+      "materials": [
+        "ottone"
+      ],
+      "assets": {
+        "master": "public/assets/ui/hud-real/slicekit/cassetto/rail-mid-fold.webp"
+      },
+      "provenance": {
+        "golden": ".mw/runs/20261121-cassetto-components/out (batch Gemini standalone)",
+        "sha256": "7a5afb4d38c880122d9511aef3b46203306e935a81e04ccc92507a9a547284e5",
+        "ruling": "Director 2026-11-21: cassetto nuovo battezzato — pezzo montato sul componente approvato",
+        "generator": "Gemini web (.mw/runs/20261121-cassetto-components)",
+        "date": "2026-11-21",
+        "promptPath": ".mw/runs/20261121-cassetto-components/"
+      },
+      "ornamentScale": 0.24,
+      "nonFusionReason": "segmenti diversi del frame esterno"
+    },
+    {
+      "id": "rail-arc-v1",
+      "kind": "ornament",
+      "scope": "hud",
+      "status": "candidate",
+      "role": "railOrnament",
+      "dialect": "nav-filetto",
+      "materials": [
+        "ottone"
+      ],
+      "assets": {
+        "master": "public/assets/ui/hud-real/slicekit/cassetto/rail-arc.webp"
+      },
+      "provenance": {
+        "golden": ".mw/runs/20261121-cassetto-components/out (batch Gemini standalone)",
+        "sha256": "9ec6d9ad455474a4c9cb7731ce039e9af9769030271a71f96f86a1afff57ed49",
+        "ruling": "in attesa di battezzo Director (pilota PLAN-130)",
+        "generator": "Gemini web (.mw/runs/20261121-cassetto-components)",
+        "date": "2026-11-21",
+        "promptPath": ".mw/runs/20261121-cassetto-components/"
+      },
+      "ornamentScale": 0.24,
+      "nonFusionReason": "segmenti diversi del frame esterno"
+    },
+    {
+      "id": "frame-bar-north-v1",
+      "kind": "band",
+      "scope": "hud",
+      "status": "candidate",
+      "role": "engravedBand",
+      "dialect": "nav-filetto",
+      "materials": [
+        "ottone"
+      ],
+      "assets": {
+        "master": "public/assets/ui/hud-real/slicekit/cassetto/frame-bar-top.webp"
+      },
+      "provenance": {
+        "golden": ".mw/runs/20261121-cassetto-components/out (batch Gemini standalone)",
+        "sha256": "d099807ad3e5cee0bf814b0d096c4b359463497189abff30045919d7d082dc56",
+        "ruling": "in attesa di battezzo Director (pilota PLAN-130)",
+        "generator": "Gemini web (.mw/runs/20261121-cassetto-components)",
+        "date": "2026-11-21",
+        "promptPath": ".mw/runs/20261121-cassetto-components/"
+      },
+      "nonFusionReason": "barre distinte del frame esterno"
+    },
+    {
+      "id": "frame-bar-south-v1",
+      "kind": "band",
+      "scope": "hud",
+      "status": "candidate",
+      "role": "engravedBand",
+      "dialect": "nav-filetto",
+      "materials": [
+        "ottone"
+      ],
+      "assets": {
+        "master": "public/assets/ui/hud-real/slicekit/cassetto/frame-bar-bottom.webp"
+      },
+      "provenance": {
+        "golden": ".mw/runs/20261121-cassetto-components/out (batch Gemini standalone)",
+        "sha256": "50bd0cee0da6ff1b3da5e829a680c320c67228408e59bca3ce42e6402d9b7711",
+        "ruling": "in attesa di battezzo Director (pilota PLAN-130)",
+        "generator": "Gemini web (.mw/runs/20261121-cassetto-components)",
+        "date": "2026-11-21",
+        "promptPath": ".mw/runs/20261121-cassetto-components/"
+      },
+      "nonFusionReason": "barre distinte del frame esterno"
+    },
+    {
+      "id": "cassetto-rim-v1",
+      "kind": "band",
+      "scope": "hud",
+      "status": "baptized",
+      "role": "engravedBand",
+      "dialect": "nav-filetto",
+      "materials": [
+        "ottone"
+      ],
+      "assets": {
+        "master": "public/assets/ui/hud-real/slicekit/cassetto/frame-bottom.webp"
+      },
+      "provenance": {
+        "golden": ".mw/runs/20261121-cassetto-components/out (batch Gemini standalone)",
+        "sha256": "4340f524574af323f1600191dd5480ede5208675ae94ad5e8311f8b2d6c3215e",
+        "ruling": "Director 2026-11-21: cassetto nuovo battezzato — pezzo montato sul componente approvato",
+        "generator": "Gemini web (.mw/runs/20261121-cassetto-components)",
+        "date": "2026-11-21",
+        "promptPath": ".mw/runs/20261121-cassetto-components/"
+      },
+      "nonFusionReason": "rim orizzontale lungo, diverso dalle barre corte"
+    },
+    {
+      "id": "cart-corner-v1",
+      "kind": "ornament",
+      "scope": "hud",
+      "status": "baptized",
+      "role": "cornerOrnament",
+      "dialect": "nav-filetto",
+      "materials": [
+        "ottone"
+      ],
+      "assets": {
+        "master": "public/assets/ui/hud-real/slicekit/cassetto/cart-corner.webp"
+      },
+      "provenance": {
+        "golden": ".mw/specs/expedition-ui/refs/mockup-r357-cassetto-largo.png",
+        "sha256": "aac359045eaf5e2047ee82ed1025197ecb4b9c397b161d3bc49becfec8edd7e8",
+        "ruling": "Director 2026-11-21: cassetto nuovo battezzato — pezzo montato sul componente approvato (angolo cartiglio del riquadro vignetta — affettato dal golden)",
+        "generator": "scripts/build-cassetto3-assets.py (sliced dal golden battezzato)",
+        "date": "2026-11-21"
+      },
+      "ornamentScale": 0.24
+    },
+    {
+      "id": "cart-gem-v1",
+      "kind": "ornament",
+      "scope": "hud",
+      "status": "baptized",
+      "role": "gem",
+      "dialect": "nav-filetto",
+      "materials": [
+        "ottone",
+        "gemma-smeraldo"
+      ],
+      "assets": {
+        "master": "public/assets/ui/hud-real/slicekit/cassetto/cart-gem.webp"
+      },
+      "provenance": {
+        "golden": ".mw/specs/expedition-ui/refs/mockup-r357-cassetto-largo.png",
+        "sha256": "b2052bf2e869c90acedb2c710c1cdba820237f0b70ed980ff3d517986a197f40",
+        "ruling": "Director 2026-11-21: cassetto nuovo battezzato — pezzo montato sul componente approvato (gemma sotto il cartiglio della vignetta)",
+        "generator": "scripts/build-cassetto3-assets.py (sliced dal golden battezzato)",
+        "date": "2026-11-21"
+      },
+      "ornamentScale": 0.24
+    },
+    {
+      "id": "chest-v1",
+      "kind": "ornament",
+      "scope": "hud",
+      "status": "baptized",
+      "role": "supplyIcon",
+      "dialect": "nav-filetto",
+      "materials": [
+        "ottone",
+        "smalto-smeraldo"
+      ],
+      "assets": {
+        "master": "public/assets/ui/hud-real/slicekit/cassetto/chest.webp"
+      },
+      "provenance": {
+        "golden": ".mw/specs/expedition-ui/refs/mockup-r357-cassetto-largo.png",
+        "sha256": "f535db7499f79fcf4121a75256b00f51c61a8c1ad06340923dbe1ff9b626f89c",
+        "ruling": "Director 2026-11-21: cassetto nuovo battezzato — pezzo montato sul componente approvato (forziere emblema della colonna reward)",
+        "generator": "scripts/build-cassetto3-assets.py (sliced dal golden battezzato)",
+        "date": "2026-11-21"
+      },
+      "ornamentScale": 1.0
+    },
+    {
+      "id": "laurel-v1",
+      "kind": "ornament",
+      "scope": "hud",
+      "status": "baptized",
+      "role": "laurel",
+      "dialect": "nav-filetto",
+      "materials": [
+        "oro-filetto"
+      ],
+      "assets": {
+        "master": "public/assets/ui/hud-real/slicekit/cassetto/laurel.webp"
+      },
+      "provenance": {
+        "golden": ".mw/specs/expedition-ui/refs/mockup-r357-cassetto-largo.png",
+        "sha256": "21f2bad7250e11f623af4ae0972810b3e43f188fd33976fd963d3554f5befb2a",
+        "ruling": "Director 2026-11-21: cassetto nuovo battezzato — pezzo montato sul componente approvato (alloro del success%)",
+        "generator": "scripts/build-cassetto3-assets.py (sliced dal golden battezzato)",
+        "date": "2026-11-21"
+      },
+      "ornamentScale": 1.0
+    },
+    {
+      "id": "skull-v1",
+      "kind": "ornament",
+      "scope": "hud",
+      "status": "baptized",
+      "role": "skull",
+      "dialect": "nav-filetto",
+      "materials": [
+        "osso",
+        "smalto-rosso"
+      ],
+      "assets": {
+        "master": "public/assets/ui/hud-real/slicekit/cassetto/skull.webp"
+      },
+      "provenance": {
+        "golden": ".mw/specs/expedition-ui/refs/mockup-r357-cassetto-largo.png",
+        "sha256": "1caa4eb9f2c9c7352fa25da1795b96712b27754e643bbdf8f1d0b6a01930d4e3",
+        "ruling": "Director 2026-11-21: cassetto nuovo battezzato — pezzo montato sul componente approvato (teschio emblema del death%/rischio)",
+        "generator": "scripts/build-cassetto3-assets.py (sliced dal golden battezzato)",
+        "date": "2026-11-21"
+      },
+      "ornamentScale": 1.0
+    },
+    {
+      "id": "rail-mid-long-v1",
+      "kind": "ornament",
+      "scope": "hud",
+      "status": "candidate",
+      "role": "railOrnament",
+      "dialect": "nav-filetto",
+      "materials": [
+        "ottone"
+      ],
+      "assets": {
+        "master": "public/assets/ui/hud-real/slicekit/cassetto/rail-mid-long.webp"
+      },
+      "provenance": {
+        "golden": ".mw/runs/20261121-cassetto-components/out (batch Gemini standalone)",
+        "sha256": "c18fac0b73131229ea8cadc70f7c64e6c7a1568636b944e2ee1702c9c5d95eac",
+        "ruling": "in attesa di battezzo Director (generato, NON montato sul cassetto)",
+        "generator": "Gemini web (.mw/runs/20261121-cassetto-components)",
+        "date": "2026-11-21"
+      },
+      "ornamentScale": 0.24
+    },
+    {
+      "id": "rail-top-v1",
+      "kind": "ornament",
+      "scope": "hud",
+      "status": "candidate",
+      "role": "railOrnament",
+      "dialect": "nav-filetto",
+      "materials": [
+        "ottone"
+      ],
+      "assets": {
+        "master": "public/assets/ui/hud-real/slicekit/cassetto/rail-top.webp"
+      },
+      "provenance": {
+        "golden": ".mw/runs/20261121-cassetto-components/out (batch Gemini standalone)",
+        "sha256": "e9b528795ef5ec9866c1e22608fc86ed3302b5d4c4f15c8ebfbdf4524b300dcf",
+        "ruling": "in attesa di battezzo Director (generato, NON montato sul cassetto)",
+        "generator": "Gemini web (.mw/runs/20261121-cassetto-components)",
+        "date": "2026-11-21"
+      },
+      "ornamentScale": 0.24
+    },
+    {
+      "id": "rail-bottom-v1",
+      "kind": "ornament",
+      "scope": "hud",
+      "status": "candidate",
+      "role": "railOrnament",
+      "dialect": "nav-filetto",
+      "materials": [
+        "ottone"
+      ],
+      "assets": {
+        "master": "public/assets/ui/hud-real/slicekit/cassetto/rail-bottom.webp"
+      },
+      "provenance": {
+        "golden": ".mw/runs/20261121-cassetto-components/out (batch Gemini standalone)",
+        "sha256": "8dd0d3938f48ad6a3ffe6347dd2305d5a226b1219d637797e6d841c3332f437f",
+        "ruling": "in attesa di battezzo Director (generato, NON montato sul cassetto)",
+        "generator": "Gemini web (.mw/runs/20261121-cassetto-components)",
+        "date": "2026-11-21"
+      },
+      "ornamentScale": 0.24
+    }
+  ]
+}
