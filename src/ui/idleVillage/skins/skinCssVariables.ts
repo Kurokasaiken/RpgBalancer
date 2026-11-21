@@ -235,7 +235,7 @@ export const BASE_SKIN_CSS_VARS: SkinCssVarMap = {
    *  `cassettoLayoutConfig.cta.vars` (traceable config → token link); a skin
    *  may retune the values via preset overrides without touching the
    *  component. */
-  '--skin-cassetto-cta-text': '#eafff5',
+  '--skin-cassetto-cta-text': '#f6e9b0', /* gold-cream like the mockup's «LAUNCH EXPEDITION» (243,229,170); was cool mint #eafff5 (Director 2026-11-21: button looked dull) */
   '--skin-cassetto-cta-text-shadow': '0 1px 4px rgba(0,0,0,.9)',
   '--skin-cassetto-cta-muted-opacity': '0.82', /* R-357: the muted label stayed unreadable at 0.55 */
   '--skin-cassetto-cta-sheen':

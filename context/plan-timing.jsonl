@@ -93,3 +93,4 @@
 {"plan":"PLAN-123","event":"close","at":"2026-11-15T15:33:37.339Z"}
 {"plan":"PLAN-126","event":"open","at":"2026-11-17T18:34:20.675Z","lane":"local"}
 {"plan":"PLAN-127","event":"note","at":"2026-11-19T21:36:39.984Z","kind":"rebaptism"}
+{"plan":"PLAN-129","event":"open","at":"2026-11-20T21:50:32.417Z"}

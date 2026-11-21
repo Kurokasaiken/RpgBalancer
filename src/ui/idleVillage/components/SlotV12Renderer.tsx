@@ -95,7 +95,6 @@ export const SLOT_VARIANT_SPECS: Record<SlotVariant, SlotVariantSpec> = {
  * from production surfaces until a Director ruling promotes one.
  */
 export type BezelPreset = 'stock' | 'a' | 'b' | 'c' | 'ab' | 'zanara' | 'zanara2' | 'draghi' | 'draghiGlifo';
-export type BezelPreset = 'stock' | 'a' | 'b' | 'c' | 'ab' | 'zanara' | 'zanara2' | 'draghi';
 
 /**
  * Resolved paint knobs for a bezel preset. All values are SVG units of the

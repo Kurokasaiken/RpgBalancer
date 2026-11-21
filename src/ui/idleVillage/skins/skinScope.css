@@ -262,6 +262,35 @@
   box-shadow: 0 -4px 0 rgba(216,189,120,0.22), 0 4px 0 rgba(216,189,120,0.22);
 }
 
+/* Horizontal band (`HudScrollBandX`, Director 2026-11-21): the vertical variant-A grammar rotated 90° — brass-rimmed well, emerald «gemma»
+ * thumb. Selectors are not scoped to `.skin-scope` on purpose: the cassetto mounts it outside the HUD controls scope. */
+[data-hud-scroll-band] { scrollbar-width: none; }
+[data-hud-scroll-band]::-webkit-scrollbar { display: none; }
+[data-hud-band-x] .hbx-well {
+  position: absolute; inset: 0;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #04141a 0%, #071e26 50%, #04141a 100%);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.85), inset 0 -1px 1px rgba(216,189,120,0.14), 0 0 0 1px rgba(0,0,0,0.55);
+}
+[data-hud-band-x] .hbx-well::before, [data-hud-band-x] .hbx-well::after {
+  content: ''; position: absolute; left: 4px; right: 4px; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(216,189,120,0.38), transparent);
+}
+[data-hud-band-x] .hbx-well::before { top: 1.5px; }
+[data-hud-band-x] .hbx-well::after { bottom: 1.5px; }
+[data-hud-band-x] .hbx-thumb {
+  position: absolute; top: 2px; bottom: 2px;
+  border-radius: 6px;
+  background:
+    radial-gradient(circle at 0% 50%, rgba(255,240,200,0.18) 0%, transparent 55%),
+    linear-gradient(90deg, #2ea377 0%, #14705a 50%, #0a3f30 100%);
+  box-shadow: inset 0 0 0 1px rgba(216,189,120,0.55), inset 1px 0 0 rgba(255,255,255,0.22), inset -2px 0 3px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.6);
+}
+[data-hud-band-x] .hbx-thumb::after {
+  content: ''; position: absolute; top: 3px; bottom: 3px; left: 50%; width: 1px;
+  background: rgba(216,189,120,0.45); box-shadow: -4px 0 0 rgba(216,189,120,0.22), 4px 0 0 rgba(216,189,120,0.22);
+}
+
 /* B — oro inciso: engraved champagne-brass thumb + stud caps on the well. */
 .skin-scope [data-hud-band][data-variant="b"] .hb-thumb {
   position: absolute; left: 2px; right: 2px;

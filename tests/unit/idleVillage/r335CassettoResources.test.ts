@@ -41,7 +41,9 @@ describe('R-357 — the cassetto has no resources band (D-1, supersedes R-335)',
     expect(src).toMatch(/slicekit\/cassetto/);
     expect(src).toMatch(/DESIGN_W = 1024/);
     expect(src).toMatch(/data-block="bag-slots"/);
-    expect(src).toMatch(/cassetto-supplies-title/);
+    // Director 2026-11-21: the corner `›` openers (party / supplies) are gone; an empty niche still opens the stash.
+    expect(src).not.toMatch(/cassetto-supplies-title|cassetto-party-title/);
+    expect(src).toMatch(/bag-slot-empty-/);
   });
 });
 

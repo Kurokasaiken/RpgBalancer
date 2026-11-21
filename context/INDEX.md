@@ -202,3 +202,4 @@ Format: `[filename](path) — one sentence — \`tag\``
 ## Pattern
 
 - [pattern-candidate villaggio](../.mw/runs/2026-11-10-village-building-layers/pattern-candidate.md) — aggiungere un edificio a un dipinto: armonizza nella scena reale, riprendi solo edificio+base — `pattern`
+[src/pages/hud-lab/catalog.ts](src/pages/hud-lab/catalog.ts) — lista viva del vocabolario battezzato su /game (componenti→pezzi, status battezzato/candidato/da-riallineare, provenance ruling+sha); montata da `/hud-lab` PLAN-129 — `vocabulary` `hud` `PLAN-129` `R-369`

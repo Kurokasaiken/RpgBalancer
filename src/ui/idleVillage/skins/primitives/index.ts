@@ -10,6 +10,7 @@ export { HudPanel, type HudPanelProps } from './HudPanel';
 export { HudPlaque, type HudPlaqueProps, type HudPlaqueShape } from './HudPlaque';
 export { PanelFrameOrnaments, type PanelFrameOrnamentsProps } from './PanelFrameOrnaments';
 export { HudScrollBand, type HudScrollBandProps } from './HudScrollBand';
+export { HudScrollBandX, type HudScrollBandXProps } from './HudScrollBandX';
 export { SkinTitle, type SkinTitleProps } from './SkinTitle';
 export { SkinButton, type SkinButtonProps, type SkinButtonVariant } from './SkinButton';
 export { SkinCloseButton, type SkinCloseButtonProps } from './SkinCloseButton';

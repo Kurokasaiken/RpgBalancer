@@ -1,0 +1,57 @@
+/**
+ * PLAN-129 — `host` key → React mount. Kept in a non-component module so
+ * `hosts.tsx` stays fast-refresh-clean (only component exports).
+ */
+
+import {
+  CassettoHost,
+  RosterHost,
+  StashHost,
+  VictoryHost,
+  TopChromeHost,
+  NavHost,
+  TimeHost,
+  TriadHost,
+  NoteHost,
+  SmeraldoPiece,
+  CornersPiece,
+  ScrollBandPiece,
+  ScrollBandXPiece,
+  PiastrinaPiece,
+  CtaPiece,
+  GroundPiece,
+  BoxFramePiece,
+  NichePiece,
+  RimPiece,
+  SeatRingPiece,
+  TabsPiece,
+  PalettePiece,
+  TokensPiece,
+  type Host,
+} from './hosts';
+
+export const HOSTS: Record<string, Host> = {
+  cassetto: CassettoHost,
+  roster: RosterHost,
+  stash: StashHost,
+  victory: VictoryHost,
+  topChrome: TopChromeHost,
+  nav: NavHost,
+  time: TimeHost,
+  triad: TriadHost,
+  note: NoteHost,
+  'piece-smeraldo': SmeraldoPiece,
+  'piece-corners': CornersPiece,
+  'piece-band': ScrollBandPiece,
+  'piece-bandx': ScrollBandXPiece,
+  'piece-piastrina': PiastrinaPiece,
+  'piece-cta': CtaPiece,
+  'piece-ground': GroundPiece,
+  'piece-boxframe': BoxFramePiece,
+  'piece-niche': NichePiece,
+  'piece-rim': RimPiece,
+  'piece-seat': SeatRingPiece,
+  'piece-tabs': TabsPiece,
+  'piece-palette': PalettePiece,
+  'piece-tokens': TokensPiece,
+};

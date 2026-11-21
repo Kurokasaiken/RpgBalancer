@@ -107,19 +107,30 @@ describe('R-357 cassetto legibility floor', () => {
     expect(container.querySelectorAll('[data-cassetto-bag] > span')).toHaveLength(5);
   });
 
-  // INV:cassetto-party-pager — Director 2026-11-20: three seats at a time + a button to reveal the next
-  it('shows 3 seats with prev/next arrows when there are more, none when they fit, and the arrow slides one seat', () => {
+  // INV:cassetto-party-scroller — Director 2026-11-21 (amends cassetto-party-pager, 2026-11-20): seats scroll sideways under the engraved
+  // band, NOT prev/next arrow buttons («non voglio pulsanti … ma la barra come hanno già roster e stash»).
+  it('scrolls the seats sideways under the band: no prev/next buttons, whatever the seat count', () => {
     const seat = (i: number) => ({ id: `s${i}`, label: `Seat ${i}`, role: 'member' } as never);
-    const four = [0, 1, 2, 3].map(seat);
-    const { unmount } = render(<div style={{ width: 420, height: 900 }}><HudRealCassetto quest={QUEST} slots={four} /></div>);
-    const next = screen.getByTestId('cassetto-party-next');
-    expect(screen.getByTestId('cassetto-party-prev')).toBeDisabled();
-    expect(document.querySelector('[data-cassetto-party-pager]')).toHaveAttribute('data-first', '0');
-    fireEvent.click(next);
-    expect(document.querySelector('[data-cassetto-party-pager]')).toHaveAttribute('data-first', '1');
-    expect(next).toBeDisabled();
+    const { unmount } = render(<div style={{ width: 420, height: 900 }}><HudRealCassetto quest={QUEST} slots={[0, 1, 2, 3].map(seat)} /></div>);
+    expect(screen.queryByTestId('cassetto-party-prev')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('cassetto-party-next')).not.toBeInTheDocument();
+    const row = document.querySelector('[data-cassetto-party-scroll]') as HTMLElement;
+    expect(row).not.toBeNull();
+    expect(row.style.overflowX).toBe('auto');
+    expect(row).toHaveAttribute('data-hud-scroll-band');
+    expect(document.querySelector('[data-hud-band-x]')).not.toBeNull();
     unmount();
     render(<div style={{ width: 420, height: 900 }}><HudRealCassetto quest={QUEST} slots={[0, 1, 2].map(seat)} /></div>);
     expect(screen.queryByTestId('cassetto-party-next')).not.toBeInTheDocument();
+  });
+
+  // INV:cassetto-supplies-band — the supplies row shares the same band; an empty niche shows «+», not a placeholder bag
+  it('mounts the sideways band on the supplies row and paints a plus (no bag) in an empty niche', () => {
+    const { container } = render(<div style={{ width: 420, height: 900 }}><HudRealCassetto quest={QUEST} slots={[]} loadout={{ slots: [null, null, null], onReleaseItem: () => {}, onOpenStash: () => {} } as never} /></div>);
+    const row = container.querySelector('[data-cassetto-bag-scroll]') as HTMLElement;
+    expect(row).toHaveAttribute('data-hud-scroll-band');
+    const empty = container.querySelector('[data-testid="bag-slot-empty-0"]') as HTMLElement;
+    expect(empty.textContent).toBe('+');
+    expect(empty.querySelector('img')).toBeNull();
   });
 });

@@ -81,8 +81,19 @@ _outside = np.isin(_lab, list(_border)).astype(np.uint8)
 _alpha = cv2.GaussianBlur((255 - _outside * 255).astype(np.float32), (0, 0), 1.2)
 _btn = Image.fromarray(np.dstack([_rgb.astype(np.uint8), np.clip(_alpha, 0, 255).astype(np.uint8)]), 'RGBA')
 _btn = _btn.resize((1500, round(1500 * _btn.height / _btn.width)), Image.LANCZOS)
+# strip what the golden's neighbouring ornaments left in the crop (Director 2026-11-21: «un'immagine sopra l'originale, un pulsante
+# mezzo cancellato dietro, una riga sotto»): the top hairline + corner curls and the smudge under the arcs. The crest and the
+# arcs live inside the kept boxes, so only the stray strokes go. Coordinates are for the final 1500 px asset.
+_ba = np.array(_btn); _bw, _bh = _btn.size
+for _x0, _x1, _y0, _y1 in [(0, 565, 0, 36), (_bw - 565, _bw, 0, 36), (0, 128, 0, 88), (_bw - 128, _bw, 0, 88),
+                           (150, 248, 290, _bh), (_bw - 248, _bw - 150, 290, _bh)]:
+    _ba[_y0:_y1, _x0:_x1, 3] = 0
+_btn = Image.fromarray(_ba, 'RGBA')
 print('cta-plaque aspect', _btn.size)
-save(_btn, 'cta-plaque', 95)
+# 2026-11-21: the shipped plaque is now Gemini-generated (clean, on magenta, keyed) — see .mw/runs/20261121-cassetto-components/.
+# The golden-crop version stays reproducible but no longer overwrites it unless REBUILD_LEGACY_CTA=1.
+if os.environ.get('REBUILD_LEGACY_CTA'):
+    save(_btn, 'cta-plaque', 95)
 
 # skull + chest, elliptical soft mask
 def medal(box, name, close_iter):
