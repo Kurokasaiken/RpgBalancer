@@ -12,14 +12,14 @@ import { OrnCorner, Z } from './zanaraOrn';
 type MenuConfig = GameFrameConfig['gamePage']['menu'];
 
 const css = (m: MenuConfig) => `
-[data-hudreal-menu] { font-family: "EB Garamond", serif; }
+[data-hudreal-menu] { font-family: "Cardo", serif; }
 [data-hudreal-menu] > span, [data-hudreal-menu] [role="radiogroup"] ~ span {
-  font: 600 ${m.labelFontPx}px Cinzel, "EB Garamond", serif; letter-spacing: 0.22em; text-transform: uppercase;
+  font: 600 ${m.labelFontPx}px Marcellus, "Cardo", serif; letter-spacing: 0.22em; text-transform: uppercase;
   color: ${Z.goldHi}; text-shadow: 0 1px 2px rgba(0,0,0,.75); margin-top: 4px;
 }
 [data-hudreal-menu] button {
   display: flex; align-items: center; justify-content: center; gap: 12px; min-height: ${m.rowHeightPx}px; padding: 0 14px;
-  font: 600 ${m.rowFontPx}px Cinzel, "EB Garamond", serif; letter-spacing: 0.1em; text-transform: uppercase; color: ${Z.ink};
+  font: 600 ${m.rowFontPx}px Marcellus, "Cardo", serif; letter-spacing: 0.1em; text-transform: uppercase; color: ${Z.ink};
   background: linear-gradient(180deg, #12302f 0%, ${Z.fieldDark} 100%);
   border: 1px solid ${Z.goldDark}; border-radius: ${m.rowRadiusPx}px; cursor: pointer;
   box-shadow: inset 0 1px 0 rgba(240, 214, 138, .18), inset 0 -2px 6px rgba(0,0,0,.45), 0 1px 2px rgba(0,0,0,.4);

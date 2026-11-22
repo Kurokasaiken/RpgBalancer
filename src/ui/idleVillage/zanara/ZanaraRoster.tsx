@@ -106,10 +106,10 @@ export function RosterRow({ resident, locked, lockedStatusLabel, onSelect }: {
       {/* live text on the plaque body */}
       <div style={{ position: 'absolute', left: G.text.left, top: plaqueTop + G.text.top, height: G.plaque.h - 2 * G.text.top, right: G.plaque.rightW + 2, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 0 }}>
         <span style={{
-          fontFamily: 'var(--font-header, "Cinzel", serif)', fontSize: G.text.nameSize, lineHeight: '15px', color: C.name,
+          fontFamily: 'var(--font-header, "Marcellus", serif)', fontSize: G.text.nameSize, lineHeight: '15px', color: C.name,
           whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
         }} title={name}>{name}</span>
-        <span style={{ fontFamily: '"EB Garamond", serif', fontSize: G.text.subSize, lineHeight: '12px', color: C.sub, whiteSpace: 'nowrap' }}>
+        <span style={{ fontFamily: '"Cardo", serif', fontSize: G.text.subSize, lineHeight: '12px', color: C.sub, whiteSpace: 'nowrap' }}>
           {levelText}
           {stateLabel && (
             <span style={{ color: view.state === 'dead' ? C.fallen : C.exception }}>{levelText ? ' · ' : ''}{stateLabel}</span>

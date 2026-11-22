@@ -52,10 +52,10 @@ export function HudRealPanel({ kicker, title, body, illustration, children, acti
       <img src={ASSET} alt="" draggable={false} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', display: 'block' }} />
       <div style={{
         position: 'absolute', left: textLeft, top: textTop, width: textW, height: belowTop - textTop - 8,
-        overflow: 'hidden', fontFamily: '"EB Garamond", serif', color: C.ink,
+        overflow: 'hidden', fontFamily: '"Cardo", serif', color: C.ink,
       }}>
         {kicker && <div style={{ fontSize: 14, letterSpacing: 1, textTransform: 'uppercase', color: C.muted, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{kicker}</div>}
-        <div style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: 21, fontWeight: 600, lineHeight: '23px', margin: '1px 0 3px', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden' }}>{title}</div>
+        <div style={{ fontFamily: 'Marcellus, "Cardo", serif', fontSize: 21, fontWeight: 600, lineHeight: '23px', margin: '1px 0 3px', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden' }}>{title}</div>
         {body && <div style={{ fontSize: 16, lineHeight: '21px', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: Math.max(2, Math.floor((belowTop - textTop - 8 - 16 - 46) / 21)), overflow: 'hidden' }}>{body}</div>}
       </div>
       {hasWindow && (
@@ -67,7 +67,7 @@ export function HudRealPanel({ kicker, title, body, illustration, children, acti
       {children && (
         <div style={{
           position: 'absolute', left: textLeft, right: F.w - (F.field.x + F.field.w) + PAD, top: belowTop,
-          height: CTA.y - belowTop - 4, overflow: 'hidden', fontFamily: '"EB Garamond", serif', color: C.ink, fontSize: 16,
+          height: CTA.y - belowTop - 4, overflow: 'hidden', fontFamily: '"Cardo", serif', color: C.ink, fontSize: 16,
         }}>{children}</div>
       )}
       {action && (
@@ -75,7 +75,7 @@ export function HudRealPanel({ kicker, title, body, illustration, children, acti
           style={{
             position: 'absolute', left: CTA.x, top: CTA.y, width: CTA.w, height: CTA.h, background: 'transparent',
             border: 0, padding: 0, cursor: action.disabled ? 'default' : 'pointer', opacity: action.disabled ? 0.55 : 1,
-            fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: 16, fontWeight: 700, letterSpacing: 3, textTransform: 'uppercase', whiteSpace: 'nowrap',
+            fontFamily: 'Marcellus, "Cardo", serif', fontSize: 16, fontWeight: 700, letterSpacing: 3, textTransform: 'uppercase', whiteSpace: 'nowrap',
             color: C.cta, textShadow: C.shadow,
           }}>{action.label}</button>
       )}

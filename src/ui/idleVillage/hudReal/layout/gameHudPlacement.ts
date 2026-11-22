@@ -4,7 +4,7 @@
  * - From 768 px wide: the signed blueprint B1 (`resolveSlots`, game HUD zoom). Each integral bar is scaled whole to its
  *   slot width (PLAN-112 §28) — same placement maths as `/hud-compose`.
  * - Below 768 px (D10: the blueprint does not apply on phones): the same bars, stacked so nothing overlaps — resources
- *   on top, time under the resources' hanging gem, nav at the bottom — each scaled down only as much as the width needs.
+ *   on top, time under the resources bar, nav at the bottom — each scaled down only as much as the width needs.
  * - Landscape windows shorter than `LANDSCAPE_MAX_H` (phones rotated, ~360–430 px tall) get a miniature of the reference
  *   desktop layout instead: every bar keeps its own share of the window measured on the signed blueprint at 1920×1080
  *   (Director 2026-11-14, R-332: the game is played horizontally on phones; "stessa percentuale... la mantieni uguale").
@@ -18,7 +18,8 @@ import { blueprintMode, frameFor, M, resolveAll, resolveSlots, SLOTS_B, TOP_ROW_
 /** Intrinsic design size of each integral bar and the y of its socket row (where it is centred on its slot). */
 export const GAME_HUD_BARS = {
   time: { w: 485.34, h: 84.96, rowY: 44.5 },
-  resources: { w: 395.79, h: 118.86, rowY: 44.3 },
+  /* R-376: regenerated pointed-cap bar (no medallion/pendant) — 917×150 asset. */
+  resources: { w: 458.6, h: 75.15, rowY: 37.9 },
   nav: { w: 513, h: 131.25 },
   /* R-338: the narrator piece (voce/piece.webp) is 440×230.56 design px; its slot (360 wide,
    *  blueprint B1 'voce') only reserves its lower band — the art overflows upward, bottom edge
@@ -67,7 +68,7 @@ export function placeGameHud(winW: number, winH: number, zoom: number): GameHudP
     const sT = fit(GAME_HUD_BARS.time.w, PHONE_SIDE);
     const sN = fit(GAME_HUD_BARS.nav.w, PHONE_SIDE - 2);
     const resourcesTop = PHONE_SIDE;
-    const timeTop = resourcesTop + GAME_HUD_BARS.resources.h * sR + PHONE_GAP; // under the hanging gem
+    const timeTop = resourcesTop + GAME_HUD_BARS.resources.h * sR + PHONE_GAP; // under the bar's lower edge
     return {
       mode: 'phone',
       cornerScale: 1,

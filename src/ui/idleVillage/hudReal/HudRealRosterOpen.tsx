@@ -37,7 +37,7 @@ const SUB = '#b9d2c4';
 
 const ctl: CSSProperties = {
   height: 34, borderRadius: 17, border: `1.5px solid ${GOLD_DK}`, background: 'rgba(4,28,26,.85)', color: INK,
-  fontFamily: '"EB Garamond", serif', fontSize: 16, padding: '0 12px',
+  fontFamily: '"Cardo", serif', fontSize: 16, padding: '0 12px',
 };
 
 function Meter({ v, fill }: { v: number; fill: string }) {
@@ -66,12 +66,12 @@ function HeroCard({ r, selected, dense, onSelect }: { r: ResidentState; selected
       </div>
       <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: dense ? 3 : 5 }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-          <span style={{ fontFamily: '"Cinzel", serif', fontSize: dense ? 16 : 19, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.displayName ?? r.id}</span>
-          {level !== null && <span style={{ fontFamily: '"EB Garamond", serif', fontSize: 15, color: SUB, flex: 'none' }}>{t('gameFrame.heroLevel.badge', { n: level })}</span>}
-          <span style={{ marginLeft: 'auto', fontFamily: '"EB Garamond", serif', fontSize: 15, color: STATE_COLOR[view.state], flex: 'none' }}>{STATE_LABEL[view.state]}</span>
+          <span style={{ fontFamily: '"Marcellus", serif', fontSize: dense ? 16 : 19, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.displayName ?? r.id}</span>
+          {level !== null && <span style={{ fontFamily: '"Cardo", serif', fontSize: 15, color: SUB, flex: 'none' }}>{t('gameFrame.heroLevel.badge', { n: level })}</span>}
+          <span style={{ marginLeft: 'auto', fontFamily: '"Cardo", serif', fontSize: 15, color: STATE_COLOR[view.state], flex: 'none' }}>{STATE_LABEL[view.state]}</span>
         </div>
         {!dense && (
-          <div style={{ display: 'grid', gridTemplateColumns: '28px 1fr 64px', alignItems: 'center', columnGap: 8, rowGap: 4, fontFamily: '"EB Garamond", serif', fontSize: 14, color: SUB }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '28px 1fr 64px', alignItems: 'center', columnGap: 8, rowGap: 4, fontFamily: '"Cardo", serif', fontSize: 14, color: SUB }}>
             <span>PV</span><Meter v={hp} fill="linear-gradient(180deg,#3fd6a4,#149a72)" /><span style={{ textAlign: 'right', color: INK }}>{r.currentHp}/{r.maxHp}</span>
             <span>Vig</span><Meter v={st} fill="linear-gradient(180deg,#ecd28a,#b38a3a)" /><span style={{ textAlign: 'right', color: INK }}>{Math.round(st * 100)}%</span>
           </div>
@@ -117,8 +117,8 @@ export function HudRealRosterOpen({ residents, selected, onSelect, onClose, heig
       border: `2.5px solid ${GOLD}`, boxShadow: `inset 0 0 0 1.5px ${GOLD_DK}, inset 0 0 30px rgba(0,0,0,.45), 0 6px 18px rgba(1,14,18,.75)`,
     }}>
       <header style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <h2 style={{ margin: 0, fontFamily: '"Cinzel", serif', fontSize: 24, color: INK, fontWeight: 600, letterSpacing: 1 }}>Compagnia</h2>
-        <span style={{ fontFamily: '"EB Garamond", serif', fontSize: 16, color: SUB }}>{counts.ready} pronti su {residents.length}</span>
+        <h2 style={{ margin: 0, fontFamily: '"Marcellus", serif', fontSize: 24, color: INK, fontWeight: 600, letterSpacing: 1 }}>Compagnia</h2>
+        <span style={{ fontFamily: '"Cardo", serif', fontSize: 16, color: SUB }}>{counts.ready} pronti su {residents.length}</span>
         <button type="button" onClick={() => setDense((d) => !d)} style={{ ...ctl, marginLeft: 'auto', cursor: 'pointer' }}>{dense ? 'Schede' : 'Compatto'}</button>
         {onClose && <button type="button" onClick={onClose} aria-label="Chiudi" style={{ ...ctl, width: 34, padding: 0, cursor: 'pointer', fontSize: 18 }}>✕</button>}
       </header>
@@ -130,7 +130,7 @@ export function HudRealRosterOpen({ residents, selected, onSelect, onClose, heig
           }}>{tb.label} <span style={{ color: SUB }}>{counts[tb.id]}</span></button>
         ))}
       </nav>
-      <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', fontFamily: '"EB Garamond", serif', fontSize: 15, color: SUB }}>
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', fontFamily: '"Cardo", serif', fontSize: 15, color: SUB }}>
         <span>Ordina</span>
         <select value={sort} onChange={(e) => setSort(e.target.value as RosterSortMode)} style={{ ...ctl, cursor: 'pointer' }}>
           {Object.values(ROSTER_SORT_MODES).map((m) => <option key={m.mode} value={m.mode}>{m.label}</option>)}
@@ -152,10 +152,10 @@ export function HudRealRosterOpen({ residents, selected, onSelect, onClose, heig
           scrollSnapType: 'y mandatory', paddingRight: 4, scrollbarWidth: 'thin', scrollbarColor: `${GOLD_DK} transparent`,
         }}>
           {shown.map((r) => <HeroCard key={r.id} r={r} dense={dense} selected={selected === r.id} onSelect={() => onSelect?.(r.id)} />)}
-          {shown.length === 0 && <p style={{ gridColumn: '1 / -1', color: SUB, fontFamily: '"EB Garamond", serif', fontSize: 16 }}>Nessun eroe con questi filtri.</p>}
+          {shown.length === 0 && <p style={{ gridColumn: '1 / -1', color: SUB, fontFamily: '"Cardo", serif', fontSize: 16 }}>Nessun eroe con questi filtri.</p>}
         </div>
       </div>
-      <footer style={{ fontFamily: '"EB Garamond", serif', fontSize: 14, color: SUB, opacity: 0.85 }}>Trascina un eroe su uno slot per assegnarlo · R apre e chiude</footer>
+      <footer style={{ fontFamily: '"Cardo", serif', fontSize: 14, color: SUB, opacity: 0.85 }}>Trascina un eroe su uno slot per assegnarlo · R apre e chiude</footer>
     </section>
   );
 }

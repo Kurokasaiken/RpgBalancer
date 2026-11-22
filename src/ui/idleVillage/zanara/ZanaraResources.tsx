@@ -54,15 +54,15 @@ function Chip({ item }: { item: ResourceReadoutItem }) {
         <div style={{ width: G.icon, height: G.icon, flex: 'none', filter: 'drop-shadow(0 1px 2px rgba(3, 26, 30, 0.8))' }}>{item.icon}</div>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <span style={{
-            fontFamily: '"EB Garamond", serif', fontSize: G.valueSize, fontWeight: danger ? 700 : 600, lineHeight: '20px',
+            fontFamily: '"Cardo", serif', fontSize: G.valueSize, fontWeight: danger ? 700 : 600, lineHeight: '20px',
             fontVariantNumeric: 'tabular-nums', color: danger ? HUD_TONE_COLOR.danger : C.value, textShadow: C.textShadow, whiteSpace: 'nowrap',
           }}>
             {item.value}
             {item.max !== undefined && <span style={{ fontSize: G.labelSize + 1, fontWeight: 500, opacity: 0.8 }}>/{item.max}</span>}
           </span>
-          <span style={{ ...line, fontFamily: 'var(--font-header, "Cinzel", serif)', fontSize: G.labelSize, letterSpacing: 1, color: C.label }}>{item.label}</span>
+          <span style={{ ...line, fontFamily: 'var(--font-header, "Marcellus", serif)', fontSize: G.labelSize, letterSpacing: 1, color: C.label }}>{item.label}</span>
           {item.detail && (
-            <span style={{ ...line, fontFamily: '"EB Garamond", serif', fontSize: G.labelSize, color: toneColor, display: 'flex', alignItems: 'center', gap: 4 }}>
+            <span style={{ ...line, fontFamily: '"Cardo", serif', fontSize: G.labelSize, color: toneColor, display: 'flex', alignItems: 'center', gap: 4 }}>
               {danger && <Hourglass color={toneColor} />}
               {item.detail}
             </span>

@@ -501,7 +501,7 @@ export const DEFAULT_ACTIVITY_CAPSULE_SKIN_CONFIG: ActivityCapsuleSkinConfig = {
     liquidGoldShimmer: true,
     shimmerAnimationDuration: '3s',
     shimmerIntensity: 0.7,
-    timerFont: 'Cinzel, serif',
+    timerFont: 'Marcellus, serif',
     timerColor: '#f4e4c1',
     timerFontSize: '11px',
     timerFontWeight: '600',

@@ -141,7 +141,7 @@ export const SLOT_RACK_IRON_BRONZE_CONFIG: SlotRackSkinConfig = {
         glyphStyle: {
           fill: '#140a02',
           stroke: 'rgba(255, 252, 205, 0.35)',
-          fontFamily: 'Cinzel, serif',
+          fontFamily: 'Marcellus, serif',
         },
       },
       minimal: {
@@ -595,7 +595,7 @@ export const RESIDENT_SLOT_RACK_SIGNATURE_CONFIG: SlotRackSkinConfig = {
           fill: '#2b1408',
           stroke: 'rgba(255, 255, 255, 0.3)',
           shadow: '0 1px 2px rgba(0,0,0,0.85)',
-          fontFamily: 'Cinzel, serif',
+          fontFamily: 'Marcellus, serif',
         },
         gem: {
           enabled: true,

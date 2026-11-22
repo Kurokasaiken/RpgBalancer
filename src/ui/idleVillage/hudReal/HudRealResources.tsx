@@ -33,7 +33,7 @@ const G_COMPACT = { pad: 4, socket: 26, glyph: 17, gap: 4, valueSize: 15, labelS
 
 const SCOPED_CSS = `
 [data-hudreal-resources] [data-hr-res]:focus { outline: none; }
-[data-hudreal-resources] [data-hr-res]:focus-visible { outline: 2px solid ${C.focus}; outline-offset: -3px; border-radius: 6px; }
+[data-hudreal-resources] [data-hr-res]:focus-visible { outline: 2px solid ${C.focus}; outline-offset: -3px; border-radius: 999px; }
 `;
 
 /** Incised hourglass: the "time is running out" emblem (rubric §1.6b) — rendered
@@ -42,7 +42,7 @@ function Hourglass({ color }: { color: string }) {
   return (
     <svg width="9" height="12" viewBox="0 0 9 12" aria-hidden="true" style={{ display: 'block', flex: 'none' }}>
       <path d="M1 0.75h7M1 11.25h7M1.6 0.75c0 3 2.9 3.6 2.9 5.25S1.6 8.25 1.6 11.25M7.4 0.75c0 3-2.9 3.6-2.9 5.25s2.9 2.25 2.9 5.25"
-        fill="none" stroke={color} strokeWidth="1.4" strokeLinecap="round" />
+        fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" />
     </svg>
   );
 }
@@ -116,7 +116,9 @@ export function HudRealResources({ items, bar: BAR_LOCAL = BAR, asset: ASSET_LOC
               style={{
                 position: 'absolute', left: slot.x, top: slot.y, width: slot.w, height: slot.h, boxSizing: 'border-box',
                 padding: `0 ${S.pad}px`, display: 'flex', alignItems: 'center', justifyContent: centerContent ? 'center' : undefined, gap: S.gap, cursor: 'default',
-                borderRadius: 10,
+                /* R-376: the regenerated glass is a stadium — the chip (and the
+                 *  danger enamel rim on it) is a pill, not a squarish rect. */
+                borderRadius: slot.h / 2,
                 /* Danger: vermilion enamel rim on the slice itself — the slot glows,
                  *  the hourglass sits at the right edge as an emblem. No hairline. */
                 ...(danger
@@ -126,17 +128,17 @@ export function HudRealResources({ items, bar: BAR_LOCAL = BAR, asset: ASSET_LOC
               <IconSocket socket={S.socket} glyph={S.glyph}>{item.icon}</IconSocket>
               <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', position: 'relative' }}>
                 <span style={{
-                  fontFamily: '"EB Garamond", serif', fontSize: hudPx(S.valueSize), fontWeight: danger ? 700 : 600, lineHeight: hudPx(18),
+                  fontFamily: '"Cardo", serif', fontSize: hudPx(S.valueSize), fontWeight: danger ? 700 : 600, lineHeight: hudPx(18),
                   fontVariantNumeric: 'tabular-nums', color: danger ? HUD_TONE_COLOR.danger : C.value, textShadow: C.emboss,
                   whiteSpace: 'nowrap', display: 'flex', alignItems: 'baseline', gap: 3,
                 }}>
                   {compactValue(item.value)}
                   {item.max !== undefined && String(item.value).length <= 3 && (
-                    <span style={{ fontSize: hudPx(S.labelSize), fontWeight: 500, color: C.label, opacity: 0.85 }}>/{item.max}</span>
+                    <span style={{ fontSize: hudPx(S.labelSize), fontWeight: 500, color: C.value, opacity: 0.85 }}>/{item.max}</span>
                   )}
                 </span>
                 <span style={{
-                  fontFamily: '"EB Garamond", serif', fontSize: hudPx(S.labelSize), lineHeight: hudPx(13), color: C.label, textShadow: C.shadow,
+                  fontFamily: '"Cardo", serif', fontStyle: 'italic', fontSize: hudPx(S.labelSize), lineHeight: hudPx(13), color: C.label, textShadow: C.shadow,
                   whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', letterSpacing: 0.6,
                   display: 'flex', alignItems: 'center', gap: 5,
                 }}>

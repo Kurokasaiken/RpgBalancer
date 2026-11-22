@@ -141,18 +141,18 @@ export function HudRealVoce({ title, children, messageKey, autoCloseMs, onDismis
             position: 'absolute', left: f.x - GROW, top: f.y - GROW, width: f.w + GROW * 2, height: f.h + GROW * 2, boxSizing: 'border-box',
             padding: '0 12px', display: 'flex', flexDirection: 'column', justifyContent: 'center', overflow: expanded ? 'visible' : 'hidden',
             ...(expanded ? { height: 'auto', minHeight: f.h + GROW * 2, top: 'auto', bottom: P.h - (f.y + f.h + GROW), background: 'linear-gradient(180deg, rgba(9, 52, 40, 0.97), rgba(7, 40, 32, 0.97))', borderRadius: 8, boxShadow: '0 4px 18px rgba(0, 0, 0, 0.55)', paddingTop: 8, paddingBottom: 8 } : {}),
-            fontFamily: '"EB Garamond", serif', color: C.text, textShadow: C.shadow,
+            fontFamily: '"Cardo", serif', color: C.text, textShadow: C.shadow,
           }}>
-            {displayed.title && <span style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: 14, lineHeight: '16px', letterSpacing: 1, color: C.title, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{displayed.title}</span>}
+            {displayed.title && <span style={{ fontFamily: 'Marcellus, "Cardo", serif', fontSize: 14, lineHeight: '16px', letterSpacing: 1, color: C.title, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{displayed.title}</span>}
             <span data-hr-voce-text="" tabIndex={0}
               onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpanded((v) => !v); } }}
               style={{ fontSize: 15, lineHeight: '17px', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: expanded ? 12 : displayed.title ? 3 : 4, overflow: 'hidden' }}>{displayed.children}</span>
           </div>
           <div style={{ position: 'absolute', left: f.x + f.w - 92, top: f.y + f.h + GROW + 2, display: 'flex', gap: 6 }}>
             <button type="button" data-hr-voce-expand="" aria-expanded={expanded} onClick={() => setExpanded((v) => !v)}
-              style={{ font: '600 12px "EB Garamond", serif', color: C.title, background: 'rgba(5, 32, 26, 0.85)', border: '1px solid rgba(240, 213, 140, 0.5)', borderRadius: 10, padding: '1px 9px', cursor: 'pointer', whiteSpace: 'nowrap' }}>{expanded ? labels.collapse : labels.expand}</button>
+              style={{ font: '600 12px "Cardo", serif', color: C.title, background: 'rgba(5, 32, 26, 0.85)', border: '1px solid rgba(240, 213, 140, 0.5)', borderRadius: 10, padding: '1px 9px', cursor: 'pointer', whiteSpace: 'nowrap' }}>{expanded ? labels.collapse : labels.expand}</button>
             <button type="button" data-hr-voce-close="" aria-label={labels.dismiss} onClick={dismiss}
-              style={{ font: '700 12px "EB Garamond", serif', color: C.title, background: 'rgba(5, 32, 26, 0.85)', border: '1px solid rgba(240, 213, 140, 0.5)', borderRadius: '50%', width: 20, height: 20, cursor: 'pointer', padding: 0 }}>×</button>
+              style={{ font: '700 12px "Cardo", serif', color: C.title, background: 'rgba(5, 32, 26, 0.85)', border: '1px solid rgba(240, 213, 140, 0.5)', borderRadius: '50%', width: 20, height: 20, cursor: 'pointer', padding: 0 }}>×</button>
           </div>
         </div>
       </div>

@@ -197,7 +197,7 @@ export const slotV12SkinData = {
       "medal-group (occupied only)",
       "halo-canvas (occupied only, positioned absolute)"
     ],
-    notes: "Slot v12 wilderness. Cavity ossidiana con venature anisotropiche. Collare bronzo ossidato. Ghiera argento con 16 segmenti incisi rotanti e 3 denti/artigli (ore 12/4/8). Medaglione bronzo con lettera Cinzel. Halo canvas amber/gold."
+    notes: "Slot v12 wilderness. Cavity ossidiana con venature anisotropiche. Collare bronzo ossidato. Ghiera argento con 16 segmenti incisi rotanti e 3 denti/artigli (ore 12/4/8). Medaglione bronzo con lettera Marcellus. Halo canvas amber/gold."
   }
 };
 
@@ -335,7 +335,7 @@ export const SLOT_WILDERNESS_BRONZE_CONFIG: TemporarySkinConfig = {
       --field-stop2: #0e0804;
       --field-stop3: #050302;
       --letter-color: rgba(200,155,50,.68);
-      --letter-font: "Cinzel",Georgia,serif;
+      --letter-font: "Marcellus",Georgia,serif;
       --letter-weight: 600;
       --highlight-color: rgba(255,255,255,.22);
       --portrait-rim: rgba(180,110,28,.28);
@@ -685,7 +685,7 @@ export const SLOT_WILDERNESS_BRONZE_CONFIG: TemporarySkinConfig = {
     'field.stop2': '#0e0804',
     'field.stop3': '#050302',
     'letter.color': 'rgba(200,155,50,.68)',
-    'letter.font': 'Cinzel,Georgia,serif',
+    'letter.font': 'Marcellus,Georgia,serif',
     'letter.weight': '600',
     'highlight.color': 'rgba(255,255,255,.22)',
     'portrait.rim': 'rgba(180,110,28,.28)',
@@ -778,7 +778,7 @@ export const SLOT_WILDERNESS_BRONZE_CONFIG: TemporarySkinConfig = {
       'medal-group (occupied only)',
       'halo-canvas (occupied only, positioned absolute)'
     ],
-    notes: 'Slot v12 wilderness. Cavity ossidiana con venature anisotropiche. Collare bronzo ossidato. Ghiera argento con 16 segmenti incisi rotanti e 3 denti/artigli (ore 12/4/8). Medaglione bronzo con lettera Cinzel. Halo canvas amber/gold.'
+    notes: 'Slot v12 wilderness. Cavity ossidiana con venature anisotropiche. Collare bronzo ossidato. Ghiera argento con 16 segmenti incisi rotanti e 3 denti/artigli (ore 12/4/8). Medaglione bronzo con lettera Marcellus. Halo canvas amber/gold.'
   }
 };
 

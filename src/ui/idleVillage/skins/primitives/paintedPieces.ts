@@ -33,7 +33,7 @@ export const PAINTED_PIECES = {
 /** Panel ground: marble texture over a dark emerald fallback. Spread into `style` of the element that is the ground. */
 export const paintedGround = (): CSSProperties => ({
   /* darkened toward the new mockup's ground (3,28,23): marble kept, a teal-black veil on top lowers it ~25% so the wells can sit darker still */
-  background: `linear-gradient(rgba(2,20,20,.26), rgba(2,20,20,.26)), url(${PAINTED_PIECES.ground.src}) center / cover no-repeat, ${PAINTED_PIECES.ground.fallback}`,
+  background: `linear-gradient(rgba(10,60,40,.10), rgba(10,60,40,.10)), url(${PAINTED_PIECES.ground.src}) center / cover no-repeat, ${PAINTED_PIECES.ground.fallback}`,
 });
 
 /**

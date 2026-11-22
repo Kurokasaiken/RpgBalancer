@@ -73,7 +73,7 @@ export const ZanaraBlock: React.FC<{ label?: string; children: React.ReactNode; 
   >
     {(['tl', 'tr', 'bl', 'br'] as const).map((c) => <OrnCorner key={c} corner={c} />)}
     {label && (
-      <div style={{ textAlign: 'center', fontSize: 11, letterSpacing: 2.4, color: Z.goldHi, textTransform: 'uppercase', textShadow: '0 1px 2px rgba(0,0,0,.7)', marginBottom: 6, fontWeight: 600, fontFamily: 'Cinzel, "EB Garamond", serif' }}>
+      <div style={{ textAlign: 'center', fontSize: 11, letterSpacing: 2.4, color: Z.goldHi, textTransform: 'uppercase', textShadow: '0 1px 2px rgba(0,0,0,.7)', marginBottom: 6, fontWeight: 600, fontFamily: 'Marcellus, "Cardo", serif' }}>
         {label}
       </div>
     )}
@@ -90,7 +90,7 @@ export const ZanaraPlaque: React.FC<{ children: React.ReactNode; style?: React.C
       border: `2.5px solid ${Z.gold}`, borderRadius: 16,
       background: `linear-gradient(180deg, ${Z.fieldHi} 0%, ${Z.field} 34%, ${Z.fieldDark} 100%)`,
       boxShadow: `inset 0 0 0 1.5px ${Z.goldDeep}, inset 0 0 26px rgba(0,0,0,.62), ${Z.shadow}`,
-      fontFamily: '"EB Garamond", serif', color: Z.ink,
+      fontFamily: '"Cardo", serif', color: Z.ink,
       overflow: 'hidden',
       ...style,
     }}
@@ -99,7 +99,7 @@ export const ZanaraPlaque: React.FC<{ children: React.ReactNode; style?: React.C
     {(title || kicker) && (
       <div style={{ padding: '12px 18px 8px', textAlign: 'center', borderBottom: `1px solid color-mix(in srgb, ${Z.gold} 42%, transparent)` }}>
         {kicker && <div style={{ fontSize: 10.5, letterSpacing: 3, color: Z.muted, textTransform: 'uppercase' }}>{kicker}</div>}
-        {title && <div style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: 17, letterSpacing: 2.6, color: Z.goldHi, textTransform: 'uppercase', textShadow: '0 1px 3px rgba(0,0,0,.75)', marginTop: 2 }}>{title}</div>}
+        {title && <div style={{ fontFamily: 'Marcellus, "Cardo", serif', fontSize: 17, letterSpacing: 2.6, color: Z.goldHi, textTransform: 'uppercase', textShadow: '0 1px 3px rgba(0,0,0,.75)', marginTop: 2 }}>{title}</div>}
       </div>
     )}
     {children}
@@ -119,7 +119,7 @@ export const ZanaraButton: React.FC<{ children: React.ReactNode; onClick?: () =>
       onClick={onClick}
       disabled={disabled}
       style={{
-        fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: 12.5, fontWeight: 700, letterSpacing: 2,
+        fontFamily: 'Marcellus, "Cardo", serif', fontSize: 12.5, fontWeight: 700, letterSpacing: 2,
         textTransform: 'uppercase', color: tones.ink,
         background: tones.bg, border: `1.5px solid ${tones.border}`, borderRadius: 9,
         padding: '8px 18px', cursor: disabled ? 'default' : 'pointer',

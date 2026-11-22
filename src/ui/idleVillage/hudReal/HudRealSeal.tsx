@@ -59,7 +59,7 @@ export function HudRealSeal({ value, marks = [], label, hint, layout = 'stack', 
           <img src={DISC} alt="" draggable={false} style={{ position: 'absolute', left: 0, top: 0, width: dw, height: dh, display: 'block' }} />
           <div style={{ position: 'absolute', left: (d.cx - d.r) * k, top: (d.cy - d.r) * k, width: d.r * 2 * k, height: d.r * 2 * k, display: 'grid', gridTemplateRows: 'auto auto', placeContent: 'center', justifyItems: 'center', gap: 0 }}>
             <span style={{ color: C.sign, filter: 'drop-shadow(0 1px 2px rgba(2, 20, 22, 0.9))' }}><EngravedIcon id="evt-combat" size={Math.round(d.r * 0.82 * k)} /></span>
-            <span style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontWeight: 600, fontSize: Math.round(d.r * 0.74 * k), lineHeight: 1, color: C.value, textShadow: C.shadow, fontVariantNumeric: 'tabular-nums', display: 'flex', alignItems: 'baseline' }}>
+            <span style={{ fontFamily: 'Marcellus, "Cardo", serif', fontWeight: 600, fontSize: Math.round(d.r * 0.74 * k), lineHeight: 1, color: C.value, textShadow: C.shadow, fontVariantNumeric: 'tabular-nums', display: 'flex', alignItems: 'baseline' }}>
               {value}<span style={{ fontSize: Math.round(d.r * 0.3 * k), marginLeft: 2, color: C.sign }}>%</span>
             </span>
           </div>
@@ -84,7 +84,7 @@ export function HudRealSeal({ value, marks = [], label, hint, layout = 'stack', 
         <img src={DISC} alt="" draggable={false} style={{ position: 'absolute', left: discLeft, top: 0, width: d.w, height: d.h, display: 'block' }} />
         <div style={{ position: 'absolute', left: discLeft + d.cx - d.r, top: d.cy - d.r, width: d.r * 2, height: d.r * 2, display: 'grid', gridTemplateRows: 'auto auto', placeContent: 'center', justifyItems: 'center', gap: 0 }}>
           <span style={{ color: C.sign, filter: 'drop-shadow(0 1px 2px rgba(2, 20, 22, 0.9))' }}><EngravedIcon id="evt-combat" size={Math.round(d.r * 0.82)} /></span>
-          <span style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontWeight: 600, fontSize: Math.round(d.r * 0.74), lineHeight: 1, color: C.value, textShadow: C.shadow, fontVariantNumeric: 'tabular-nums', display: 'flex', alignItems: 'baseline' }}>
+          <span style={{ fontFamily: 'Marcellus, "Cardo", serif', fontWeight: 600, fontSize: Math.round(d.r * 0.74), lineHeight: 1, color: C.value, textShadow: C.shadow, fontVariantNumeric: 'tabular-nums', display: 'flex', alignItems: 'baseline' }}>
             {value}<span style={{ fontSize: Math.round(d.r * 0.3), marginLeft: 2, color: C.sign }}>%</span>
           </span>
         </div>

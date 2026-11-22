@@ -1273,7 +1273,7 @@ function DragTestContainerV2({
           data-roster-handle-state={isDragging ? 'dragging' : 'idle'}
         >
           <div className={_headerTextClassName} style={useWanderlustSkin && isCompact ? HUD_TITLE_STYLE : undefined}>
-            <span style={useWanderlustSkin ? { fontFamily: 'var(--wl-font-display, "Cinzel", "Trajan Pro", serif)' } : {}}>{t('gameFrame.roster.title')}</span>
+            <span style={useWanderlustSkin ? { fontFamily: 'var(--wl-font-display, "Marcellus", "Trajan Pro", serif)' } : {}}>{t('gameFrame.roster.title')}</span>
           </div>
           <div className={isCompact ? 'flex min-w-0 items-center gap-(--skin-hud-control-gap)' : 'flex items-center gap-1'} data-hud-controls={isCompact ? '' : undefined} data-collapsed={isCompact && isRosterCollapsed ? '' : undefined}>
             {/* INV:drag-test-container-v2.INV-1 — the native select is stretched

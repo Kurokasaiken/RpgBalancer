@@ -76,7 +76,7 @@ export function HudRealTime({ dayLabel, isDayPhase, cycleProgress, isPaused, loc
       </div>
       <div style={{
         position: 'absolute', left: f.x + 8, top: f.y, width: f.w - 24, height: f.h, display: 'flex', alignItems: 'center', gap: 8,
-        fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: hudPx(HUD_TYPE.value), letterSpacing: 1, color: C.text, textShadow: C.shadow, whiteSpace: 'nowrap', overflow: 'hidden',
+        fontFamily: 'Marcellus, "Cardo", serif', fontSize: hudPx(HUD_TYPE.value), letterSpacing: 1, color: C.text, textShadow: C.shadow, whiteSpace: 'nowrap', overflow: 'hidden',
       }}>
         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{dayLabel}</span>
       </div>
@@ -92,7 +92,7 @@ export function HudRealTime({ dayLabel, isDayPhase, cycleProgress, isPaused, loc
           return (
             <HudTooltip key={s} label={labels.speed(s)} shortcut={String(i + 1)} side="bottom" wrap>
               <button type="button" role="radio" data-hr-time={`x${s}`} aria-checked={speed.multiplier === s} aria-label={labels.speed(s)} disabled={locked} onClick={() => speed.onChange(s)}
-                style={{ ...pos(i + 1), color: on ? C.gold : C.dim, fontFamily: '"EB Garamond", serif', fontWeight: 700, fontSize: hudPx(HUD_TYPE.secondary), textShadow: C.shadow, ...ring(on) }}>×{s}</button>
+                style={{ ...pos(i + 1), color: on ? C.gold : C.dim, fontFamily: '"Cardo", serif', fontWeight: 700, fontSize: hudPx(HUD_TYPE.secondary), textShadow: C.shadow, ...ring(on) }}>×{s}</button>
             </HudTooltip>
           );
         })}

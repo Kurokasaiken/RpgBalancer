@@ -43,7 +43,7 @@ export const POI_DETAIL_SKIN_CONFIG: TemporarySkinConfig = {
       --stat-value: #e8b040;
       --danger-value: #e04818;
       
-      font-family: 'EB Garamond', serif;
+      font-family: 'Cardo', serif;
       background: var(--body-base);
       color: var(--title-color);
       border-radius: 26px;
@@ -66,7 +66,7 @@ export const POI_DETAIL_SKIN_CONFIG: TemporarySkinConfig = {
     }
     
     .poi-detail-title {
-      font-family: 'Cinzel', serif;
+      font-family: 'Marcellus', serif;
       font-weight: 700;
       font-size: 24px;
       letter-spacing: .03em;
@@ -80,7 +80,7 @@ export const POI_DETAIL_SKIN_CONFIG: TemporarySkinConfig = {
     }
     
     .poi-detail-subtitle {
-      font-family: 'EB Garamond', serif;
+      font-family: 'Cardo', serif;
       font-style: italic;
       font-size: 12px;
       color: rgba(192,158,78,.55);
@@ -88,7 +88,7 @@ export const POI_DETAIL_SKIN_CONFIG: TemporarySkinConfig = {
     }
     
     .poi-detail-description {
-      font-family: 'EB Garamond', serif;
+      font-family: 'Cardo', serif;
       font-style: italic;
       font-size: 13px;
       line-height: 1.58;
@@ -114,7 +114,7 @@ export const POI_DETAIL_SKIN_CONFIG: TemporarySkinConfig = {
     }
     
     .poi-detail-button {
-      font-family: 'Cinzel', serif;
+      font-family: 'Marcellus', serif;
       font-weight: 700;
       font-size: 8.5px;
       letter-spacing: .28em;

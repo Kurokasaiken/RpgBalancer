@@ -14,7 +14,7 @@ import type { ResidentCompatibilityState } from '../components/ResidentRosterTyp
  *  - Grid layout: identity (left), bars (center), portrait (right)
  *  - Gradient background with inset shadows
  *  - Gold rail on left side on hover
- *  - Cinzel typography for name, sans for role/labels
+ *  - Marcellus typography for name, sans for role/labels
  *  - Circular portrait with gold border
  *  - HP/Stamina bars with gold styling and specular highlight
  * ════════════════════════════════════════════════════════════════════════ */
@@ -74,8 +74,8 @@ const COLOR = {
 } as const;
 
 const FONT = {
-  display: 'var(--wl-font-display, "Cinzel", "Trajan Pro", serif)',
-  serif: 'var(--wl-font-serif, "EB Garamond", Georgia, serif)',
+  display: 'var(--wl-font-display, "Marcellus", "Trajan Pro", serif)',
+  serif: 'var(--wl-font-serif, "Cardo", Georgia, serif)',
   sans: 'var(--wl-font-sans, system-ui, sans-serif)',
 } as const;
 

@@ -88,7 +88,7 @@ const SLOT_WILDERNESS_BRONZE_SKIN_HTML = String.raw`
       <circle cx="0" cy="0" r="42" fill="url(#slot-v12-medal-outer)" />
       <circle cx="0" cy="0" r="34" fill="url(#slot-v12-medal-field)" />
       <circle cx="0" cy="0" r="30" stroke="rgba(205,155,50,0.68)" stroke-width="3" fill="none" />
-      <text x="0" y="10" text-anchor="middle" font-family="Cinzel,Georgia,serif" font-size="36" font-weight="600" fill="rgba(205,155,50,0.68)">S</text>
+      <text x="0" y="10" text-anchor="middle" font-family="Marcellus,Georgia,serif" font-size="36" font-weight="600" fill="rgba(205,155,50,0.68)">S</text>
     </g>
 
     <g data-slot="halo">
@@ -275,7 +275,7 @@ export const SLOT_WILDERNESS_BRONZE_SKIN_CONFIG: TemporarySkinConfig = {
       TOOTH_HEIGHT: 14,
       TOOTH_WIDTH: 7.5,
     },
-    notes: 'Slot v12 wilderness: cavity ossidiana, collare bronzo ossidato, ghiera argento con artigli, medaglione bronzo Cinzel.',
+    notes: 'Slot v12 wilderness: cavity ossidiana, collare bronzo ossidato, ghiera argento con artigli, medaglione bronzo Marcellus.',
     arcane: {
       alphaEmpty: 0.06,
       alphaOccupied: 0.13,

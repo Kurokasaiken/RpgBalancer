@@ -38,7 +38,7 @@
 .skin-scope :where(.skin-text-secondary) { color: var(--skin-text-secondary); }
 .skin-scope :where(.skin-text-muted) { color: var(--skin-text-muted); }
 
-/* ── First-level title (gold, incised, Cinzel) ────────────────────────── */
+/* ── First-level title (gold, incised, Marcellus) ────────────────────────── */
 .skin-scope :where(h1, [data-skin="title"]) {
   margin: 0;
   font-family: var(--skin-font-display);
@@ -107,12 +107,15 @@
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.35), transparent);
   pointer-events: none;
 }
-.skin-scope :where(button, [data-skin="button"]):not([data-skin="cta"]):not([data-skin="close"]):hover:not(:disabled) {
+/* Painted `data-ctl` pieces are excluded: the `background` shorthand here would reset their
+   background-size/repeat and the painted piece would paint at native size inside the box
+   (visible as a colored square with no art — the roster-ring hover bug). */
+.skin-scope :where(button, [data-skin="button"]):not([data-skin="cta"]):not([data-skin="close"]):not([data-ctl]):hover:not(:disabled) {
   background: var(--skin-btn-hover-bg);
   box-shadow: var(--skin-btn-hover-shadow);
   transform: var(--skin-btn-hover-lift);
 }
-.skin-scope :where(button, [data-skin="button"]):not([data-skin="cta"]):not([data-skin="close"]):active:not(:disabled) {
+.skin-scope :where(button, [data-skin="button"]):not([data-skin="cta"]):not([data-skin="close"]):not([data-ctl]):active:not(:disabled) {
   transform: translateY(0);
   box-shadow: var(--skin-btn-active-shadow);
   filter: var(--skin-btn-active-filter);
@@ -186,6 +189,14 @@
   transform: none;
   filter: brightness(1.2);
 }
+
+/* Parchment victory report (R-357): every button sits on a painted affordance
+   of the baked frame (crew rows, plaque CTA, brass close cap). The
+   struck-bronze ::before specular streak is positioned absolute and the rows
+   are `all:unset` (position: static), so it resolved against the *positioned
+   scroll zone* and painted a stray light rectangle over the crew list —
+   suppress it on the whole report surface. */
+.skin-scope [data-victory-report] button::before { display: none; }
 
 /* ── Themed scrollbar (R-246): scroll regions inside HUD panels opt in with
    `data-hud-scroll` — the OS-default bar clashed with the bronze lacquer.
@@ -399,14 +410,14 @@
   border-color: var(--skin-title-color);
   background: radial-gradient(circle at 40% 35%, color-mix(in srgb, var(--skin-title-color) 22%, var(--skin-hud-lacquer-base)), var(--skin-hud-lacquer-deep));
 }
-.skin-scope [data-hud-controls] button:not([data-skin="cta"]):hover:not(:disabled),
-.skin-scope [data-hud-controls] label:hover {
+.skin-scope [data-hud-controls] button:not([data-skin="cta"]):not([data-ctl]):hover:not(:disabled),
+.skin-scope [data-hud-controls] label:not([data-ctl]):hover {
   border-color: var(--skin-surface-border);
   background: color-mix(in srgb, var(--skin-icon-accent) 16%, var(--skin-surface-base));
   color: var(--skin-title-color);
 }
-.skin-scope [data-hud-controls] button[aria-pressed="true"],
-.skin-scope [data-hud-controls] button[aria-checked="true"] {
+.skin-scope [data-hud-controls] button:not([data-ctl])[aria-pressed="true"],
+.skin-scope [data-hud-controls] button:not([data-ctl])[aria-checked="true"] {
   border-color: var(--skin-surface-border);
   background: color-mix(in srgb, var(--skin-icon-accent) 30%, var(--skin-surface-base));
   color: var(--skin-title-color);

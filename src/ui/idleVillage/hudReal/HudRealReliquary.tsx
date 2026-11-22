@@ -58,7 +58,7 @@ export const HudRealReliquary: React.FC<{ onClose?: () => void }> = ({ onClose }
       {/* Title engraved on the clean pale-ivory top plaque */}
       <div style={{ ...pct(Z.title), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <span style={{
-          fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: '4.2cqh', fontWeight: 800,
+          fontFamily: 'Marcellus, "Cardo", serif', fontSize: '4.2cqh', fontWeight: 800,
           letterSpacing: '0.14em', textTransform: 'uppercase', color: C.ink,
           textShadow: '0 1px 0 rgba(255,248,225,.75)',
         }}>
@@ -74,7 +74,7 @@ export const HudRealReliquary: React.FC<{ onClose?: () => void }> = ({ onClose }
       {LEGACY_RELIQUARY_CATEGORIES.map((category, ci) => (
         <React.Fragment key={category}>
           <div style={{ ...pct(Z.colLabels[ci]), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: '2.6cqh', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: C.goldHi, textShadow: '0 1px 3px rgba(0,0,0,.85)' }}>
+            <span style={{ fontFamily: 'Marcellus, "Cardo", serif', fontSize: '2.6cqh', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: C.goldHi, textShadow: '0 1px 3px rgba(0,0,0,.85)' }}>
               {t(`gameFrame.legacy.category.${category}`)}
             </span>
           </div>
@@ -83,7 +83,7 @@ export const HudRealReliquary: React.FC<{ onClose?: () => void }> = ({ onClose }
             style={{ ...pct(Z.cols[ci]), display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1.8cqh', padding: '1.6cqh 1.2cqw', overflow: 'hidden' }}
           >
             {slots[category] === 0 ? (
-              <span style={{ font: 'italic 2.4cqh "EB Garamond", serif', color: C.muted, textAlign: 'center' }}>
+              <span style={{ font: 'italic 2.4cqh "Cardo", serif', color: C.muted, textAlign: 'center' }}>
                 {t('gameFrame.legacy.noSlots')}
               </span>
             ) : (
@@ -102,7 +102,7 @@ export const HudRealReliquary: React.FC<{ onClose?: () => void }> = ({ onClose }
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                       border: active ? `2px solid ${C.emeraldGlow}` : '1.5px solid #9d7f3e',
                       background: active ? `radial-gradient(ellipse at 50% 30%, ${C.emeraldGlow}33, #081621 75%)` : 'linear-gradient(180deg,#15302c,#0a1917)',
-                      color: C.goldHi, fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: '2.5cqh', fontWeight: 700, letterSpacing: '0.12em',
+                      color: C.goldHi, fontFamily: 'Marcellus, "Cardo", serif', fontSize: '2.5cqh', fontWeight: 700, letterSpacing: '0.12em',
                       boxShadow: active ? `0 0 14px ${C.emerald}66` : 'inset 0 1px 4px rgba(0,0,0,.6)',
                     }}
                   >
@@ -125,7 +125,7 @@ export const HudRealReliquary: React.FC<{ onClose?: () => void }> = ({ onClose }
           ...pct(Z.confirm), padding: 0, border: 'none', background: 'transparent',
           cursor: onClose ? 'pointer' : 'default',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: '2.4cqh', fontWeight: 800,
+          fontFamily: 'Marcellus, "Cardo", serif', fontSize: '2.4cqh', fontWeight: 800,
           letterSpacing: '0.22em', textTransform: 'uppercase', color: C.goldHi,
           textShadow: '0 1px 4px rgba(0,0,0,.9)',
         }}

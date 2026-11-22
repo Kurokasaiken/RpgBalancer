@@ -141,11 +141,11 @@ function Row({ resident, locked, lockedStatusLabel, selected, onSelect, joint, o
         <img src={ASSETS.plaque} alt="" draggable={false} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
         <div style={{ position: 'absolute', left: f.x + 6, top: f.y - 6, width: f.w * L.textWidth, height: f.h + 10, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 0 }}>
           <span title={name} style={{
-            fontFamily: '"EB Garamond", serif', fontWeight: 600, fontSize: name.length > L.text.longName ? L.text.nameSizeLong : L.text.nameSize,
+            fontFamily: '"Cardo", serif', fontWeight: 600, fontSize: name.length > L.text.longName ? L.text.nameSizeLong : L.text.nameSize,
             lineHeight: '20px', flexShrink: 0, color: C.name,
             textShadow: C.textShadow, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
           }}>{name}</span>
-          <span style={{ fontFamily: '"EB Garamond", serif', fontSize: L.text.subSize, lineHeight: '14px', flexShrink: 0, color: C.sub, whiteSpace: 'nowrap', textShadow: C.textShadow }}>
+          <span style={{ fontFamily: '"Cardo", serif', fontSize: L.text.subSize, lineHeight: '14px', flexShrink: 0, color: C.sub, whiteSpace: 'nowrap', textShadow: C.textShadow }}>
             {levelText}
             {stateLabel && <span style={{ color: view.state === 'dead' ? C.fallen : C.exception }}>{levelText ? ' · ' : ''}{stateLabel}</span>}
           </span>

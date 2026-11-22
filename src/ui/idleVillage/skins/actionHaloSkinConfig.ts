@@ -296,7 +296,7 @@ export const DEFAULT_ACTION_HALO_SKIN_CONFIG: ActionHaloSkinConfig = {
     iconBackground: 'rgba(71, 85, 105, 0.8)',
     iconColor: '#ffffff',
     iconBorderRadius: '50%',
-    iconFont: 'Cinzel, serif',
+    iconFont: 'Marcellus, serif',
     iconFontSize: '11px',
     iconFontWeight: 'bold',
     iconText: 'POI',

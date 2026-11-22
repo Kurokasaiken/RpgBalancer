@@ -38,9 +38,10 @@ export const BASE_SKIN_CSS_VARS: SkinCssVarMap = {
   '--skin-glow-accent': 'rgba(0,229,255,0.25)',
   '--skin-glow-primary': 'rgba(223,184,87,0.20)',
 
-  /* Typography families */
-  '--skin-font-display': '"Cinzel", "Trajan Pro", serif',
-  '--skin-font-serif': '"EB Garamond", Georgia, serif',
+  /* Typography families — PLAN-125 D-4 «A inciso» (Director ruling 2026-11-21):
+     Marcellus display + Cardo serif, previous faces kept as fallbacks. */
+  '--skin-font-display': '"Marcellus", "Marcellus", "Trajan Pro", serif',
+  '--skin-font-serif': '"Cardo", "Cardo", Georgia, serif',
   '--skin-font-sans': 'system-ui, sans-serif',
 
   /* Title (h1/h2 — gold engraved gradient) */
@@ -106,7 +107,7 @@ export const BASE_SKIN_CSS_VARS: SkinCssVarMap = {
     'linear-gradient(135deg, #f7dd80 0%, #dfb857 40%, #c9a040 70%, #8b6f47 100%)',
   '--skin-btn-border': '1px solid rgba(247,221,128,0.85)',
   '--skin-btn-color': '#1a1208',
-  '--skin-btn-font': '"Cinzel", "Trajan Pro", serif',
+  '--skin-btn-font': '"Marcellus", "Trajan Pro", serif',
   '--skin-btn-size': '12px',
   '--skin-btn-tracking': '0.14em',
   '--skin-btn-radius': '7px',
@@ -253,7 +254,7 @@ export const BASE_SKIN_CSS_VARS: SkinCssVarMap = {
   /* R-357: the CTA is the painted plaque (cassetto3/cta-plaque); hover/press/disabled are filters on it. */
   '--skin-cassetto-cta-enamel-hover-filter': 'brightness(1.16) saturate(1.12) drop-shadow(0 0 10px rgba(60,230,160,.55))',
   '--skin-cassetto-cta-enamel-press-filter': 'brightness(.88) saturate(1.05)',
-  '--skin-cassetto-cta-enamel-disabled': 'saturate(.72) brightness(.82)', /* dimmed, hues kept: grayscale turned the gold brown-grey (Director 2026-11-20 «colori strani») */
+  '--skin-cassetto-cta-enamel-disabled': 'saturate(.43) brightness(.80)', /* OB-7 iss-c/α (Director 2026-11-21 «troppo vivo → prova −40% sat»): .72×.6≈.43, hues kept (grayscale turned the gold brown-grey, R-357 «colori strani») */
 
   /* Drag handle & draggable states */
   '--skin-drag-handle-color': 'rgba(223,184,87,0.50)',
@@ -310,8 +311,8 @@ export const BASE_SKIN_CSS_VARS: SkinCssVarMap = {
   '--skin-tab-active-border': 'var(--skin-title-color)',
 
   /* ── Bridge → legacy WanderlustLayout `--wl-*` variables ─────────────── */
-  '--wl-font-display': '"Cinzel", "Trajan Pro", serif',
-  '--wl-font-serif': '"EB Garamond", Georgia, serif',
+  '--wl-font-display': '"Marcellus", "Marcellus", "Trajan Pro", serif',
+  '--wl-font-serif': '"Cardo", "Cardo", Georgia, serif',
   '--wl-font-sans': 'system-ui, sans-serif',
   '--wl-title-size': '30px',
   '--wl-body-size': '15.5px',

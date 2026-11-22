@@ -86,10 +86,10 @@ const GalleryBay: React.FC<{ entry: MemorialEntry; index: number }> = ({ entry, 
           gap: 2,
         }}
       >
-        <span style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: 13.5, fontWeight: 700, letterSpacing: '0.08em', color: C.goldHi, textTransform: 'uppercase' }}>
+        <span style={{ fontFamily: 'Marcellus, "Cardo", serif', fontSize: 13.5, fontWeight: 700, letterSpacing: '0.08em', color: C.goldHi, textTransform: 'uppercase' }}>
           {entry.name}
         </span>
-        <span style={{ font: 'italic 11.5px "EB Garamond", serif', color: C.muted, lineHeight: 1.25 }}>
+        <span style={{ font: 'italic 11.5px "Cardo", serif', color: C.muted, lineHeight: 1.25 }}>
           {t('gameFrame.menu.memorialLevel', { level: entry.level })}
           {' · '}
           {entry.place}
@@ -150,7 +150,7 @@ export const HudRealMemorial: React.FC<{ onClose?: () => void }> = ({ onClose })
 
       {/* Header bar */}
       <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 22px 8px', borderBottom: '1px solid rgba(201,169,78,.35)' }}>
-        <span style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: 18, fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', color: C.goldHi, textShadow: '0 1px 4px rgba(0,0,0,.9)' }}>
+        <span style={{ fontFamily: 'Marcellus, "Cardo", serif', fontSize: 18, fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', color: C.goldHi, textShadow: '0 1px 4px rgba(0,0,0,.9)' }}>
           {t('gameFrame.menu.memorialTitle')}
         </span>
         {onClose && (
@@ -160,7 +160,7 @@ export const HudRealMemorial: React.FC<{ onClose?: () => void }> = ({ onClose })
             style={{
               padding: '5px 16px', border: `1.5px solid ${C.gold}`, borderRadius: 7, cursor: 'pointer',
               background: 'linear-gradient(180deg,#1a7d54,#0d5c40)', color: '#eafff5',
-              fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: 11.5, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase',
+              fontFamily: 'Marcellus, "Cardo", serif', fontSize: 11.5, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase',
             }}
           >
             {t('gameFrame.menu.close')}
@@ -171,7 +171,7 @@ export const HudRealMemorial: React.FC<{ onClose?: () => void }> = ({ onClose })
       {/* Horizontal gallery bays (8-A Solemn Gallery architecture) */}
       <div style={{ position: 'relative', zIndex: 1, flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '14px 20px', overflowX: 'auto' }}>
         {entries.length === 0 ? (
-          <div style={{ font: 'italic 16px "EB Garamond", serif', color: C.muted }}>{t('gameFrame.menu.memorialEmpty')}</div>
+          <div style={{ font: 'italic 16px "Cardo", serif', color: C.muted }}>{t('gameFrame.menu.memorialEmpty')}</div>
         ) : (
           <ol style={{ margin: 0, padding: 0, width: '100%', display: 'flex', justifyContent: 'center', gap: 16 }}>
             {entries.map((e, i) => <GalleryBay key={e.key} entry={e} index={i} />)}

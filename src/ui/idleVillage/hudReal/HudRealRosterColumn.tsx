@@ -98,10 +98,10 @@ function Row({ resident, locked, lockedStatusLabel, selected, onSelect, onKey }:
         <img src={ASSETS.plaque} alt="" draggable={false} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
         <div style={{ position: 'absolute', left: 48, top: 4, width: 140, height: 64, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <span title={name} style={{
-            fontFamily: '"EB Garamond", serif', fontWeight: 600, fontSize: long ? HUD_TYPE.nameLong : HUD_TYPE.name, lineHeight: '20px',
+            fontFamily: '"Cardo", serif', fontWeight: 600, fontSize: long ? HUD_TYPE.nameLong : HUD_TYPE.name, lineHeight: '20px',
             color: C.name, textShadow: C.textShadow, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
           }}>{name}</span>
-          <span style={{ fontFamily: '"EB Garamond", serif', fontSize: HUD_TYPE.secondary, lineHeight: '15px', color: C.sub, whiteSpace: 'nowrap', textShadow: C.textShadow }}>
+          <span style={{ fontFamily: '"Cardo", serif', fontSize: HUD_TYPE.secondary, lineHeight: '15px', color: C.sub, whiteSpace: 'nowrap', textShadow: C.textShadow }}>
             {levelText}
             {stateLabel && <span style={{ color: view.state === 'dead' ? C.fallen : C.exception }}>{levelText ? ' · ' : ''}{stateLabel}</span>}
           </span>

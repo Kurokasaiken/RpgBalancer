@@ -34,7 +34,7 @@ export const HudRealTriad: React.FC<HudRealTriadProps> = ({ onRosterClose }) => 
         border: `2px solid ${C.rail}`,
         boxShadow: `${C.shadow}, inset 0 0 0 1px ${C.railDark}, inset 0 0 42px rgba(90,70,40,.18)`,
         display: 'flex', flexDirection: 'column', overflow: 'hidden',
-        fontFamily: '"EB Garamond", serif',
+        fontFamily: '"Cardo", serif',
       }}
     >
       {/* Module 1 — roster (the real draggable roster, inside the shared furniture) */}

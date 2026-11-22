@@ -264,7 +264,7 @@ export function PoiDetailVerificationPage() {
             <article>
               <h3>Versione estetica</h3>
               <p>
-                La skin <strong>{POI_DETAIL_SKIN_CONFIG.name}</strong> applica il tema Dark Luxury: titolo Cinzel con glow,
+                La skin <strong>{POI_DETAIL_SKIN_CONFIG.name}</strong> applica il tema Dark Luxury: titolo Marcellus con glow,
                 cornici bronzee, rack in legno annerito e CTA serif. Questa verification page imposta gli stessi token di
                 colore e tipografia così da confrontare qualsiasi regressione visiva.
               </p>

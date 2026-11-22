@@ -27,8 +27,8 @@ export function ZanaraTooltip({ label, hint, side = 'bottom', children }: Zanara
               zIndex: 2500, maxWidth: 260, boxSizing: 'border-box', ...zanaraLastraFrame(CORNER),
               padding: '2px 4px', display: 'flex', flexDirection: 'column', gap: 4, pointerEvents: 'none', filter: C.plateShadow,
             }}>
-            <span style={{ fontFamily: 'var(--font-header, "Cinzel", serif)', fontSize: 13, letterSpacing: 1.2, color: C.title, textShadow: C.textShadow }}>{label}</span>
-            {hint && <span style={{ fontFamily: '"EB Garamond", serif', fontSize: 14, lineHeight: 1.35, color: C.body }}>{hint}</span>}
+            <span style={{ fontFamily: 'var(--font-header, "Marcellus", serif)', fontSize: 13, letterSpacing: 1.2, color: C.title, textShadow: C.textShadow }}>{label}</span>
+            {hint && <span style={{ fontFamily: '"Cardo", serif', fontSize: 14, lineHeight: 1.35, color: C.body }}>{hint}</span>}
           </Tooltip.Content>
         </Tooltip.Portal>
       </Tooltip.Root>

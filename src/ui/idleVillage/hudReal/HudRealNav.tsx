@@ -107,7 +107,7 @@ export function HudRealNav({ navItems, activeNavId, alsoActiveNavIds, onNavSelec
         return (
           <span key={`l-${item.id}`} aria-hidden="true" style={{
             position: 'absolute', left: slot.x - 16 + outer * labelSpread, top: slot.y + slot.h + 17, width: slot.w + 32, textAlign: 'center', pointerEvents: 'none',
-            fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: hudPx(13), fontWeight: 600, letterSpacing: 0.6, textTransform: 'uppercase', whiteSpace: 'nowrap',
+            fontFamily: 'Marcellus, "Cardo", serif', fontSize: hudPx(13), fontWeight: 600, letterSpacing: 0.6, textTransform: 'uppercase', whiteSpace: 'nowrap',
             color: active ? C.gold : item.locked ? C.dim : '#e6dcb8', textShadow: '0 0 4px rgba(2, 18, 22, 1), 0 1px 2px rgba(2, 18, 22, 1), 0 0 8px rgba(2, 18, 22, 0.9)',
           }}>{t(item.labelKey)}</span>
         );

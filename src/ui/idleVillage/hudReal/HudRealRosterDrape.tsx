@@ -204,7 +204,7 @@ export function HudRealRosterDrape() {
             border: '1px solid #c9a24a',
             borderRadius: '12px',
             color: '#e8d5a3',
-            font: '10px Cinzel, serif',
+            font: '10px Marcellus, serif',
             cursor: 'pointer',
             zIndex: 11,
             boxShadow: '0 4px 12px rgba(0,0,0,0.6)',

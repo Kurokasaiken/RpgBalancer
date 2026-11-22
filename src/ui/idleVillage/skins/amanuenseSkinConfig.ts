@@ -34,10 +34,10 @@ const AMANUENSE_SKIN: AmanuenseSkinConfig = {
     vine: '#4a5a2a', marginalia: '#7a5a3a', loreParchment: '#efe6d0',
   },
   fonts: {
-    body: "'EB Garamond', serif",
+    body: "'Cardo', serif",
     incipit: "'Almendra SC', 'Cormorant SC', serif",
     lombardic: "'Almendra SC', serif",
-    lore: "'IM Fell English', 'EB Garamond', serif",
+    lore: "'IM Fell English', 'Cardo', serif",
   },
   type: { bodyPx: 17, glossPx: 14, incipitPx: 24, colophonPx: 13, lineHeight: 1.55 },
   readingRect: { measureCh1920: 48, measureCh1480: 40, textureDeltaL: 0.03 },
