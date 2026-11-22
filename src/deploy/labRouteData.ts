@@ -12,6 +12,7 @@ export const LAB_PATHS: readonly string[] = [
  "/goblin-event-lab",
  "/harmonization-gallery",
  "/hero-components-lab",
+ "/hud-charter-review",
  "/hud-compare",
  "/hud-compose",
  "/hud-defects",

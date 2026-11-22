@@ -223,6 +223,8 @@ const gameFrameEventTypeSchema = z.object({
   icon: z.string(),
   tone: z.enum(['danger', 'warning', 'neutral', 'good']),
   priority: z.number().int(),
+  /** Painted backdrop for the chronicle card; types without one render on plain lacquer. */
+  vignette: z.string().optional(),
 });
 
 const gameFrameEventLedgerSchema = z.object({
@@ -915,8 +917,8 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
     defaultSort: 'due',
     pinTypesWhenCollapsed: ['threat'],
     types: [
-      { id: 'threat', labelKey: 'gameFrame.events.types.threat', icon: 'threat', tone: 'danger', priority: 0 },
-      { id: 'quest', labelKey: 'gameFrame.events.types.quest', icon: 'evt-quest', tone: 'warning', priority: 1 },
+      { id: 'threat', labelKey: 'gameFrame.events.types.threat', icon: 'threat', tone: 'danger', priority: 0, vignette: '/assets/ui/hud-real/kit/event-vignette-threat.png' },
+      { id: 'quest', labelKey: 'gameFrame.events.types.quest', icon: 'evt-quest', tone: 'warning', priority: 1, vignette: '/assets/ui/hud-real/kit/event-vignette-quest.png' },
       { id: 'expedition', labelKey: 'gameFrame.events.types.expedition', icon: 'evt-expedition', tone: 'warning', priority: 1 },
       { id: 'construction', labelKey: 'gameFrame.events.types.construction', icon: 'evt-construction', tone: 'neutral', priority: 2 },
       { id: 'harvest', labelKey: 'gameFrame.events.types.harvest', icon: 'evt-harvest', tone: 'good', priority: 3 },
@@ -1138,8 +1140,8 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
         minWidthPx: 280,
         widthMode: 'zone-fill',
         naturalWidthPx: 300,
-        minHeightPx: 160,
-        naturalHeightPx: 320,
+        minHeightPx: 240,
+        naturalHeightPx: 520,
       },
       merchant: {
         zone: 'rightWing',

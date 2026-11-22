@@ -216,6 +216,7 @@ describe('R-339 T8 — same planner surface, six named blocks preserved', () => 
   /* INV:expedition-bottom-sheet.INV-4 (statement amended R-357/D-1,
    *  sync:bug) — the sheet, like the column, paints no cost cell (the cost
    *  lives in the supplies flow). */
+  // INV:expedition-bottom-sheet.INV-8 — R-357/D-1 amended: no cost cell in the sheet either.
   it('paints no cost cell (INV-5 parity with the column)', () => {
     const { container } = renderSheet();
     expect(container.querySelector('[data-testid="cassetto-cost-slot"]')).not.toBeInTheDocument();

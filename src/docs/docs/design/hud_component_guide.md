@@ -200,15 +200,15 @@ Restano numeri nel codice, non token CSS (sono geometria letta da JavaScript): r
 
 | Ruolo | Famiglia | Token | Maiuscolo | Colore |
 |---|---|---|---|---|
-| Titolo di pannello ("Roster") | Cinzel (`--skin-font-display`) | `--skin-hud-title-*` | no: il maiuscoletto lo fa Cinzel da solo | `--skin-title-color` |
-| Voce di riga, valore principale | Cinzel | `--skin-hud-name-*` + `--skin-hud-engrave` | no | `--skin-text-primary` |
-| Etichetta breve (stato, controllo, didascalia sotto un valore) | Cinzel nei controlli; `--skin-font-sans` per le etichette di stato nelle righe | `--skin-hud-caps-*` | sì (`uppercase`) | `--skin-label-primary`; stato = tono dello stato |
-| Frase (descrizione, voce del registro, tooltip lungo, esito) | EB Garamond (`--skin-font-serif`) | dimensione ≥ 12 px, corpo 15-16 px dove c'è spazio | **mai** | `--skin-body-color` |
+| Titolo di pannello ("Roster") | Marcellus (`--skin-font-display`, stack `Marcellus → Cinzel → Trajan Pro`) | `--skin-hud-title-*` | il display ha minuscolo vero: il maiuscoletto si ottiene con `text-transform: uppercase` o testo sorgente in caps | `--skin-title-color` |
+| Voce di riga, valore principale | Marcellus | `--skin-hud-name-*` + `--skin-hud-engrave` | no (title-case «Giggiolillo» approvato dal Director, D-4) | `--skin-text-primary` |
+| Etichetta breve (stato, controllo, didascalia sotto un valore) | Marcellus nei controlli; `--skin-font-sans` per le etichette di stato nelle righe | `--skin-hud-caps-*` | sì (`uppercase`) | `--skin-label-primary`; stato = tono dello stato |
+| Frase (descrizione, voce del registro, tooltip lungo, esito) | Cardo (`--skin-font-serif`, stack `Cardo → EB Garamond → Georgia`) | dimensione ≥ 12 px, corpo 15-16 px dove c'è spazio | **mai** | `--skin-body-color` |
 | Contatori e numeri secondari ("4/4") | come il testo a cui stanno accanto | — | — | `--skin-body-color` |
 
 Regole:
 
-1. **Maiuscoletto Cinzel solo per etichette di 3 parole al massimo.** Una frase in Cinzel o in maiuscolo si legge male: va in EB Garamond, minuscolo.
+1. **Maiuscoletto del display solo per etichette di 3 parole al massimo.** Una frase in display o in maiuscolo si legge male: va in Cardo, minuscolo. (D-4, ruling Director 2026-11-21: famiglie Marcellus + Cardo — Cinzel/EB Garamond restano nel fallback degli stack.)
 2. **Minimo 12 px per qualunque testo**, valori delle barre compresi (il guardiano controlla `fontSize`, `font-size` e `text-[Npx]`).
 3. **Numeri allineati**: `font-variant-numeric: tabular-nums`.
 4. **Colori del testo** solo dai ruoli: `--skin-title-color` (titoli), `--skin-text-primary` (voci), `--skin-body-color` (frasi, numeri), `--skin-label-primary` (etichette, controlli), `--skin-text-secondary` (secondario). Valori per skin in `test-results/plan-058-2026-10-13-T0.1-roster-measure.md`.
@@ -243,7 +243,7 @@ Il Roster è il riferimento di stile, ma oggi ha questi difetti (misurati in T0.
 
 ## 5. Controlli e interazioni
 
-**Controlli (bottoni, menu, chip, icone)**: metti `data-hud-controls=""` sul contenitore e usa elementi nativi (`button`, `label > select`). Sono le pillole della testata del Roster: alte `--skin-hud-control-height` (26 px), testo `--skin-hud-caps-*` in Cinzel maiuscolo, colori da token, stato `aria-pressed="true"` evidenziato, focus visibile con doppio anello (seat + accento). I bottoni con solo un'icona SVG diventano tondi da soli (26 × 26, icona `--skin-hud-control-icon-size`). Non mettere stili inline di colore o bordo. Non usare `data-roster-controls="compact"`: è lo stile legacy marrone.
+**Controlli (bottoni, menu, chip, icone)**: metti `data-hud-controls=""` sul contenitore e usa elementi nativi (`button`, `label > select`). Sono le pillole della testata del Roster: alte `--skin-hud-control-height` (26 px), testo `--skin-hud-caps-*` in Marcellus maiuscolo, colori da token, stato `aria-pressed="true"` evidenziato, focus visibile con doppio anello (seat + accento). I bottoni con solo un'icona SVG diventano tondi da soli (26 × 26, icona `--skin-hud-control-icon-size`). Non mettere stili inline di colore o bordo. Non usare `data-roster-controls="compact"`: è lo stile legacy marrone.
 
 > **Trappola icona+testo**: la regola CSS che rende tondo da 26px un pill-icona è `:has(> svg:only-child)` — e `:only-child` conta solo i nodi **elemento**, non i nodi testo. Un bottone `<button><Icon/>Testo</button>` (testo nudo) viene trattato come icon-only e schiacciato a 26px, col testo che straborda sul vicino. **Se un bottone ha icona + etichetta, avvolgi sempre l'etichetta in un `<span>`** (o qualsiasi elemento). Vedi `ContextStrip`/`StashPicker` del lab quest (PLAN-024).
 
@@ -530,7 +530,7 @@ Regole che non si negoziano:
 - Roster V2 non è un kit certificato.
 - Il dettaglio quest (`ActivityCapsuleDetailSkinAware`) ha la cornice HUD ma va rifatto compatto **dopo** il rework delle quest.
 - Il livello `edgeWash` (pennellate sui bordi) è pronto ma manca l'immagine.
-- Restano: ruoli in `skinScope.css` per il resto della HUD, font EB Garamond incorporati, movimento e prestazioni, regioni cliccabili.
+- Restano: ruoli in `skinScope.css` per il resto della HUD, font Cardo incorporati, movimento e prestazioni, regioni cliccabili.
 
 ---
 

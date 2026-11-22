@@ -188,3 +188,14 @@ Fonte: `.mw/runs/r309-village-plates/pattern-candidate.md`
 1. `GIT_INDEX_FILE=/tmp/x git read-tree HEAD` → `git add` dei file puliti → per i file entangled blob "HEAD + mie righe" via `hash-object -w` + `update-index --cacheinfo` → `write-tree`/`commit-tree`/`update-ref`.
 2. Dopo il commit riparare le entry stantie dell'index reale sui propri path (`git reset HEAD -- <paths>`) — `git checkout HEAD --` durante cerimonie (red-first) sporca index+worktree.
 3. `commit-tree` non esegue i git hooks: registrarlo nel ledger (governance:check saltato consapevolmente).
+
+## P-017 — `all:unset` su bottone skin-scope lascia vivo il `::before` (streak su antenato posizionato) (2026-11-21)
+
+**Stato:** proposta — fix in `HudRealVictoryReward.tsx` + `skinScope.css` (INV:hudreal-victory-reward.INV-7).
+**Pattern:** `.mw/runs/20261121-victory-fix/pattern-candidate.md`.
+**Istanze:** R-244 (`[data-belt-rows]`), R-357 victory report (`[data-victory-report]`) — 2 contesti distinti, stessa trappola.
+
+**Cosa si propone (trappola candidata):**
+1. `all: 'unset'` inline NON neutralizza gli pseudo-elementi: le regole su `::before/::after` sopravvivono sempre allo strip.
+2. `all:unset` riporta anche `position` a `static` → il `::before` assoluto del materiale base si ancora all'antenato posizionato più vicino (zona scroll `position:absolute`) e dipinge una fascia fuori dal bottone — un "rettangolo strano" visibile solo in runtime.
+3. Sotto `.skin-scope`, interattivi che non devono portare struck-bronze vanno esentati via attributo di scope (convenzione `[data-belt-rows]`/`[data-victory-report]`), mai affidandosi a `all:unset`.

@@ -1012,7 +1012,12 @@
         "harvest": "Raccolto di grano pronto",
         "caravan": "Arriva una carovana di mercanti"
       },
-      "move": "Sposta il pannello"
+      "move": "Sposta il pannello",
+      "all": "Tutti",
+      "otherEvents": "Altri eventi · {count}",
+      "collapse": "Riduci",
+      "expand": "Espandi",
+      "close": "Chiudi"
     },
     "questPoi": {
       "open": "{name} — apri la quest",

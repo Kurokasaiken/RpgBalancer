@@ -25,3 +25,14 @@
 - `gen-victory-frame-gemini.mjs` + `gen-victory-frame-prompt.txt` — generatore:
   Gemini web via CDP :9222, image-editing della B ChatGPT senza scritte +30% alto.
   Lezione: rigenerazione AI del frame > patching raster (iterazioni V4 bocciate).
+
+## Victory/Reward report live (PLAN-125 7d, ruling 2026-11-22)
+
+- `approved-victory-pergamena-live.png` — witness live headless su `/game`
+  (run reale, outcome wipe) della pergamena battezzata DOPO il fix-pass
+  R-357: drop-shadow rimosso, margine dipinto nero di `frame.webp`
+  flood-cut ad alpha (silhouette strappata vera), titolo oro leggibile,
+  CTA centrata, aria fra i blocchi centrali, ritratto anchor a disco
+  nell'anello dipinto, niente rettangolo skin sullo scroller crew.
+  Ruling verbatim: **«battezzo»** (2026-11-22). Sostituisce la baseline
+  live; `approved-victory-pergamena-frame.png` resta il golden dell'art.

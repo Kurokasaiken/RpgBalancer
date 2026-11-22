@@ -42,3 +42,56 @@ generazione AI: ogni parte deriva da un golden **già registrato** in
   ritagli del golden come segnaposto pittorici.
 - Dati reali — voci fittizie fedeli al golden (Invasion/Tournament/
   Fortification/Other), mapping sui type-id reali in produzione.
+
+---
+
+## Ruling Director 2026-11-21 (eye-check su lab + GPT/Gemini mockups)
+
+**DIREZIONE BLOCCATA. I lab/GPT-mockup sono spike usa-e-getta — il deliverable è il DOM vivo a qualità produzione.**
+
+### Composizione approvata — stato APERTO
+- Frame: `PanelFrameOrnaments` manifest `panelFrame5` (cornici battezzate, fermaglio top + pendente bottom).
+- Header COMPATTO (niente scritta enorme): `World Ledger <count>` ~14-15px + controlli round `data-ctl="round"` → sort, collapse, close (toolbar v4c già approvata).
+- Filtri = **tab-pill stile Roster** (`HudRealRosterOpen` nav role=tablist): riga wrap di pill piccole, label + count, `.on` evidenziata — tipi da `gameFrameConfig.eventLedger.types` + tab "All".
+- Voci = **card con vignetta dipinta a sfondo** (bordino oro, icona, titolo Cinzel, countdown tono, riga desc, chevron `›`, progress bar se construction).
+- Banda `HudScrollBand` variante B nel gutter destro.
+- Riga «OTHER EVENTS · n» collassata in coda.
+- Titolo + countdown non devono collimare: title con ellipsis, countdown a larghezza fissa.
+
+### Stato CHIUSO — diverso dall'aperta (ruling: A non va bene per la chiusa)
+- Strip sotto la stessa cornice: 3 mini-righe (icona + titolo + giorni, threat pinnata da `pinTypesWhenCollapsed`) + chevron riapertura. Raffinarla in produzione, non copiare il lab.
+
+### Asset registrati disponibili
+- Slice-kit: `/assets/ui/hud-real/slicekit/panel-frame5/` (manifest `src/generated/slicekit/panelFrame5Frame.ts` — NON hand-tune geometry).
+- Estratti golden (in `public/mockups/eventi-lab/assets/` — copiare in public/assets registrati se usati in prod): `vignette-invasion.png`, `vignette-tournament.png`, `icon-swords.png`, `icon-trophy.png`, `icon-hammer.png`, `icon-castle.png`, `clasp-top.png`, `pendant-bottom.png`.
+- Vignette mancanti per: expedition, harvest, visit → fallback card su lacca con icona incisa (ruling provvisorio mio, confermare).
+
+### Layout/copertura
+- Larghezza ~360-376px (`topChrome.chronicleReservePx=360`), docked top-right ~18px dal bordo; cassetto aperto (flush, ~512px) copre TUTTO (D-1). Verificare aperto+chiuso.
+- Top chrome resta left/center, non invade la riserva.
+
+### File da toccare
+- `src/ui/idleVillage/hudReal/HudRealLedgerPanel.tsx` — rewrite (oggi prototipo con HudRealPanel + C hardcoded + native scroll).
+- Modello/logica da `src/ui/idleVillage/hudReal/HudEventLedger.tsx` (HudEvent, sort, maxVisible, controls).
+- Mount: `src/pages/game-mappa2.tsx` ~L1593 StagePanelFrame panelId="events" — width/dock da allineare alla colonna cassetto.
+- i18n: namespace `idleVillage`, chiavi eventLedger esistenti + nuove (tab labels, otherEvents).
+- Tests: invariant tags `// INV:chronicle.INV-n`.
+
+### Verifica finale (T-04 + gates)
+- mw-pw captures `/game` 1440×900 + 1920×1080 + 390×844: ledger visibile vs cassetto aperto = zero pixel.
+- `npm run lint/test/build:check/closure:lint` scoped + `verify:bundle`.
+- Occhio Director su capture live prima di "done". NESSUN commit.
+
+### Note processo
+- GPT/Gemini mockups in `.mw/runs/20261120-eventi-mockup/gpt/` (gen-02=A approvata come riferimento mood; gen-04 timeline; gem-b-01 compatta) — spike, non asset prod.
+- Guida mockup-web-requests: `context/mockup-web-request-guide.md`.
+
+## 2026-11-21/22 — Riferimento TEMPORANEO 3 stati (ultimo mockup Director)
+
+`refs/mockup-eventi-3stati-tmp.png` (1024×682) — incollato dal Director, **da lavorare ancora** (non battezzato). Mostra i tre stati insieme:
+
+- **Chiusa** (in alto): banda — medaglione dipinto goblin a sx + titolo threat oro + `5 d` rosso + bottone ottone chevron-giù + ornamento centro-fondo.
+- **Aperta compatta** (centro): medaglione a sx **sporgente dal bordo frame**; header `EVENTS 3` (icona pergamena + conteggio) + chevron-su (collapse) a dx; pill `All 3 | Threat 2 | Quest 1 | Work 0`; 3 righe icona-tonda-smalto + titolo + giorni + chevron dx (righe semplici, NON card vignetta).
+- **Aperta piena** (sotto): stessa forma con 10 righe **numerate** + banda scroll oro sul bordo dx con cap-frecce.
+
+Delta vs implementazione corrente: medaglione sx sporgente dal frame; righe = icona tonda smalto + testo (niente vignetta di sfondo); numerazione quando molte; chevron-up di collapse in header; tipo "Work" nelle pill.

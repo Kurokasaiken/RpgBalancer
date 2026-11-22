@@ -67,6 +67,7 @@ export const LAB_ROUTE_COMPONENTS: LabRouteComponents = {
   "/mappa2-upscale-review": lazy(() => import('../pages/mappa2-upscale-review').then(m => ({ default: m.default }))),
   "/lab/poi-luogo": lazy(() => import('../pages/poi-luogo-lab').then(m => ({ default: m.default }))),
   "/hud-lab": lazy(() => import('../pages/hud-lab').then(m => ({ default: m.default }))),
+  "/hud-charter-review": lazy(() => import('../pages/hud-charter-review').then(m => ({ default: m.default }))),
   "/hud-compare": lazy(() => import('../pages/hud-compare').then(m => ({ default: m.default }))),
   "/hud-compose": lazy(() => import('../pages/hud-compose').then(m => ({ default: m.default }))),
   "/hud-panel-compare": lazy(() => import('../pages/hud-panel-compare').then(m => ({ default: m.default }))),

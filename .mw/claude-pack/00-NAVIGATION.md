@@ -1,4 +1,4 @@
-# Navigation — cosa leggere, quando (snapshot 2026-11-19)
+# Navigation — cosa leggere, quando (snapshot 2026-11-21)
 
 Mappa del knowledge pack. Convenzione stati (campo reale dichiarato nei file —
 il vocabolario del repo non è ancora normalizzato, vedi §governance del primer):

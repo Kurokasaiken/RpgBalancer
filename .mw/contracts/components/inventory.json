@@ -1,6 +1,6 @@
 {
   "schema": "plan054-component-inventory/1",
-  "generated_at": "2026-11-18T22:11:05.891Z",
+  "generated_at": "2026-11-21T20:06:39.138Z",
   "strict_files": [
     "src/pages/game-frame-pixi.tsx",
     "src/pages/game-frame.tsx",
@@ -217,7 +217,6 @@
     "src/ui/idleVillage/components/gameFrame/villageBuildingIcons.tsx",
     "src/ui/idleVillage/components/gameFrame/villageStashItemIcons.tsx",
     "src/ui/idleVillage/components/gameFrame/villageStashViewModel.ts",
-    "src/ui/idleVillage/components/gameIcons.tsx",
     "src/ui/idleVillage/components/minimal/ActivityPOI.tsx",
     "src/ui/idleVillage/components/minimal/ClockWidget.tsx",
     "src/ui/idleVillage/components/minimal/DayNightPOI.tsx",
@@ -424,6 +423,7 @@
     "src/ui/idleVillage/skins/activityCapsuleDetail/ActivityCapsuleDetailSkinSchema.ts",
     "src/ui/idleVillage/skins/activityPoiSkinConfig.ts",
     "src/ui/idleVillage/skins/amanuenseSkinConfig.ts",
+    "src/ui/idleVillage/skins/controlsArt.ts",
     "src/ui/idleVillage/skins/converted/slotWildernessBronzeConfig.ts",
     "src/ui/idleVillage/skins/dayNightPoiSkinConfig.ts",
     "src/ui/idleVillage/skins/jobPoiSkinConfig.ts",
@@ -432,6 +432,8 @@
     "src/ui/idleVillage/skins/poi/poiDetailSkinConfig.ts",
     "src/ui/idleVillage/skins/primitives/HudPanel.tsx",
     "src/ui/idleVillage/skins/primitives/HudPlaque.tsx",
+    "src/ui/idleVillage/skins/primitives/HudScrollBand.tsx",
+    "src/ui/idleVillage/skins/primitives/HudScrollBandX.tsx",
     "src/ui/idleVillage/skins/primitives/PanelFrameOrnaments.tsx",
     "src/ui/idleVillage/skins/primitives/SkinBadge.tsx",
     "src/ui/idleVillage/skins/primitives/SkinButton.tsx",
@@ -1154,6 +1156,7 @@
         "src/ui/idleVillage/rosterV2/runHeroLevelUpStaging.ts",
         "src/ui/idleVillage/rosterV2/runStagingOpeningRoster.ts",
         "src/ui/idleVillage/skins/amanuenseSkinConfig.ts",
+        "src/ui/idleVillage/skins/controlsArt.ts",
         "src/ui/idleVillage/skins/dayNightPoiSkinConfig.ts",
         "src/ui/idleVillage/skins/resolveInitialSkin.ts",
         "src/ui/idleVillage/slots/useResidentSlotController.ts",
@@ -1162,16 +1165,6 @@
         "src/ui/idleVillage/utils/gamePerfProbe.ts"
       ],
       "tier_source": "page"
-    },
-    {
-      "id": "game-icons",
-      "role": "ui-component",
-      "tier": 2,
-      "root_file": "src/ui/idleVillage/components/gameIcons.tsx",
-      "scope_files": [
-        "src/ui/idleVillage/components/gameIcons.tsx"
-      ],
-      "tier_source": "default"
     },
     {
       "id": "game-intent",
@@ -1418,6 +1411,26 @@
         "src/ui/idleVillage/components/gameFrame/hudScale.ts"
       ],
       "tier_source": "kernel"
+    },
+    {
+      "id": "hud-scroll-band",
+      "role": "ui-component",
+      "tier": 2,
+      "root_file": "src/ui/idleVillage/skins/primitives/HudScrollBand.tsx",
+      "scope_files": [
+        "src/ui/idleVillage/skins/primitives/HudScrollBand.tsx"
+      ],
+      "tier_source": "default"
+    },
+    {
+      "id": "hud-scroll-band-x",
+      "role": "ui-component",
+      "tier": 2,
+      "root_file": "src/ui/idleVillage/skins/primitives/HudScrollBandX.tsx",
+      "scope_files": [
+        "src/ui/idleVillage/skins/primitives/HudScrollBandX.tsx"
+      ],
+      "tier_source": "default"
     },
     {
       "id": "hud-tones",
@@ -2009,8 +2022,7 @@
       "tier": 2,
       "root_file": "src/ui/idleVillage/skins/primitives/PanelFrameOrnaments.tsx",
       "scope_files": [
-        "src/ui/idleVillage/skins/primitives/PanelFrameOrnaments.tsx",
-        "src/ui/idleVillage/skins/primitives/sliceKitManifest.ts"
+        "src/ui/idleVillage/skins/primitives/PanelFrameOrnaments.tsx"
       ],
       "tier_source": "default"
     },
@@ -2901,6 +2913,16 @@
       "tier_source": "default"
     },
     {
+      "id": "slice-kit-manifest",
+      "role": "shared-kernel",
+      "tier": 1,
+      "root_file": "src/ui/idleVillage/skins/primitives/sliceKitManifest.ts",
+      "scope_files": [
+        "src/ui/idleVillage/skins/primitives/sliceKitManifest.ts"
+      ],
+      "tier_source": "kernel"
+    },
+    {
       "id": "slot",
       "role": "ui-component",
       "tier": 2,
@@ -3714,10 +3736,10 @@
     }
   ],
   "stats": {
-    "files": 504,
-    "units": 300,
-    "ui_components": 229,
-    "shared_kernels": 71
+    "files": 506,
+    "units": 302,
+    "ui_components": 230,
+    "shared_kernels": 72
   },
-  "content_sha256": "5679bf991b39dc0a27b41a85b230cada7bfc00381e1e9bf7ff24a6115e1b5ced"
+  "content_sha256": "4cf0efd79ede7cbdf7e4ef48142885dd6d39a5cf245ed48f4ca588035531ca19"
 }

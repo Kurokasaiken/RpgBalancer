@@ -1,0 +1,13 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch({ args: ['--enable-unsafe-swiftshader'] });
+const p = await b.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 2 });
+await p.goto('http://localhost:5173/hud-compose?comp=cassetto&poi=poi-goblin&pcts=96,4&risk=3', { waitUntil: 'domcontentloaded', timeout: 60000 });
+await p.waitForSelector('[data-cassetto-column]', { timeout: 45000 });
+await p.waitForTimeout(2500);
+await p.screenshot({ path: '/tmp/z-title.png', clip: { x: 928, y: 140, width: 512, height: 140 } });
+await p.screenshot({ path: '/tmp/z-party.png', clip: { x: 928, y: 250, width: 512, height: 200 } });
+await p.screenshot({ path: '/tmp/z-journey.png', clip: { x: 928, y: 515, width: 512, height: 150 } });
+await p.screenshot({ path: '/tmp/z-risk.png', clip: { x: 928, y: 645, width: 512, height: 135 } });
+await p.screenshot({ path: '/tmp/z-cta.png', clip: { x: 928, y: 770, width: 512, height: 130 } });
+await b.close();
+console.log('done');

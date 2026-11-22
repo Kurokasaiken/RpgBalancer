@@ -31,7 +31,7 @@ const COLOR = {
 } as const;
 
 const FONT = {
-  display: 'var(--wl-font-display, "Cinzel", "Trajan Pro", serif)',
+  display: 'var(--wl-font-display, "Marcellus", "Trajan Pro", serif)',
 } as const;
 
 export const WanderlustPortrait: React.FC<WanderlustPortraitProps> = ({

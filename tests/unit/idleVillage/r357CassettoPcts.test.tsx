@@ -56,9 +56,9 @@ describe('R-357 — % morte beside risk, % riuscita beside reward', () => {
     expect(screen.getByTestId('cassetto-success-pct')).toHaveTextContent('4');
     /* Same block, not scattered: the death pct follows the risk value inside
      *  the risk-rewards zone. */
-    // 2026-11-20 layout: the big death % comes first, the skull level (the risk) right under it.
+    // 2026-11-21 (v3 mockup) layout inside the risk well: label, then the skull level, then the death % (2026-11-20 had the % first); the skull level (the risk) right under it.
     const risk = screen.getByTestId('cassetto-risk-value');
-    expect(screen.getByTestId('cassetto-death-pct').compareDocumentPosition(risk) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(risk.compareDocumentPosition(screen.getByTestId('cassetto-death-pct')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it('paints nothing while the estimate is pending — never fabricated', () => {

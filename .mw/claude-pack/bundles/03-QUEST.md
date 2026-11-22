@@ -1,4 +1,4 @@
-# 03-QUEST — bundle tematico (snapshot 2026-11-19)
+# 03-QUEST — bundle tematico (snapshot 2026-11-21)
 
 File uniti per provider con cap documenti. Fonti:
 - repo-snapshot/QUEST_AUTHORING_PLAYBOOK.md

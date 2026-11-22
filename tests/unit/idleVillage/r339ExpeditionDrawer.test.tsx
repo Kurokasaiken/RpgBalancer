@@ -18,7 +18,7 @@
  * different surface, not a drawer mode.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { Provider as TooltipProvider } from '@radix-ui/react-tooltip';
 import { DndContext } from '@dnd-kit/core';
 import { DragProvider } from '@/ui/idleVillage/components/DragContext';
@@ -113,60 +113,37 @@ describe('R-339 T2 — the drawer mounts the six named blocks of the mockup', ()
   });
 });
 
-describe('R-339 T2 — expanded ⇄ chip fold preserves the session surface', () => {
+describe('R-339 T2 — ONE form only: no fold chips (Director 2026-11-22, OB-7 γ)', () => {
   // INV:expedition-drawer.INV-1
-  it('mounts expanded with the signed column and a fold chip; the chip folds it', () => {
+  it('mounts expanded with the signed column and NO fold chip', () => {
     renderDrawer();
     expect(screen.getByTestId('expedition-drawer')).toHaveAttribute('data-expanded');
     expect(document.querySelector('[data-hudreal-cassetto]')).toBeInTheDocument();
-    fireEvent.click(screen.getByTestId('expedition-drawer-collapse'));
-    expect(document.querySelector('[data-hudreal-cassetto]')).not.toBeInTheDocument();
-    expect(screen.getByTestId('expedition-drawer-expand')).toBeInTheDocument();
-    expect(screen.getByTestId('expedition-drawer')).not.toHaveAttribute('data-expanded');
+    expect(screen.queryByTestId('expedition-drawer-collapse')).toBeNull();
+    expect(screen.queryByTestId('expedition-drawer-expand')).toBeNull();
   });
 
   // INV:expedition-drawer.INV-1
-  it('the edge chip restores the full drawer (visual fold — the surface never closed)', () => {
+  it('the drawer never reads the fold store — the column is the only lateral form', () => {
+    useExpeditionDrawer.setState({ expanded: false });
     renderDrawer();
-    fireEvent.click(screen.getByTestId('expedition-drawer-collapse'));
-    fireEvent.click(screen.getByTestId('expedition-drawer-expand'));
     expect(document.querySelector('[data-hudreal-cassetto]')).toBeInTheDocument();
     expect(screen.getByTestId('cassetto-confirm')).toBeInTheDocument();
-  });
-
-  // INV:expedition-drawer.INV-5
-  it('the fold chip hugs the column left edge — same min(aspect·vh, cap) width rule', () => {
-    renderDrawer();
-    const chip = screen.getByTestId('expedition-drawer-collapse');
-    expect(chip.style.right).toContain('min(');
-    expect(chip.style.right).toContain('100vh');
-    expect(chip.style.right).toContain(`${DRAWER.widthMaxPxExtracted}px`);
+    useExpeditionDrawer.setState({ expanded: true });
   });
 });
 
 describe('R-339 T2 — honest occupancy in the insets ledger', () => {
   // INV:expedition-drawer.INV-3
-  it('collapsed publishes drawer.chipWidthPx; expanded the column keeps its own measure', () => {
+  it('expanded: the column publishes its own live measure — never a chip token', () => {
     renderDrawer();
-    /* Expanded: the column's own effect publishes aspect × viewportH (the
-     *  same live measure as hud-real-cassetto.INV-4 — not the chip token). */
     const expandedInset = useGameLayoutInsets.getState().insets.right;
     expect(expandedInset).toBeGreaterThan(0);
     expect(expandedInset).not.toBe(DRAWER.chipWidthPx);
-    fireEvent.click(screen.getByTestId('expedition-drawer-collapse'));
-    expect(useGameLayoutInsets.getState().insets.right).toBe(DRAWER.chipWidthPx);
-    fireEvent.click(screen.getByTestId('expedition-drawer-expand'));
-    expect(useGameLayoutInsets.getState().insets.right).toBe(expandedInset);
   });
 
   // INV:expedition-drawer.INV-3
-  it('unmount restores 0 from either form; hidden publishes 0 and renders nothing', () => {
-    useExpeditionDrawer.setState({ expanded: false });
-    const collapsed = renderDrawer();
-    expect(useGameLayoutInsets.getState().insets.right).toBe(DRAWER.chipWidthPx);
-    collapsed.unmount();
-    expect(useGameLayoutInsets.getState().insets.right).toBe(0);
-
+  it('unmount restores 0; hidden publishes 0 and renders nothing', () => {
     const expanded = renderDrawer();
     expect(useGameLayoutInsets.getState().insets.right).toBeGreaterThan(0);
     expanded.unmount();

@@ -137,20 +137,22 @@ export default function HudComposePage() {
       }}>
 
       {/* Cimiero (armillary crest) — always mounted where the roster family lives;
-          in ?comp=roster it is the piece the drape hangs from. */}
-      {inView('roster') && (
+          in ?comp=roster it is the piece the drape hangs from.
+          comp=cassetto hides the whole roster family (Director ruling 2026-11-21 R-374 rev2:
+          cassetto witnesses/tests must not include the roster). */}
+      {inView('roster') && params.get('comp') !== 'cassetto' && (
         <div data-hudslot="crest" style={{ ...place(rects.crest), zIndex: 6, overflow: 'visible' }}>
           <HudRealCrest size={CREST_SIZE} ready={residents.filter((r) => r.status === 'available').length} total={residents.length} open={rosterOpenState} onToggle={() => setRosterOpenState((o) => !o)} />
         </div>
       )}
-      {inView('roster') && params.get('comp') !== 'roster' && (
+      {inView('roster') && params.get('comp') !== 'roster' && params.get('comp') !== 'cassetto' && (
         <div data-hudslot="roster" style={{ ...place(rects.roster), zIndex: 4, overflow: 'visible' }}>
           <HudRealRosterColumn residents={residents} height={rects.roster.h}
             selectedResidentId={residents[1]?.id ?? null} />
         </div>
       )}
 
-      {!isTriad && inView('rosterOpen') && (
+      {!isTriad && inView('rosterOpen') && params.get('comp') !== 'cassetto' && (
         <div data-hudslot="rosterOpen" style={{ ...place(rects.rosterOpen), zIndex: 7, overflow: 'visible' }}>
           {/* Director ruling: the roster shown on crest/roster press is EXACTLY the /game draggable roster, inside the same SkinScope that gives it the pill chrome */}
           <SkinScope style={{ height: '100%' }}>
@@ -333,7 +335,7 @@ export default function HudComposePage() {
             <div role="menu" data-hr-cmd-menu="" style={{
               position: 'absolute', right: 0, bottom: 48, minWidth: 168, padding: '8px 12px', borderRadius: 10,
               background: 'linear-gradient(180deg, rgba(11, 56, 44, 0.97), rgba(6, 32, 26, 0.97))',
-              border: '1.5px solid #c9a55a', fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: 13, color: '#f3ead0',
+              border: '1.5px solid #c9a55a', fontFamily: 'Marcellus, "Cardo", serif', fontSize: 13, color: '#f3ead0',
               display: 'grid', gap: 6,
             }}>
               <button type="button" role="menuitem" onClick={() => { setRecenterSignal((n) => n + 1); setMenuOpen(false); }}
@@ -402,7 +404,7 @@ const ComposeSwitcher: React.FC = () => {
       >{open ? '×' : '☰'}</button>
       {open && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4, padding: '8px 10px', borderRadius: 10, background: 'rgba(7,18,26,.92)', border: '1.5px solid #8a6f35' }}>
-          <div style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: 9.5, letterSpacing: 2.4, color: '#8fb2a2', textTransform: 'uppercase' }}>Superfici</div>
+          <div style={{ fontFamily: 'Marcellus, "Cardo", serif', fontSize: 9.5, letterSpacing: 2.4, color: '#8fb2a2', textTransform: 'uppercase' }}>Superfici</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, maxWidth: 340 }}>
             {COMPOSE_SURFACES.map((s) => {
               const active = s.match(p);
@@ -414,7 +416,7 @@ const ComposeSwitcher: React.FC = () => {
                   aria-pressed={active}
                   onClick={() => go(s.params)}
                   style={{
-                    fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: 10.5, letterSpacing: 1.2, textTransform: 'uppercase',
+                    fontFamily: 'Marcellus, "Cardo", serif', fontSize: 10.5, letterSpacing: 1.2, textTransform: 'uppercase',
                     padding: '5px 10px', borderRadius: 7, cursor: 'pointer',
                     color: active ? '#052015' : '#f0d58c',
                     background: active ? 'linear-gradient(180deg,#2fd4a3,#1fb877)' : 'rgba(20,50,41,.9)',
@@ -454,7 +456,7 @@ const LevelUpLab: React.FC<{ residents: Array<{ id: string } & Record<string, un
         }}
         style={{
           position: 'absolute', left: 24, bottom: 160, zIndex: 8, cursor: 'pointer',
-          fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: 12, letterSpacing: 1.5, textTransform: 'uppercase',
+          fontFamily: 'Marcellus, "Cardo", serif', fontSize: 12, letterSpacing: 1.5, textTransform: 'uppercase',
           color: '#f0d58c', background: 'rgba(5,32,26,.9)', border: '1.5px solid #c9a55a', borderRadius: 9, padding: '8px 14px',
         }}
       >

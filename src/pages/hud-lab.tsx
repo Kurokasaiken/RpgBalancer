@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 import { LAB_CATALOG, type LabEntry, type LabEntryStatus } from './hud-lab/catalog';
 import { HOSTS } from './hud-lab/hostRegistry';
+import { charterFor } from '@/config/hud/charters';
+import { CharterSection } from './hud-lab/charterSection';
 
 /**
  * PLAN-129 — `/hud-lab` rewritten as the catalog of the baptized vocabulary:
@@ -57,6 +59,16 @@ const Card: React.FC<{ entry: LabEntry }> = ({ entry }) => {
           <div style={{ padding: 10, fontSize: 11, color: '#f0a0a0' }}>host sconosciuto: {entry.host}</div>
         )}
       </div>
+      {/* PLAN-131 T-004: charter sotto il mount, forma fissa sempre visibile.
+          Join su componentId — mai duplicato dal catalogo. */}
+      {entry.kind === 'component' && (() => {
+        const charter = charterFor(entry.id);
+        return charter ? <CharterSection charter={charter} /> : (
+          <div data-charter-section={entry.id} style={{ borderTop: '1px solid rgba(125,180,220,0.18)', padding: '6px 10px', fontSize: 10, color: '#7d92a6' }}>
+            charter non compilato — {entry.status}
+          </div>
+        );
+      })()}
       <footer style={{ padding: '6px 10px', borderTop: '1px solid rgba(125,180,220,0.14)', fontSize: 9, color: '#8fa5b8', lineHeight: 1.5 }}>
         <div>{entry.provenance.ruling}</div>
         {entry.provenance.ref && <div style={{ opacity: 0.8 }}>{entry.provenance.ref}{entry.provenance.sha256 ? ` · sha ${entry.provenance.sha256}` : ''}</div>}

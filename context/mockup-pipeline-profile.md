@@ -143,7 +143,9 @@ T2 (ruling 2026-10-28).
   `.mw/specs/<area>/refs/REGISTERED.md`.
 - **Verdetto di Fase C:** riga nel record di conversione della superficie
   ([P8]); se il candidato scelto contiene cambi T2, riga anche in
-  `REGISTERED.md` (è il nuovo aspetto approvato).
+  `REGISTERED.md` (è il nuovo aspetto approvato). Ogni ruling estetico
+  distilla conoscenza: ≥1 tratto `appreciated` (il perché) nel component
+  charter — vedi [`component-charter.md`](component-charter.md) (PLAN-131).
 - **Testimone visivo:** T-04 — un claim su UI si chiude solo guardando la
   cattura montata; quello che non è stato guardato va detto.
 - Con sessioni parallele sullo stesso worktree vale anche T-13.

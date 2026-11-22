@@ -1,4 +1,4 @@
-# Claude pack — snapshot 2026-11-19
+# Claude pack — snapshot 2026-11-21
 
 Generato da `tools/build-claude-pack.sh` (R-364). Knowledge statica:
 rigenera prima di sessioni Claude importanti.
@@ -9,6 +9,12 @@ rigenera prima di sessioni Claude importanti.
   il repo lo legge live (guidalo col primer su quali doc sono canonici).
 - **Senza** GitHub integration: carica anche `repo-snapshot/*`.
 - Custom instructions: blocco §6 di `00-PRIMER.md`.
+
+## Come caricare su chatgpt.com (project knowledge)
+- Cap documenti Free = 5: carica i `bundles/*.md` (stesso contenuto per tema).
+- Nel Chrome personale del Director: tab sul progetto `/project`, poi
+  `tools/chatgpt-pack-upload.sh bundles/0*.md` (AppleScript + drop sintetico,
+  niente CDP/focus). Istruzioni progetto: blocco §6 del primer (adattato).
 
 ## Contenuto
 ```
@@ -75,4 +81,4 @@ rigenera prima di sessioni Claude importanti.
 ./repo-snapshot/village_event_system_spec.md
 ```
 
-Totale: 61 file, 1.9M
+Totale: 61 file, 2.0M

@@ -148,4 +148,62 @@ describe('HudRealVictoryReward — baptized pergamena report (R-348)', () => {
       vi.useRealTimers();
     }
   });
+
+  // INV:hudreal-victory-reward.INV-7
+  it('Director eye-review: no black halo, readable title, optically centered CTA, aired center copy (R-357)', () => {
+    vi.useFakeTimers();
+    try {
+      renderReward(endedRun(7));
+      revealAll();
+      const root = screen.getByTestId('hudreal-victory-reward');
+      const shell = root.querySelector('[role="dialog"]') as HTMLElement;
+      // No near-black veil or heavy drop-shadow halo behind the parchment.
+      expect(root.style.background).not.toContain('0.75');
+      expect(shell.style.filter).not.toContain('0.78');
+      // The webp's painted black surround is cut to real alpha — the ragged
+      // silhouette is the edge; no CSS edge-feather hack must come back.
+      const frameImg = root.querySelector('img[src*="victory/frame"]') as HTMLElement;
+      const mask = frameImg?.style.maskImage || frameImg?.style.webkitMaskImage || '';
+      expect(mask).not.toContain('linear-gradient');
+      // The report is exempt from the skin base-button specular streak, which
+      // otherwise resolves against the positioned scroller = stray light rect.
+      expect(shell.hasAttribute('data-victory-report')).toBe(true);
+      // Title must be a light ink on the dark painted cartouche (was #16241f).
+      const title = screen.getByText('Expedition report') as HTMLElement;
+      const rgb = title.style.color.match(/\d+/g)?.map(Number) ?? [0, 0, 0];
+      expect((rgb[0] + rgb[1] + rgb[2]) / 3).toBeGreaterThan(150);
+      // CTA copy carries the optical lift so it sits on the plaque's visual center.
+      const cta = screen.getByTestId('quest-reward-collect');
+      const lifted = cta.querySelector('span');
+      expect(lifted?.style.transform).toContain('translateY(-');
+      // Center copy breathes: a real gap between column labels and row zones.
+      const pctOf = (v: string) => parseFloat(v);
+      const crewLabel = screen.getByText(/who came back/i).closest('span') as HTMLElement;
+      const crewRows = screen.getByTestId('hudreal-victory-crew');
+      const gap = pctOf(crewRows.style.top) - (pctOf(crewLabel.style.top) + pctOf(crewLabel.style.height));
+      expect(gap).toBeGreaterThanOrEqual(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  // INV:hudreal-victory-reward.INV-8
+  it('anchor portrait sits inside the painted ring holder as a disc (R-357)', () => {
+    vi.useFakeTimers();
+    try {
+      renderReward(endedRun(7));
+      act(() => vi.advanceTimersByTime(STAGE_MS + 10));
+      const medal = screen.getByTestId('hudreal-victory-medal');
+      // The zone hugs the painted ring (~140 art-px ≈ 13.7% of the 1024 art
+      // width) — not the old 156px+ oversized mount.
+      expect(parseFloat(medal.style.width)).toBeLessThanOrEqual(14);
+      // Portrait is a disc inside the holder — not the ornate C1 ring asset.
+      const disc = medal.querySelector('img') as HTMLImageElement | null;
+      expect(disc).not.toBeNull();
+      expect(disc?.style.borderRadius).toBe('50%');
+      expect(disc?.getAttribute('src') ?? '').not.toContain('C1/ring.webp');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });

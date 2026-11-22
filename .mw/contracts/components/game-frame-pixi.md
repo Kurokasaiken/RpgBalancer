@@ -55,6 +55,7 @@ scope_files:
   - src/ui/idleVillage/rosterV2/runHeroLevelUpStaging.ts
   - src/ui/idleVillage/rosterV2/runStagingOpeningRoster.ts
   - src/ui/idleVillage/skins/amanuenseSkinConfig.ts
+  - src/ui/idleVillage/skins/controlsArt.ts
   - src/ui/idleVillage/skins/dayNightPoiSkinConfig.ts
   - src/ui/idleVillage/skins/resolveInitialSkin.ts
   - src/ui/idleVillage/slots/useResidentSlotController.ts

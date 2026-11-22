@@ -13,14 +13,14 @@ e2e_trigger_globs: []
 invariants:
   - id: expedition-drawer.INV-1
     source: plan
-    source_ref: PLAN-119
+    source_ref: PLAN-119; amended R-374 OB-7 γ + ruling Director 2026-11-22 (chip › rimossa)
     statement: >-
-      Con una quest selezionata la superficie drawer esiste in due sole forme: la colonna firmata
-      `HudRealCassetto` docked flush-right (espansa) oppure il chip sottile docked sullo stesso bordo
-      destro (ripiegata). Il fold chip siede sul bordo sinistro vivo della colonna — offset
-      `min(aspect × 100vh, drawer.widthMaxPx)`, la stessa regola di larghezza della colonna.
-      La forma di riposo senza quest est ABSENTE (R-351 : l'ancien `ExpeditionEdgeTab` a été
-      supprimé — aucune surface expedition ne monte sans quest sélectionnée), non un modo du drawer.
+      Con una quest selezionata la superficie drawer esiste in UNA sola forma: la colonna firmata
+      `HudRealCassettoV2` docked flush-right. NESSUN fold: il collapse chip sul bordo sinistro della
+      colonna e il chip ripiegato sul bordo destro sono rimossi (Director 2026-11-22: «c'è una specie
+      di freccia › — eliminala», sigillo di OB-7 γ «il cassetto resta chiuso senza tab»).
+      La forma di riposo senza quest è ASSENTE (R-351): chiusura solo via adapter (Esc / click mappa →
+      `onClose`), mai una terza forma docked.
     test_refs:
       - tests/unit/idleVillage/r339ExpeditionDrawer.test.tsx
   - id: expedition-drawer.INV-2
@@ -35,11 +35,11 @@ invariants:
       - tests/unit/idleVillage/r339ExpeditionDrawer.test.tsx
   - id: expedition-drawer.INV-3
     source: plan
-    source_ref: PLAN-119
+    source_ref: PLAN-119; amended R-374 OB-7 γ (nessun fold ⇒ nessuna occupazione chip)
     statement: >-
-      Occupazione onesta in `useGameLayoutInsets.insets.right`: ripiegato il chip pubblica
-      `drawer.chipWidthPx`; espanso la colonna continua a pubblicare la propria larghezza misurata
-      (hud-real-cassetto.INV-4) senza essere clobberata; smontaggio o `visible=false` → 0.
+      Occupazione onesta in `useGameLayoutInsets.insets.right`: espanso la colonna pubblica la propria
+      larghezza misurata (hud-real-cassetto.INV-4); smontaggio o `visible=false` → 0. Non esiste una
+      forma ripiegata, quindi nessun `chipWidthPx` viene mai pubblicato.
     test_refs:
       - tests/unit/idleVillage/r339ExpeditionDrawer.test.tsx
   - id: expedition-drawer.INV-4
@@ -56,20 +56,20 @@ invariants:
       - tests/unit/idleVillage/r339BagAssign.test.tsx
   - id: expedition-drawer.INV-5
     source: plan
-    source_ref: PLAN-119
+    source_ref: PLAN-119; amended R-374 OB-7 γ + ruling Director 2026-11-22
     statement: >-
-      Il fold è solo visivo: collassare non chiude mai il detail né tocca lo stato della sessione
-      (slot, bag, estimate restano); `useExpeditionDrawer.expanded` persiste tra remount e switch
-      di quest come intenzione dell'utente (mirror del contratto rail, D2 "state preserved").
+      Il fold NON ESISTE PIÙ: nessuna forma ripiegata, nessun chip. `useExpeditionDrawer` resta nel
+      repo come store vestigiale per compat (test/steering esterno) ma il drawer non lo legge —
+      montato ⇒ sempre espanso; lo stato sessione (slot, bag, estimate) non viene mai toccato.
     test_refs:
       - tests/unit/idleVillage/r339ExpeditionDrawer.test.tsx
 ---
 # expedition-drawer
 
 Primitiva drawer expedition di /game (R-339/PLAN-119 T2, artifact-r004):
-wrapper docked del `HudRealCassetto` firmato con il contratto di piega a
-chip (mirror della rail T5) e i sei blocchi nominati del mockup marcati
-`data-block` nell'art column. Stato fold in `useExpeditionDrawer` (Zustand);
-occupazione pubblicata in `useGameLayoutInsets.insets.right`. Montato da
+wrapper docked del `HudRealCassettoV2` firmato — UNA sola forma (colonna
+espansa; nessun fold/chip, ruling Director 2026-11-22 che sigilla OB-7 γ)
+con i sei blocchi nominati del mockup marcati `data-block` nell'art
+column. Occupazione pubblicata in `useGameLayoutInsets.insets.right`. Montato da
 `HudRealCassettoDetail` su /game (via `wrapDetail`) e da
 `HudRealCassettoHost` nel lab `/hud-compose?comp=cassetto`.

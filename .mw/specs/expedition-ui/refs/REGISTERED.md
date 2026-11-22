@@ -20,3 +20,5 @@ Plan che usa queste referenze: `../../../../plans/PLAN-125-hud-fix-r357.md` (R-3
 Plan source spec: `../artifact-r004.md` (mw-web-debate run `20261115-wanderlust-ui-plan`,
 sha256 `582a2e03048de2a360a1bb3fb9a4f8ea2fb1eceeac98fc3dc4519ebf9e32c33b`).
 Cassetto prompt spec: `../prompt-cassetto.md` (R-353).
+
+- `mockup-cassetto-goblin-v3.webp` (604×848, sha256 1366b9d71aac…) — 2026-11-21, Director: nuovo mockup del cassetto Goblin come REFERENZA (cornice simmetrica sottile con diamanti, ritratti nelle ghiere, viaggio a pillola, rischio/ricompensa a due riquadri). Il viaggio è «superiore»: già adottato.

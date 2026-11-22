@@ -104,7 +104,7 @@ import { COMPARABLE_SKIN_IDS, resolveInitialSkinPresetId } from '@/ui/idleVillag
 import { warmGameAssets } from '@/ui/idleVillage/utils/gameAssetWarmup';
 import { MatericRosterComponentV2 } from '@/ui/idleVillage/rosterV2';
 import { RosterKitShell, useRosterKitData, type RosterDropVerdict } from '@/ui/idleVillage/frozen/kits/rosterKit';
-import { QuestJourneyRoute, QuestOverlays, QuestRunWindow, RegionTooltip, useHeroSheet, usePanelWhileOpen, type HeroSheetApi, type HudEvent, type HudPanelsApi, type VillageScreenViewHandle } from '@/ui/idleVillage/components/gameFrame';
+import { QuestJourneyRoute, QuestOverlays, QuestRunWindow, RegionTooltip, useHeroSheet, type HeroSheetApi, type HudEvent, type HudPanelsApi, type VillageScreenViewHandle } from '@/ui/idleVillage/components/gameFrame';
 import { MapDemoPoi } from '@/ui/idleVillage/components/gameFrame/MapDemoPoi';
 import { VillageStashPanel } from '@/ui/idleVillage/components/gameFrame/VillageStashPanel';
 import { CASSETTO_LAYOUT_CONFIG } from '@/balancing/config/idleVillage/cassettoLayoutConfig';
@@ -213,11 +213,11 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
  * Positions picked per biome: open sea is the worst case for the quest blue. */
 const POI_DEMO_CYCLE_TICKS = 90;
 const POI_DEMO_MARKERS = [
-  { id: 'demo-job', type: 'job' as const, x: 0.585, y: 0.52, sizePx: 48, offset: 0.15, iconUrl: '/assets/ui/poi/offer-forage-128.webp' },
-  { id: 'demo-job-64', type: 'job' as const, x: 0.66, y: 0.62, sizePx: 64, offset: 0.65, iconUrl: '/assets/ui/hud-real/poi/poi-icon-logs.webp' },
-  { id: 'demo-quest-sea', type: 'quest' as const, x: 0.24, y: 0.5, sizePx: 48, offset: 0.55, iconUrl: '/assets/ui/poi/poi-goblin-camp-128.webp' },
-  { id: 'demo-quest-lagoon', type: 'quest' as const, x: 0.4, y: 0.68, sizePx: 64, offset: 0.85, iconUrl: '/assets/ui/poi/poi-ruins-128.webp' },
-  { id: 'demo-quest-forest', type: 'quest' as const, x: 0.47, y: 0.36, sizePx: 32, offset: 0.25, iconUrl: '/assets/ui/poi/offer-recon-128.webp' },
+  { id: 'demo-job', type: 'job' as const, x: 0.585, y: 0.52, sizePx: 55, offset: 0.15, iconUrl: '/assets/ui/poi/offer-forage-128.webp' },
+  { id: 'demo-job-64', type: 'job' as const, x: 0.66, y: 0.62, sizePx: 55, offset: 0.65, iconUrl: '/assets/ui/hud-real/poi/poi-icon-logs.webp' },
+  { id: 'demo-quest-sea', type: 'quest' as const, x: 0.24, y: 0.5, sizePx: 55, offset: 0.55, iconUrl: '/assets/ui/poi/poi-goblin-camp-128.webp' },
+  { id: 'demo-quest-lagoon', type: 'quest' as const, x: 0.4, y: 0.68, sizePx: 55, offset: 0.85, iconUrl: '/assets/ui/poi/poi-ruins-128.webp' },
+  { id: 'demo-quest-forest', type: 'quest' as const, x: 0.47, y: 0.36, sizePx: 55, offset: 0.25, iconUrl: '/assets/ui/poi/offer-recon-128.webp' },
 ] as const;
 const POI_DEMO_ON = import.meta.env.DEV && DEV_Q.get('poiDemo') !== '0';
 
@@ -641,7 +641,14 @@ export default function GameMappa2Page() {
     ],
   );
   const anyExpeditionDetailOpen = expeditions.some((exp) => exp.isDetailOpen && (!exp.run || exp.run.ended));
-  usePanelWhileOpen(panels, 'roster', anyExpeditionDetailOpen);
+  /* Director ruling 2026-11-21: opening a POI mounts ONLY the cassetto — the
+   * roster never follows the detail (R-184's `usePanelWhileOpen` auto-open is
+   * retired on /game; it still stands on /gameOld). Roster and stash stay
+   * always-separate surfaces (Director 2026-11-15): the roster opens on demand
+   * — the party-seat › (`onOpenRoster`) or the nav/menu toggle — and the
+   * player closes it at will. Re-coupling it to the detail also reintroduces
+   * the lock: the hook's effect re-opened the roster on every `panels` api
+   * rebuild, so it could not be closed while the detail was up. */
   /* Stage occupancy follows the real surfaces: a planner being open means the
    *  `questDetail` panel is on stage; no run means `quest` must be released. */
   useEffect(() => {
@@ -1593,11 +1600,12 @@ export default function GameMappa2Page() {
       {panels.visible.events && (
         <StagePanelFrame panelId="events" positioned={false}>
           {(res) => (
-            /* R-334ter: the signed ledger replaces the stock panel — same real
-             *  `gameEvents`/`focusEvent` feed, native 340×513 panel art at the
-             *  stage rect (close stays stage-owned: Escape). */
-            <div style={{ position: 'absolute', left: res.rect?.x ?? 0, top: res.rect?.y ?? 0, zIndex: panelsZ }}>
-              <HudRealLedgerPanel events={gameEvents} onSelect={focusEvent} />
+            /* R-334ter + PLAN-125 F4: the signed ledger replaces the stock
+             *  panel — same real `gameEvents`/`focusEvent` feed, zone-fill
+             *  width = right-wing column so the cassetto covers it whole
+             *  (D-1). Escape stays stage-owned; the close control mirrors it. */
+            <div style={{ position: 'absolute', left: res.rect?.x ?? 0, top: res.rect?.y ?? 0, width: res.rect?.w, zIndex: panelsZ }}>
+              <HudRealLedgerPanel events={gameEvents} onSelect={focusEvent} onClose={() => panels.set('events', false)} height={res.rect?.h} />
             </div>
           )}
         </StagePanelFrame>

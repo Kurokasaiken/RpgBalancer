@@ -1017,7 +1017,12 @@
         "harvest": "Wheat harvest ready",
         "caravan": "A merchant caravan arrives"
       },
-      "move": "Move panel"
+      "move": "Move panel",
+      "all": "All",
+      "otherEvents": "Other events · {count}",
+      "collapse": "Collapse",
+      "expand": "Expand",
+      "close": "Close"
     },
     "questPoi": {
       "open": "{name} — open the quest",

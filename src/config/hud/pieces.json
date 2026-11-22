@@ -275,10 +275,11 @@
       },
       "provenance": {
         "golden": ".mw/runs/20261121-cassetto-components/out (batch Gemini standalone)",
-        "sha256": "385d8871502e3de8f1dbf7769481e534f80ad171d79d09e3d5a1049944f1ce3e",
+        "sha256": "99ad38dd7f715d8753b578c22f7cd7f55dccf21cfaa7b2639ac7e81de8026650",
         "ruling": "Director 2026-11-21: cassetto nuovo battezzato — pezzo montato sul componente approvato",
         "generator": "Gemini web (.mw/runs/20261121-cassetto-components)",
         "date": "2026-11-21",
+        "postprocess": "2026-11-21 shadow retint (out/pre-shadow) + joint-shard cleanup per «pezzo nero che esce ad angolo» (fix-joint-shards.py, originali in out/pre-joint) + outer-halo cut per «nero esterno al frame» (out/pre-halo) + warm-olive retint delle tasche scure per «non ci dev essere il nero» (out/pre-olive)",
         "promptPath": ".mw/runs/20261121-cassetto-components/p8g-corner-tl.txt"
       },
       "ornamentScale": 0.24,
@@ -299,10 +300,11 @@
       },
       "provenance": {
         "golden": ".mw/runs/20261121-cassetto-components/out (batch Gemini standalone)",
-        "sha256": "c8068d2a2364ec7d7f40bfd06fc75b06a6def98b9254701dbd5e2f0eb2552c75",
+        "sha256": "2db4740d1ae6e285c3df8a659f522b2cfdc5d730c453a5ebe2e4360ea74c1794",
         "ruling": "Director 2026-11-21: cassetto nuovo battezzato — pezzo montato sul componente approvato",
         "generator": "Gemini web (.mw/runs/20261121-cassetto-components)",
         "date": "2026-11-21",
+        "postprocess": "2026-11-21 shadow retint (out/pre-shadow); nota: non montato — BL = TL con scaleY(-1)",
         "promptPath": ".mw/runs/20261121-cassetto-components/p7g-corner-bl.txt"
       },
       "ornamentScale": 0.24,
@@ -323,10 +325,11 @@
       },
       "provenance": {
         "golden": ".mw/runs/20261121-cassetto-components/out (batch Gemini standalone)",
-        "sha256": "7a5afb4d38c880122d9511aef3b46203306e935a81e04ccc92507a9a547284e5",
+        "sha256": "c43fef15a46a3611651ae66bed8a5b54e49a76c89ed2a6142acddf8d57455cf2",
         "ruling": "Director 2026-11-21: cassetto nuovo battezzato — pezzo montato sul componente approvato",
         "generator": "Gemini web (.mw/runs/20261121-cassetto-components)",
         "date": "2026-11-21",
+        "postprocess": "2026-11-21 shadow retint (out/pre-shadow)",
         "promptPath": ".mw/runs/20261121-cassetto-components/"
       },
       "ornamentScale": 0.24,

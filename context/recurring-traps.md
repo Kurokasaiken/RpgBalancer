@@ -1,7 +1,7 @@
 ---
 title: Recurring Traps
 type: preflight-checklist
-updated: 2026-11-19
+updated: 2026-11-21
 ---
 
 # Recurring Traps — regole preventive lette in pre-flight
@@ -36,6 +36,7 @@ Un caso singolo resta un pattern-candidate: non viene promosso.
 | ricolor/confronto colore su arte dipinta (gemme, ori, smalti), ΔE o mediana come prova «uguale al golden» | T-30 |
 | richieste Director con riferimenti ambigui ("la barra", "sotto il frame", "l'originale"), screenshot allegati a commento | T-31 |
 | montaggio in gioco di arte tagliata (cornici, giunzioni, angoli), correzioni iterative su composizione di pezzi | T-32 |
+| difetto visivo su arte composita con ritagli/trafori (asset + layer DOM sotto), «rettangolo/banda/quadrato» riportato dal Director | T-33 |
 
 ---
 
@@ -775,3 +776,34 @@ angoli, gemme, pezzi ripetuti), correzioni iterative su composizione.
   5. Dopo **3 patch** sullo stesso pezzo senza convergenza → rigenerare il
      pezzo intero. Il rattoppo ripetuto costa più della rigenerazione e
      lascia comunque un risultato «cucito».
+
+## T-33 — Difetto su arte composita: attribuisci il LAYER prima di fixare (bordo dritto dietro ritaglio = rettangolo percepito)
+
+**Surface:** correzioni visive su arte composita da asset con alpha (cornici, filigrane, trafori) + layer DOM sotto
+(enamel, vignette, backing, mappa): segnalazioni tipo «rettangolo», «banda», «quadrato», «pezzo colorato».
+
+- **Cosa succede:** il difetto viene fixato ripetutamente sul layer sbagliato — tipicamente sull'asset
+  (ritint, cut chirurgico, margine cotto) — mentre il colore visibile viene da un layer DOM dietro, visto
+  *attraverso* i vuoti dell'asset. Ogni patch fallita cambia solo la tinta del sintomo («prima nero, ora
+  verde») senza toglierlo: è il segnale che il layer indagato è quello sbagliato. Sessione 2026-11-21
+  (cassetto frame): 4 fix falliti prima della diagnosi — il "rettangolo" era il bordo sinistro rettilineo
+  del div enamel (`left: u(36)`, fallback `#04281a`) che correva su tutta l'altezza della colonna e
+  affiorava a frammenti nei trafori della filigrana. Terza occorrenza nella stessa sessione dello stesso
+  meccanismo: il «quadrato» era il bordo dritto della vignette; l'«angolo colorato» era il backing rect.
+- **Meccanismo:** un bordo rettilineo visto a frammenti attraverso un ritaglio organico viene ricostruito
+  come rettangolo — qualunque layer lo produca. Il fix non è tagliare l'asset né aggiungere materia:
+  è **dissolvere il bordo** (mask gradient sul layer che lo possiede) o spostarlo sotto materia opaca.
+- **Istanze:** `.mw/runs/20261121-cassetto-enamel-edge/pattern-candidate.md` · DECISION_LOG 2026-11-21
+  quinquies→septies (vignette-edge, backing-rect, enamel-edge).
+- **Regola:**
+  1. **Attribuzione layer prima del fix**: screenshot → pipette/probe sui pixel esatti della zona segnalata
+     → se quelle coordinate sono trasparenti nell'asset, il colore viene da dietro (DOM/pagina/mappa):
+     hit-test DOM o A/B `display:none` sul candidato. Mai fixare l'asset per un difetto che non contiene.
+  2. **Segnale di layer sbagliato**: patch applicata e il sintomo non si è mosso, o è cambiato solo di
+     tinta → fermarsi e riattribuire, non applicare la patch successiva.
+  3. **Bordi dritti sotto trafori**: il layer sotto un ritaglio organico non deve avere bordi rettilinei
+     che lo attraversano — mask `linear-gradient` sul bordo, o geometria che lo nasconde sotto materia
+     opaca. Niente backing rettangolari né margini dipinti oltre la silhouette: sbucano come angolo
+     colorato / alone.
+  4. Segnalazione ambigua: offrire subito il marking tool (`public/tmp-mark/mark.html` — rettangoli disegnati
+     dall'utente sul live + coordinate JSON) invece di indovinare la zona.

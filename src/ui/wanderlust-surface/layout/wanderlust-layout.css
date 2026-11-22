@@ -39,8 +39,8 @@
   --wl-gap-medium: 24px;
 
   /* ── FONTS ── */
-  --wl-font-display: "Cinzel", "Trajan Pro", serif;
-  --wl-font-serif:   "EB Garamond", Georgia, serif;
+  --wl-font-display: "Marcellus", "Trajan Pro", serif;
+  --wl-font-serif:   "Cardo", Georgia, serif;
   --wl-font-sans:    system-ui, -apple-system, sans-serif;
 
   /* ── TYPE SCALE ── */

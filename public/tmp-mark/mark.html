@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Segna il rettangolo — cassetto</title>
+<style>
+  body { background:#1a1420; color:#eee; font:14px/1.4 system-ui; margin:16px; }
+  h1 { font-size:16px; color:#ffd878; }
+  .canvas-wrap { position:relative; display:inline-block; margin:8px 12px 8px 0; vertical-align:top; }
+  canvas { border:1px solid #554; cursor:crosshair; display:block; }
+  canvas.img { position:absolute; inset:0; z-index:0; }
+  canvas.ovl { position:relative; z-index:1; }
+  .bar { margin:10px 0; }
+  button { background:#2c6; color:#031; border:0; border-radius:6px; padding:6px 12px; font-weight:600; cursor:pointer; margin-right:8px; }
+  button.sec { background:#445; color:#eee; }
+  #out { background:#111; border:1px solid #443; padding:8px; font:12px/1.5 ui-monospace,monospace; white-space:pre; min-height:3em; }
+  .hint { color:#aa9; font-size:12px; }
+</style>
+</head>
+<body>
+<h1>Disegna i rettangoli dove vedi il difetto (trascina col mouse)</h1>
+<p class="hint">Bordo sinistro della colonna: angolo ALTO (4×), striscia intera (2×), angolo BASSO (4×). Poi premi «Scarica marcate» e/o «Copia coordinate» e incollami il risultato.</p>
+<div class="bar">
+  <button id="dl">Scarica marcate (PNG)</button>
+  <button id="cp" class="sec">Copia coordinate</button>
+  <button id="undo" class="sec">Annulla ultimo</button>
+  <button id="clr" class="sec">Pulisci tutto</button>
+</div>
+<div id="canvases"></div>
+<div id="out">—</div>
+<script>
+const IMAGES = [
+  { id:'corner-top', src:'/tmp-mark/corner-top.png', label:'angolo ALTO (x880-1080, y0-200 @4x)' },
+  { id:'edge-strip', src:'/tmp-mark/edge-strip.png', label:'bordo intero (x860-1080, y0-900 @2x)' },
+  { id:'corner-bot', src:'/tmp-mark/corner-bot.png', label:'angolo BASSO (x880-1080, y700-900 @4x)' },
+];
+const boards = [];
+const root = document.getElementById('canvases');
+IMAGES.forEach(cfg => {
+  const lab = document.createElement('div'); lab.textContent = cfg.label; lab.className='hint';
+  const wrap = document.createElement('div'); wrap.className='canvas-wrap';
+  const bg = document.createElement('canvas'); bg.className='img';
+  const ov = document.createElement('canvas'); ov.className='ovl';
+  wrap.append(bg, ov); root.append(lab, wrap);
+  const im = new Image();
+  im.onload = () => {
+    bg.width = ov.width = im.width; bg.height = ov.height = im.height;
+    bg.getContext('2d').drawImage(im, 0, 0);
+    const b = { cfg, bg, ov, im, rects: [], draw: null };
+    boards.push(b); wire(b);
+  };
+  im.src = cfg.src;
+});
+function wire(b){
+  const ctx = b.ov.getContext('2d');
+  const redraw = () => {
+    ctx.clearRect(0,0,b.ov.width,b.ov.height);
+    ctx.strokeStyle='#ff3b30'; ctx.fillStyle='rgba(255,40,40,.25)'; ctx.lineWidth=3;
+    b.rects.forEach(r => { ctx.fillRect(r.x,r.y,r.w,r.h); ctx.strokeRect(r.x,r.y,r.w,r.h); });
+    if (b.draw) { const r=b.draw; ctx.fillRect(r.x,r.y,r.w,r.h); ctx.strokeRect(r.x,r.y,r.w,r.h); }
+  };
+  let sx=0, sy=0, down=false;
+  b.ov.addEventListener('mousedown', e => { const r=b.ov.getBoundingClientRect(); sx=e.clientX-r.left; sy=e.clientY-r.top; down=true; });
+  b.ov.addEventListener('mousemove', e => { if(!down) return; const r=b.ov.getBoundingClientRect();
+    b.draw={x:Math.min(sx,e.clientX-r.left),y:Math.min(sy,e.clientY-r.top),w:Math.abs(e.clientX-r.left-sx),h:Math.abs(e.clientY-r.top-sy)}; redraw(); });
+  b.ov.addEventListener('mouseup', () => { down=false; if(b.draw&&b.draw.w>3&&b.draw.h>3) b.rects.push(b.draw); b.draw=null; redraw(); dump(); });
+  b.redraw = redraw;
+}
+function dump(){
+  const j = {};
+  boards.forEach(b => { if(b.rects.length) j[b.cfg.id]=b.rects.map(r=>[Math.round(r.x),Math.round(r.y),Math.round(r.w),Math.round(r.h)]); });
+  document.getElementById('out').textContent = JSON.stringify(j,null,1);
+  return j;
+}
+document.getElementById('undo').onclick = () => { const b=[...boards].reverse().find(b=>b.rects.length); if(b){b.rects.pop(); b.redraw(); dump();} };
+document.getElementById('clr').onclick = () => { boards.forEach(b=>{b.rects=[]; b.redraw();}); dump(); };
+document.getElementById('cp').onclick = async () => { await navigator.clipboard.writeText(JSON.stringify(dump())); document.getElementById('out').textContent += '\n[copiato]'; };
+document.getElementById('dl').onclick = () => {
+  boards.forEach(b => {
+    if(!b.rects.length) return;
+    const c=document.createElement('canvas'); c.width=b.bg.width; c.height=b.bg.height;
+    const x=c.getContext('2d'); x.drawImage(b.bg,0,0); x.drawImage(b.ov,0,0);
+    const a=document.createElement('a'); a.download='marked-'+b.cfg.id+'.png'; a.href=c.toDataURL('image/png'); a.click();
+  });
+};
+</script>
+</body>
+</html>

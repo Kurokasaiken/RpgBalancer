@@ -34,18 +34,18 @@ invariants:
     source: plan
     source_ref: PLAN-119
     statement: >-
-      Il tap su uno slot party VUOTO (unico evento che il rack emette su seat vuoto) è cablato a
-      `onOpenRoster` → `panels.set('roster', true)` nella pagina; il Detail converte la prop.
+      Il tap su uno slot party VUOTO (unico evento che il rack emette su seat vuoto) è cablato a `onOpenRoster` →
+      `panels.set('roster', true)` nella pagina; il Detail converte la prop.
     test_refs:
       - tests/unit/idleVillage/r339ExpeditionStates.test.tsx
   - id: hud-real-cassetto.INV-4
     source: plan
     source_ref: PLAN-119
     statement: >-
-      Il drawer pubblica la propria larghezza renderizzata in `useGameLayoutInsets.insets.right` al mount e
-      la azzera allo smontaggio — fondazione per safeFit/pan-clamp. La larghezza è `aspect × viewportH`
-      cappata a `CASSETTO_LAYOUT_CONFIG.drawer.widthMaxPx` (clamp T1: sopra la soglia la colonna si accorcia,
-      l'art non si distorce).
+      Il drawer pubblica la propria larghezza renderizzata in `useGameLayoutInsets.insets.right` al mount e la azzera
+      allo smontaggio — fondazione per safeFit/pan-clamp. La larghezza è `aspect × viewportH` cappata a
+      `CASSETTO_LAYOUT_CONFIG.drawer.widthMaxPx` (clamp T1: sopra la soglia la colonna si accorcia, l'art non si
+      distorce).
     test_refs:
       - tests/unit/idleVillage/r339ExpeditionStates.test.tsx
   - id: hud-real-cassetto.INV-5
@@ -53,10 +53,9 @@ invariants:
     source_ref: PLAN-119
     statement: >-
       Anche con `quest.costPreview` fornito non viene dipinta nessuna cost cell
-      (`cassetto-cost-slot`/`cassetto-cost-value`) — il costo vive nel flusso supplies del
-      planner (R-357 rebuild, D-1; statement amendato: il vecchio T3-S2 con cost cell dedicata
-      è superato). I bag-slot frames specchiano il ledger sparso `bags[poi.id]` (posizioni
-      fisse — mai re-index denso di `selectedItemIds`).
+      (`cassetto-cost-slot`/`cassetto-cost-value`) — il costo vive nel flusso supplies del planner (R-357 rebuild, D-1;
+      statement amendato: il vecchio T3-S2 con cost cell dedicata è superato). I bag-slot frames specchiano il ledger
+      sparso `bags[poi.id]` (posizioni fisse — mai re-index denso di `selectedItemIds`).
     test_refs:
       - tests/unit/idleVillage/r339BagAssign.test.tsx
       - tests/unit/idleVillage/r337CassettoBagSlots.test.tsx
@@ -64,64 +63,55 @@ invariants:
     source: plan
     source_ref: PLAN-125
     statement: >-
-      Il cassetto non monta la barra risorse standalone (`HudRealResources`,
-      `RESOURCES_BAR`, `resWellRef` assenti dal markup): il readout vive come
-      targhette dentro la header band della cornice — wrapper
-      `data-cassetto-resources` con una placca `data-cassetto-res={item.id}`
-      per item del readout reale (R-335, statement amendato R-357/PLAN-125
-      Fase 8: la banda separata resta vietata, la well header è la sede
-      contrattuale — il rebuild slicekit che rimuoveva anche la well non è
-      mai stato committato).
+      Il cassetto non monta la barra risorse standalone (`HudRealResources`, `RESOURCES_BAR`, `resWellRef` assenti dal
+      markup): il readout vive come targhette dentro la header band della cornice — wrapper `data-cassetto-resources`
+      con una placca `data-cassetto-res={item.id}` per item del readout reale (R-335, statement amendato R-357/PLAN-125
+      Fase 8: la banda separata resta vietata, la well header è la sede contrattuale — il rebuild slicekit che rimuoveva
+      anche la well non è mai stato committato).
     test_refs:
       - tests/unit/idleVillage/r335CassettoResources.test.ts
   - id: cassetto-no-cost-cell
     source: plan
     source_ref: PLAN-125
     statement: >-
-      Anche quando `quest.costPreview` è fornito, nessuna cost cell o valore è dipinto nel
-      cassetto (`cassetto-cost-slot`/`cassetto-cost-value` assenti dal DOM).
+      Anche quando `quest.costPreview` è fornito, nessuna cost cell o valore è dipinto nel cassetto
+      (`cassetto-cost-slot`/`cassetto-cost-value` assenti dal DOM).
     test_refs:
       - tests/unit/idleVillage/r339BagAssign.test.tsx
   - id: cassetto-art-no-stray-rules
     source: plan
     source_ref: PLAN-125
-    statement: >-
-      Nessuna righetta luminosa verticale dentro il pozzetto risk/rewards del cassetto
-      rebuilt (R-357).
+    statement: Nessuna righetta luminosa verticale dentro il pozzetto risk/rewards del cassetto rebuilt (R-357).
     test_refs:
       - tests/unit/idleVillage/r357CassettoFrame.test.ts
   - id: cassetto-captions-min-size
     source: plan
     source_ref: PLAN-125
-    statement: >-
-      Le captions del cassetto rebuilt rispettano la dimensione minima leggibile (R-357 2i/2h).
+    statement: Le captions del cassetto rebuilt rispettano la dimensione minima leggibile (R-357 2i/2h).
     test_refs:
       - tests/unit/idleVillage/r357CassettoLabels.test.tsx
   - id: cassetto-risk-pending-muted
     source: plan
     source_ref: PLAN-125
-    statement: >-
-      Le voci di rischio in pending nel cassetto sono rese in tono muted, mai accentuato
-      (R-357 2h).
+    statement: Le voci di rischio in pending nel cassetto sono rese in tono muted, mai accentuato (R-357 2h).
     test_refs:
       - tests/unit/idleVillage/r357CassettoLabels.test.tsx
   - id: cassetto-no-block-titles
     source: plan
     source_ref: PLAN-125
     statement: >-
-      I titoli di blocco PARTY SLOTS / SUPPLIES / JOURNEY / RISK & REWARDS non sono scritti
-      nel cassetto rebuilt — lo spazio va agli slot (R-357).
+      I titoli di blocco PARTY SLOTS / SUPPLIES / JOURNEY / RISK & REWARDS non sono scritti nel cassetto rebuilt — lo
+      spazio va agli slot (R-357).
     test_refs:
       - tests/unit/idleVillage/r357CassettoLabels.test.tsx
   - id: cassetto-close
     source: plan
     source_ref: PLAN-125
     statement: >-
-      Esc e il bottone × chiudono il planner cassetto (R-357). Director ruling
-      2026-11-20 «X chiudi e perdi tutto»: la chiusura SCARTA la bozza — i seat
-      pieni si liberano via onSlotClear (path reale R-248), la borsa torna al pool
-      condiviso via onReleaseAllItems, poi il planner chiude. Il fold col chip
-      (collapse/expand) NON chiude e tiene la bozza — sono affordance diverse.
+      Esc e il bottone × chiudono il planner cassetto (R-357). Director ruling 2026-11-20 «X chiudi e perdi tutto»: la
+      chiusura SCARTA la bozza — i seat pieni si liberano via onSlotClear (path reale R-248), la borsa torna al pool
+      condiviso via onReleaseAllItems, poi il planner chiude. Il fold col chip (collapse/expand) NON chiude e tiene la
+      bozza — sono affordance diverse.
     test_refs:
       - tests/unit/idleVillage/r357CassettoLabels.test.tsx
       - tests/unit/idleVillage/r339BagAssign.test.tsx
@@ -129,29 +119,26 @@ invariants:
     source: director-spec
     source_ref: PLAN-125 Fase 8 (Director 2026-11-20)
     statement: >-
-      Accanto alla difficoltà si mostra la percentuale di morte
-      (`data-testid="cassetto-death-pct"`, `questExpedition.forecast.death` =
-      `sim.anyDeathPct` della PartyEstimate) e accanto al reward la percentuale
-      di riuscita (`data-testid="cassetto-success-pct"`,
-      `questExpedition.forecast.reward` = `sim.outcomePct.reward`). Entrambe
-      assenti finché la stima è pending ('computing'/'incomplete') — mai
-      inventate, mai hardcoded. Stessa resa sul bottom-sheet.
+      Accanto alla difficoltà si mostra la percentuale di morte (`data-testid="cassetto-death-pct"`,
+      `questExpedition.forecast.death` = `sim.anyDeathPct` della PartyEstimate) e accanto al reward la percentuale di
+      riuscita (`data-testid="cassetto-success-pct"`, `questExpedition.forecast.reward` = `sim.outcomePct.reward`).
+      Entrambe assenti finché la stima è pending ('computing'/'incomplete') — mai inventate, mai hardcoded. Stessa resa
+      sul bottom-sheet.
     test_refs:
       - tests/unit/idleVillage/r339BagAssign.test.tsx
   - id: cassetto-supplies-scroll
     source: plan
     source_ref: PLAN-125
-    statement: >-
-      Le supplies del cassetto sono centrate e scorrono lateralmente quando non entrano
-      (R-357).
+    statement: Le supplies del cassetto sono centrate e scorrono lateralmente quando non entrano (R-357).
     test_refs:
       - tests/unit/idleVillage/r357CassettoLabels.test.tsx
   - id: cassetto-slide-lateral
     source: plan
     source_ref: PLAN-125
     statement: >-
-      Il drawer entra con la keyframe `cassettoSlideIn` per `drawer.slideMs` ed esce con
-      `cassettoSlideOut`, foldando solo dopo la fine dello slide (R-357).
+      Il drawer entra con la keyframe `cassettoSlideIn` per `drawer.slideMs` (R-357). Il fold a chip —
+      e con esso la coreografia slide-out — è rimosso per ruling Director 2026-11-22 (OB-7 γ:
+      «il cassetto resta chiuso senza tab»); la chiusura passa per `onClose` dell'adapter.
     test_refs:
       - tests/unit/idleVillage/r357DrawerSlide.test.tsx
   - id: hud-real-cassetto.INV-6
@@ -160,15 +147,62 @@ invariants:
     statement: R-359 medallion drag regressions on /game
     test_refs:
       - tests/unit/idleVillage/hudRealCassettoSlotSwap.test.tsx
-
   - id: cassetto-cta-tips-intact
     source: director-bug
     source_ref: R-357
     statement: >-
-      Il bottone CTA del cassetto e un asset generato standalone (refs/button-launch-gemini.png):
-      entrambe le punte della freccia (sinistra E destra) devono sopravvivere nell'asset baked,
-      simmetriche, su fondo trasparente. R-357 Director 2026-11-18 — errore fatto due volte.
+      Il bottone CTA del cassetto e un asset generato standalone (refs/button-launch-gemini.png): entrambe le punte
+      della freccia (sinistra E destra) devono sopravvivere nell'asset baked, simmetriche, su fondo trasparente. R-357
+      Director 2026-11-18 — errore fatto due volte.
     test_refs:
       - tests/unit/idleVillage/r357CassettoFrame.test.ts
-
+  - id: hud-real-cassetto.INV-7
+    source: director-bug
+    source_ref: R-357
+    statement: >-
+      Director 2026-11-21: «un pezzo nero che esce ad angolo» alla cornice top-left E bottom-left del cassetto — schegge
+      nere opache oltre la silhouette d'oro nella giuntura arco→barra di frame-corner-tl.webp (BL = stessa immagine
+      scaleY(-1)). L'edge superiore della cornice dev'essere oro o trasparente: nessun pixel scuro opaco sopra il primo
+      oro della colonna (x>=240), e nessun granello scuro isolato dentro la banda del rail.
+    test_refs:
+      - tests/unit/idleVillage/r357CassettoFrame.test.ts
+  - id: hud-real-cassetto.INV-8
+    source: director-bug
+    source_ref: R-357
+    statement: >-
+      Director 2026-11-21: «nero tutto dietro il frame … esterno al frame di sinistra», poi «un angolo colorato
+      invece di essere ritagliato … eliminarlo e basta», poi «il rettangolo … sia sopra che sotto». (a) La
+      silhouette del frame è RITAGLIATA: nessun rettangolo di backing DOM può stare sotto il reticolo —
+      sbucherebbe oltre il bordo organico come angolo colorato; l'enamel resta a u(36). (b) Frangia scura
+      anti-alias sulla silhouette ESTERNA di rail-mid-fold / frame-corner-tl (viticci neri oltre il bordo
+      d'oro): nessun pixel nero (lum<50, non-oro, non-gemma) entro ~2px della trasparenza esterna oltre il
+      jitter di encode. (c) Il bordo sinistro rettilineo dell'enamel, visto a frammenti nei trafori della
+      filigrana, si legge come rettangolo scuro su tutta l'altezza: il div enamel porta una mask
+      orizzontale (transparent → #000 a u(120)) che lo dissolve sotto l'ornamento — stessa tecnica della
+      vignette (mask su u(70)).
+    test_refs:
+      - tests/unit/idleVillage/r357CassettoFrame.test.ts
+  - id: cassetto-risk-reward-wells
+    source: director-spec
+    source_ref: R-357
+    statement: >-
+      Director 2026-11-21 (v3 mockup; amends «captions gone» of 2026-11-20): risk and reward are TWO
+      wells, each with its written label («Risk», «Reward»); the % and the skulls/rewards still render inside them.
+    test_refs:
+      - tests/unit/idleVillage/r357CassettoLabels.test.tsx
+  - id: cassetto-party-scroller
+    source: director-spec
+    source_ref: R-357
+    statement: >-
+      Director 2026-11-21 (amends cassetto-party-pager, 2026-11-20): seats scroll sideways under the engraved
+      band, NOT prev/next arrow buttons («non voglio pulsanti … ma la barra come hanno già roster e stash»).
+    test_refs:
+      - tests/unit/idleVillage/r357CassettoLabels.test.tsx
+  - id: cassetto-supplies-band
+    source: director-spec
+    source_ref: R-357
+    statement: >-
+      The supplies row shares the same band; an empty niche shows «+», not a placeholder bag.
+    test_refs:
+      - tests/unit/idleVillage/r357CassettoLabels.test.tsx
 ---

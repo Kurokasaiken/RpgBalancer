@@ -1,0 +1,12 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch({ headless: true });
+const p = await b.newPage({ viewport: { width: 1440, height: 1200 } });
+const bad = [];
+p.on('response', (r) => { if (r.request().resourceType() === 'image' && r.status() !== 200) bad.push(r.url()); });
+await p.goto('http://localhost:5173/hud-charter-review', { waitUntil: 'domcontentloaded', timeout: 60000 });
+await p.waitForSelector('img', { timeout: 30000 });
+await p.waitForTimeout(2500);
+const imgs = await p.evaluate(() => [...document.images].map((i) => ({ src: i.src.split('/').pop(), ok: i.complete && i.naturalWidth > 0 })));
+console.log('imgs:', imgs.length, 'loaded:', imgs.filter(i => i.ok).length);
+console.log('broken:', imgs.filter(i => !i.ok), 'http-fails:', bad);
+await b.close();

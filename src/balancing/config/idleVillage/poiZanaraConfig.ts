@@ -154,5 +154,5 @@ export const POI_ZANARA_LAYERS = {
    *  marker, less complicated — engraved annulus flattened to a solid ring,
    *  dome and corner gems identical. Swapped in via CSS under
    *  `data-poi-zoom="far"`; canvas-aligned like every layer. Quest only. */
-  light: { quest: 'layers/poi-quest-light.webp' },
+  light: { job: 'layers/poi-job-light.webp', quest: 'layers/poi-quest-light.webp' },
 } as const;

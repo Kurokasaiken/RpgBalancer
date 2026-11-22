@@ -35,14 +35,12 @@ import type { ResourceReadoutItem } from '@/ui/idleVillage/components/gameFrame/
 
 const TC = CASSETTO_LAYOUT_CONFIG.topChrome;
 /* R-352: the resource bar renders at RES_K so its capsule band matches the
- *  banner's (`topChrome.capsulePx`, measured on the signed art). */
-const RES_K = TC.capsulePx.time / TC.capsulePx.resources;
-/* The cap seats are symmetric: art+slots shift LEFT so slot 0's glass
- *  starts exactly where the mirrored seat ends (`seatPx`, matched to the
- *  right cap's ornament) — `RES_SHIFT` is negative, the medallion is
- *  cut by the inner clip. */
-const RES_SHIFT = TC.resCapMirror.seatPx - RESOURCES_SLIM_BAR.slots[0].x;
-const RES_W = (RESOURCES_SLIM_BAR.w + RES_SHIFT) * RES_K;
+ *  banner's (`topChrome.capsulePx`, measured on the signed art). R-376-bis:
+ *  `resourcesBoost` enlarges the bar in proportion to the banner. */
+const RES_K = (TC.capsulePx.time / TC.capsulePx.resources) * TC.resourcesBoost;
+/* R-376: the pointed-cap art is natively specular — the bar mounts at its
+ *  own size, no cap-mirror slice, no shift, no clip. */
+const RES_W = RESOURCES_SLIM_BAR.w * RES_K;
 const RES_H = RESOURCES_SLIM_BAR.h * RES_K;
 const ROW_H = Math.max(TIME_SLIM_BAR.h, RES_H);
 
@@ -158,7 +156,10 @@ describe('R-339/R-350/R-352 — centred bar, banner docked at bannerMarginPx', (
 
   // INV:game-top-chrome.INV-4
   it('keeps natural size at 1920 (reserve and bound cleared, fit = 1)', () => {
-    useGameLayoutInsets.setState({ insets: { top: 0, right: 0, bottom: 0, left: 320 } });
+    /* R-376-bis: with the boosted bar the cleared-bound premise needs a
+     *  smaller inset — at 320 the banner's bound would collide with the
+     *  bar's left edge at 1920 and fit would shrink (by design). */
+    useGameLayoutInsets.setState({ insets: { top: 0, right: 0, bottom: 0, left: 240 } });
     renderChrome({ frame: { scale: 1, W: 1920, H: 1080 } });
     const el = screen.getByTestId('game-top-chrome');
     expect(parseFloat(el.style.height)).toBeCloseTo(ROW_H, 6);
@@ -166,7 +167,7 @@ describe('R-339/R-350/R-352 — centred bar, banner docked at bannerMarginPx', (
     const bannerLeft = parseFloat(screen.getByTestId('chrome-day-banner').style.left);
     expect(resLeft + RES_W / 2).toBeCloseTo(1920 / 2, 6);
     /* A left inset pushes the banner's dock to the bound, still centred bar. */
-    expect(bannerLeft).toBeCloseTo(bannerDock(320 + TC.marginPx), 6);
+    expect(bannerLeft).toBeCloseTo(bannerDock(240 + TC.marginPx), 6);
     expect(bannerLeft + TIME_SLIM_BAR.w + TC.gapPx).toBeLessThanOrEqual(resLeft + 1e-6);
     expect(resLeft + RES_W).toBeLessThanOrEqual(1920 - TC.chronicleReservePx + 1e-6);
   });
@@ -214,47 +215,23 @@ describe('R-339 T6 — two separate slim elements, e2e-compatible slots', () => 
   });
 });
 
-describe('R-352 — the resource bar is specular end-to-end and capsule-matched', () => {
+describe('R-376 — the resource bar is natively specular end-to-end and capsule-matched', () => {
   // INV:game-top-chrome.INV-6
-  it('the left cap is ONE flipped slice — the cap-mirror lab pick, clipped to the symmetric seat', () => {
+  it('mounts the signed art with no cap mirror, no shift, no clip — the retired R-352 hack', () => {
     renderChrome();
-    const mirror = screen.getByTestId('chrome-res-cap-mirror');
-    expect(mirror).toBeInTheDocument();
-    const cap = TC.resCapMirror;
-    /* The clip shows only `seatPx` — the ornament end of the pick, so the
-     *  left seat equals the right cap's. One piece, not a composite. */
-    expect(parseFloat(mirror.style.left)).toBeCloseTo(0, 6);
-    expect(parseFloat(mirror.style.top)).toBeCloseTo(cap.destY, 6);
-    expect(parseFloat(mirror.style.width)).toBeCloseTo(cap.seatPx, 6);
-    expect(parseFloat(mirror.style.height)).toBeCloseTo(cap.h, 6);
-    const imgs = mirror.querySelectorAll('img');
-    expect(imgs.length).toBe(1);
-    expect(imgs[0].getAttribute('src')).toBe('/assets/ui/hud-real/resources/bar-slim.webp');
-    expect(imgs[0].style.transform).toContain('scaleX(-1)');
-    /* The img must keep the full bar width inside the clip — without
-     *  `maxWidth: 'none'` the global img preflight squeezes it to the clip
-     *  and the whole bar renders compressed into the cap. */
-    expect(imgs[0].style.maxWidth).toBe('none');
-    expect(parseFloat(imgs[0].style.width)).toBeCloseTo(RESOURCES_SLIM_BAR.w, 6);
-    /* Offset pins the flip: clip column 0 shows source column srcX+w (the
-     *  bar's right edge) — `srcX + w - barW`. */
-    expect(parseFloat(imgs[0].style.left)).toBeCloseTo(cap.srcX + cap.w - RESOURCES_SLIM_BAR.w, 6);
-    expect(parseFloat(imgs[0].style.top)).toBeCloseTo(-cap.srcY, 6);
-  });
-
-  // INV:game-top-chrome.INV-6
-  it('the cap seats are symmetric — art slides left, medallion cut by the inner clip', () => {
-    renderChrome();
+    /* The pointed-cap art is specular by construction: the flipped-slice
+     *  overlay (`resCapMirror`) is gone for good, and so is its config. */
+    expect(screen.queryByTestId('chrome-res-cap-mirror')).not.toBeInTheDocument();
+    expect('resCapMirror' in TC).toBe(false);
     const slot = screen.getByTestId('chrome-resources');
     const inner = slot.firstElementChild as HTMLElement;
-    /* The inner clips the art's left bleed (medallion under the seat). */
-    expect(inner.style.overflow).toBe('hidden');
-    /* Slot 0's glass starts exactly where the seat ends. */
-    const wrapper = inner.querySelector('[data-hudreal-resources]')!.parentElement as HTMLElement;
-    expect(parseFloat(wrapper.style.left)).toBeCloseTo(RES_SHIFT, 6);
-    expect(RES_SHIFT + RESOURCES_SLIM_BAR.slots[0].x).toBeCloseTo(TC.resCapMirror.seatPx, 6);
-    /* The bar art's right edge lands on the inner's right edge. */
-    expect(RES_SHIFT + RESOURCES_SLIM_BAR.w).toBeCloseTo(RES_W / RES_K, 6);
+    /* No clip, no art shift: the section sits at the inner's origin. */
+    expect(inner.style.overflow).not.toBe('hidden');
+    const section = inner.querySelector('[data-hudreal-resources]') as HTMLElement;
+    expect(section).toBeInTheDocument();
+    expect(parseFloat(section.style.left ?? '0') || 0).toBeCloseTo(0, 6);
+    /* The bar fills the slot at its own size scaled by RES_K. */
+    expect(parseFloat(slot.style.width)).toBeCloseTo(RES_W, 6);
   });
 
   // INV:game-top-chrome.INV-6

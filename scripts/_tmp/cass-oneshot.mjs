@@ -1,0 +1,11 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch({ headless: true, args: ['--enable-unsafe-swiftshader'] });
+const p = await b.newPage({ viewport: { width: 1440, height: 900 } });
+const errs = [];
+p.on('pageerror', (e) => errs.push(String(e)));
+await p.goto('http://localhost:5173/hud-compose?comp=cassetto&poi=poi-goblin&risk=3&pcts=28,74&reward=4', { waitUntil: 'domcontentloaded', timeout: 90000 });
+await p.waitForSelector('[data-cassetto-column]', { timeout: 120000 });
+await p.waitForTimeout(4000);
+await p.screenshot({ path: '.mw/runs/20261122-cassetto-v3-ob7/v3-1440x900.png' });
+console.log('errors:', errs.length ? errs : 'none');
+await b.close();

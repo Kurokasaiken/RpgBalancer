@@ -42,8 +42,8 @@ const ENGRAVE = {
 // ─── Typography Tokens ──────────────────────────────────────────────
 
 const FONT = {
-  display: 'var(--wl-font-display, "Cinzel", "Trajan Pro", serif)',
-  serif:   'var(--wl-font-serif, "EB Garamond", Georgia, serif)',
+  display: 'var(--wl-font-display, "Marcellus", "Trajan Pro", serif)',
+  serif:   'var(--wl-font-serif, "Cardo", Georgia, serif)',
   sans:    'var(--wl-font-sans, system-ui, sans-serif)',
 } as const;
 

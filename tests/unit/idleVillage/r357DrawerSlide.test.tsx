@@ -2,15 +2,14 @@
  * R-357 / PLAN-125 — the expedition drawer slides in from / out to the right edge.
  * Motion is skipped under reduced-motion (and where matchMedia says so, e.g. jsdom default).
  */
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Provider as TooltipProvider } from '@radix-ui/react-tooltip';
 import { DndContext } from '@dnd-kit/core';
 import { DragProvider } from '@/ui/idleVillage/components/DragContext';
 import type { CassettoQuest } from '@/ui/idleVillage/hudReal/HudRealCassetto';
 import { ExpeditionDrawer } from '@/ui/idleVillage/components/gameFrame/ExpeditionDrawer';
-import { useExpeditionDrawer } from '@/ui/idleVillage/store/useExpeditionDrawer';
 import { CASSETTO_LAYOUT_CONFIG } from '@/balancing/config/idleVillage/cassettoLayoutConfig';
 
 vi.mock('react-i18next', () => ({
@@ -35,30 +34,23 @@ const mockMotion = (noPreference: boolean) => {
 
 describe('R-357 drawer lateral slide', () => {
   let restore: () => void = () => {};
-  beforeEach(() => { useExpeditionDrawer.setState({ expanded: true }); vi.useFakeTimers(); });
-  afterEach(() => { restore(); vi.useRealTimers(); });
+  afterEach(() => { restore(); });
 
-  // INV:cassetto-slide-lateral
-  it('enters with the slide-in keyframe and leaves with slide-out, folding only after slideMs', () => {
+  // INV:cassetto-slide-lateral — slide-in on mount; the chip-fold choreography (slide-out + chip swap)
+  // is REMOVED (Director 2026-11-22 «eliminala», seal of OB-7 γ «il cassetto resta chiuso senza tab»).
+  it('enters with the slide-in keyframe and mounts NO fold chips', () => {
     restore = mockMotion(true);
     mountDrawer();
     const slide = screen.getByTestId('expedition-drawer-slide');
     expect(slide.style.animation).toContain('cassettoSlideIn');
     expect(slide.style.animation).toContain(`${CASSETTO_LAYOUT_CONFIG.drawer.slideMs}ms`);
-    fireEvent.click(screen.getByTestId('expedition-drawer-collapse'));
-    expect(screen.getByTestId('expedition-drawer-slide')).toHaveAttribute('data-leaving');
-    expect(screen.getByTestId('expedition-drawer-slide').style.animation).toContain('cassettoSlideOut');
-    expect(useExpeditionDrawer.getState().expanded).toBe(true);           // still open while it slides
-    act(() => { vi.advanceTimersByTime(CASSETTO_LAYOUT_CONFIG.drawer.slideMs + 5); });
-    expect(useExpeditionDrawer.getState().expanded).toBe(false);          // folded after the slide
-    expect(screen.getByTestId('expedition-drawer-expand')).toBeInTheDocument();
+    expect(screen.queryByTestId('expedition-drawer-collapse')).toBeNull();
+    expect(screen.queryByTestId('expedition-drawer-expand')).toBeNull();
   });
 
-  it('under reduced motion there is no animation and the fold is immediate', () => {
+  it('under reduced motion there is no animation', () => {
     restore = mockMotion(false);
     mountDrawer();
     expect(screen.getByTestId('expedition-drawer-slide').style.animation).toBe('');
-    fireEvent.click(screen.getByTestId('expedition-drawer-collapse'));
-    expect(useExpeditionDrawer.getState().expanded).toBe(false);
   });
 });

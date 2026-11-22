@@ -903,4 +903,219 @@ dal lab: un componente futuro li indossa spargendo la ricetta, senza copiare CSS
 **Aggiunta (2026-11-21, «andiamo di gold come il mockup»):** testi e colori interni del cassetto portati al caldo del mockup. Misure: etichette del mockup ≈ crema (251,244,217), titoli di sezione/valori oro (242,215,147)–(233,217,145); le nostre erano grigio-verdi (143,178,162). Ora: etichette e didascalie `muted` → `#eadfb4`, etichette dei posti via `--slot-rack-slot-label-color` e `p` → `#f1e6bd` (scoped al cassetto), glifi di ruolo `#f3e193` (scoped, `!important` sul colore inline del renderer condiviso), valori giorni e ricompensa → `goldInk #f3e193`, «+» delle nicchie pieno. Titoli di sezione ancora assenti (ruling 17/11).
 **Aggiunta (2026-11-21, angoli della cornice):** gli ornamenti `rail-top`/`rail-bottom` erano ritagliati dal mockup a larghezza fissa (foglie tagliate in verticale, punte del bottone dentro l'angolo in basso). Sostituiti da due angoli **generati da Gemini** vuoti su magenta (`frame-corner-tl.webp` con l'arco rotondo sopra il dipinto + barra; `frame-corner-bl.webp` con il ricciolo che entra nella riga d'oro; il primo tentativo in basso aveva un «baffo» che sporgeva → rigenerato con il divieto esplicito). Barra e riga arrivano al bordo destro dentro le stesse immagini (ultime colonne replicate: nessun attacco); fascia centrale `rail-mid-fold.webp` piegata dal pezzo in basso, che passa SOTTO gli angoli per 70 px dove l'angolo sfuma (niente taglio netto). Tolti `rail-top`, `rail-mid-long`, `rail-bottom`, `frame-top`, `frame-bottom` e l'arco SVG disegnato a mano. Pulsante ridotto a 740 u perché la punta sinistra non tocchi il ricciolo. ChatGPT non usato: limite del piano gratuito.
 **Aggiunta (2026-11-21, nuovo mockup «il viaggio è superiore» + «chiaroscuro» + «oro più acceso»):** riferimento nuovo `images/5.webp` (cassetto Goblin con cornice simmetrica sottile). Misure: fondo (3,28,23), pozzetti nero-teal (8,16,16), segmento attivo smeraldo (5,63,33), etichette oro spento (196,191,145), titolo (242,217,143). **Fatto:** (1) barra del viaggio rifatta come nel mockup — tre chevron nero-teal con bordo d'oro, segmento attivo smeraldo (Outbound), diamanti smeraldo ai giunti e alle estremità, icona incisa (`ico-target`/`ico-axe`/`ico-gust`) + nome nel segmento, giorni piccoli sotto il nome (dato di gioco, non nel mockup); (2) chiaroscuro: fondo scurito con velo teal-nero (~25%), `wellStyle` nero-teal `rgba(3,14,13,.78)`, nicchie con interno scurito ×0,5 (oro intatto), etichette `muted` → `#cfc796`, etichette posti `#d9d29f`; (3) oro dei pezzi interni riportato al livello della cornice (misura: cornici sat 62/val 79, CTA 50/65, nicchie 50/71, filetto riquadri 44/60 → `grade_gold` sat×1,2–1,5, val×1,13–1,24; originali in `.mw/runs/20261121-cassetto-components/out/pre-boost/`); (4) pulsante: lacca verde `cta-plaque-enamel.webp` con saturazione ×1,55 e luminosità ×1,38 (era grigio-verde spento), etichetta `--skin-cassetto-cta-text` `#eafff5` → `#f6e9b0` (crema-oro come il mockup). **Non fatto (struttura):** cornice simmetrica sottile con diamanti, fila di teschi rossi + ricompensa a intervallo, ritratti nelle ghiere, titoli di sezione.
+**Aggiunta (2026-11-21, «due errori… questo pezzo di nero»):** le ombre dipinte dentro la fascia/angoli generati erano nero puro (tra le barre d'oro, attorno alle gemme) e leggevano come buchi neri sulla mappa. Ritinte in smeraldo scurissimo `(0,10L+1 .. 0.95L+12 .. 0.7L+9)` solo sui pixel scuri non-oro (luminanza < 75, peso sfumato 75→35, oro saturo escluso): ombreggiatura mantenuta, niente nero. Applicato a `frame-corner-tl`, `frame-corner-bl`, `rail-mid-fold`; originali in `.mw/runs/20261121-cassetto-components/out/pre-shadow/`. Da verificare dal Director sui due punti indicati (ritagli `images/6.png`, `7.png`).
+**Aggiunta (2026-11-21, «il viaggio è ancora sbagliato»):** la barra del viaggio non seguiva la struttura del mockup (3 frecce a punta, icona accanto al nome, giorni dentro il segmento). Rifatta: UNA pillola con estremi arrotondati divisa da tagli diagonali in tre segmenti nero-teal con bordo d'oro (attivo smeraldo = Outbound), diamante smeraldo al centro del bordo alto e basso di ogni segmento, uno su ogni giunto e uno a ciascun estremo; icona incisa SOPRA il nome (`ico-target`/`ico-axe`/`ico-gust`, 48 u). I giorni, assenti nel mockup ma dato di gioco, sono una riga piccola sotto la pillola (`cassetto-leg-days-N`) più il totale. Il file del mockup (`images/5.webp`) non era più su disco: ricostruito dalle misure e dalla descrizione salvate, non da un confronto pixel.
+**Aggiunta (2026-11-21, «Risk/reward + journey» dal mockup v3 `refs/mockup-cassetto-goblin-v3.webp`):** (1) **Rischio e ricompensa = DUE pozzetti** affiancati con cornice, ciascuno con emblema (teschio / baule), etichetta scritta «Risk» / «Reward» (`cassetto-risk-label`, `cassetto-reward-label`), poi teschi (rischio) e quantità (ricompensa); le % del sim restano (ruling 2026-11-20): % morte bordeaux, % riuscita con alloro. **Amenda** il ruling 2026-11-20 «etichette Risk/Reward non scritte» — il mockup le scrive; test `INV:cassetto-risk-reward-wells`. (2) **Viaggio:** pillola più alta (148 u) con estremi interamente arrotondati, tre segmenti **incassati** (banda scura interna + labbro chiaro, riflesso sul segmento attivo), diamanti agli estremi, ai giunti e al centro di bordo alto e basso di ogni segmento, stelline a 4 punte ai lati dell'icona, icona incisa 50 u sopra il nome; i giorni restano sotto la pillola (dato di gioco assente dal mockup). Confronto: il mockup mostra «120–180» e cinque teschi accesi, noi mostriamo il dato reale della quest.
+**Aggiunta (2026-11-21, «togli il ricciolo… centra il pulsante… troppo nera»):** (1) **Ricciolo in basso a sinistra tolto**: l'angolo in basso è ora l'angolo in alto specchiato in verticale (`frame-corner-tl.webp` con `scaleY(-1)`): arco tondo che entra nella riga d'oro, simmetrico a quello sopra; `frame-corner-bl.webp` non è più usato (resta su disco, originale in `out/pre-curl/`). Un tentativo di tagliare il ricciolo e disegnare un raccordo a mano è stato scartato (bordi netti). (2) **Pulsante centrato** nella colonna del contenuto (`CTA_CENTER_U = 541`, 820 u; prima 740 u a destra per non toccare il ricciolo). (3) **Risk/Reward stondati**: bordo oro con raggio 44 u, doppio filetto interno, niente 9-slice. (4) **Viaggio generato da Gemini** (`journey-bar.webp`: pillola con segmento sinistro smeraldo, due scuri incassati, bordo oro, gemme su estremi/giunti/centri; scontornata da magenta, 1024×123): icone e nomi restano DOM sopra, centri segmento in % (`JOURNEY_CENTERS`); il SVG disegnato a mano è rimosso. Limite noto: il primo taglio è quasi verticale, il secondo obliquo; risoluzione nativa bassa. (5) **«Troppo nera» risolto**: i pozzetti (`wellStyle`) ora usano lo smalto HUD (`--skin-hud-enamel-lift/base/deep` = (0,70,47) → (6,52,39) → (9,29,21)): verde in alto, quasi nero in basso, come le barre superiori e la nav; velo scuro del fondo ridotto da 26% a 12%.
+**Aggiunta (2026-11-21, bilanciamento verde/nero «come nelle top bar»):** misurato sulle barre in alto: cuore nero-petrolio (1,17,25) lum 14, verde solo come alone sul bordo (lum 24–30), ~80% nero / 20% verde; il passaggio precedente (smalto pieno alto→basso, lum 35–50) rovesciava il rapporto. Ora `wellStyle` = cuore `#01111a` con alone verde stretto in alto e in basso + filo/alone interno verde (`inset … rgba(24,110,78,.30)`); stessi ingredienti sui pozzetti stondati Risk/Reward. Fondo = gradino più verde (velo `rgba(10,60,40,.10)` invece del nero). Misura dopo: barra del tempo cuore lum 14,2 → pozzetti 14,4–17,0; fondo 21,8–23,5; nav 34,6 (gradino lacca). Lo smeraldo saturo resta solo agli accenti (Outbound, pulsante, gemme).
 
+**Aggiunta (2026-11-21, «un pezzo nero che esce ad angolo» — fix):** il pezzo nero era dentro `frame-corner-tl.webp` (1447×520), nella giuntura arco→barra (x 263–617, y 0–45): schegge scure opache sopra la silhouette d'oro (l'edge superiore nel golden è tutto oro; ombreggiatura solo dentro) + granelli scuri dentro la banda del rail. BL = stessa immagine `scaleY(-1)` → difetto identico specchiato: un file sistemato = entrambi gli angoli. Fix `fix-joint-shards.py` (run dir): per x≥240 il *leading dark run* (pixel scuri opachi sopra il primo oro della colonna, prime 20 righe) → alpha 0, iterato a convergenza (il taglio espone nuovi run); granelli scuri <600 px racchiusi nell'oro della banda → mediana oro locale. Il cuneo d'ombra interno arco↔barra resta (è nel golden). Misure: leading-dark 157 px (run max 16) → 9 (run 5); i residui sono rumore di confine da ri-encode webp (colori bronzo scuro, non nero). Originale in `out/pre-joint/`. Provenance `pieces.json` riallineata su tl/bl/rail-mid-fold (sha256 + nota postprocess). Test `// INV:hud-real-cassetto.INV-7` in `r357CassettoFrame` (massa ≤40 px E run ≤7: rosso 157/16 sul buggato, verde 9/5 sul fissato; red-first registrato). Verifica live headless `/hud-compose?comp=cassetto` 1440×900: entrambi i bordi puliti (`test-results/cassetto-review/`). Non verificato: angolo su /game con party vero (stesso asset, stesso montaggio); `closure:lint` resta rosso su debris pre-esistenti (poiZanara, paintedPieces, ricevute slice-kit cassetto — non toccati da questo fix).
+**Aggiunta (2026-11-21 bis, «parte esterna dell'angolo, una specie di triangolo nero che esce» — fix):** sotto la punta destra dell'arco (x~210–350, y~50–110) una *macchia scura semitrasparente* (alpha 40–120, quindi invisibile alla maschera `op>120` del primo fix — per questo era sopravvissuta) gocciolava sotto la linea dei dentini d'oro nel vuoto: un triangolo nero appeso alla silhouette. Nel golden sotto l'arco c'è sfondo aperto → per x∈[195,460], sotto il pixel d'oro più basso di ogni colonna (righe 30–170) tutto ciò che non è oro → alpha 0 (~25 600 px). Seconda passata inline sui residui di encode (−104 px). Misure: non-oro sotto i dentini 631 → 54 px (residui = jitter alpha di confine, sparsi 1–3 px, invisibili). Stessa INV `hud-real-cassetto.INV-7` estesa con la clausola sotto-arco (≤150; rosso 631/157 sul buggato, verde sul fissato; red-first ri-registrato). Provenance tl riallineata. Witness: `test-results/cassetto-review/underarch-board.png`, `tri-zoom-v5.png`, `full-v5.png`.
+**Aggiunta (2026-11-21 ter, «nero tutto dietro il frame, in alto e in basso esterno al frame di sinistra» — fix):** diagnosi — i buchi del reticolo di `rail-mid-fold.webp` sono *trasparenti* (42% del pezzo) e il campo enamel partiva a `u(36)`: la metà sinistra del frame galleggiava sulla mappa, che nei punti scuri leggeva come nero dietro il reticolo; nel golden dietro le maglie c'è il marmo smeraldo. Fix in due atti: (a) enamel `left: u(36)` → `left: 0` in `HudRealCassetto.tsx:375` — ora il marmo copre tutta la zona visibile del frame (la colonna è `overflow:hidden`, nessuna barra verde: il margine scuro a sinistra delle viti è il bordo dipinto del golden); (b) halo-cut sui due pezzi (`fix-joint-shards.py` pass 3): px neri (lum<85, non-oro, non-gemma) entro ~2.5px della trasparenza **esterna** (connessa al bordo immagine, non ai buchi interni) → alpha 0: rail 153 px, corner 761 px — viticci neri che sporgevano oltre il bordo d'oro sulla mappa. Nuova `hud-real-cassetto.INV-8` (enamel backing + exterior-halo lum<50: rail ≤15, corner ≤400; buggy 26/518); red-first registrato. Provenance sha riallineata (rail `5a6e50e3…`, corner `3c2eb1d6…`). Witness: `test-results/cassetto-review/final-board-v7.png`, `compose-cassetto-v7.png` — la striscia di sfondo visibile a sinistra dell'ornamento è ora marmo.
+**Aggiunta (2026-11-21 quater, «sembra peggio di prima, non ci dev'essere il nero» — correzione del fix):** il backing a `left:0` col marmo annerito leggeva come lastra nera uniforme — nel golden dietro le viti c'è un margine smeraldo *luminoso* (~(25,45,28), g dominante) e le tasche scure sono *olivastre calde* (~(28,26,10)), non verdi-fredde. Corretto in due mosse: (a) strip dedicata sotto il frame `left:0, width:u(150)` sopra l'enamel — stesso `ground.webp` con wash smeraldo `rgba(20,72,48,.62)` → dietro le maglie si vede smeraldo dipinto, mai nero; (b) ritint warm-olive delle ~107k px scuri non-oro/non-gemma in rail+corner (ramp lum→(1.35,1.10,0.50)·lum, blend .8): le tasche passano da (27,43,21) freddo a ~(28,23,11) caldo come il golden. Backup `out/pre-olive/`. Test invariato (soglie reggono: residui halo contano ancora lum<50), sha riallineati. Witness: `rail-3way-v8.png`, `compose-cassetto-v8.png`.
+**Aggiunta (2026-11-21 quinquies, «angolo colorato invece di essere ritagliato — eliminarlo e basta» — soluzione finale):** il backing DOM (enamel a left:0 + strip smeraldo u(150)) sbucava oltre la silhouette organica come rettangolo colorato. Soluzione: NESSUN backing DOM — enamel tornato a `u(36)`; i pezzi restano ritagliati: i buchi del reticolo e l'esterno della silhouette sono trasparenti e mostrano il mondo. Il "nero" che restava era la *materia cotta*: ritint warm-olive già applicato (pass 4) + halo esterno tagliato (pass 3). Tentativo di fill-in-asset (pass 5) scartato: i buchi sono finestre aperte, non tasche — riempirle ricreava la stessa toppa colorata. INV-8 riscritta: (a) asserisce `left: u(36)` e assenza di backing sotto il frame; (b) halo esterno ≤ soglia. Test 3/3 verdi. Witness `rail-3way-v9.png`, `compose-cassetto-v9.png`.
+**Aggiunta (2026-11-21 sexies, «alone verde scuro tutt'attorno + quel quadrato» — diagnosi finale):** due difetti diversi, uno mio e uno strutturale. (1) **L'alone verde scuro** era la fascia di margine dipinta che avevo cotto oltre la silhouette (~10px, 94k px): annullata ripristinando l'alpha pre-margine (backup `out/pre-pockets/` + `out/pre-margin/`) — la silhouette torna ritagliata vera. (2) **Il "quadrato"** era un artefatto di composito, non di asset: il bordo sinistro **rettilineo** della vignette (x=973px screen) cadeva dentro la zona traforata sotto l'arco del corner (img x920–1432) — attraverso le finestre si vedeva un taglio dritto di foresta teal attaccato all'oro. Spiega anche i report precedenti: lo stesso bordo dritto era «nero» quando dietro c'era l'enamel scuro e «verde» col wash. Consultazione esterna confermata (chatGPT/codex via mw-ask: «bordo geometrico netto visto a frammenti nei trafori → rettangolo percepito»; Gemini timeout). Fix in `HudRealCassetto.tsx`: vignette `marginLeft u(2)` → `u(-50)` (parte sotto i viticci opachi) + mask orizzontale `linear-gradient(90deg, transparent, #000 u(70))` sul wrapper — nessun bordo dritto coincide più con un traforo; il dipinto sfuma sotto l'arco come nel golden. INV-8 e suite cassetto verdi (31/31), build:check ok, provenance riallineata (`frame-corner-tl e9af6289…`, `rail-mid-fold c43fef15…`). Witness `test-results/cassetto-review/final-board-v13.png`, `compose-cassetto-v13.png` (roster chiuso nel witness). Nota: nel lab il "nero fuori" a sinistra del frame è lo sfondo/mappa visibile attraverso il ritaglio — nessun layer fuori dalla colonna.
+**Aggiunta (2026-11-21 septies, «è ancora lì» — i rettangoli segnati a mano erano il bordo sinistro dell'enamel):** il Director ha marcato i difetti su uno strumento di marking dedicato (`public/tmp-mark/mark.html`, coordinate screenshot): bande a gradini sopra/sotto l'ornamento + strisce sul bordo. La misura pixel-per-pixel ha chiuso la diagnosi: **non era materia cotta** — a screen x≈937 una linea netta verticale separa la mappa (blu) dallo smalto piatto scuro (1,25,14 ≈ fallback `#04281a` di `paintedGround()`), e corre su **tutta l'altezza della colonna**: il bordo sinistro *rettilineo* del campo enamel (`left: u(36)`) visto a frammenti attraverso i trafori della filigrana → «il rettangolo … sia sopra che sotto». Stesso meccanismo del "quadrato" della vignette, terzo artefatto della serie: **qualsiasi bordo rettilineo che attraversa un ritaglio organico viene ricostruito come rettangolo**. Prima era stata fatta una passata chirurgica sull'asset (taglio vela scura x40–170/y0–140, gemme protette da maschera dilatata — 1877 px, sha `99ad38dd…`), corretta ma non toccava la causa: il layer DOM dietro. Fix: `HudRealCassetto.tsx` — mask `linear-gradient(90deg, transparent, #000 u(120))` sul div enamel, il bordo si dissolve sotto l'ornamento invece di tagliare; geometria `left: u(36)` invariata (niente backing reintrodotto). INV-8 esteso con la nuova asserzione (enamel `left: u(36)` + mask 90deg), test 3/3 verdi; suite cassetto 31/31; build:check ok. Witness `test-results/cassetto-review/final-board-v15.png`, `compose-cassetto-v15/-v16.png` (roster chiuso). Freezato dal Director 2026-11-21; learn → `.mw/runs/20261121-cassetto-enamel-edge/pattern-candidate.md`, promosso a `recurring-traps.md` T-33.
+
+## 2026-11-21 — OB-7 cassetto: rulings estetici della review charter (14/14)
+
+**Da:** PLAN-131 ha prodotto i component charter `reconstructed`; OB-7 richiedeva l'occhio
+Director sul pilota cassetto (review visuale su `/hud-charter-review`, witness V2 R-374).
+**A:** ruling Director 2026-11-21T22:20Z (JSON completo in
+`.mw/runs/20261121-plan131-charters/signoff-OB7.json`):
+- **confermati** (appreciated): placca CONFIRM, cornice da pezzi standalone, vignetta a
+  filo bordo, emblemi lit/dimmed, banda viaggio pill, scroller peek+fade;
+- **correzioni** → openIssues dirette: pozzi troppo neri in proporzione (materiale
+  nero-teal confermato → **D-open-4 chiuso, niente lacca-petrolio/amend**), spaziatura
+  sx/dx da ribilanciare, blocco risk/reward senza label + % sopra + reward 5 simboli +
+  gain via click/tooltip, proporzioni scroller senza toccare frame/barra, disabled
+  «troppo vivo» → prova −40% sat lacca, motivo CTA disabilitata → **visibile**
+  (allinea REQ:v38-states senza amend), vignetta → arte per-quest;
+- **lasciato aperto**: affordance HudScrollBandX;
+- **esplorazione residua**: spessore cornice (forse meno spessa);
+- **chiuso**: edge-tab cassetto chiuso → resta chiuso senza tab — **amend v38 D6b da
+  formalizzare** nelle desiderata.
+Charter cassetto promosso `director-verified` + `ornamentLevel 'II'` (proposta accettata,
+contro-ruling possibile). I 7 seed restano `reconstructed`.
+**Fonte:** ruling Director via JSON ruling page 2026-11-21.
+
+## 2026-11-21 — D-4 tipografia HUD: ruling «A inciso» + implementazione
+
+**Da:** PLAN-125 D-4 richiedeva 3 prove tipografiche side-by-side sulle superfici
+reali `/hud-compose` e la scelta del Director. Prove in
+`.mw/runs/20261120-d4-typography/` (board 2×2 + specimen leggibilità):
+A Marcellus+Cardo, B Almendra SC+Almendra, C Carrois Gothic SC+IM Fell English
+(dress copperplate/elisir).
+**Ruling Director 2026-11-21: «A»** — Marcellus display + Cardo serif.
+**Implementazione:** woff2 latin self-hosted in `public/fonts/` (marcellus-400,
+cardo-400/700/italic — stesso pattern dei volti esistenti, zero dipendenza di
+rete); `@font-face` in `index.css`; stack su `--skin-font-display`/`--skin-font-serif`
+e bridge `--wl-*` in `skinCssVariables.ts` (Marcellus→Cinzel→Trajan Pro,
+Cardo→EB Garamond→Georgia); rename in-place dei literal su 71 file in
+`src/ui/idleVillage/**`, `wanderlust-surface`, `base.css --font-header`,
+`hud-compose` — i nomi vecchi restano come fallback nelle stack.
+**Nota semantica:** Marcellus ha minuscolo vero (Cinzel no) → nomi/titoli in
+title-case («Giggiolillo») salvo `text-transform: uppercase`; guida HUD §4.3
+aggiornata. Floor PLAN-127 11px non toccato (nessuna dimensione modificata).
+**Fuori scope volutamente:** lab pinned (hud-lab spikes, styleLab, v9, moodboard),
+`FantasyTheme`/designSystem. Witness live `/hud-compose?comp=cassetto`:
+`shots/live-a-cassetto.png` (font caricati nativi, rendering verificato a
+occhio). `build:check` verde; lint scope: 1 errore preesistente in HEAD
+(`WanderlustLayout.tsx:511` react-refresh, non correlato). 43 failure
+vitest suite skins preesistenti e infrastrutturali (`Preset not found:
+wanderlust`), nessun test asserisce nomi font. T-13: worktree condiviso —
+`HudRealCassetto*` in riscrittura attiva da altra sessione; rename applicato
+anche lì, nessun sovrascrittura.
+
+## 2026-11-21 — Victory/Reward pergamena: eye-review fix pass (R-357, PLAN-125 Fase 7d)
+
+Ruling Director su cattura pergamena: «A, ma senza il bordo nero dietro,
+la scritta Expedition Report è poco visibile, la scritta Close Report nn è
+centrata, le scritte al centro sembrano incollate e c'è un rettangolo strano».
+
+Root cause + fix (bug registrato `INV:hudreal-victory-reward.INV-7`,
+`source: director-bug`, Mode A red-first):
+1. **Bordo nero** = velo radiale `.75` + `drop-shadow(.78)` → `.52` + `.45`.
+2. **Titolo illeggibile** = ink `#16241f` su cartiglio teal scuro → `#ecdcae`
+   + incisione scura.
+3. **CTA bassa** = copia ~10px sotto il centro ottico della placca →
+   `translateY(-1.4cqh)` sul testo (zone già centrata sul campo dipinto).
+4. **Centro incollato** = label↔righe gap 0 → zone nudge (label −8px, righe
+   +10/−18px) + gap echoes `0.4`→`1cqh`.
+5. **Rettangolo strano** = streak `::before` del bottone-base `.skin-scope`:
+   su row `all:unset` il pseudo assoluto risolve contro la zona scroll
+   posizionata → fascia chiara 45%h. Esentato via
+   `.skin-scope [data-victory-report] button::before` (convenzione
+   `data-belt-rows`), utile anche a CTA/X.
+
+Pattern riusabile: `all:unset` rende un bottone `position:static`, quindi i
+suoi `::before/::after` assoluti si ancorano all'antenato posizionato più
+vicino — sotto `.skin-scope` i bottoni "non-bottoni" vanno esentati dal
+materiale base (streak/hover) via attributo di scope.
+
+## 2026-11-21b — Victory/Reward: medaglione anchor dentro l'anello dipinto (INV-8)
+
+«Il medaglione è troppo grande» — il C1 ornato (156px + crescent) copriva
+l'anello dipinto sottile (~140px, centro ~226,412) che nel golden è il
+*holder* vuoto previsto per il ritratto. Fix: il ritratto anchor è un disco
+118px dentro l'anello dipinto (`getMedalPortraitUrl` + borderRadius 50%);
+la variante `panel` (dev-only, niente anello dipinto) conserva il C1 ring.
+INV:hudreal-victory-reward.INV-8 — test rosso lockato → fix → 8/8 verdi.
+
+### Annotazione Director — il «rettangolo nero» è il drop-shadow (R-357, INV-7)
+
+Su richiesta dell'agente è stato fornito uno strumento di annotazione
+(`.mw/runs/20261121-victory-fix/annotate-report.html`, servito su :8791):
+il Director ha disegnato 23 rettangoli che tracciano il PERIMETRO completo
+della pergamena — una fascia nera su tutti e 4 i lati. Root cause: il
+`filter: drop-shadow` sullo shell — l'img frame.webp è un rettangolo opaco
+senza alpha, quindi l'ombra è un rettangolo nero sfumato; la riduzione
+`.78→.45` non bastava perché il problema è la FORMA (rettangolare), non
+l'intensità. Fix: `filter` rimosso del tutto — i bordi dipinti portano già
+la propria ombreggiatura e il velo dà la separazione dalla mappa.
+Implicazione riusabile: su frame baked rettangolari niente drop-shadow CSS —
+solo ombre cotte nell'art o asset con alpha reale.
+
+## 2026-11-21c — PLAN-131: advisory Claude sui charter, rulings Director
+
+Review esterna di Claude (briefing `.mw/runs/20261121-plan131-charters/briefing-claude.md`):
+segnalata incoerenza reale — la scala `ornamentLevel` era descritta invertita
+nel briefing (I sobrio / III cerimoniale) vs il canonico PLAN-131 §2
+(I monumentale · II prezioso · III funzionale, radice: ruling v4 sui
+«3 livelli di ricchezza»). Briefing corretto; schema e signoff erano già
+allineati al canonico.
+
+Ratifiche Director 2026-11-21:
+- **Re-verify `director-verified` a trigger, non a scadenza** — ratificato:
+  la verifica resta valida finché non cambia il contesto attorno (palette
+  condivisa, nav, top-chrome, composizione schermata) o su richiesta
+  esplicita; agganciato alla harmony review PLAN-128, niente decay temporale.
+- **Reward concreto VISIBILE** — ruling rivisto (post-advisory Pillar 4):
+  il reward si mostra nel blocco, sotto la % di vittoria, presentato «bene»;
+  il tooltip resta per il dettaglio, non porta il valore principale.
+- **Pair-comparison nel battesimo** — adottato come pratica: quando un ruling
+  apre un visual-fork la review mostra attuale + alternativa, non solo il
+  witness corrente; non obbligatorio per difetti evidenti.
+- **`rejected` (campo charter per soluzioni provate e scartate)** —
+  RATIFICATO e implementato: `rejectedSchema` {item, reason, ruling}
+  con ruling obbligatorio (gate schema + test); seed nel cassetto:
+  lacca-petrolio (→nero-teal) ed edge-tab (→resta chiuso).
+- **`pairsWith`** — non aggiunto: nessun consumer, la relazione emerge dalla
+  harmony review. **«un solo I per schermata»** — regola di composizione da
+  harmony review, non gate meccanico.
+
+## 2026-11-22 — Cassetto V3: implementati i rulings OB-7
+
+Applicati a `HudRealCassettoV2` i rulings del charter-review (conferma occhio
+Director pendente su ogni voce — openIssue del charter aggiornati con ref
+«IMPLEMENTATO V3»):
+
+- **Asse condiviso 530→560** (app-2 «vicini al frame sx, vuoto dx»):
+  padL 120→148, padR 85→52 — l'asse si ancora alla card smaltata PERCEPITA
+  (il campo visibile parte ~u120 dopo il fade-in), non a quella geometrica.
+  Amend contratto `cassetto-v2-cta-panel-centre` + `well-clearance`.
+- **Pozzi verso nero-teal** (app-1 «troppo nero»): glow verde allargato
+  0–30%/70–100%, core liftato a nero-teal (#04222b/#01141c/#03302a).
+- **Risk/reward** (app-5 + ruling rivisto): label RISK/REWARD rimosse; % sopra
+  la scala lit/dimmed e allineate; reward 5 forzieri via `rewardLevel`
+  (POI `tier` authored: main=5, normal=3 — mapping nuovo, ruling da confermare);
+  reward concreto visibile in chips orlate sotto la % vittoria (Pillar 4);
+  tooltip per dettaglio. Nuovo INV `cassetto-v2-reward-visible`.
+- **Scroller party** (app-7): seat 230→205u, peek 105→80u — frame e journey
+  intatti.
+- **Motivo CTA visibile** (iss-a): band sopra la placca — riallinea V2
+  all'INV-2 (lo sr-only era divergenza dal contratto, non la regola).
+- **Disabled −40% sat** (iss-c/α): `enamelDisabled` saturate .72→.43.
+
+Non toccati per ruling: HudScrollBandX (iss-d aperto), spessore cornice
+(app-3 openExploration — serve variante d'asset, non un tweak di costante),
+vignetta per-quest (β: `quest.vignette` già live via coverArt; arte dedicata
+resta openIssue di pipeline). Witness: `.mw/runs/20261122-cassetto-v3-ob7/`
+(`/hud-compose?comp=cassetto&poi=poi-goblin&risk=3&pcts=28,74&reward=4`,
+headless, zero pageErrors).
+
+## 2026-11-22 — Cassetto: rimozione fold chip `›` (amend expedition-drawer.INV-1/3/5 + cassetto-slide-lateral)
+- **Ruling Director** (screenshot, «c'è una specie di freccia › — eliminala»): il collapse chip sul bordo sinistro della colonna e il chip ripiegato sul bordo destro sono rimossi. Sigilla OB-7 γ «il cassetto resta chiuso senza tab»: UNA sola forma — colonna espansa con quest, assente senza. Chiusura solo via `onClose` dell'adapter.
+- **Amend**: `.mw/contracts/components/expedition-drawer.md` INV-1/INV-3/INV-5 + `hud-real-cassetto.md` `cassetto-slide-lateral` (slide-out era coreografia del fold → rimosso). Test r339ExpeditionDrawer/r357DrawerSlide riscritti: `useExpeditionDrawer` resta vestigiale, il drawer non lo legge.
+- **Viaggi**: `journey-bar.webp` → `journey-pill.webp` (asset ornamentale battezzato nel mockup), centri segmento ri-misurati 17.4/52/82%.
+- **Review page**: witness `v2-*` stale → `v3-*` rigenerati post-ruling.
+
+## 2026-11-22 — Cassetto: motivo CTA NON dipinto (supera OB-7 iss-a «motivo-visibile»)
+- **Ruling Director** («togli le scritte party incomplete ecc.» sul witness V3): la frase di motivo del CTA disabilitato NON va dipinta — il band sopra la placca resta pulito. Il motivo resta nel DOM `sr-only` e via `aria-describedby` (screen reader). **Supera il ruling OB-7 iss-a «motivo-visibile»** e riallinea il contratto V2 (`states.disabled`: «motivo sr-only, NON dipinto») — il render visibile di ieri era drift, oggi risolto per ruling.
+- `rejected` charter: «motivo CTA dipinto in band sopra la placca» — provato, visto, scartato.
+
+## 2026-11-22 — Victory: il «rettangolo nero» era il margine dipinto del webp (INV-7, chiusura)
+
+Dopo la rimozione del `drop-shadow` (entry 2026-11-21b) il profilo pixel ha
+mostrato che la fascia nera persistente (lum 13-18, identica pre/post fix)
+era **dentro** il rettangolo dell'immagine: `frame.webp` è RGB opaco e porta
+~50-70px di margine quasi-nero dipinto attorno ai bordi sfrangiati — il
+"rettangolo" dei 23 rect annotati dal Director. Primo fix via `mask-image`
+a 4 gradienti — **respinto** («è rimasta un'ombra, hai mandato in alfa una
+parte»): la sfumatura alleggeriva il bordo ma lasciava l'ombra e mangiava
+contenuto. Fix definitivo: **flood-cut dell'asset** — px border-connected
+con lum<45 & sat<30 → alpha 0 (160k px, 20%); la silhouette strappata è il
+bordo vero, la mappa corre fino allo strappo, zero alpha nel contenuto.
+Backup pre-cut `.mw/runs/20261121-victory-fix/frame-backup-precut.webp`.
+Test INV-7 esteso, 8/8 verdi. Witness finale
+`.mw/runs/20261121-victory-fix/parchment-alphacut2/` — run reale, 0 errori.
+Pattern gemello di T-33 (cassetto): *qualsiasi bordo rettilineo che
+attraversa una scena organica viene ricostruito come rettangolo* — qui
+persino il bordo dell'asset stesso.
+Nota ops: il reaper MW (`mw-reap`) uccideva dev server (L3-orphan) e il
+chromium headless (L6-browser-hog) a metà witness — dev server ora lanciato
+via `mw-run --lease 2h --port 5173`, browser root adottato via `mw-adopt`.
+
+## 2026-11-22 — Cassetto: campo esterno NERO battezzato
+- **Ruling Director** («prova a mettere lo sfondo nero invece che verde — non dentro i frame interni, solo dentro quello esterno» → **«battezzo»**): il campo smaltato della colonna passa a velo nero ~86% sul marmo (`rgba(3,5,5,.86)` + fallback `#060807`). I frame interni (pozzi, cartouche, journey, placca) mantengono i loro fill — la traslucenza scurisce sul nero senza toccare le ricette. Effetto letto nel witness: «cornice oro su velluto nero con cammei verdi». Registrato in `appreciated` del charter; il fork non era pinnato da nessun INV, nessun amend richiesto.
+
+## 2026-11-22 — Victory/Reward: BATTEZZO del report finale (R-357, Fase 7d chiusa)
+
+«battezzo» — il Director approva lo stato live della pergamena dopo il
+fix-pass completo (INV-7 + INV-8): drop-shadow rimosso, margine nero del
+webp flood-cut ad alpha (silhouette strappata vera — seconda iterazione
+dopo il mask-feather respinto), titolo/CTA/spaziatura/ritratto-a-disco,
+band a smalto condivisa. Artefatto registrato:
+`.mw/specs/hud-real/refs/approved-victory-pergamena-live.png` (witness
+headless run reale, da `.mw/runs/20261121-victory-fix/parchment-alphacut2/`),
+entry in REGISTERED.md. PLAN-125 Fase 7d (N=3 PLAN-127) → completata.

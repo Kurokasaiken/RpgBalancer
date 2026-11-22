@@ -33,12 +33,39 @@ const RUN_DEADLINE_MS = Number(process.env.DEADLINE_MS ?? 600_000);
 fs.mkdirSync(OUT, { recursive: true });
 const log = (...a) => console.log(`[vfork:${TAG}]`, ...a);
 
-const browser = await chromium.launch({ headless: true, args: ['--enable-unsafe-swiftshader'] });
-const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
-const page = await context.newPage();
+let browser = await chromium.launch({ headless: true, args: ['--enable-unsafe-swiftshader'] });
+let context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+let page = await context.newPage();
 const errors = [];
-page.on('pageerror', (e) => errors.push(String(e)));
-page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
+const attach = (p) => {
+  p.on('pageerror', (e) => errors.push(String(e)));
+  p.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
+  p.on('close', () => log('page CLOSED'));
+  p.on('crash', () => log('page CRASHED'));
+};
+attach(page);
+browser.on('disconnected', () => log('browser DISCONNECTED'));
+
+/* The settlement commit at run-end keeps killing the page target (reload /
+ * renderer death under the shared-server edit storm). Reopen levels: page →
+ * context → full browser relaunch; the ended run is persisted so the report
+ * remounts by itself on a fresh load. */
+const reopenPage = async () => {
+  for (const lvl of ['page', 'context', 'browser']) {
+    try {
+      if (lvl === 'page') { page = await context.newPage(); }
+      else if (lvl === 'context') { context = await browser.newContext({ viewport: { width: 1440, height: 900 } }); page = await context.newPage(); }
+      else { browser = await chromium.launch({ headless: true, args: ['--enable-unsafe-swiftshader'] }); context = await browser.newContext({ viewport: { width: 1440, height: 900 } }); page = await context.newPage(); }
+      attach(page);
+      await page.goto(URL_ARG, { waitUntil: 'domcontentloaded', timeout: 90_000 });
+      await waitHook().catch(() => {});
+      await waitReady();
+      log(`reopened at level ${lvl}`);
+      return true;
+    } catch (e) { log(`reopen ${lvl} failed:`, String(e).slice(0, 90)); }
+  }
+  return false;
+};
 
 const waitHook = () =>
   page.waitForFunction((pid) => Boolean(window.__idleVillageTestHooks?.expedition?.[pid]), POI, { timeout: 90_000 });
@@ -110,10 +137,25 @@ for (let attempt = 1; attempt <= MAX_ATTEMPTS && !captured; attempt++) {
 
   const deadline = Date.now() + RUN_DEADLINE_MS;
   let ended = null, lastLog = 0, lastSig = '', stuckSince = Date.now(), lastTick = 0;
+  const dead = (e) => /Target closed|Target page|has been closed|disconnected|browser has been closed/i.test(String(e));
   while (Date.now() < deadline) {
-    const run = await getRun();
-    if (!run) break;
+    let run = null;
+    try {
+      run = await getRun();
+    } catch (e) {
+      if (!dead(e)) throw e;
+      log('drive loop: target died — reopening');
+      if (!(await reopenPage())) break;
+      continue;
+    }
+    if (!run) {
+      /* getRun returned null only when the page is gone in a way ev() could
+       * not recover from — reopen once and let the persisted run resume. */
+      if (!(await reopenPage())) break;
+      continue;
+    }
     if (run.ended) { ended = run; break; }
+    try {
     const sig = `${run.nodeId}|${run.frontierStatus}|${run.combatTurn}|${run.goblinLeft}`;
     if (sig !== lastSig) { lastSig = sig; stuckSince = Date.now(); log('→', sig); }
     if (Date.now() - lastLog > 20000) {
@@ -195,34 +237,56 @@ for (let attempt = 1; attempt <= MAX_ATTEMPTS && !captured; attempt++) {
     lastTick = now;
     await ev(() => window.__idleVillageTestHooks.advanceTicks?.(60));
     await page.waitForTimeout(120);
+    } catch (e) {
+      if (!dead(e)) throw e;
+      log('drive body: target died — reopening');
+      if (!(await reopenPage())) break;
+    }
   }
 
-  if (!ended) { log('run deadline hit'); await shot(`${TAG}-deadline-attempt${attempt}.png`); break; }
+  if (!ended) { log('run deadline hit'); await shot(`${TAG}-deadline-attempt${attempt}.png`).catch(() => {}); break; }
   log(`run ended: ${ended.outcome} | party: ${JSON.stringify(ended.party)}`);
 
   /* The staged beat reveal keeps playing inside the run window
    *  (`rewardVisible` gates on !questPresenting) — click every beat through,
-   *  then close via the window's own close-report. */
-  for (let i = 0; i < 30; i++) {
-    if (await vis('[data-testid="quest-window-close-report"]')) break;
-    if (await vis('[data-testid="quest-window-beat"]')) {
-      await page.locator('[data-testid="quest-window-beat"]').first().click().catch(() => {});
-    } else {
-      await page.locator('[data-testid="quest-window"]').first().click({ position: { x: 10, y: 10 } }).catch(() => {});
+   *  then close via the window's own close-report. The page target keeps
+   *  dying right at run end: on Target-closed reopen and let the persisted
+   *  ended run remount the report (quest panel stays closed after reload). */
+  let popupUp = false, popup = null;
+  try {
+    for (let i = 0; i < 30; i++) {
+      if (await vis('[data-testid="quest-window-close-report"]')) break;
+      if (await vis('[data-testid="quest-window-beat"]')) {
+        await page.locator('[data-testid="quest-window-beat"]').first().click().catch(() => {});
+      } else {
+        await page.locator('[data-testid="quest-window"]').first().click({ position: { x: 10, y: 10 } }).catch(() => {});
+      }
+      await page.waitForTimeout(350);
     }
-    await page.waitForTimeout(350);
+    await clickIf('[data-testid="quest-outcome-toast"]');
+    await page.waitForTimeout(300);
+    await clickIf('[data-testid="quest-window-close-report"]');
+    await page.waitForTimeout(800);
+    popup = page.locator('[data-testid="hudreal-victory-reward"]').first();
+    popupUp = await popup.waitFor({ state: 'visible', timeout: 15_000 }).then(() => true).catch(() => false);
+  } catch (e) {
+    log('post-end page died:', String(e).slice(0, 90));
   }
-  await clickIf('[data-testid="quest-outcome-toast"]');
-  await page.waitForTimeout(300);
-  await clickIf('[data-testid="quest-window-close-report"]');
-  await page.waitForTimeout(800);
-
-  const popup = page.locator('[data-testid="hudreal-victory-reward"]').first();
-  const popupUp = await popup.waitFor({ state: 'visible', timeout: 15_000 }).then(() => true).catch(() => false);
+  if (!popupUp) {
+    log('reopening — expecting the persisted ended run to remount the report');
+    if (await reopenPage()) {
+      popup = page.locator('[data-testid="hudreal-victory-reward"]').first();
+      popupUp = await popup.waitFor({ state: 'visible', timeout: 30_000 }).then(() => true).catch(() => false);
+    }
+  }
   log('hudreal-victory-reward visible:', popupUp,
     '| variant:', await ev(() => document.querySelector('[data-testid="hudreal-victory-reward"]')?.getAttribute('data-victory-variant')));
 
   if (popupUp) {
+    /* immediate shot: the settlement commit reboots the Pixi map and the
+     *  GameBootScreen veil covers the viewport for a while — capture the
+     *  report before (and again after) that veil lifts. */
+    await shot(`${TAG}-early.png`);
     /* hurry the staged reveal — a click on the report shell advances. */
     for (let i = 0; i < 16; i++) {
       if (await vis('[data-testid="quest-reward-collect"]')) break;
@@ -230,6 +294,8 @@ for (let attempt = 1; attempt <= MAX_ATTEMPTS && !captured; attempt++) {
       await page.waitForTimeout(350);
     }
     await page.getByTestId('quest-reward-collect').waitFor({ state: 'visible', timeout: 15_000 }).catch(() => {});
+    /* wait the boot veil out (detached resolves at once when it never came). */
+    await page.locator('[data-testid="game-boot-screen"]').waitFor({ state: 'detached', timeout: 60_000 }).catch(() => {});
     /* Park the mouse on the bare veil so no crew tooltip is open in the shot
      *  (the last DOM click leaves it wherever the close-report button was). */
     await page.mouse.move(30, 870);

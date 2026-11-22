@@ -73,6 +73,7 @@ const renderPanel = (config: VillageStashConfig = CFG) =>
   render(<VillageStashPanel config={config} left={0} top={0} widthPx={320} zIndex={12} onClose={() => {}} />);
 
 describe('T3-S2 — expeditionFoodCost (config-driven consequence preview)', () => {
+  // INV:expedition-bag-assign.INV-2 — same per-resident daily rate the TimeEngine charges; malformed input → 0.
   it('is partySize × days × the per-resident daily rate, ceiled', () => {
     expect(expeditionFoodCost(3, 4, 1)).toBe(12);
     expect(expeditionFoodCost(2, 5, 0.5)).toBe(5);
@@ -87,6 +88,8 @@ describe('T3-S2 — expeditionFoodCost (config-driven consequence preview)', () 
 });
 
 describe('T3-S2 — bagAssignEligibility mirrors the ledger reject reasons', () => {
+  // INV:expedition-bag-assign.INV-1 — eligibility mirrors the sparse-ledger rejects (alreadyInBag/bagFull),
+  // fixed positions; read-only derivation, never a second authority.
   it('a missing or empty bag leaves every row eligible up to bagSlots', () => {
     expect(bagAssignEligibility(undefined, 'quest_consumable_corda', 3)).toBe('eligible');
     expect(bagAssignEligibility([null, null, null], 'quest_consumable_corda', 3)).toBe('eligible');

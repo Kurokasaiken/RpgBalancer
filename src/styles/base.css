@@ -1,7 +1,7 @@
 @layer base {
   :root {
     /* Config-first theme tokens (Epic Frontier defaults) */
-    --font-header: 'Cinzel', serif;
+    --font-header: 'Marcellus', serif;
     --font-body: 'Crimson Text', serif;
     --surface-base: #0d0f12;
     --surface-panel: rgba(11, 13, 18, 0.95);

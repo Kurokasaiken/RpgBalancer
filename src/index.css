@@ -36,6 +36,38 @@
   src: url("/fonts/cinzel-latin-wght-normal.woff2") format("woff2");
 }
 
+/* PLAN-125 D-4 (Director ruling 2026-11-21, prova «A inciso»): HUD display
+   = Marcellus, HUD serif = Cardo. Latin subsets, self-hosted like the faces
+   above — no runtime network dependency. */
+@font-face {
+  font-family: "Marcellus";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/marcellus-latin-400-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Cardo";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/cardo-latin-400-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Cardo";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/cardo-latin-700-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Cardo";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/cardo-latin-400-italic.woff2") format("woff2");
+}
+
 
   @layer base {
     :root {

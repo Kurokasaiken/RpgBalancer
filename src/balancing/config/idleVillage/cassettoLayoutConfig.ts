@@ -156,22 +156,12 @@ export const cassettoLayoutSchema = z
         time: z.number().positive(),
         resources: z.number().positive(),
       }),
-      /** R-352: the left cap is ONE flipped slice of the same bar — the
-       *  Director picked the exact rect in the cap-mirror lab (design px):
-       *  source `srcX..srcX+w` at `srcY` (h tall) on the signed 360×62 art,
-       *  drawn horizontally flipped at `destX`,`destY` on the left edge. */
-      resCapMirror: z.object({
-        srcX: z.number().nonnegative(),
-        srcY: z.number().nonnegative(),
-        w: z.number().positive(),
-        h: z.number().positive(),
-        destX: z.number().nonnegative(),
-        destY: z.number().nonnegative(),
-        /** How much of the pick shows on the left edge — the cap "seat",
-         *  matched to the right cap's ornament width so the bar reads
-         *  specular end-to-end (Director ruling: same seat both sides). */
-        seatPx: z.number().positive(),
-      }),
+      /** R-376-bis (Director ruling 2026-11-21 sera — «sembra troppo piccolo
+       *  in proporzione al componente tempo… ingradiscilo in proporzione»):
+       *  multiplier on the capsule-pair ratio; at 1.2 the bar lands ~420×68.6,
+       *  width ≈ the banner's. */
+      resourcesBoost: z.number().positive().max(2),
+
     }),
   })
   .strict();
@@ -204,13 +194,12 @@ const RAW_CASSETTO_LAYOUT_CONFIG: CassettoLayoutConfig = {
     bannerMarginPx: 40,
     chronicleReservePx: 360,
     minFitScale: 0.55,
-    /* Measured on the signed `bar-slim.webp` art (solid-band rows): time
-     * 105/2 = 52.5, resources 112/2 = 56.0 — resources scales by 0.9375. */
-    capsulePx: { time: 52.5, resources: 56.0 },
-    /* Cap-mirror lab pick (Director, R-352): the last 61 design px of the
-     *  bar (asset px x=596, w=122, y=5, h=114 on the 720×124 art) flipped
-     *  onto the left edge at x=1.5 — one specular cap, medallion covered. */
-    resCapMirror: { srcX: 298, srcY: 2.5, w: 61, h: 57, destX: 1.5, destY: 2.5, seatPx: 38 },
+    /* Measured on the signed `bar-slim.webp` art (opaque band height at
+     *  interior columns): time 105/2 = 52.5, resources 114/2 = 57.0 (R-376
+     *  pointed-cap bar) — resources scales by ~0.921. */
+    capsulePx: { time: 52.5, resources: 57.0 },
+    /* R-376-bis: 1.2 × (52.5/57) ≈ 1.105 → barra ~419×68.5 a fit 1. */
+    resourcesBoost: 1.2,
   },
 };
 

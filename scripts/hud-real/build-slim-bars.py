@@ -4,10 +4,9 @@
 Surgery on the already-approved assets (vivid pre-G2-4 palette restored by Director ruling):
 
   - slot/socket band kept at native size; ornament bands squashed to thin trim;
-  - LEFT CLOSURE IS A UNIT: for resources the caged-gem medallion + end-cap frame + hanging
-    teardrop pendant are kept whole (Director: the pendant hangs UNDER the component, the cage
-    must be big enough to close the bar's end). The cluster is scaled uniformly and overlaid on
-    the pill's left end like the original bar does;
+  - RESOURCES (R-376, Director 2026-11-21): the regenerated pointed-cap bar is natively
+    specular (no medallion/pendant) — the slim is one proportional resize to the signed
+    top-row height; time keeps its own medallion dial overlaid on the pill's left end;
   - the pill is stretched horizontally to the signed slot width.
 
 Outputs per bar: `bar-slim.webp` (2x) + `bar-slim-geometry.json` + a generated `*Geometry.ts`.
@@ -112,38 +111,30 @@ def emit(name, img, slots, out_dir, ts_path, field=None, note=''):
 
 
 def build_resources():
+    # R-376 (Director 2026-11-21): the regenerated bar is natively specular —
+    # pointed leaf caps with emeralds at BOTH ends, no medallion/cage/pendant.
+    # The slim is ONE proportional resize to the signed top-row height: the
+    # stadium slot band keeps its shape (no cluster surgery, no band squash).
     im = cv2.imread(f'{ROOT}/public/assets/ui/hud-real/resources/bar.webp', cv2.IMREAD_UNCHANGED)
-    # LEFT CLUSTER = caged-gem medallion + end-cap filigree + teardrop pendant (x<220 covers it all).
-    # Kept whole and scaled uniformly — the cage closes the bar's left end, the pendant hangs below it.
-    cluster = im[:, :220]
-    cluster2 = cv2.resize(cluster, (int(cluster.shape[1] * 124 / cluster.shape[0]), 124), interpolation=cv2.INTER_AREA)
-    # pill body: slot band native, ornament bands squashed (cut AFTER the end-cap, inside slot 1's left frame)
-    pill = im[:180, 208:]
-    slim, _ = squash_bands(pill, 40, 138, 10)
-    H = 124                                     # the cluster's medallion sets the bar height (62 CSS px)
-    W = 720                                     # 360 CSS px x2
-    out = np.zeros((H, W, 4), np.uint8)
-    # strip's own end-cap is covered by the cluster: lay the strip so slot 1 keeps ~10px of pill margin
-    px = cluster2.shape[1] - 12
-    pill2 = cv2.resize(slim, (W - px, 116), interpolation=cv2.INTER_AREA)
-    out[4:4 + 116, px:] = np.where(pill2[..., 3:4] > 0, pill2, out[4:4 + 116, px:])
-    over(out, cluster2, 0, 0)                   # cluster on top, medallion wraps the left end
+    H = 124                                     # signed top-row height (62 CSS px x2)
+    W = round(im.shape[1] * H / im.shape[0])
+    # Slots come from the signed full-bar geometry (design px) scaled by the
+    # resize factor — on this art the deep emerald reads as dark as the glass,
+    # so the component detector bridges the rims and merges the slots.
+    geo = json.load(open(f'{ROOT}/public/assets/ui/hud-real/resources/bar-geometry.json'))
+    k = W / geo['asset2x'][0]
+    out = cv2.resize(im, (W, H), interpolation=cv2.INTER_AREA)
     out = match_gold(out)
+    # save_webp crops to the ink bbox — shift the slot origins by the same crop.
+    ys, xs = np.where(out[..., 3] > 8)
+    ox, oy = int(xs.min()), int(ys.min())
+    slots = [{kk: round(v * 2 * k, 2) for kk, v in s.items()} for s in geo['slots']]
+    slots = [dict(s, x=round(s['x'] - ox, 2), y=round(s['y'] - oy, 2)) for s in slots]
     out = save_webp(out, f'{ROOT}/public/assets/ui/hud-real/resources/bar-slim.webp')
-    slots = dark_slots(out, 3)
-    # the detector merges the cluster's dark gem with slot 1: clip slot 1 to start at the cluster's
-    # right ink edge (measured on the saved asset at the slot's mid-row)
-    midy = slots[0]['y'] + slots[0]['h'] // 2
-    row = out[midy, :, 3]
-    xs = np.where((row > 8) & (np.arange(out.shape[1]) < cluster2.shape[1]))[0]
-    if len(xs):
-        edge0 = slots[0]['x'] + slots[0]['w']
-        slots[0]['x'] = int(xs.max()) + 1
-        slots[0]['w'] = edge0 - slots[0]['x']
     emit('resources', out, slots,
          f'{ROOT}/public/assets/ui/hud-real/resources',
          f'{ROOT}/src/ui/idleVillage/hudReal/resourcesSlimGeometry.ts',
-         note='; left cluster kept whole (cage + pendant), squashed ornament bands')
+         note='; symmetric pointed-cap bar, proportional resize (R-376)')
 
 
 def build_time():

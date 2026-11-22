@@ -23,14 +23,14 @@ const mount = (q: Partial<CassettoQuest> = {}) => render(<div style={{ width: 42
 
 describe('R-357 cassetto legibility floor', () => {
   // INV:cassetto-captions-min-size — R-357 2i/2h
-  it('journey sub-labels and total are floored (risk/reward captions are gone) at the minimum px', () => {
+  it('journey sub-labels, total and the risk/reward labels are floored at the minimum px', () => {
     mount();
     const floor = `max(${CASSETTO_MIN_LABEL_PX}px`;
     for (const text of ['Outbound', 'At site', 'Return']) expect(screen.getByText(text).getAttribute('style')).toContain(floor);
     expect(screen.getByText('gameFrame.cassetto.journeyTotal:4').getAttribute('style')).toContain(floor);
-    // R-357 (Director 2026-11-20): «Risk»/«Reward» are no longer written — they stay as accessible names on the two groups.
-    expect(screen.queryByText((c) => c.startsWith('gameFrame.cassetto.risk:'))).not.toBeInTheDocument();
-    expect(screen.queryByText((c) => c.startsWith('gameFrame.cassetto.reward:'))).not.toBeInTheDocument();
+    // Director 2026-11-21 (v3 mockup) amends the 2026-11-20 «captions gone» ruling: «Risk» / «Reward» ARE written again, floored like the rest.
+    expect(screen.getByTestId('cassetto-risk-label').getAttribute('style')).toContain(floor);
+    expect(screen.getByTestId('cassetto-reward-label').getAttribute('style')).toContain(floor);
     expect(screen.getByTestId('cassetto-risk-value')).toHaveAttribute('aria-label');
   });
 
@@ -55,6 +55,19 @@ describe('R-357 cassetto legibility floor', () => {
     expect(screen.getByTestId('cassetto-risk-value').getAttribute('aria-label')).toContain('High');
     expect(document.querySelectorAll('[data-skull="on"]')).toHaveLength(3);
     expect(document.querySelectorAll('[data-skull="off"]')).toHaveLength(1);
+  });
+
+  // INV:cassetto-risk-reward-wells — Director 2026-11-21 (v3 mockup; amends «captions gone» of 2026-11-20): risk and reward are TWO
+  // wells, each with its written label («Risk», «Reward»); the % and the skulls/rewards still render inside them.
+  it('paints Risk and Reward as two labelled wells with the skulls and the rewards inside', () => {
+    mount();
+    const risk = screen.getByTestId('cassetto-risk-well');
+    const reward = screen.getByTestId('cassetto-reward-well');
+    expect(risk).not.toBe(reward);
+    expect(screen.getByTestId('cassetto-risk-label')).toHaveTextContent('gameFrame.cassetto.risk');
+    expect(screen.getByTestId('cassetto-reward-label')).toHaveTextContent('gameFrame.cassetto.reward');
+    expect(risk.contains(screen.getByTestId('cassetto-risk-value'))).toBe(true);
+    expect(reward.querySelector('[role="group"]')).not.toBeNull();
   });
 
   // INV:cassetto-no-block-titles — R-357: PARTY SLOTS / SUPPLIES / JOURNEY / RISK & REWARDS are not written (space goes to the slots)

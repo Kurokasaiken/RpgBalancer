@@ -66,17 +66,20 @@ invariants:
       - tests/unit/idleVillage/r339TopChrome.test.tsx
   - id: game-top-chrome.INV-6
     source: director-spec
-    source_ref: R-352
+    source_ref: R-376
     statement: >-
-      La resource bar è speculare da capo a capo, con sedi capo SIMMETRICHE, e pareggiata in altezza
-      di capsula (R-352, ruling Director): il cap sinistro è UN solo pezzo capovolto — la fetta di
-      coda `topChrome.resCapMirror` (rettangolo scelto dal Director nel cap-mirror lab sull'arte
-      firmata `bar-slim.webp`) disegnata orizzontalmente flippata sul bordo sinistro, tagliata a
-      `resCapMirror.seatPx` così la sede sinistra eguaglia quella destra (~ornamento+bezel); arte e
-      slot scorrono a sinistra sotto il cap (`RES_SHIFT = seatPx − slots[0].x`, medaglione tagliato
-      dal clip interno, non solo coperto) — e la barra renderizza scalata di
-      `topChrome.capsulePx.time / topChrome.capsulePx.resources` così la sua banda parallela
-      pareggia quella del banner (orpelli esclusi dalla misura).
+      La resource bar è speculare da capo a capo PER ARTE NATIVA e scalata in proporzione
+      al banner (R-376, rulings Director 2026-11-21 — mockup stadium: capi a punta
+      foglia-oro con smeraldi su entrambe le estremità, niente medaglione/pendente;
+      R-376-bis «troppo piccolo in proporzione al componente tempo» → «ingradiscilo in
+      proporzione»): la slim art rigenerata `bar-slim.webp` ha sedi capo simmetriche per
+      costruzione e la barra renderizza scalata di `(capsulePx.time /
+      capsulePx.resources) × topChrome.resourcesBoost` — la capsula pareggia quella del
+      banner (orpelli esclusi dalla misura) e il boost la ingrandisce fino a ~larghezza
+      banner; il testo dei chip scala col boost e non scende mai sotto il px firmato.
+      L'hack R-352 `resCapMirror` (fetta di coda flippata + clip interno + config
+      `topChrome.resCapMirror`) è RITIRATO: nessun overlay, nessun clip, nessun shift
+      dell'arte.
     test_refs:
       - tests/unit/idleVillage/r339TopChrome.test.tsx
 ---
