@@ -25,6 +25,13 @@ import { homedir } from 'node:os';
 import { canShutdown, type ShutdownDecision } from './canShutdown.js';
 import { findActiveWorkProcesses } from './knownProcesses.js';
 import { getUserIdleMs } from './getUserIdleMs.js';
+import {
+  decideMediaGate,
+  getMediaPlayback,
+  MEDIA_GUARD_DEFAULTS,
+  notifyShutdownGrace,
+  type MediaGrace,
+} from './mediaGuard.js';
 import { executeShutdown } from './shutdownExecutor.js';
 import { backupProjectTree } from './preShutdownBackup.js';
 import {
@@ -41,6 +48,9 @@ const LOG_FILE = path.join(process.cwd(), 'test-results', 'shutdown-manager.log'
 /** Project dirs that get a pre-shutdown commit+push (opt-in backup). */
 const BACKUP_DIRS = [process.cwd()];
 
+/** Pending media-guard grace window, kept across poll cycles. */
+let mediaGrace: MediaGrace | null = null;
+
 async function logLine(line: string): Promise<void> {
   const stamped = `[${new Date().toISOString()}] ${line}`;
   console.log(stamped);
@@ -55,9 +65,10 @@ async function logLine(line: string): Promise<void> {
 /**
  * Runs one evaluation cycle: registry → recovery → idle → decision.
  *
+ * @param options - `notify: false` suppresses the grace banner (diagnostics).
  * @returns The decision taken this cycle.
  */
-export async function evaluateOnce(): Promise<ShutdownDecision> {
+export async function evaluateOnce(options: { notify?: boolean } = {}): Promise<ShutdownDecision> {
   const registryPath = getRegistryFilePath();
   let registry;
   try {
@@ -102,6 +113,38 @@ export async function evaluateOnce(): Promise<ShutdownDecision> {
     );
   }
 
+  /* Media guard (Director ruling 2026-11-22, R-377): playing audio/video
+   * vetoes an allowed shutdown while idle stays below
+   * `policy.mediaGuard.vetoMaxIdleSeconds`; past the cap a grace window
+   * probes for user input — the "asleep with video running" case. */
+  if (decision.allowed && registry.policy.mediaGuard?.enabled !== false) {
+    const probe = await getMediaPlayback();
+    if (probe.playing && typeof decision.userIdleMs === 'number') {
+      const config = registry.policy.mediaGuard ?? MEDIA_GUARD_DEFAULTS;
+      const gate = decideMediaGate({
+        playing: probe.playing,
+        sources: probe.sources,
+        idleMs: decision.userIdleMs,
+        grace: mediaGrace,
+        nowMs: Date.now(),
+        config,
+      });
+      mediaGrace = gate.grace;
+      if (gate.notify) {
+        await logLine(`media grace notification posted (${config.gracePeriodSeconds}s probe)`);
+        if (options.notify !== false) {
+          await notifyShutdownGrace(config.gracePeriodSeconds);
+        }
+      }
+      decision.allowed = gate.allowed;
+      decision.reason = gate.reason;
+    } else {
+      mediaGrace = null;
+    }
+  } else {
+    mediaGrace = null;
+  }
+
   await logLine(
     `decision: ${decision.allowed ? 'ALLOWED' : 'BLOCKED'} — ${decision.reason}` +
       (decision.blockers.length ? ` | blockers=${JSON.stringify(decision.blockers)}` : ''),
@@ -124,12 +167,15 @@ async function actOnDecision(decision: ShutdownDecision): Promise<void> {
 }
 
 async function status(): Promise<void> {
-  const decision = await evaluateOnce();
+  const decision = await evaluateOnce({ notify: false });
   const registry = await readRegistry(getRegistryFilePath()).catch(() => null);
+  const media = await getMediaPlayback();
   console.log('\n=== shutdown:status ===');
   console.log(`registry: ${getRegistryFilePath()} ${registry ? '(readable)' : '(UNREADABLE)'}`);
   console.log(`policy:   ${JSON.stringify(decision.policy)}`);
   console.log(`idle:     ${decision.userIdleMs === 'UNKNOWN' ? 'UNKNOWN' : `${Math.round(Number(decision.userIdleMs) / 1000)}s`}`);
+  console.log(`media:    ${media.playing ? 'PLAYING' : 'none'}${media.sources.length ? ` — ${media.sources.join('; ')}` : ''}`);
+  console.log(`grace:    ${mediaGrace ? `pending since ${new Date(mediaGrace.startedAtMs).toISOString()}` : 'none'}`);
   console.log(`verdict:  ${decision.allowed ? 'ALLOWED' : 'BLOCKED'} — ${decision.reason}`);
   if (registry) {
     for (const [projectId, project] of Object.entries(registry.projects)) {

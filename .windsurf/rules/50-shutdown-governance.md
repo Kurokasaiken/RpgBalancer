@@ -35,6 +35,13 @@ Applies to every task that touches or introduces auto-shutdown, auto-commit, aut
 - The `ps`-based backstop classifies matches before vetoing (R-212): real work — test runners, builds, harness, coordinator, deliberation — blocks shutdown; server fixtures (`vite preview`, dev servers) are reported but **never** veto. A leftover server is not work: its consumer is what the blocking patterns detect.
 - New blocking patterns may be added only for actual work; new server/fixture patterns must go to the non-blocking list.
 
+## Media playback guard (Director ruling 2026-11-22, R-377)
+
+- While `pmset -g assertions` reports a media playback assertion — video wake lock (`NoDisplaySleepAssertion`/`NoIdleSleepAssertion`), audio render (`PreventUserIdleSystemSleep` whose name mentions audio), any `PreventUserIdleDisplaySleep` (players, AirPlay) — an otherwise-allowed shutdown is vetoed as long as user idle stays below `policy.mediaGuard.vetoMaxIdleSeconds` (default 7200s).
+- Past the cap, playback alone is not proof of presence ("asleep with the video running"): the manager posts a macOS **notification banner** (never a dialog — no focus steal, CTR-foreground-001) and probes `HIDIdleTime` for `policy.mediaGuard.gracePeriodSeconds` (default 300s). Any input during the window cancels the shutdown; silence lets it proceed.
+- An unreadable `pmset` is treated as "media may be playing" (fail-closed; the grace probe bounds the error).
+- Transient power-management holds (`delayDisplayOff`) and powerd's generic "display is on" are not playback.
+
 ## Auto-commit / auto-push separation
 
 - Automated Git backup (`auto-commit`, `auto-push`) may be preserved as an opt-in per-project policy.

@@ -87,6 +87,22 @@ export const QuietWindowSchema = z.object({
     .default([...DEFAULT_RESTRICTED_DAYS_OF_WEEK]),
 });
 
+/**
+ * Media playback guard (Director ruling 2026-11-22, R-377): while audio or
+ * video is actually playing, an otherwise-allowed shutdown is vetoed as long
+ * as user idle stays below `vetoMaxIdleSeconds`. Past the cap — the
+ * "fell asleep with the video running" case — a grace window of
+ * `gracePeriodSeconds` opens: any user input cancels the shutdown, none
+ * lets it proceed.
+ */
+export const MediaGuardSchema = z.object({
+  enabled: z.boolean().default(true),
+  /** Idle seconds beyond which media stops vetoing and the grace probe starts. */
+  vetoMaxIdleSeconds: z.number().int().positive().default(7200),
+  /** Seconds the grace window waits for user input before shutdown proceeds. */
+  gracePeriodSeconds: z.number().int().positive().default(300),
+});
+
 /** Shutdown policy embedded in the registry. */
 export const ShutdownPolicySchema = z.object({
   dryRun: z.boolean().default(true),
@@ -108,6 +124,11 @@ export const ShutdownPolicySchema = z.object({
      * restrictedDaysOfWeek was a type error; runtime semantics unchanged
      * (inner default already resolved to Mon–Fri, per Rule 50). */
     restrictedDaysOfWeek: [...DEFAULT_RESTRICTED_DAYS_OF_WEEK],
+  }),
+  mediaGuard: MediaGuardSchema.default({
+    enabled: true,
+    vetoMaxIdleSeconds: 7200,
+    gracePeriodSeconds: 300,
   }),
 });
 
@@ -169,6 +190,11 @@ export function createDefaultRegistry(machineId?: string): SessionRegistry {
         startHour: 23,
         endHour: 7,
         restrictedDaysOfWeek: [...DEFAULT_RESTRICTED_DAYS_OF_WEEK],
+      },
+      mediaGuard: {
+        enabled: true,
+        vetoMaxIdleSeconds: 7200,
+        gracePeriodSeconds: 300,
       },
     },
   };
