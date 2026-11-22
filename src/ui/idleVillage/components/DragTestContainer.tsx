@@ -1150,7 +1150,7 @@ function DragTestContainer({
                 <GripVertical className={`w-3 h-3 ${useWanderlustSkin ? 'text-[var(--skin-icon-color)] hover:text-[var(--skin-title-color)]' : 'text-[var(--skin-label-primary)]/80 hover:text-[var(--skin-text-primary)]'} transition-colors`} />
               </div>
             )}
-            <span style={useWanderlustSkin ? { fontFamily: 'var(--wl-font-display, "Cinzel", "Trajan Pro", serif)' } : {}}>Roster</span>
+            <span style={useWanderlustSkin ? { fontFamily: 'var(--wl-font-display, "Marcellus", "Trajan Pro", serif)' } : {}}>Roster</span>
             <span 
               className={useWanderlustSkin ? 'text-[var(--skin-title-color)]' : 'text-[var(--skin-text-primary)]'}
               aria-label={`Filtered residents: ${sortedResidents.length} of ${residents.length}`}

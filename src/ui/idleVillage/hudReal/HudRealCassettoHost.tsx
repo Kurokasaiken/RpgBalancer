@@ -18,8 +18,6 @@ import { QUEST_STASH } from '@/balancing/config/idleVillage/quests/questStash';
 import { journeyFasiOf } from '@/ui/idleVillage/quests/questJourney';
 import { scenarioForQuest } from '@/ui/idleVillage/questS1Lab/questOffer';
 import { DndContext } from '@dnd-kit/core';
-import { MatericRosterComponentV2 } from '@/ui/idleVillage/rosterV2';
-import { SkinScope } from '@/ui/idleVillage/skins/primitives';
 import { selectResourceOutlook, useMinimalGameplayWithIdleVillageConfig } from '@/store/useMinimalGameplay';
 import { buildResourceReadoutItems } from '@/ui/idleVillage/components/gameFrame';
 import { ExpeditionDrawer } from '@/ui/idleVillage/components/gameFrame/ExpeditionDrawer';
@@ -85,6 +83,10 @@ export const HudRealCassettoHost: React.FC = () => {
     const m = /[?&]risk=(\d)/.exec(typeof window !== 'undefined' ? window.location.search : '');
     return m ? Number(m[1]) : null;
   }, []);
+  const witnessReward = useMemo(() => {
+    const m = /[?&]reward=(\d)/.exec(typeof window !== 'undefined' ? window.location.search : '');
+    return m ? Number(m[1]) : null;
+  }, []);
   const quest: CassettoQuest = useMemo(() => {
     const fasi = poi ? journeyFasiOf(poi) : null;
     const label = session.poiView?.activity?.label ?? scenario?.title ?? 'Spedizione';
@@ -106,7 +108,6 @@ export const HudRealCassettoHost: React.FC = () => {
     ];
     return {
       title: label,
-      subtitle: t('gameFrame.cassetto.demo.subtitle', 'Pianifica la spedizione'),
       briefing: scenario?.offer.dispatch ?? scenario?.offer.objective ?? '',
       legs,
       totalDays: legs.reduce((sum, leg) => sum + (typeof leg.days === 'number' ? leg.days : 0), 0),
@@ -119,11 +120,15 @@ export const HudRealCassettoHost: React.FC = () => {
         { icon: 'gold', qty: String(scenario?.rewardBase ?? 60) },
       ],
       successPct: witnessPcts?.[1] ?? sim?.outcomePct.reward,
+      /* OB-7 app-5 (Director 2026-11-21): the chest scale mirrors the skull scale — level from the POI's
+       *  authored offer tier (main=5/5 lit, normal=3/5), pending → dim. `?reward=N` overrides for witnesses. */
+      rewardLevel: witnessReward ?? (poi?.tier === 'main' ? 5 : poi?.tier === 'normal' ? 3 : undefined),
+      rewardLevelMax: 5,
       /* Director 2026-11-20: the quest's own cover art as the cassetto
        *  vignette — same `offer.coverArt` source the /game adapter uses. */
       vignette: scenario?.offer.coverArt,
     };
-  }, [poi, scenario, session.poiView, session.estimate, t, witnessPcts, witnessRisk]);
+  }, [poi, scenario, session.poiView, session.estimate, t, witnessPcts, witnessRisk, witnessReward]);
 
   const slots = session.controller.slots as unknown as import('@/ui/idleVillage/slots/types').ResidentSlotViewModel[];
 
@@ -153,40 +158,9 @@ export const HudRealCassettoHost: React.FC = () => {
       onDragStart={session.handleDragStart}
       onDragEnd={session.handleDragEnd}
     >
-      {/* The REAL roster — the resident cards carry `data-resident-id` so the
-          session's medal flight lands; onResidentSelect is the production
-          click-to-assign path (first free matching slot). Docked left of the
-          drawer — the signed planner composition (option A). */}
-      <div data-detail-open={String(session.isDetailOpen)} data-can-send={String(session.canSend)} data-assigned={Object.values(session.assignments).filter(Boolean).length} style={{ position: 'absolute', right: 400, top: 0, bottom: 0, width: 300, zIndex: 6 }}>
-        {/* LAB DEBUG — bypass the roster wiring: fire the session's real
-            handleResidentSelect for each kit resident and log the verdict. */}
-        <button
-          type="button" data-cassetto-debug="select-first"
-          onClick={() => {
-            const ids = Array.from(document.querySelectorAll('[data-resident-id]'), (el) => el.getAttribute('data-resident-id')).filter(Boolean) as string[];
-            console.info('[cassetto-host] cards in dom:', ids.length);
-            for (const rid of ids.slice(0, 4)) {
-              const ok = session.handleResidentSelect(rid);
-              const compat = session.getResidentCompatibility(rid);
-              console.info('[cassetto-host]', rid, 'compat:', JSON.stringify(compat), 'select→', ok);
-              if (ok) break;
-            }
-          }}
-          style={{ position: 'absolute', top: -34, left: 0, fontSize: 10, padding: '2px 8px', opacity: .5 }}
-        >dbg</button>
-        <SkinScope style={{ height: '100%' }}>
-          <MatericRosterComponentV2
-            componentId="cassetto-host-roster"
-            density="compact"
-            onResidentSelect={(rid) => {
-              const ok = session.handleResidentSelect(rid);
-              console.info('[cassetto-host] select', rid, '→', ok, '| detailOpen:', session.isDetailOpen);
-            }}
-            lockedResidentIds={session.lockedResidentIds}
-            getResidentCompatibility={session.getResidentCompatibility}
-          />
-        </SkinScope>
-      </div>
+      {/* R-374 rev2 (Director): witnesses/tests must show the cassetto WITHOUT the roster — the lab's docked
+       *  roster panel (option-A composition for medal flights / click-to-assign) is removed. Resident
+       *  assignment is exercised through the roster tests, not this host. */}
       {/* R-339/PLAN-119 T2: same mount as /game — the ExpeditionDrawer
        *  primitive owns the column + the collapse chip. */}
       <ExpeditionDrawer

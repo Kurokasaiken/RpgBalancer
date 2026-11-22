@@ -27,7 +27,7 @@
   font-size: 20px;
   font-weight: 600;
   color: #c9a227;
-  font-family: 'Cinzel', serif;
+  font-family: 'Marcellus', serif;
 }
 
 .headerActions {
@@ -191,7 +191,7 @@
   margin: 0 0 16px 0;
   font-size: 16px;
   color: #8db3a5;
-  font-family: 'Cinzel', serif;
+  font-family: 'Marcellus', serif;
 }
 
 .riskDisplay {
@@ -296,7 +296,7 @@
 .riskFactors h4 {
   margin: 0 0 12px 0;
   color: #8db3a5;
-  font-family: 'Cinzel', serif;
+  font-family: 'Marcellus', serif;
 }
 
 .riskFactor {
@@ -356,7 +356,7 @@
 .mitigationStrategies h4 {
   margin: 0 0 12px 0;
   color: #8db3a5;
-  font-family: 'Cinzel', serif;
+  font-family: 'Marcellus', serif;
 }
 
 .mitigationStrategies ul {
@@ -423,7 +423,7 @@
 .decisionsTab h3 {
   margin: 0;
   color: #8db3a5;
-  font-family: 'Cinzel', serif;
+  font-family: 'Marcellus', serif;
 }
 
 .decisionList {
@@ -497,7 +497,7 @@
 .lessonsTab h3 {
   margin: 0;
   color: #8db3a5;
-  font-family: 'Cinzel', serif;
+  font-family: 'Marcellus', serif;
 }
 
 .lessonsGrid {

@@ -31,8 +31,8 @@ export function CompanyPlaque({ ready, total }: { ready: number; total: number }
       border: `2px solid ${GOLD}`, borderLeft: 0, borderRadius: '0 28px 28px 0',
       boxShadow: `inset 0 0 0 1px ${GOLD_DK}, 0 2px 6px rgba(1,14,18,.7)`,
     }}>
-      <span style={{ fontFamily: '"Cinzel", serif', fontSize: 14, letterSpacing: 2, color: SUB, lineHeight: '16px' }}>COMPAGNIA</span>
-      <span style={{ fontFamily: '"Cinzel", serif', fontSize: 22, color: INK, lineHeight: '26px', whiteSpace: 'nowrap' }}>
+      <span style={{ fontFamily: '"Marcellus", serif', fontSize: 14, letterSpacing: 2, color: SUB, lineHeight: '16px' }}>COMPAGNIA</span>
+      <span style={{ fontFamily: '"Marcellus", serif', fontSize: 22, color: INK, lineHeight: '26px', whiteSpace: 'nowrap' }}>
         {ready}<span style={{ color: SUB, fontSize: 16 }}> / {total} pronti</span>
       </span>
     </div>

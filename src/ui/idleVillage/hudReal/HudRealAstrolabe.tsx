@@ -85,7 +85,7 @@ export const HudRealAstrolabe: React.FC<HudRealAstrolabeProps> = ({ skillName, s
         <ZanaraButton tone="emerald" onClick={() => { setVerdict(null); setBeat((b) => b + 1); }}>
           {t('gameFrame.questWindow.checkOverlay.throwLabel', 'Throw')}
         </ZanaraButton>
-        {verdict && <span data-testid="hudreal-astrolabe-verdict" style={{ font: 'italic 11px "EB Garamond", serif', color: Z.muted, maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{verdict}</span>}
+        {verdict && <span data-testid="hudreal-astrolabe-verdict" style={{ font: 'italic 11px "Cardo", serif', color: Z.muted, maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{verdict}</span>}
       </div>
     </ZanaraPlaque>
   );

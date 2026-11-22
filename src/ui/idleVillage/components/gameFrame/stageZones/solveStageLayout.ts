@@ -133,13 +133,14 @@ function solveZoneWidths(config: StageZonesConfig, vw: number): Record<StageZone
 
 /** Zone x positions once the effective widths are known — residual slack goes
  *  to symmetric outer margins (never inflates zones past their caps). */
-function zoneRects(config: StageZonesConfig, vw: number, stageTop: number, stageH: number, widths: Record<StageZoneId, number>, onlyLeftWing = false): Record<StageZoneId, StageRect> {
+function zoneRects(config: StageZonesConfig, vw: number, stageTop: number, stageH: number, widths: Record<StageZoneId, number>, anchor: 'left' | 'right' | 'center' = 'center'): Record<StageZoneId, StageRect> {
   const { outer } = config;
   const zonesW = widths.leftWing + widths.centerStage + widths.rightWing;
   const residual = Math.max(0, vw - 2 * outer.edgePx - 2 * outer.gutterPx - zonesW);
-  /* Only the left wing is occupied (roster/stash): it hugs the left edge — centring a lone column on the map
-   *  put it over the playfield (Director 2026-11-20). Otherwise slack stays symmetric. */
-  const bandLeft = outer.edgePx + (onlyLeftWing ? 0 : residual / 2);
+  /* A lone wing hugs its own edge — centring it on the map put the column over
+   *  the playfield (Director 2026-11-20 for left; D-8 symmetry for the ledger
+   *  docked upper-right). Otherwise slack stays symmetric. */
+  const bandLeft = outer.edgePx + (anchor === 'left' ? 0 : anchor === 'right' ? residual : residual / 2);
   const leftX = bandLeft;
   const centerX = leftX + widths.leftWing + outer.gutterPx;
   const rightX = centerX + widths.centerStage + outer.gutterPx;
@@ -289,8 +290,10 @@ export function solveStageLayout(config: StageZonesConfig, inputs: SolverInputs)
       : clamp(viewport.w - 2 * config.outer.edgePx - 2 * config.outer.gutterPx - effective.leftWing - effective.rightWing, config.zones.centerStage.minPx, config.zones.centerStage.maxPx);
 
   const onlyLeftWing = effective.centerStage === 0 && effective.rightWing === 0;
-  const zones = zoneRects(config, viewport.w, stageTop, stageH, effective, onlyLeftWing);
-  const nominalZones = zoneRects(config, viewport.w, stageTop, stageH, nominal, onlyLeftWing);
+  const onlyRightWing = effective.centerStage === 0 && effective.leftWing === 0 && effective.rightWing > 0;
+  const anchor = onlyLeftWing ? 'left' as const : onlyRightWing ? 'right' as const : 'center' as const;
+  const zones = zoneRects(config, viewport.w, stageTop, stageH, effective, anchor);
+  const nominalZones = zoneRects(config, viewport.w, stageTop, stageH, nominal, anchor);
 
   /* Center strips anchor the row at userCenterX (cluster drag intent) or the
    * stage center when unset. */

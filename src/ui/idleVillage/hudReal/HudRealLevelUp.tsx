@@ -97,7 +97,7 @@ export const HudRealLevelUp: React.FC<{ residentsById: Record<string, ResidentSt
             {/* Roman numeral directly inside the clean sunburst */}
             <div style={{ ...pct(Z.level), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <span style={{
-                fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: '6.2cqh', fontWeight: 800,
+                fontFamily: 'Marcellus, "Cardo", serif', fontSize: '6.2cqh', fontWeight: 800,
                 color: '#4a2e06', textShadow: '0 0 10px rgba(255,245,200,.95), 0 1px 2px rgba(255,255,255,.85)',
               }}>
                 {toRoman(p.level)}
@@ -117,7 +117,7 @@ export const HudRealLevelUp: React.FC<{ residentsById: Record<string, ResidentSt
             {/* Hero name + level ceremony line in the light beam between medallion and shield */}
             <div style={{ ...pct(Z.heroLine), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <span style={{
-                fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: '2.1cqh', fontWeight: 700,
+                fontFamily: 'Marcellus, "Cardo", serif', fontSize: '2.1cqh', fontWeight: 700,
                 letterSpacing: '0.1em', textTransform: 'uppercase', color: '#fff3c9',
                 textShadow: '0 1px 4px rgba(0,0,0,.95), 0 0 10px rgba(0,0,0,.85)', textAlign: 'center',
               }}>
@@ -128,9 +128,9 @@ export const HudRealLevelUp: React.FC<{ residentsById: Record<string, ResidentSt
             {/* Real gain rows inside the clean baroque emerald shield */}
             <div style={{ ...pct(Z.gains), display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '0.8cqh', padding: '0.8cqh 1.6cqw', overflow: 'hidden' }}>
               {rows.map((r) => (
-                <div key={r.key} data-gain-row={r.key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 4, font: '1.8cqh "EB Garamond", serif', color: C.ink, textShadow: '0 1px 2px rgba(0,0,0,.9)', whiteSpace: 'nowrap' }}>
+                <div key={r.key} data-gain-row={r.key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 4, font: '1.8cqh "Cardo", serif', color: C.ink, textShadow: '0 1px 2px rgba(0,0,0,.9)', whiteSpace: 'nowrap' }}>
                   <span style={{ color: C.muted, overflow: 'hidden', textOverflow: 'ellipsis' }}>{t(r.labelKey)}</span>
-                  <b style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: '1.8cqh', fontVariantNumeric: 'tabular-nums', color: C.emeraldGlow }}>{r.from} → {r.to}</b>
+                  <b style={{ fontFamily: 'Marcellus, "Cardo", serif', fontSize: '1.8cqh', fontVariantNumeric: 'tabular-nums', color: C.emeraldGlow }}>{r.from} → {r.to}</b>
                 </div>
               ))}
             </div>
@@ -143,7 +143,7 @@ export const HudRealLevelUp: React.FC<{ residentsById: Record<string, ResidentSt
                 ...pct(Z.button), border: '1.5px solid #c9a94e', cursor: 'pointer', borderRadius: 6,
                 background: 'linear-gradient(180deg,#1a7d54,#0d5c40 60%,#083a28)',
                 boxShadow: '0 4px 12px rgba(0,0,0,.65), inset 0 1px 3px rgba(255,255,255,.35)',
-                fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: '2.1cqh', fontWeight: 800,
+                fontFamily: 'Marcellus, "Cardo", serif', fontSize: '2.1cqh', fontWeight: 800,
                 letterSpacing: '0.2em', textTransform: 'uppercase', color: '#eafff5',
               }}
             >

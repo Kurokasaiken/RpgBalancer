@@ -894,12 +894,12 @@ export function createAstrolabeV5Engine(
     ctx.rotate(rot);
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.font = `600 ${size}px "Cinzel", Georgia, serif`;
+    ctx.font = `600 ${size}px "Marcellus", Georgia, serif`;
     ctx.fillStyle = rgba(palette.ivory, 0.9);
     ctx.fillText(label, 0, 0);
 
     if (full) {
-      ctx.font = `500 ${size * 0.78}px "Cinzel", Georgia, serif`;
+      ctx.font = `500 ${size * 0.78}px "Marcellus", Georgia, serif`;
       ctx.fillStyle = rgba(palette.ivory, 0.45);
       ctx.fillText(`${p.difficultyValue}`, 0, size * 0.95);
     }

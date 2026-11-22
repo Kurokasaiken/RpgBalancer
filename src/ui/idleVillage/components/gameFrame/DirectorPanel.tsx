@@ -51,7 +51,7 @@ export const DirectorPanel: React.FC<DirectorPanelProps> = ({ actions, onReset, 
       }}
     >
       <div {...handleProps} title={t('gameFrame.panel.dragHint')} style={{ ...handleProps.style, display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={{ flex: 1, fontFamily: 'var(--wl-font-display, "Cinzel", serif)', fontSize: 11, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'var(--skin-title-color, #f0cf6a)' }}>
+        <span style={{ flex: 1, fontFamily: 'var(--wl-font-display, "Marcellus", serif)', fontSize: 11, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'var(--skin-title-color, #f0cf6a)' }}>
           {t('gameFrame.director.title')}
         </span>
         <button

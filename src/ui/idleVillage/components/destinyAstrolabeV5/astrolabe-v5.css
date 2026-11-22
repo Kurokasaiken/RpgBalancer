@@ -116,7 +116,7 @@
 
 .dav5-plate-value {
   grid-column: 2;
-  font-family: 'Cinzel', Georgia, serif;
+  font-family: 'Marcellus', Georgia, serif;
   font-size: clamp(11px, calc(var(--dav5-board, 380px) * 0.042), 19px);
   font-weight: 600;
   color: var(--skin-text-primary, #f5f2e8);
@@ -153,7 +153,7 @@
   border: 0;
   border-radius: 6px;
   cursor: pointer;
-  font-family: 'Cinzel', Georgia, serif;
+  font-family: 'Marcellus', Georgia, serif;
   font-size: clamp(10px, calc(var(--dav5-board, 380px) * 0.034), 15px);
   font-weight: 700;
   letter-spacing: 0.08em;

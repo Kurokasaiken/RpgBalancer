@@ -126,10 +126,15 @@ export const PoiZanara: React.FC<PoiZanaraProps> = ({ family, fraction, sizePx, 
  *  so the marker is planted on a pool of light instead of wearing a neon
  *  ring pasted on the map. */
 .poi-glow { display: none; position: absolute; inset: -18%; border-radius: 50%; pointer-events: none;
+  /* Annular glow (Director 2026-11-21): light pools AROUND the silhouette,
+   *  dark under the piece — a filled disc would wash through the enamel
+   *  gaps and make the marker unreadable. */
   background: radial-gradient(closest-side,
-    color-mix(in srgb, var(--poi-band-far) 55%, transparent) 0%,
-    color-mix(in srgb, var(--poi-band-far) 22%, transparent) 52%,
-    transparent 78%); }
+    transparent 0%,
+    transparent 52%,
+    color-mix(in srgb, var(--poi-band-far) 34%, transparent) 64%,
+    color-mix(in srgb, var(--poi-band-far) 58%, transparent) 74%,
+    transparent 88%); }
 [data-poi-zoom='far'] .poi-glow { display: block; }
 [data-poi-zoom='far'] .poi-halo { opacity: 0.55; filter: blur(1.6px); }`}</style>
       {/* Magic-circle halo (sigillo language): time writes a solid band of
@@ -166,9 +171,7 @@ export const PoiZanara: React.FC<PoiZanaraProps> = ({ family, fraction, sizePx, 
           />
         </div>
       ) : null}
-      {family === 'quest' && (
-        <img className="poi-light" src={`${CFG.assetBase}${POI_ZANARA_LAYERS.light.quest}`} alt="" draggable={false} style={LAYER_STYLE} />
-      )}
+      <img className="poi-light" src={`${CFG.assetBase}${POI_ZANARA_LAYERS.light[family]}`} alt="" draggable={false} style={LAYER_STYLE} />
       <img className="poi-detail" src={`${CFG.assetBase}${POI_ZANARA_LAYERS.base[family]}`} alt="" draggable={false} style={LAYER_STYLE} />
       <img className="poi-detail" src={`${CFG.assetBase}${POI_ZANARA_LAYERS.incision}`} alt="" draggable={false} style={LAYER_STYLE} />
       <img className="poi-detail" src={`${CFG.assetBase}${POI_ZANARA_LAYERS.top[family]}`} alt="" draggable={false} style={LAYER_STYLE} />

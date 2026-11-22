@@ -131,11 +131,12 @@ const RAIL_W = 100;
 const FRAME_S = 0.72;
 const FRAME_LEFT = -16;
 const FRAME_TL_H = 520 * FRAME_S;
-const FRAME_BL_H = 534 * FRAME_S;
+const FRAME_BL_H = 520 * FRAME_S;  /* the bottom corner is the TOP corner mirrored (Director 2026-11-21: «togli il ricciolo grande di sotto») */
 const FRAME_OV = 70 * FRAME_S;  /* the mid rail runs this far UNDER each corner, whose rail end fades out over the same distance */
 /** The CTA button asset (1500×317, both arrow tips, transparent ground) scaled to 880u: 12 px clear of the rail, 10 px of the edge. */
 const [PLAQUE_W, PLAQUE_H] = PAINTED_PIECES.plaque.size;  /* Gemini-generated plaque (2026-11-21), clean on magenta, keyed — replaces the cropped golden slice */
-const CTA_W = 740, CTA_RIGHT_GAP = 22, CTA_BOTTOM_GAP = 34;  /* narrower: the bottom-left corner's curl ends at ~262 u, the plaque's left tip starts right after it (Director 2026-11-21) */  /* lifted: it no longer sits on the screen edge, the south frame bar closes the column under it */
+const CTA_W = 820, CTA_BOTTOM_GAP = 34;  /* centred in the content column (the big bottom-left curl is gone — Director 2026-11-21) */
+const CTA_CENTER_U = 541;  /* centre of the content area: (rail padding 88 + (1024 − right padding 30)) / 2 */
 const CTA_H = CTA_W * PLAQUE_H / PLAQUE_W;
 
 /** Viewport-wide variant switch kept for API compatibility (the art no longer varies). */
@@ -204,7 +205,7 @@ const RACK_SCOPED_CSS = `
 [data-hudreal-cassetto] [data-testid^="loadout-item-"]:active { transform: translateY(0) scale(0.95); }
 `;
 
-const CINZEL = 'Cinzel, "EB Garamond", serif';
+const CINZEL = 'Marcellus, "Cardo", serif';
 
 /** A framed block (well): brass hairline, dark enamel fill. */
 const wellStyle: React.CSSProperties = {
@@ -212,13 +213,18 @@ const wellStyle: React.CSSProperties = {
   /* Gemini-generated frame (2026-11-21, Director «i componenti interni + curati»): fine brass double border + four corner flourishes,
    * sliced like the mockup's section boxes. Corners 130×105 of the 1024×254 source are kept, the straight edges stretch. */
   ...paintedBoxFrame({ y: u(44), x: u(55) }, u(2)),
-  /* WELL: near-black teal, darker than the ground (new mockup: ground (3,28,23), wells (8,16,16)) — the recess is what makes the gold read */
-  background: 'linear-gradient(180deg, rgba(3,14,13,.78), rgba(2,11,11,.86))',
-  boxShadow: 'inset 0 12px 26px rgba(0,0,0,.45), inset 0 0 0 1px rgba(0,0,0,.35)',
+  /* WELL = the top bars' recipe (measured 2026-11-21 on the day/resource bars: core black-teal (1,17,26), lum 12–18; a narrow green glow on
+   * the inner edge, lighter at top and bottom, lum 24–30 — ~80% black / 20% green). Saturated emerald is kept for accents only
+   * (Outbound segment, CTA, gems). The previous pass (full top→bottom emerald) inverted the balance (Director: «non c'è bilanciamento»). */
+  background: [
+    'linear-gradient(180deg, rgba(18,92,66,.42) 0%, rgba(18,92,66,0) 16%, rgba(18,92,66,0) 84%, rgba(18,92,66,.34) 100%)',
+    'linear-gradient(180deg, #03161d 0%, #01111a 50%, #021612 100%)',
+  ].join(', '),
+  boxShadow: 'inset 0 0 0 1px rgba(30,120,84,.35), inset 0 0 14px rgba(24,110,78,.30), inset 0 0 34px rgba(0,0,0,.55)',
 };
 
 /** The % readout (Director 2026-11-20: a big number beside the emblem). Pending → a muted dash, same height. */
-const BigPct: React.FC<{ pct?: number; tone: 'danger' | 'gold'; label: string; testId: string; leading?: React.ReactNode }> = ({ pct, tone, label, testId, leading }) => {
+const BigPct: React.FC<{ pct?: number; tone: 'danger' | 'gold'; label: string; testId: string; leading?: React.ReactNode; size?: number }> = ({ pct, tone, label, testId, leading, size = 66 }) => {
   const color = tone === 'danger' ? C.bordeaux : C.goldHi;
   const known = pct != null;
   return (
@@ -228,7 +234,7 @@ const BigPct: React.FC<{ pct?: number; tone: 'danger' | 'gold'; label: string; t
       aria-label={known ? label : undefined}
       aria-hidden={known ? undefined : true}
       title={known ? label : undefined}
-      style={{ display: 'inline-flex', alignItems: 'center', gap: u(8), fontFamily: CINZEL, fontSize: fzMin(66), fontWeight: 700, letterSpacing: '0.02em', lineHeight: 1, color: known ? color : C.muted, opacity: known ? 1 : 0.55, textShadow: '0 1px 3px rgba(0,0,0,.85)', whiteSpace: 'nowrap' }}
+      style={{ display: 'inline-flex', alignItems: 'center', gap: u(8), fontFamily: CINZEL, fontSize: fzMin(size), fontWeight: 700, letterSpacing: '0.02em', lineHeight: 1, color: known ? color : C.muted, opacity: known ? 1 : 0.55, textShadow: '0 1px 3px rgba(0,0,0,.85)', whiteSpace: 'nowrap' }}
     >
       {leading}
       {known ? `${Math.round(pct as number)}%` : '—'}
@@ -238,12 +244,15 @@ const BigPct: React.FC<{ pct?: number; tone: 'danger' | 'gold'; label: string; t
 
 /** Danger level as skulls: `level` of `max` lit (the small copy of the emblem), the rest dimmed. */
 const SkullLevel: React.FC<{ level?: number; max: number; label: string }> = ({ level, max, label }) => (
-  <span data-testid="cassetto-risk-value" role="img" aria-label={label} title={label} data-risk-level={level ?? 0} style={{ display: 'inline-flex', gap: u(6), alignItems: 'center' }}>
+  <span data-testid="cassetto-risk-value" role="img" aria-label={label} title={label} data-risk-level={level ?? 0} style={{ display: 'inline-flex', gap: u(5), alignItems: 'center' }}>
     {Array.from({ length: max }, (_, i) => (
-      <img key={i} src={`${ASSET}/skull.webp`} alt="" draggable={false} data-skull={i < (level ?? 0) ? 'on' : 'off'} style={{ width: u(40), height: u(40), objectFit: 'contain', filter: i < (level ?? 0) ? 'none' : 'grayscale(1) brightness(.55)', opacity: i < (level ?? 0) ? 1 : 0.4 }} />
+      <img key={i} src={`${ASSET}/skull.webp`} alt="" draggable={false} data-skull={i < (level ?? 0) ? 'on' : 'off'} style={{ width: u(44), height: u(44), objectFit: 'contain', filter: i < (level ?? 0) ? 'none' : 'grayscale(1) brightness(.55)', opacity: i < (level ?? 0) ? 1 : 0.4 }} />
     ))}
   </span>
 );
+
+/** Journey bar art: centre of each segment as % of the image width (measured on the generated bar: lit segment 22–365, middle 375–685, right 690–1000 of 1024). */
+const JOURNEY_CENTERS = [18.9, 51.8, 82.5];
 
 /** Journey: the leg shown lit (the mockup lights Outbound) and the engraved glyph of each leg (outbound / on site / return). */
 const ACTIVE_LEG = 0;
@@ -341,7 +350,7 @@ export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
       style={{
         position: 'absolute', inset: 0,
         display: 'flex', alignItems: 'stretch', justifyContent: 'flex-end',
-        fontFamily: '"EB Garamond", serif', color: C.ink,
+        fontFamily: '"Cardo", serif', color: C.ink,
         filter: `drop-shadow(${C.shadow})`,
         pointerEvents: 'none',
       }}
@@ -359,8 +368,15 @@ export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
           overflow: 'hidden',
         }}
       >
-        {/* enamel field — starts under the rail, NOT at the column edge (no green bar left of the frame) */}
-        <div aria-hidden style={{ position: 'absolute', left: u(36), right: 0, top: 0, bottom: 0, ...paintedGround(), pointerEvents: 'none' }} />
+        {/* enamel field — starts under the rail, NOT at the column edge (no bar left of the frame). The frame lattice
+         *  is ritagliata: its gaps are truly transparent and show what is underneath, so no DOM rectangle may sit under
+         *  them — a backing rect pokes outside the organic silhouette as a coloured corner
+         *  (Director 2026-11-21 quinquies: «un angolo colorato invece di essere ritagliato … eliminarlo e basta»). */}
+        {/* mask on the left edge: the enamel's straight left boundary shows through the lattice gaps as a flat
+         *  dark rectangle running the full column height («il rettangolo … sia sopra che sotto», Director 2026-11-21).
+         *  Fading it in under the opaque ornament removes the hard line — same fix as the vignette's left edge. */}
+        <div aria-hidden style={{ position: 'absolute', left: u(36), right: 0, top: 0, bottom: 0, ...paintedGround(), pointerEvents: 'none',
+          WebkitMaskImage: `linear-gradient(90deg, transparent 0, #000 ${u(120)})`, maskImage: `linear-gradient(90deg, transparent 0, #000 ${u(120)})` }} />
         <div
           style={{
             position: 'absolute', inset: 0,
@@ -371,11 +387,11 @@ export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
         >
           {/* ---------- painted frame (sliced from the golden) ---------- */}
           {/* LEFT FRAME + NORTH/SOUTH BARS — Gemini-generated corners (Director 2026-11-21: the old pieces were cropped from the golden at a
-           *  fixed width and carried cut leaves and button remains). TL corner (rounded arc over the painting + bar), BL corner (curl into the rim),
+           *  fixed width and carried cut leaves and button remains). TL corner (rounded arc over the painting + bar), bottom corner = the top corner flipped vertically (rounded arc into the rim, no curl),
            *  a folded mid rail between them; the bar / rim run to the right edge INSIDE the corner images (last columns replicated), so no seam. Scale FRAME_S u per source px. */}
           <div aria-hidden style={{ position: 'absolute', left: u(FRAME_LEFT), top: u(FRAME_TL_H - FRAME_OV), bottom: u(FRAME_BL_H - FRAME_OV), width: u(205 * FRAME_S), backgroundImage: `url(${ASSET}/rail-mid-fold.webp)`, backgroundRepeat: 'no-repeat', backgroundSize: '100% 100%', pointerEvents: 'none' }} />
           <img aria-hidden alt="" draggable={false} src={`${ASSET}/frame-corner-tl.webp`} style={{ position: 'absolute', left: u(FRAME_LEFT), top: 0, width: u(1447 * FRAME_S), height: u(520 * FRAME_S), pointerEvents: 'none', zIndex: 3 }} />
-          <img aria-hidden alt="" draggable={false} src={`${ASSET}/frame-corner-bl.webp`} style={{ position: 'absolute', left: u(FRAME_LEFT), bottom: 0, width: u(1447 * FRAME_S), height: u(534 * FRAME_S), pointerEvents: 'none', zIndex: 3 }} />
+          <img aria-hidden alt="" draggable={false} src={`${ASSET}/frame-corner-tl.webp`} style={{ position: 'absolute', left: u(FRAME_LEFT), bottom: 0, width: u(1447 * FRAME_S), height: u(520 * FRAME_S), transform: 'scaleY(-1)', pointerEvents: 'none', zIndex: 3 }} />
 
           {/* ---------- quest-banner: vignette + title + briefing ---------- */}
           <div data-block="quest-banner" style={{ display: 'contents' }}>
@@ -385,7 +401,11 @@ export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
              *  painting — so the picture gets the same quarter-circle corner and a gold arc along it (Director: «dobbiamo ottenere quell'effetto
              *  invece di questo squadrato»). The painting runs to the right edge, sits under the north frame bar and dissolves into the panel
              *  at the bottom (mask); the title cartouche below carries the first border. */}
-            <div data-cassetto-vignette-frame="" style={{ position: 'relative', flex: '0 0 auto', marginTop: u(VIGNETTE_TOP), marginLeft: u(2), marginRight: u(-14) }}>
+            {/* marginLeft -50: the picture starts under the opaque vine cluster and fades in, so its straight left edge
+             *  never coincides with a see-through notch of the corner — a hard edge there reads as a coloured square
+             *  («quel quadrato», Director 2026-11-21). Same trick as the bottom mask, on the left edge. */}
+            <div data-cassetto-vignette-frame="" style={{ position: 'relative', flex: '0 0 auto', marginTop: u(VIGNETTE_TOP), marginLeft: u(-50), marginRight: u(-14),
+              WebkitMaskImage: `linear-gradient(90deg, transparent 0, #000 ${u(70)})`, maskImage: `linear-gradient(90deg, transparent 0, #000 ${u(70)})` }}>
               <div style={{ position: 'relative', height: u(VIGNETTE_H), overflow: 'hidden', borderTopLeftRadius: u(CORNER_R),
                 WebkitMaskImage: 'linear-gradient(180deg, #000 0%, #000 74%, transparent 100%)', maskImage: 'linear-gradient(180deg, #000 0%, #000 74%, transparent 100%)' }}>
                 <img
@@ -492,47 +512,31 @@ export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
           </div>
 
           {/* ---------- journey-strip (no text title) ----------
-           *  New mockup (Director 2026-11-21: «il viaggio è superiore, prendiamo quello»): three chevron segments, near-black teal with a gold
-           *  edge, the ACTIVE one in emerald, small emerald diamonds at the ends and at the joints, an engraved icon + the leg name inside each. The
-           *  days stay as a small line under the name (the mockup omits them but they are game data). */}
-          <div data-block="journey-strip" style={{ ...wellStyle, marginTop: u(10), padding: `${u(18)} 0 ${u(12)}`, flexShrink: 0 }}>
-            <div style={{ position: 'relative', margin: `0 ${u(34)}`, height: u(112) }}>
-              <svg viewBox="0 0 912 112" preserveAspectRatio="none" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', overflow: 'visible' }} aria-hidden>
-                <defs>
-                  <linearGradient id="cas-leg-dark" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#0b1d1d" /><stop offset="0.5" stopColor="#061313" /><stop offset="1" stopColor="#030b0b" /></linearGradient>
-                  <linearGradient id="cas-leg-lit" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#1f9a62" /><stop offset="0.5" stopColor="#0f6e45" /><stop offset="1" stopColor="#0a4a30" /></linearGradient>
-                  <linearGradient id="cas-gem" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#8ff0c4" /><stop offset="1" stopColor="#0c7a52" /></linearGradient>
-                </defs>
-                {[
-                  { pts: '4,56 44,6 296,6 338,56 296,106 44,106', lit: 0 },
-                  { pts: '300,6 596,6 638,56 596,106 300,106 342,56', lit: 1 },
-                  { pts: '600,6 868,6 908,56 868,106 600,106 642,56', lit: 2 },
-                ].map((s) => (
-                  <g key={s.lit}>
-                    <polygon points={s.pts} fill={s.lit === ACTIVE_LEG ? 'url(#cas-leg-lit)' : 'url(#cas-leg-dark)'} stroke={C.goldHi} strokeWidth="4" strokeLinejoin="round" />
-                    <polygon points={s.pts} fill="none" stroke="rgba(0,0,0,.55)" strokeWidth="1.4" strokeLinejoin="round" transform="translate(0 1.4)" />
-                  </g>
-                ))}
-                {[[2, 56], [320, 56], [620, 56], [910, 56]].map(([x, y]) => (
-                  <polygon key={x} points={`${x - 15},${y} ${x},${y - 17} ${x + 15},${y} ${x},${y + 17}`} fill="url(#cas-gem)" stroke={C.goldHi} strokeWidth="3.2" strokeLinejoin="round" />
-                ))}
-              </svg>
-              <div style={{ position: 'absolute', inset: 0, display: 'flex' }}>
-                {quest.legs.map((leg, i) => (
-                  <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: u(2) }}>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: u(10) }}>
-                      <EngravedIcon id={LEG_ICONS[i] ?? 'ico-dot'} size={Math.round((26 / 1024) * 512)} style={{ color: i === ACTIVE_LEG ? '#fff3b4' : C.goldInk, filter: 'drop-shadow(0 1px 2px rgba(0,0,0,.8))' }} />
-                      <span style={{ fontFamily: CINZEL, fontSize: fzMin(32), fontWeight: 700, letterSpacing: '0.04em', color: i === ACTIVE_LEG ? '#fff6cf' : C.goldInk, textShadow: '0 1px 3px rgba(0,0,0,.9)' }}>{leg.label}</span>
-                    </span>
-                    <span style={{ fontFamily: CINZEL, fontSize: fzMin(26), letterSpacing: '0.06em', color: i === ACTIVE_LEG ? '#d7f3df' : C.muted, textShadow: '0 1px 2px rgba(0,0,0,.85)' }}>
-                      {typeof leg.days === 'number' ? t('gameFrame.cassetto.legDays', { count: leg.days }) : leg.days}
-                    </span>
-                  </div>
-                ))}
-              </div>
+           *  New mockup (Director 2026-11-21 «il viaggio è superiore, prendiamo quello», redone after «ancora sbagliato»): ONE pill split by
+           *  slanted cuts into three segments — rounded outer ends, near-black teal with a gold edge, the active one emerald; a small emerald
+           *  diamond centred on the top and bottom edge of every segment, one on each slanted joint and one on each end; the engraved icon sits
+           *  ABOVE the leg name. The days are game data the mockup does not show: they go in a small caption row under the pill. */}
+          <div data-block="journey-strip" style={{ ...wellStyle, marginTop: u(10), padding: `${u(20)} 0 ${u(12)}`, flexShrink: 0 }}>
+            <div style={{ position: 'relative', margin: `0 ${u(30)}` }}>
+              {/* Gemini-generated bar (Director 2026-11-21: «Outbound ecc… fatti creare da Gemini»): one pill, left segment emerald (lit), two dark
+               *  recessed segments, gold edge, emerald gems — keyed from magenta, empty: icons and names are live DOM on top. */}
+              <img data-cassetto-journey-art="" aria-hidden alt="" draggable={false} src={`${ASSET}/journey-bar.webp`} style={{ display: 'block', width: '100%', height: 'auto' }} />
+              {quest.legs.map((leg, i) => (
+                <div key={i} style={{ position: 'absolute', top: 0, bottom: 0, left: `${JOURNEY_CENTERS[i] ?? 50}%`, transform: 'translateX(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: u(2), pointerEvents: 'none' }}>
+                  <EngravedIcon id={LEG_ICONS[i] ?? 'ico-dot'} size={Math.round((38 / 1024) * 512)} style={{ color: i === ACTIVE_LEG ? '#fff3b4' : C.goldInk, filter: 'drop-shadow(0 1px 2px rgba(0,0,0,.8))' }} />
+                  <span style={{ fontFamily: CINZEL, fontSize: fzMin(28), fontWeight: 700, letterSpacing: '0.03em', lineHeight: 1.05, color: i === ACTIVE_LEG ? '#fff6cf' : C.goldInk, textShadow: '0 1px 3px rgba(0,0,0,.9)', whiteSpace: 'nowrap' }}>{leg.label}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{ display: 'flex', margin: `${u(6)} ${u(30)} 0` }}>
+              {quest.legs.map((leg, i) => (
+                <div key={i} data-testid={`cassetto-leg-days-${i}`} style={{ flex: 1, textAlign: 'center', fontFamily: CINZEL, fontSize: fzMin(26), letterSpacing: '0.06em', color: C.muted }}>
+                  {typeof leg.days === 'number' ? t('gameFrame.cassetto.legDays', { count: leg.days }) : leg.days}
+                </div>
+              ))}
             </div>
             {quest.totalDays != null && (
-              <div data-testid="cassetto-journey-total" style={{ textAlign: 'center', marginTop: u(8) }}>
+              <div data-testid="cassetto-journey-total" style={{ textAlign: 'center', marginTop: u(6) }}>
                 <span style={{ fontSize: fzMin(26), letterSpacing: '0.12em', textTransform: 'uppercase', color: C.muted }}>
                   {t('gameFrame.cassetto.journeyTotal', { count: quest.totalDays })}
                 </span>
@@ -540,28 +544,31 @@ export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
             )}
           </div>
 
-          {/* ---------- risk-rewards (no text title; NO cost cell — INV-5) ---------- */}
-          <div data-block="risk-rewards" style={{ ...wellStyle, marginTop: u(10), padding: `${u(16)} ${u(20)} ${u(16)}`, display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-            <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: u(14), justifyContent: 'center' }} data-risk-state={quest.riskPending ?? 'ready'}>
-              <img src={`${ASSET}/skull.webp`} alt="" draggable={false} style={{ width: u(150), height: u(150), flexShrink: 0 }} />
-              <div style={{ display: 'flex', flexDirection: 'column', gap: u(12), alignItems: 'flex-start' }}>
-                <BigPct pct={quest.deathPct} tone="danger" testId="cassetto-death-pct" label={t('questExpedition.forecast.death', { pct: Math.round(quest.deathPct ?? 0) })} />
+          {/* ---------- risk-rewards: TWO wells with labels (new mockup v3, Director 2026-11-21 «Risk/reward + journey»; amends the 2026-11-20
+           *  «captions gone» ruling — the mockup writes «Risk» and «Reward»). NO cost cell (INV-5). Each well: emblem left, then label,
+           *  then the value row; the sim's % stay (2026-11-20 ruling): death % in the skull's red, success % with the laurel. ---------- */}
+          <div data-block="risk-rewards" style={{ marginTop: u(10), display: 'flex', gap: u(14), flexShrink: 0 }}>
+            <div data-testid="cassetto-risk-well" data-risk-state={quest.riskPending ?? 'ready'} style={{ ...wellStyle, borderImage: 'none', border: `${u(3)} solid ${C.goldHi}`, borderRadius: u(44), boxShadow: `inset 0 0 0 ${u(4)} rgba(0,0,0,.5), inset 0 0 0 ${u(5.5)} rgba(243,225,147,.42), inset 0 0 0 ${u(7)} rgba(30,120,84,.35), inset 0 0 16px rgba(24,110,78,.32), inset 0 0 34px rgba(0,0,0,.55), 0 2px 6px rgba(0,0,0,.5)`, flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: u(12), padding: `${u(18)} ${u(14)} ${u(18)} ${u(16)}` }}>
+              <img src={`${ASSET}/skull.webp`} alt="" draggable={false} style={{ width: u(128), height: u(128), flexShrink: 0 }} />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: u(8), alignItems: 'flex-start', minWidth: 0 }}>
+                <span data-testid="cassetto-risk-label" style={{ fontFamily: CINZEL, fontSize: fzMin(38), fontWeight: 700, letterSpacing: '0.04em', color: C.goldInk, textShadow: '0 1px 3px rgba(0,0,0,.9)', lineHeight: 1 }}>{t('gameFrame.cassetto.risk', 'Risk')}</span>
                 <SkullLevel level={quest.riskPending ? undefined : quest.riskLevel} max={quest.riskLevelMax ?? 4} label={`${t('gameFrame.cassetto.risk', 'Risk')}: ${quest.riskPending === 'computing' ? '…' : quest.riskLabel}`} />
+                <BigPct pct={quest.deathPct} tone="danger" testId="cassetto-death-pct" size={48} label={t('questExpedition.forecast.death', { pct: Math.round(quest.deathPct ?? 0) })} />
               </div>
             </div>
-            <div aria-hidden style={{ width: 1, alignSelf: 'stretch', margin: `${u(8)} 0`, background: `linear-gradient(180deg, transparent, ${C.gold}99, transparent)` }} />
-            <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: u(14), justifyContent: 'center' }}>
-              <img src={`${ASSET}/chest.webp`} alt="" draggable={false} style={{ width: u(150), height: u(150), flexShrink: 0 }} />
-              <div style={{ display: 'flex', flexDirection: 'column', gap: u(12), alignItems: 'flex-start' }}>
-                <BigPct pct={quest.successPct} tone="gold" testId="cassetto-success-pct" label={t('questExpedition.forecast.reward', { pct: Math.round(quest.successPct ?? 0) })} leading={<img src={`${ASSET}/laurel.webp`} alt="" aria-hidden draggable={false} data-laurel="" style={{ width: u(66), height: u(66), flexShrink: 0, opacity: quest.successPct != null ? 1 : 0.4, filter: quest.successPct != null ? 'drop-shadow(0 1px 2px rgba(0,0,0,.6))' : 'grayscale(.8) brightness(.7)' }} />} />
+            <div data-testid="cassetto-reward-well" style={{ ...wellStyle, borderImage: 'none', border: `${u(3)} solid ${C.goldHi}`, borderRadius: u(44), boxShadow: `inset 0 0 0 ${u(4)} rgba(0,0,0,.5), inset 0 0 0 ${u(5.5)} rgba(243,225,147,.42), inset 0 0 0 ${u(7)} rgba(30,120,84,.35), inset 0 0 16px rgba(24,110,78,.32), inset 0 0 34px rgba(0,0,0,.55), 0 2px 6px rgba(0,0,0,.5)`, flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: u(12), padding: `${u(18)} ${u(14)} ${u(18)} ${u(16)}` }}>
+              <img src={`${ASSET}/chest.webp`} alt="" draggable={false} style={{ width: u(128), height: u(128), flexShrink: 0 }} />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: u(8), alignItems: 'flex-start', minWidth: 0 }}>
+                <span data-testid="cassetto-reward-label" style={{ fontFamily: CINZEL, fontSize: fzMin(38), fontWeight: 700, letterSpacing: '0.04em', color: C.goldInk, textShadow: '0 1px 3px rgba(0,0,0,.9)', lineHeight: 1 }}>{t('gameFrame.cassetto.reward', 'Reward')}</span>
                 <span role="group" aria-label={t('gameFrame.cassetto.reward', 'Reward')} style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: u(10) }}>
                   {quest.rewards.map((r) => (
-                    <span key={r.icon} style={{ display: 'inline-flex', alignItems: 'center', gap: u(8), fontFamily: CINZEL, fontSize: fzMin(46), fontWeight: 700, color: C.goldInk }}>
+                    <span key={r.icon} style={{ display: 'inline-flex', alignItems: 'center', gap: u(8), fontFamily: CINZEL, fontSize: fzMin(50), fontWeight: 700, color: C.goldInk, textShadow: '0 1px 3px rgba(0,0,0,.85)' }}>
                       <img src={`/assets/ui/resources/res-${r.icon}-64.webp`} alt="" style={{ width: u(40), height: u(40) }} draggable={false} />
                       {r.qty}
                     </span>
                   ))}
                 </span>
+                <BigPct pct={quest.successPct} tone="gold" testId="cassetto-success-pct" size={48} label={t('questExpedition.forecast.reward', { pct: Math.round(quest.successPct ?? 0) })} leading={<img src={`${ASSET}/laurel.webp`} alt="" aria-hidden draggable={false} data-laurel="" style={{ width: u(46), height: u(46), flexShrink: 0, opacity: quest.successPct != null ? 1 : 0.4 }} />} />
               </div>
             </div>
           </div>
@@ -587,7 +594,7 @@ export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
               aria-label={t('gameFrame.cassetto.confirm', 'CONFIRM')}
               aria-describedby={!canSend && disabledReason ? 'cassetto-confirm-reason' : undefined}
               style={{
-                position: 'absolute', right: u(CTA_RIGHT_GAP), bottom: u(CTA_BOTTOM_GAP), width: u(CTA_W), height: u(CTA_H),
+                position: 'absolute', left: u(CTA_CENTER_U - CTA_W / 2), bottom: u(CTA_BOTTOM_GAP), width: u(CTA_W), height: u(CTA_H),
                 padding: 0, border: 'none', background: 'transparent',
                 cursor: canSend ? 'pointer' : 'default',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',

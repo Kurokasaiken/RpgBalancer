@@ -30,13 +30,13 @@ export function HudRealCompass({ position, phase, phaseIcon }: HudRealCompassPro
       {CARDINALS.map(({ l, a }) => (
         <span key={l} aria-hidden="true" style={{
           position: 'absolute', left: (DIAL.cx + Math.cos((a * Math.PI) / 180) * DIAL.r * 0.96) * P.w, top: (DIAL.cy + Math.sin((a * Math.PI) / 180) * DIAL.r * 1.8 * 0.96) * P.h,
-          transform: 'translate(-50%, -50%)', fontFamily: 'Cinzel, "EB Garamond", serif', fontWeight: 700, fontSize: 13, color: '#f1d88a', textShadow: C.shadow, pointerEvents: 'none',
+          transform: 'translate(-50%, -50%)', fontFamily: 'Marcellus, "Cardo", serif', fontWeight: 700, fontSize: 13, color: '#f1d88a', textShadow: C.shadow, pointerEvents: 'none',
         }}>{l}</span>
       ))}
       <div style={{
         position: 'absolute', left: f.x + 12, top: f.y - GROW, width: f.w + GROW - 8, height: f.h + GROW * 2, boxSizing: 'border-box',
         display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 1, padding: '0 4px', overflow: 'hidden',
-        fontFamily: '"EB Garamond", serif', color: C.value, textShadow: C.shadow, whiteSpace: 'nowrap',
+        fontFamily: '"Cardo", serif', color: C.value, textShadow: C.shadow, whiteSpace: 'nowrap',
       }}>
         <span style={{ fontSize: 13, lineHeight: '15px', fontVariantNumeric: 'tabular-nums', display: 'block', minWidth: 0, maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis' }}>{position}</span>
         {phase && <span style={{ fontSize: 13, lineHeight: '15px', display: 'flex', alignItems: 'center', gap: 5, minWidth: 0 }}>{phaseIcon}<span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{phase}</span></span>}

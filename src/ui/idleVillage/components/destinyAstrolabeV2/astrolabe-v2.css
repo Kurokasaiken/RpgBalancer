@@ -12,7 +12,7 @@
   justify-content: center;
   overflow: hidden;
   container-type: size;
-  font-family: var(--skin-font-display, "Cinzel", "Trajan Pro", serif);
+  font-family: var(--skin-font-display, "Marcellus", "Trajan Pro", serif);
   --da2-gold: var(--skin-icon-color, #dfb857);
   --da2-warm: var(--skin-close-color, #f7dd80);
   --da2-azure: var(--skin-icon-accent, #00e5ff);
@@ -152,7 +152,7 @@
     0 0 30px var(--da2-hero-glow, rgba(247,221,128,0.55));
 }
 .da2-hero__delta {
-  font-family: var(--skin-font-serif, "EB Garamond", Georgia, serif);
+  font-family: var(--skin-font-serif, "Cardo", Georgia, serif);
   font-size: clamp(14px, 3.4vh, 26px);
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -195,7 +195,7 @@
   border-radius: 50%;
   cursor: pointer;
   color: var(--da2-obsidian);
-  font-family: var(--skin-font-display, "Cinzel", serif);
+  font-family: var(--skin-font-display, "Marcellus", serif);
   font-size: clamp(11px, 2.3vh, 18px);
   font-weight: 900;
   letter-spacing: 0.12em;

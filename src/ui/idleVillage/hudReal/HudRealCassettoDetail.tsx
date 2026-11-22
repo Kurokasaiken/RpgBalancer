@@ -61,7 +61,6 @@ export const HudRealCassettoDetail: React.FC<HudRealCassettoDetailProps> = (p) =
     );
     return {
       title: p.scenario?.title ?? '',
-      subtitle: t('gameFrame.cassetto.demo.subtitle', 'Pianifica la spedizione'),
       briefing: p.scenario?.offer.dispatch ?? p.scenario?.offer.objective ?? '',
       legs: [
         { label: t('gameFrame.cassetto.leg.outbound', 'Outbound'), days: fasi?.travelDays ?? 0 },
@@ -76,6 +75,10 @@ export const HudRealCassettoDetail: React.FC<HudRealCassettoDetailProps> = (p) =
       deathPct: sim?.anyDeathPct,
       rewards: [{ icon: 'gold', qty: String(p.scenario?.rewardBase ?? 60) }],
       successPct: sim?.outcomePct.reward,
+      /* OB-7 app-5 (Director 2026-11-21): chest scale mirrors the skull scale — level from the POI's authored
+       *  offer tier (main=5/5 lit, normal=3/5). */
+      rewardLevel: p.poi?.tier === 'main' ? 5 : p.poi?.tier === 'normal' ? 3 : undefined,
+      rewardLevelMax: 5,
       /* Director 2026-11-20 «vignetta da quest»: the scenario's own cover
        *  art — the per-quest painted illustration at the head of the
        *  planner (offer.coverArt is the authored source). */

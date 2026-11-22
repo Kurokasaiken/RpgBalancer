@@ -186,7 +186,7 @@
   100%{opacity:1;transform:translate(-50%,-50%) scale(1);filter:none;}
 }
 .destiny-astrolabe .card .seal{width:60px;height:60px;margin:0 auto 12px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-  font-family:'Cinzel',serif;font-weight:900;font-size:27px;position:relative;}
+  font-family:'Marcellus',serif;font-weight:900;font-size:27px;position:relative;}
 .destiny-astrolabe .card.triumph .seal, .destiny-astrolabe .card.win .seal{color:#3a2403;
   background:radial-gradient(circle at 36% 30%, #ffe9a8, #c9a227 55%, #8a5a18 100%);
   box-shadow:0 4px 18px rgba(201,162,39,.55), inset 0 -3px 8px rgba(96,44,8,.6), inset 0 2px 4px rgba(255,255,255,.6);}
@@ -196,7 +196,7 @@
 .destiny-astrolabe .card.fail .seal, .destiny-astrolabe .card.epic .seal{color:#caa9c2;
   background:radial-gradient(circle at 36% 30%, #2a2238, #120d1d 55%, #060309 100%);
   box-shadow:0 4px 18px rgba(90,59,255,.3), inset 0 -3px 8px rgba(0,0,0,.8);}
-.destiny-astrolabe .card .title{font-family:'Cinzel',serif;font-weight:900;letter-spacing:.26em;text-transform:uppercase;
+.destiny-astrolabe .card .title{font-family:'Marcellus',serif;font-weight:900;letter-spacing:.26em;text-transform:uppercase;
   font-size:clamp(26px,3.6vw,46px);line-height:1.05;white-space:nowrap;
   -webkit-text-stroke:1px rgba(201,162,39,.55);paint-order:stroke fill;}
 .destiny-astrolabe .card.triumph .title, .destiny-astrolabe .card.win .title{color:#ffeebc;
@@ -223,7 +223,7 @@
 .destiny-astrolabe .card.fail .sub, .destiny-astrolabe .card.epic .sub{color:#cdbfe0;
   text-shadow:0 1px 8px rgba(0,0,0,.95), 0 0 22px rgba(0,0,0,.8);}
 /* letter-spacing ridotto: .28em in maiuscoletto costa il 10-15% di velocita' di lettura */
-.destiny-astrolabe .card .nums{margin-top:9px;font-family:'Cinzel',serif;font-weight:700;letter-spacing:.14em;
+.destiny-astrolabe .card .nums{margin-top:9px;font-family:'Marcellus',serif;font-weight:700;letter-spacing:.14em;
   text-transform:uppercase;font-size:11px;color:#d8c386;
   text-shadow:0 1px 6px rgba(0,0,0,.95), 0 0 14px rgba(0,0,0,.8);}
 .destiny-astrolabe .card .chips{display:flex;gap:26px;justify-content:center;margin-top:15px;padding-top:12px;position:relative;}
@@ -231,26 +231,26 @@
 .destiny-astrolabe .card .chips::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
   width:64%;height:1px;background:linear-gradient(90deg,transparent,rgba(201,162,39,.55) 30%,rgba(201,162,39,.55) 70%,transparent);
   box-shadow:0 0 8px rgba(201,162,39,.25);}
-.destiny-astrolabe .card .chip{font-family:'Cinzel',serif;font-weight:700;font-size:11px;letter-spacing:.36em;text-transform:uppercase;
+.destiny-astrolabe .card .chip{font-family:'Marcellus',serif;font-weight:700;font-size:11px;letter-spacing:.36em;text-transform:uppercase;
   padding:0;border:none;background:none;border-radius:0;}
 .destiny-astrolabe .card .chip.wounded{color:#ff9ad8;text-shadow:0 0 15px rgba(255,40,190,.65), 0 1px 5px rgba(0,0,0,.85);}
 .destiny-astrolabe .card .chip.dead{color:#9fd4ff;text-shadow:0 0 15px rgba(34,140,255,.65), 0 1px 5px rgba(0,0,0,.85);}
-.destiny-astrolabe .state-chip{position:absolute;z-index:8;top:14px;left:14px;font-family:'Cinzel',serif;font-size:9px;
+.destiny-astrolabe .state-chip{position:absolute;z-index:8;top:14px;left:14px;font-family:'Marcellus',serif;font-size:9px;
   letter-spacing:.3em;text-transform:uppercase;color:#7fae9d;padding:7px 14px;border-radius:999px;
   border:1px solid rgba(16,185,129,.25);background:rgba(6,14,13,.75);}
 .destiny-astrolabe .state-chip b{color:var(--gold-soft);}
-.destiny-astrolabe .panel-col h2{font-family:'Cinzel',serif;font-weight:900;letter-spacing:.24em;text-transform:uppercase;
+.destiny-astrolabe .panel-col h2{font-family:'Marcellus',serif;font-weight:900;letter-spacing:.24em;text-transform:uppercase;
   font-size:15px;color:#f6ebc4;margin:4px 0 2px;text-shadow:0 0 24px rgba(252,232,144,.18);}
 .destiny-astrolabe .panel-col .tagline{font-family:'Cormorant Garamond',serif;font-style:italic;color:#8fb5a8;font-size:14px;margin:0 0 18px;}
 .destiny-astrolabe .group{border:1px solid var(--panel-line);border-radius:14px;padding:16px 16px 12px;margin-bottom:16px;
   background:linear-gradient(180deg, rgba(13,22,24,.7), rgba(8,14,15,.7));
   box-shadow:inset 0 1px 0 rgba(252,232,144,.06);}
-.destiny-astrolabe .group>legend, .destiny-astrolabe .group .gtitle{font-family:'Cinzel',serif;font-weight:700;font-size:10px;letter-spacing:.32em;
+.destiny-astrolabe .group>legend, .destiny-astrolabe .group .gtitle{font-family:'Marcellus',serif;font-weight:700;font-size:10px;letter-spacing:.32em;
   text-transform:uppercase;color:var(--gold-soft);margin-bottom:12px;display:block;}
 .destiny-astrolabe .ctl{margin-bottom:13px;}
 .destiny-astrolabe .ctl label{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;
   letter-spacing:.12em;text-transform:uppercase;color:#9fc4b5;margin-bottom:5px;}
-.destiny-astrolabe .ctl label b{font-family:'Cinzel',serif;color:var(--gold-bright);font-size:12px;letter-spacing:.06em;}
+.destiny-astrolabe .ctl label b{font-family:'Marcellus',serif;color:var(--gold-bright);font-size:12px;letter-spacing:.06em;}
 .destiny-astrolabe input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:18px;background:transparent;cursor:pointer;}
 .destiny-astrolabe input[type=range]::-webkit-slider-runnable-track{height:5px;border-radius:99px;
   background:linear-gradient(90deg, var(--gold-soft) var(--fill,50%), #152226 var(--fill,50%));
@@ -266,7 +266,7 @@
 .destiny-astrolabe select:focus{border-color:var(--gold-soft);}
 .destiny-astrolabe .launch{display:block;width:100%;margin:4px 0 16px;position:relative;overflow:hidden;cursor:pointer;
   appearance:none;border:1px solid rgba(252,232,144,.7);border-radius:14px;
-  padding:17px 10px;font:900 14px/1 'Cinzel',serif;letter-spacing:.34em;text-transform:uppercase;color:#231402;
+  padding:17px 10px;font:900 14px/1 'Marcellus',serif;letter-spacing:.34em;text-transform:uppercase;color:#231402;
   background:linear-gradient(180deg,#ffeebc 0%,#e3b961 45%,#a06a1e 100%);
   box-shadow:0 6px 24px rgba(201,162,39,.45), inset 0 1px 0 rgba(255,255,255,.75), inset 0 -2px 6px rgba(96,44,8,.45);
   text-shadow:0 1px 0 rgba(255,255,255,.4);transition:filter .15s ease;}
@@ -285,7 +285,7 @@
 .destiny-astrolabe .math-row{display:flex;justify-content:space-between;font-size:11.5px;padding:5px 0;
   border-bottom:1px dashed rgba(201,162,39,.12);color:#b9d2c6;}
 .destiny-astrolabe .math-row:last-child{border-bottom:none;}
-.destiny-astrolabe .math-row b{font-family:'Cinzel',serif;color:var(--gold-bright);letter-spacing:.04em;}
+.destiny-astrolabe .math-row b{font-family:'Marcellus',serif;color:var(--gold-bright);letter-spacing:.04em;}
 .destiny-astrolabe .math-row .mag{color:#ffc6f6;}
 .destiny-astrolabe .math-row .ind{color:#c3cbff;}
 .destiny-astrolabe .prob-bar{display:flex;height:14px;border-radius:99px;overflow:hidden;margin:10px 0 4px;
@@ -298,7 +298,7 @@
 .destiny-astrolabe .prob-legend{display:flex;gap:10px;flex-wrap:wrap;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:#7fae9d;}
 .destiny-astrolabe .prob-legend i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:4px;vertical-align:middle;}
 .destiny-astrolabe .result-box{font-size:12px;color:#b9d2c6;}
-.destiny-astrolabe .result-box .verdict{font-family:'Cinzel',serif;font-weight:900;letter-spacing:.2em;text-transform:uppercase;
+.destiny-astrolabe .result-box .verdict{font-family:'Marcellus',serif;font-weight:900;letter-spacing:.2em;text-transform:uppercase;
   font-size:14px;margin-bottom:6px;}
 .destiny-astrolabe .result-box .verdict.triumph, .destiny-astrolabe .result-box .verdict.win{color:var(--gold-bright);}
 .destiny-astrolabe .result-box .verdict.almost{color:#e3b961;}

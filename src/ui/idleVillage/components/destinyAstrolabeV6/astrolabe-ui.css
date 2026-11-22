@@ -53,7 +53,7 @@
   font-size: 11px;
   line-height: 1.45;
   color: #e0cbb0;
-  font-family: 'Cinzel', serif;
+  font-family: 'Marcellus', serif;
 }
 .da-narrator-dot {
   flex-shrink: 0;
@@ -96,7 +96,7 @@
     var(--v8-sun-bronze, #a05c18) 55%,
     var(--v8-sun-bronze-dark, #602c08));
   color: #fce890;
-  font-family: 'Cinzel', serif;
+  font-family: 'Marcellus', serif;
   font-weight: 700;
   letter-spacing: clamp(0.03em, 0.34vmin, 0.34em);
   font-size: clamp(10px, 1.35vmin, 16px);
@@ -260,7 +260,7 @@
 }
 
 .da-skill-name {
-  font-family: 'Cinzel', serif;
+  font-family: 'Marcellus', serif;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.22em;
@@ -274,7 +274,7 @@
 }
 
 .da-skill-tst {
-  font-family: 'Cinzel', serif;
+  font-family: 'Marcellus', serif;
   font-size: 13px;
   font-weight: 900;
   letter-spacing: 0.04em;
@@ -328,7 +328,7 @@
     rgba(228, 176, 72, 0.25),
     rgba(96, 44, 8, 0.55));
   color: var(--v8-sun-bronze-light, #e4b048);
-  font-family: 'Cinzel', serif;
+  font-family: 'Marcellus', serif;
   font-weight: 700;
   font-size: 14px;
   line-height: 1;
@@ -378,7 +378,7 @@
   flex-shrink: 0;
 }
 .da-legend-title {
-  font-family: 'Cinzel', serif;
+  font-family: 'Marcellus', serif;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -406,7 +406,7 @@
 
 .da-legend-heading {
   margin: 0;
-  font-family: 'Cinzel', serif;
+  font-family: 'Marcellus', serif;
   font-size: 8px;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -700,7 +700,7 @@
   padding: 3px 11px 3px 9px;
   border-radius: 999px;
   backdrop-filter: blur(8px);
-  font-family: 'Cinzel', serif;
+  font-family: 'Marcellus', serif;
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.18em;
@@ -799,14 +799,14 @@
   transition: transform 0.1s ease, filter 0.15s ease;
 }
 .da-skill-core__rune {
-  font-family: 'Cinzel', serif;
+  font-family: 'Marcellus', serif;
   font-size: clamp(16px, 3vmin, 30px);
   line-height: 1;
   color: #3a2403;
   text-shadow: 0 1px 0 rgba(255, 240, 190, 0.8), 0 0 12px rgba(255, 236, 170, 0.6);
 }
 .da-skill-core__label {
-  font-family: 'Cinzel', serif;
+  font-family: 'Marcellus', serif;
   font-weight: 700;
   font-size: clamp(8px, 1.15vmin, 12px);
   letter-spacing: 0.3em;
@@ -953,7 +953,7 @@
 }
 .da-skill-plaque__text {
   fill: #f0cf6a;
-  font-family: 'Cinzel', serif;
+  font-family: 'Marcellus', serif;
   font-size: 15px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -967,7 +967,7 @@
 
 /* Auto-throw countdown inside the Skill Core. */
 .da-skill-core__countdown {
-  font-family: 'Cinzel', serif;
+  font-family: 'Marcellus', serif;
   font-size: clamp(7px, 1vmin, 10px);
   letter-spacing: 0.12em;
   color: #4a2f08;

@@ -660,7 +660,7 @@ export function GenericPoiSkin(props: GenericPoiSkinProps): JSX.Element {
         <div
           className="font-serif uppercase whitespace-nowrap pointer-events-none"
           style={{
-            fontFamily: "'Cinzel', 'Trajan Pro', serif",
+            fontFamily: "'Marcellus', 'Trajan Pro', serif",
             fontSize: '6px',
             letterSpacing: '0.28em',
             color: 'rgba(210,178,90,.70)',

@@ -28,8 +28,8 @@ export function HudRealBrand({ title, subtitle }: HudRealBrandProps) {
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflowX: 'hidden', overflowY: 'visible', whiteSpace: 'nowrap',
         textShadow: C.shadow,
       }}>
-        <h1 style={{ margin: 0, fontFamily: 'Cinzel, "EB Garamond", serif', fontWeight: 600, fontSize: size, letterSpacing: 2, maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.1, color: C.title, textTransform: 'uppercase' }}>{title}</h1>
-        {subtitle && <span style={{ fontFamily: '"EB Garamond", serif', fontSize: 12, letterSpacing: 1, color: C.sub }}>{subtitle}</span>}
+        <h1 style={{ margin: 0, fontFamily: 'Marcellus, "Cardo", serif', fontWeight: 600, fontSize: size, letterSpacing: 2, maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.1, color: C.title, textTransform: 'uppercase' }}>{title}</h1>
+        {subtitle && <span style={{ fontFamily: '"Cardo", serif', fontSize: 12, letterSpacing: 1, color: C.sub }}>{subtitle}</span>}
       </div>
     </header>
   );

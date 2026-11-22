@@ -44,22 +44,16 @@ const TC = CASSETTO_LAYOUT_CONFIG.topChrome;
 const RES_SLIM_ASSET = '/assets/ui/hud-real/resources/bar-slim.webp';
 /* R-352: the resource bar renders at RES_K so its capsule (the plain band,
  *  ornaments ignored — `topChrome.capsulePx`, measured on the signed art)
- *  matches the banner's; and its right filigree cap is mirrored onto the
- *  left edge so the bar reads specular end-to-end — and the cap "seats"
- *  are SYMMETRIC: the left seat equals the right's ornament width
- *  (`resCapMirror.seatPx`), so the medallion is cut, not just covered. */
-const RES_K = TC.capsulePx.time / TC.capsulePx.resources;
-/* The left cap is ONE flipped slice — the Director picked the exact
- *  source/dest rect in the cap-mirror lab (`topChrome.resCapMirror`).
- *  Only `seatPx` of it shows (the ornament end, matching the right cap's
- *  ~26px seat): art+slots shift LEFT by `RES_SHIFT` (negative) so slot 0's
- *  glass starts exactly where the seat ends — equal cap seats, specular. */
-const RES_CAP = TC.resCapMirror;
-const RES_SHIFT = RES_CAP.seatPx - RESOURCES_SLIM_BAR.slots[0].x;
-const RES_BAR_W = RESOURCES_SLIM_BAR.w + RES_SHIFT;
-const RES_W = RES_BAR_W * RES_K;
+ *  matches the banner's. R-376 (Director 2026-11-21): the regenerated
+ *  pointed-cap art is natively specular end-to-end — the resCapMirror
+ *  flipped-slice hack was retired with the medallion it was hiding.
+ *  R-376-bis (Director 2026-11-21): `resourcesBoost` enlarges the bar in
+ *  proportion to the banner (~420×68.6 — same width, the pair reads as
+ *  siblings); chip text scales with it, never below designed px. */
+const RES_K = (TC.capsulePx.time / TC.capsulePx.resources) * TC.resourcesBoost;
+const RES_W = RESOURCES_SLIM_BAR.w * RES_K;
 const RES_H = RESOURCES_SLIM_BAR.h * RES_K;
-/** Row height = the tallest bar (the resources' pendant still dips lowest). */
+/** Row height = the tallest bar. */
 const ROW_H = Math.max(TIME_SLIM_BAR.h, RES_H);
 
 export interface GameTopChromeProps {
@@ -148,33 +142,12 @@ export const GameTopChrome: React.FC<GameTopChromeProps> = ({ items, locked = fa
         </div>
       </div>
       {/* Resource bar — slim bar, centred on the frame's horizontal centre
-       *  (R-350), compact chips for the narrower slots; R-352: RES_K matches
-       *  its capsule to the banner's and the mirrored right cap makes the
-       *  bar specular end-to-end. */}
-      <div data-hudslot="resources" data-testid="chrome-resources" style={{ ...barSlot(RES_W, RES_H, resLeft), pointerEvents: 'auto', ['--hud-text-k' as string]: String(fit * RES_K > 0 ? 1 / (fit * RES_K) : 1) }}>
-        <div style={{ ...barInner(RES_BAR_W, RESOURCES_SLIM_BAR.h, RES_K), overflow: 'hidden' }}>
-          <style>{'[data-hudslot="resources"] [data-hr-res]{z-index:2}'}</style>
-          <div style={{ position: 'absolute', left: RES_SHIFT, top: 0 }}>
-            <HudRealResources items={items} bar={RESOURCES_SLIM_BAR} asset={RES_SLIM_ASSET} compact centerContent />
-          </div>
-          {/* Mirrored cap on the left edge: ONE slice of the same bar
-           *  (`resCapMirror` — the tail rect the Director picked in the
-           *  cap-mirror lab) drawn horizontally flipped. Only `seatPx`
-           *  shows — the ornament end — so the left seat equals the right
-           *  cap's seat; the medallion is cut by the inner clip, not just
-           *  covered. z-index 1 over the art, chips at 2 via scoped rule. */}
-          <div
-            aria-hidden
-            data-testid="chrome-res-cap-mirror"
-            style={{ position: 'absolute', left: 0, top: RES_CAP.destY, width: RES_CAP.seatPx, height: RES_CAP.h, overflow: 'hidden', pointerEvents: 'none', zIndex: 1 }}
-          >
-            <img
-              src={RES_SLIM_ASSET}
-              alt=""
-              draggable={false}
-              style={{ position: 'absolute', left: RES_CAP.srcX + RES_CAP.w - RESOURCES_SLIM_BAR.w, top: -RES_CAP.srcY, width: RESOURCES_SLIM_BAR.w, height: RESOURCES_SLIM_BAR.h, maxWidth: 'none', transform: 'scaleX(-1)' }}
-            />
-          </div>
+       *  (R-350), compact chips for the narrower slots; RES_K matches its
+       *  capsule to the banner's and the pointed-cap art (R-376) is
+       *  natively specular end-to-end — no cap mirror needed. */}
+      <div data-hudslot="resources" data-testid="chrome-resources" style={{ ...barSlot(RES_W, RES_H, resLeft), pointerEvents: 'auto', ['--hud-text-k' as string]: String(fit > 0 ? 1 / (fit * Math.min(1, RES_K)) : 1) }}>
+        <div style={barInner(RESOURCES_SLIM_BAR.w, RESOURCES_SLIM_BAR.h, RES_K)}>
+          <HudRealResources items={items} bar={RESOURCES_SLIM_BAR} asset={RES_SLIM_ASSET} compact centerContent />
         </div>
       </div>
     </div>

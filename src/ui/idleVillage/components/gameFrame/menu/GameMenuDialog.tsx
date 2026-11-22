@@ -53,8 +53,8 @@ const ZANARA_TOKENS = {
   '--skin-hud-lacquer-base': Z.field,
   '--skin-hud-lacquer-deep': Z.fieldDark,
   '--skin-hud-brass-hi': Z.goldHi,
-  '--skin-font-display': 'Cinzel, "EB Garamond", serif',
-  '--skin-font-serif': '"EB Garamond", serif',
+  '--skin-font-display': 'Marcellus, "Cardo", serif',
+  '--skin-font-serif': '"Cardo", serif',
 } as Record<string, string>;
 
 const zanaraCss = (d: (typeof DEFAULT_GAME_FRAME_CONFIG)['gamePage']['dialog']) => `
@@ -63,7 +63,7 @@ const zanaraCss = (d: (typeof DEFAULT_GAME_FRAME_CONFIG)['gamePage']['dialog']) 
   border: 1px solid ${Z.goldDark}; color: ${Z.ink};
   background: linear-gradient(180deg, #12302f 0%, ${Z.fieldDark} 100%);
   box-shadow: inset 0 1px 0 rgba(240, 214, 138, .18), inset 0 -2px 6px rgba(0,0,0,.45), 0 1px 2px rgba(0,0,0,.4);
-  font-family: Cinzel, "EB Garamond", serif; text-shadow: 0 1px 2px rgba(0,0,0,.6);
+  font-family: Marcellus, "Cardo", serif; text-shadow: 0 1px 2px rgba(0,0,0,.6);
 }
 .skin-scope [data-hudreal-dialog][data-hudreal-dialog] button:not([data-skin="cta"])::before { display: none; }
 .skin-scope [data-hudreal-dialog][data-hudreal-dialog] button:not([data-skin="cta"]):hover:not(:disabled) { border-color: ${Z.goldHi}; color: #fff3cf; filter: brightness(1.15); }
@@ -140,11 +140,11 @@ export function GameMenuDialog({ title, onClose, width = 700, hideClose = false,
                 border: `2.5px solid ${Z.gold}`, borderRadius: d.radius,
                 background: `linear-gradient(180deg, ${Z.fieldHi} 0%, ${Z.field} 34%, ${Z.fieldDark} 100%)`,
                 boxShadow: `inset 0 0 0 1.5px ${Z.goldDeep}, inset 0 0 26px rgba(0,0,0,.62), ${Z.shadow}`,
-                color: Z.ink, fontFamily: '"EB Garamond", serif',
+                color: Z.ink, fontFamily: '"Cardo", serif',
               }}>
               {(['tl', 'tr', 'bl', 'br'] as const).map((c) => <OrnCorner key={c} corner={c} />)}
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-                <h2 style={{ flex: 1, margin: 0, font: `600 ${d.titlePx}px Cinzel, "EB Garamond", serif`, letterSpacing: '0.2em', textTransform: 'uppercase', color: Z.goldHi, textShadow: '0 1px 3px rgba(0,0,0,.75)' }}>{title}</h2>
+                <h2 style={{ flex: 1, margin: 0, font: `600 ${d.titlePx}px Marcellus, "Cardo", serif`, letterSpacing: '0.2em', textTransform: 'uppercase', color: Z.goldHi, textShadow: '0 1px 3px rgba(0,0,0,.75)' }}>{title}</h2>
                 {closeButton}
               </div>
               <div aria-hidden="true" style={{ height: 1, background: `linear-gradient(90deg, transparent, ${Z.gold}, transparent)`, flexShrink: 0 }} />

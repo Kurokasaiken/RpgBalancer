@@ -59,7 +59,7 @@ export const HudRealExpeditionLost: React.FC<HudRealExpeditionLostProps> = ({ ru
         {/* Engraved title directly on the clean painted metal ribbon */}
         <div style={{ ...pct(Z.ribbon), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <span style={{
-            fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: '3.2cqh', fontWeight: 800,
+            fontFamily: 'Marcellus, "Cardo", serif', fontSize: '3.2cqh', fontWeight: 800,
             letterSpacing: '0.18em', textTransform: 'uppercase', color: '#1b1610',
             textShadow: '0 1px 0 rgba(255,235,180,.55)',
           }}>
@@ -69,14 +69,14 @@ export const HudRealExpeditionLost: React.FC<HudRealExpeditionLostProps> = ({ ru
 
         {/* Real wipe line + tombs directly on the clean painted stone slab */}
         <div style={{ ...pct(Z.plaque), display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.8cqh', padding: '1cqh 2cqw' }}>
-          <div style={{ font: 'italic 2.1cqh "EB Garamond", serif', color: C.stoneSub, textAlign: 'center' }}>
+          <div style={{ font: 'italic 2.1cqh "Cardo", serif', color: C.stoneSub, textAlign: 'center' }}>
             {t('gameFrame.questLog.outcome.wipe', { quest: questName })}
           </div>
-          <div style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: '1.9cqh', fontWeight: 700, letterSpacing: '0.24em', textTransform: 'uppercase', color: C.ink }}>
+          <div style={{ fontFamily: 'Marcellus, "Cardo", serif', fontSize: '1.9cqh', fontWeight: 700, letterSpacing: '0.24em', textTransform: 'uppercase', color: C.ink }}>
             {t('gameFrame.questEpilogue.dead')}
           </div>
           {tombs.length === 0 ? (
-            <span style={{ font: 'italic 2.2cqh "EB Garamond", serif', color: C.stoneSub }}>—</span>
+            <span style={{ font: 'italic 2.2cqh "Cardo", serif', color: C.stoneSub }}>—</span>
           ) : (
             <div data-testid="hudreal-lost-tombs" style={{ display: 'flex', gap: '1.2cqw', flexWrap: 'wrap', justifyContent: 'center' }}>
               {tombs.map((tomb) => (
@@ -92,11 +92,11 @@ export const HudRealExpeditionLost: React.FC<HudRealExpeditionLostProps> = ({ ru
                   }}
                 >
                   <EngravedIcon id="status-fallen" size={14} aria-hidden style={{ color: '#9fb4ac' }} />
-                  <div style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: '1.7cqh', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#e6efe9', marginTop: '0.2cqh' }}>
+                  <div style={{ fontFamily: 'Marcellus, "Cardo", serif', fontSize: '1.7cqh', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#e6efe9', marginTop: '0.2cqh' }}>
                     {tomb.name}
                   </div>
                   {tomb.day !== null && (
-                    <div style={{ font: 'italic 1.6cqh "EB Garamond", serif', color: '#9db5ab' }}>
+                    <div style={{ font: 'italic 1.6cqh "Cardo", serif', color: '#9db5ab' }}>
                       {t('gameFrame.questWindow.fellOnDay', { day: tomb.day })}
                     </div>
                   )}
@@ -113,7 +113,7 @@ export const HudRealExpeditionLost: React.FC<HudRealExpeditionLostProps> = ({ ru
           style={{
             ...pct(Z.button), padding: 0, border: 'none', background: 'transparent', cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: '2.3cqh', fontWeight: 800,
+            fontFamily: 'Marcellus, "Cardo", serif', fontSize: '2.3cqh', fontWeight: 800,
             letterSpacing: '0.22em', textTransform: 'uppercase', color: C.goldHi,
             textShadow: '0 1px 4px rgba(0,0,0,.9)',
           }}
