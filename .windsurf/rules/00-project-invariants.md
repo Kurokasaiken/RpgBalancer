@@ -104,7 +104,7 @@ If any safeguard fails, the task is **BLOCKED**, not complete.
 - Mechanical gate: `scripts/deploy/webglBootProbe.mjs` is wired into
   `guardian:deploy-guard` post-verification (`webglProbeRoutes: ['/', '/game']`)
   — a boot error, page exception or missing world canvas FAILS the deployment.
-  Manual probes: `scripts/_tmp-boot-wait.mjs`, `scripts/_tmp-landing-check.mjs`.
+  Manual probes: `scripts/probes/boot-wait.mjs`, `scripts/probes/landing-check.mjs`.
 - On any verification failure: fix the problem and iterate until the whole
   cycle (safeguards → deploy → post-deploy verification) is green. Never report
   "deploy OK" on a failed or unverified check — say what was not verified (T-04).
