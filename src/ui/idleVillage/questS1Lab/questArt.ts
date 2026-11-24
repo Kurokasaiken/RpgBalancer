@@ -64,7 +64,7 @@ export const NODE_ART: Record<string, { src: string; fit: 'contain' | 'cover' }>
   'gob-accampamento': { src: '/assets/scene-library/accampamento-v2.png', fit: 'cover' },
   'gob-stealth': { src: '/assets/scene-library/accampamento-v2.png', fit: 'cover' },
   'gob-assalto': { src: '/assets/scene-library/accampamento-v2.png', fit: 'cover' },
-  'gob-combattimento': { src: '/assets/scene-library/assalto-goblin.jpg', fit: 'cover' },
+  'gob-combattimento': { src: '/assets/scene-library/carica-goblin.png', fit: 'cover' },
   'gob-incalzare': { src: '/assets/scene-library/incalzare-v2.png', fit: 'cover' },
   'gob-incalza-check': { src: '/assets/scene-library/incalzare-v2.png', fit: 'cover' },
   'gob-esplora-extra': { src: '/assets/scene-library/spoglie-v2.png', fit: 'cover' },
@@ -130,6 +130,11 @@ export const LIBRARY_ART: Record<string, { src: string; fit: 'cover' }> = {
   'sentiero-tracce': { src: '/assets/scene-library/sentiero-tracce.jpg', fit: 'cover' },
   'sentiero-tracce-v2': { src: '/assets/scene-library/sentiero-tracce-v2.png', fit: 'cover' },
   'sentiero-tracce-v3': { src: '/assets/scene-library/sentiero-tracce-v3.png', fit: 'cover' },
+  'carica-goblin': { src: '/assets/scene-library/carica-goblin.png', fit: 'cover' },
+  /* Replaced on gob-combattimento by carica-goblin (2026-11-24) — kept
+   *  in the manifest + lab picker as alternate camp-eruption art. */
+  'assalto-goblin': { src: '/assets/scene-library/assalto-goblin.jpg', fit: 'cover' },
+  'bosco-occhi-teal': { src: '/assets/scene-library/bosco-occhi-teal.png', fit: 'cover' },
   'viaggio-ritorno': { src: '/assets/scene-library/viaggio-ritorno.jpg', fit: 'cover' },
   /* Horizontally TILEABLE variant of the same plate (2026-10-26): the
    *  i3 image rolled 50%, the center seam healed in Gemini, rolled back —

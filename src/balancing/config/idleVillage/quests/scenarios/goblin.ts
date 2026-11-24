@@ -513,7 +513,7 @@ export const GOBLIN_SCENARIO_AUTHORED = {
     dangerBandRef: 'alta',
     rewardBase: 60,
     /* PLAN-036: ~21:9 planner banner (the goblin totem, scene library). */
-    coverArt: '/assets/scene-library/totem-goblin.jpg',
+    coverArt: '/assets/scene-library/bosco-occhi-teal.png',
   },
   nodes: GOBLIN_NODES,
 } satisfies Omit<QuestScenario, 'primaryStats'> & { primaryStats: LabStat[] };

@@ -432,6 +432,28 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
       { type: 'glint', at: [0.36, 0.75], period: 12, r: 0.004 },
     ],
   },
+  'bosco-occhi-teal': {
+    /* Quest coverArt (2026-11-24): Solar Triumph meadow edge — azure
+     *  sky, golden grass, birch + crimson maple — and inside the teal
+     *  treeline wall, pairs of amber eyes and crude spear tips. The
+     *  hidden goblin band is never shown (Director ruling). */
+    depth: '/assets/depth/bosco-occhi-teal.webp',
+    depthWidth: 512,
+    depthHeight: 217,
+    imgAspect: 1024 / 434,
+    entrance: 'enter-creep',
+    pose: 'pose-watch',
+    focusAnchor: [0.5, 0.55],
+    atmosphere: [],
+    ambient: [
+      /* Pollen in the shaft + a slow amber glint where the eyes
+       *  blink inside the teal wall. */
+      { type: 'dust', count: 12 },
+      { type: 'drift', band: [0.5, 0.62], count: 2, lean: 0.3 },
+      { type: 'glint', at: [0.42, 0.52], period: 11, r: 0.005 },
+      { type: 'glint', at: [0.62, 0.55], period: 14, r: 0.004 },
+    ],
+  },
   'ritorno-v2': {
     /* f8 return (2026-10-26): mountain descent through forest, the
      *  golden-thatched village far below at sunset — warm far / cold
@@ -601,6 +623,33 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
       { type: 'smoke', at: [0.69, 0.52], count: 5, lean: 0.12 },
       { type: 'embers', at: [0.42, 0.58], count: 7 },
       { type: 'embers', at: [0.69, 0.54], count: 5 },
+      { type: 'dust', count: 6 },
+    ],
+  },
+  'carica-goblin': {
+    /* f4 combat (2026-11-24): the goblin wedge pours out of the camp
+     *  breach and charges straight at the viewer — bodies scale from
+     *  the burning palisade to the frame bottom; arrows from off-frame,
+     *  cinnabar banner left, burning tent right, indigo storm sky.
+     *  Director-baptized gen (scene-author). */
+    depth: '/assets/depth/carica-goblin.webp',
+    depthWidth: 512,
+    depthHeight: 217,
+    imgAspect: 1024 / 434,
+    entrance: 'enter-direct',
+    pose: 'pose-tense',
+    focusAnchor: [0.5, 0.55],
+    atmosphere: [],
+    ambient: [
+      /* Painted fire sources: camp breach center, left firepit,
+       *  right burning tent. */
+      { type: 'glow', at: [0.5, 0.45], r: 0.13, color: '#ff8c30', a: 0.55, flicker: 0.5 },
+      { type: 'glow', at: [0.23, 0.63], r: 0.12, color: '#ff8c30', a: 0.5, flicker: 0.45 },
+      { type: 'glow', at: [0.87, 0.58], r: 0.14, color: '#ff8c30', a: 0.55, flicker: 0.5 },
+      { type: 'smoke', at: [0.55, 0.4], count: 5, lean: 0.12 },
+      { type: 'smoke', at: [0.88, 0.5], count: 6, lean: 0.15 },
+      { type: 'embers', at: [0.5, 0.5], count: 6 },
+      { type: 'embers', at: [0.87, 0.55], count: 6 },
       { type: 'dust', count: 6 },
     ],
   },
