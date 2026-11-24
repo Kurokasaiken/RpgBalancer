@@ -808,3 +808,12 @@ Triage 2026-10-12 (R-156): 28 voci chiuse su evidenza kanban/artefatto — `cont
 **Plan:** `plans/PLAN-132-repo-cleanup.md`.
 **Documentation Impact:** REQUIRED — questo ledger, `plans/INDEX.md`, `test-results/cleanup/evidence.md`.
 **Esito (2026-11-24 sera):** **+12 GiB liberati** (19→31 GiB free). Via: 4 worktree `.claude` ~6.5G (fix pixiDestroy ridondante, già su main f67af6e35), `src-tauri/target` 4.4G, `tools/hud-real` ~2.1G, `dist`+`dist-playwright` ~1.3G, `.sdx-venv`+`venv` ~0.8G, `out/` 335M (incl. cv2.so vendored), 368 `_tmp` non citati, `test-results` stale ~264M, 4 run pre-ago non citati. Promossi `scripts/probes/{boot-wait,landing-check}.mjs` (citati regola 00). `protected.txt` meccanica (797 path): battezzati/citati/traps/sessions/ledger intatti, `check-protected-paths` PASS, `build:check` PASS. REVIEW batch: dir attive e strays → KEEP (ruling). **Rimandato:** cache profili provider (~1.5-2G — `.mw/providers` è symlink a mind-weaver + Canary attiva, da fare a browser chiuso) e `.git` 8.4G (filter-repo = plan separato). Evidence: `test-results/cleanup/evidence.md` + `manifest.csv`.
+
+## R-382 — Estendere la cernita agli altri progetti personali + worktree
+
+**Richiesta (verbatim, 2026-11-24):** *"dobbiamo fare qualcosa d simile anche x gli altri progetti personali? abbiamo anche worktree lavorativi, possiamo eliminarli tutti tranne queli creati questa settimana"*
+**Data:** 2026-11-24
+**Stato:** `in corso`
+**Decisioni Director (2026-11-24):** worktree → via tutti salvando i diff; benchmark work-solver → via; venv/build dir → via tutti; ACE-Step-1.5 → **via tutto il progetto** (remote pubblico, riclonabile).
+**Esito (2026-11-24 sera):** free disk 31→**52 GiB** (totale sessione: 19→52 GiB, **+33 GiB**). Rimossi: `rpg-devin` (branch mergiato), `work-solver/.claude/worktrees/image-download-832c2b` (diff ticket SIXSTER salvati in `~/progetti_personali/cleanup-salvage-2026-11-24/`), `fs-old` pruned; `work-solver/tmp/.mw/benchmark` 8.2G; venv camera-fighter/jobhunter×2/mw-trading + node_modules+dist fighting-style ~2.7G; `ACE-Step-1.5/` intero 12G.
+**Rimandato:** cache provider MW (~1.5-2G, Canary attiva), `mw-trading-crypto/data` 731M (dati mercato, REVIEW), `.git` RPG 8.4G + MW 5.2G (filter-repo = plan separato).
