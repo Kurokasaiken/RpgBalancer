@@ -105,10 +105,11 @@ invariants:
       - tests/unit/idleVillage/r374CassettoV2.test.ts
   - id: cassetto-v2-journey-glyphs
     source: director-spec
-    source_ref: R-378 (Director 2026-11-24 «nuove icone x la parte del viaggio»)
+    source_ref: R-378 rev2 (Director 2026-11-24 «i glifi dei villaggi nn vanno bene, guarda cm era il mockup» — mockup-cassetto-goblin-v3.webp)
     statement: >-
-      Le tre gambe del viaggio portano i glifi incisi dedicati `ico-boot` (marcia), `ico-tent` (campo),
-      `ico-return` (ritorno) — non più il set target/axe/gust.
+      Le tre gambe del viaggio portano i glifi incisi del mockup v3: `ico-compass` (marcia — rosa/bussola),
+      `ico-swords` (campo — spade incrociate), `ico-cycle` (ritorno — frecce circolari) — non il set
+      target/axe/gust né i glifi provvisori boot/tent/freccia.
     test_refs:
       - tests/unit/idleVillage/r374CassettoV2.test.ts
 ---

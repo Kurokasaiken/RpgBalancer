@@ -50,6 +50,9 @@ const C = {
   /** Briefing under the title: warm gold-cream — the mockup's description is gold (251,241,138); softened toward the HUD's «Day 1» ink so it does not shout. */
   briefing: '#ecdca0',
   danger: '#e86a5e',
+  /** R-378 rev2 (Director 2026-11-24 «la percentuale di vittoria falla verde (solo i numeri)»): the success
+   *  readout's own emerald — bright enough on the enamel, distinct from both gold and danger red. */
+  success: '#5fd98d',
   /** The skull emblem's own red (eyes #b70b05, brightened ~10% for legibility on the enamel) — the death % uses it (Director 2026-11-20). */
   bordeaux: '#c9140b',
   shadow: '0 14px 44px rgba(0,0,0,.68)',
@@ -236,8 +239,8 @@ const RACK_SCOPED_CSS = `
  *  signal the Director asked for («quando è completo si illuminano i gioielli»). Glow discs in screen blend
  *  over the painted gems; staggered so the crest leads the tips. */
 @keyframes cassettoJewelPulse {
-  0%, 100% { opacity: .5; transform: translate(-50%, -50%) scale(.82); }
-  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.18); }
+  0%, 100% { opacity: .38; transform: translate(-50%, -50%) scale(.78); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.22); }
 }
 [data-hudreal-cassetto] .cta-jewel {
   position: absolute; aspect-ratio: 1; border-radius: 50%; pointer-events: none;
@@ -267,8 +270,8 @@ const wellStyle: React.CSSProperties = {
 };
 
 /** The % readout (Director 2026-11-20: a big number beside the emblem). Pending → a muted dash, same height. */
-const BigPct: React.FC<{ pct?: number; tone: 'danger' | 'gold'; label: string; testId: string; leading?: React.ReactNode; size?: number }> = ({ pct, tone, label, testId, leading, size = 66 }) => {
-  const color = tone === 'danger' ? C.bordeaux : C.goldHi;
+const BigPct: React.FC<{ pct?: number; tone: 'danger' | 'gold' | 'success'; label: string; testId: string; leading?: React.ReactNode; size?: number }> = ({ pct, tone, label, testId, leading, size = 66 }) => {
+  const color = tone === 'danger' ? C.bordeaux : tone === 'success' ? C.success : C.goldHi;
   const known = pct != null;
   return (
     <span
@@ -303,7 +306,7 @@ const JOURNEY_CENTERS = [17.4, 52, 82];
  *  R-378 (Director 2026-11-24 «nuove icone x la parte del viaggio»): a striding boot for the march out, a bannered
  *  tent for the camp on site, a curved arrow for the way back. */
 const ACTIVE_LEG = 0;
-const LEG_ICONS: EngravedIconId[] = ['ico-boot', 'ico-tent', 'ico-return'];
+const LEG_ICONS: EngravedIconId[] = ['ico-compass', 'ico-swords', 'ico-cycle'];
 
 /** Vignette geometry (design units): the picture starts just under the north bar's centre line and its top-left corner is a quarter circle of radius CORNER_R. */
 const VIGNETTE_TOP = 22;
@@ -639,7 +642,7 @@ export const HudRealCassettoV2: React.FC<HudRealCassettoV2Props> = ({
             <div data-testid="cassetto-reward-well" style={{ ...wellStyle, flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: u(12), padding: `${u(38)} ${u(16)} ${u(28)} ${u(20)}` }}>
               <img src={`${ASSET}/chest.webp`} alt="" draggable={false} style={{ width: u(128), height: u(128), flexShrink: 0 }} />
               <div style={{ display: 'flex', flexDirection: 'column', gap: u(10), alignItems: 'flex-start', minWidth: 0 }}>
-                <BigPct pct={quest.successPct} tone="gold" testId="cassetto-success-pct" size={48} label={t('questExpedition.forecast.reward', { pct: Math.round(quest.successPct ?? 0) })} leading={<img src={`${ASSET}/laurel.webp`} alt="" aria-hidden draggable={false} data-laurel="" style={{ width: u(46), height: u(46), flexShrink: 0, opacity: quest.successPct != null ? 1 : 0.4 }} />} />
+                <BigPct pct={quest.successPct} tone="success" testId="cassetto-success-pct" size={48} label={t('questExpedition.forecast.reward', { pct: Math.round(quest.successPct ?? 0) })} leading={<img src={`${ASSET}/laurel.webp`} alt="" aria-hidden draggable={false} data-laurel="" style={{ width: u(46), height: u(46), flexShrink: 0, opacity: quest.successPct != null ? 1 : 0.4 }} />} />
                 {/* the concrete reward, in gold-rimmed insets under the victory % — readable at a glance, `title` carries the detail */}
                 <div data-testid="cassetto-reward-items" role="group" aria-label={t('gameFrame.cassetto.reward', 'Reward')} style={{ display: 'flex', flexWrap: 'wrap', gap: u(8), marginTop: u(2) }}>
                   {quest.rewards.map((r) => (

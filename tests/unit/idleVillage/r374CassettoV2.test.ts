@@ -74,6 +74,14 @@ describe('R-374 cassetto V2 — audit fixes', () => {
     expect(quest).toContain('rewardLevel');
   });
 
+  // INV:cassetto-v2-reward-visible — R-378 rev2 (Director 2026-11-24 «la percentuale di vittoria falla
+  // verde (solo i numeri)»): the success readout uses the emerald `success` tone, not gold.
+  it('victory % readout is green (numbers only)', () => {
+    expect(V2).toContain('pct={quest.successPct} tone="success"');
+    expect(V2).toContain("success: '#5fd98d'");
+    expect(V2).toContain("tone === 'success' ? C.success");
+  });
+
   // INV:cassetto-v2-cta-jewels — R-378 (Director 2026-11-24): when `canSend` the plaque's jewels pulse —
   // the «now clickable» affordance; disabled mounts nothing.
   it('CTA jewels mount only when canSend (lit = clickable affordance)', () => {
@@ -83,12 +91,13 @@ describe('R-374 cassetto V2 — audit fixes', () => {
     expect(V2).toContain('cassettoJewelPulse');
   });
 
-  // INV:cassetto-v2-journey-glyphs — R-378 (Director 2026-11-24): the three journey legs carry the new
-  // engraved glyphs (boot / tent / return), not the old target/axe/gust set.
-  it('journey legs use the new engraved glyphs', () => {
-    expect(V2).toContain("'ico-boot'");
-    expect(V2).toContain("'ico-tent'");
-    expect(V2).toContain("'ico-return'");
+  // INV:cassetto-v2-journey-glyphs — R-378 rev2 (Director 2026-11-24 «i glifi dei villaggi nn vanno bene,
+  // guarda cm era il mockup»): the three journey legs carry the mockup's glyphs — compass rose (outbound),
+  // crossed swords (at site), chasing arrows (return) — not the old target/axe/gust set.
+  it('journey legs use the mockup engraved glyphs', () => {
+    expect(V2).toContain("'ico-compass'");
+    expect(V2).toContain("'ico-swords'");
+    expect(V2).toContain("'ico-cycle'");
     expect(V2).not.toMatch(/LEG_ICONS[^;]*ico-target/);
   });
 
