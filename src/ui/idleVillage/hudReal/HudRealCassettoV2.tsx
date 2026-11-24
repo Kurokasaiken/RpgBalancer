@@ -77,8 +77,8 @@ export interface CassettoQuest {
   rewards: { icon: string; qty: string }[];
   /** Director ruling 2026-11-20: "% riuscita" next to the reward — the sim's `outcomePct.reward`. */
   successPct?: number;
-  /** Reward tier 1..`rewardLevelMax` → that many chests light up under the success % (mirror of the skull scale,
-   *  OB-7 app-5). Sourced from the POI's authored offer tier. Absent = pending → all dim. */
+  /** Reward tier 1..`rewardLevelMax`, sourced from the POI's authored offer tier. R-378 (Director 2026-11-24):
+   *  the mirrored chest scale was REMOVED — the field stays in the model (tier data), nothing paints it. */
   rewardLevel?: number;
   rewardLevelMax?: number;
   /** DEPRECATED (hud-real-cassetto.INV-5 / cassetto-no-cost-cell): kept in the model for source compat, NEVER painted. */
@@ -152,6 +152,13 @@ const CTA_W = 820, CTA_BOTTOM_GAP = 34;
  * column shares (padL u148 / padR u52): blocks and CTA share one centre, so nothing drifts. */
 const CTA_CENTER_U = 560;
 const CTA_H = CTA_W * PLAQUE_H / PLAQUE_W;
+/** The plaque's three painted emeralds — centres measured on the 1500×381 `cta-plaque.webp` (emerald mask):
+ *  left tip (110,225), crest (751,95), right tip (1390,222) → x%/y%/glow-width%/pulse-delay-s. */
+const CTA_JEWELS: readonly (readonly [number, number, number, number])[] = [
+  [7.3, 59, 9, 0.35],
+  [50, 23.6, 11, 0],
+  [92.7, 58.3, 9, 0.7],
+];
 
 /** Viewport-wide variant switch kept for API compatibility (the art no longer varies). */
 const WIDE_MQ = `(min-width: ${CASSETTO_WIDE_BREAKPOINT}px)`;
@@ -179,7 +186,7 @@ const RACK_SCOPED_CSS = `
   grid-auto-flow: column !important;
   /* V2 (R-374): seat columns/gap in cqw so the rack keeps the golden's proportion at any column width —
    * replaces fixed px + zoom (unsupported on Firefox). 230u ≈ 118 px at the 512 px column. */
-  grid-auto-columns: ${u(205)} !important; /* in sync with PARTY_SEAT_U (OB-7 app-7) */
+  grid-auto-columns: ${u(170)} !important; /* in sync with PARTY_SEAT_U (R-378) */
   grid-template-columns: none !important;
   gap: ${u(12)} !important;
   align-items: start !important;
@@ -225,6 +232,22 @@ const RACK_SCOPED_CSS = `
 [data-hudreal-cassetto] [data-testid^="loadout-item-"] { transition: filter 160ms ease, transform 120ms ease; border-radius: 8px; }
 [data-hudreal-cassetto] [data-testid^="loadout-item-"]:hover { filter: brightness(1.18) drop-shadow(0 0 5px rgba(223,184,87,0.45)); transform: translateY(-1px); }
 [data-hudreal-cassetto] [data-testid^="loadout-item-"]:active { transform: translateY(0) scale(0.95); }
+/* CTA jewels (R-378): when the party is complete the plaque's three emeralds pulse — the «now clickable»
+ *  signal the Director asked for («quando è completo si illuminano i gioielli»). Glow discs in screen blend
+ *  over the painted gems; staggered so the crest leads the tips. */
+@keyframes cassettoJewelPulse {
+  0%, 100% { opacity: .5; transform: translate(-50%, -50%) scale(.82); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.18); }
+}
+[data-hudreal-cassetto] .cta-jewel {
+  position: absolute; aspect-ratio: 1; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, rgba(196,255,224,.95) 0%, rgba(96,240,172,.6) 38%, transparent 68%);
+  mix-blend-mode: screen;
+  animation: cassettoJewelPulse 2.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-hudreal-cassetto] .cta-jewel { animation: none; opacity: .75; }
+}
 `;
 
 /** A framed block (well): brass hairline, dark enamel fill. */
@@ -276,9 +299,11 @@ const EmblemLevel: React.FC<{ src: string; level?: number; max: number; label: s
  *  lit Outbound interior ~60–460 → 17.4%, middle ~580–980 → 52%, right ~1040–1420 → 82%). */
 const JOURNEY_CENTERS = [17.4, 52, 82];
 
-/** Journey: the leg shown lit (the mockup lights Outbound) and the engraved glyph of each leg (outbound / on site / return). */
+/** Journey: the leg shown lit (the mockup lights Outbound) and the engraved glyph of each leg (outbound / on site / return).
+ *  R-378 (Director 2026-11-24 «nuove icone x la parte del viaggio»): a striding boot for the march out, a bannered
+ *  tent for the camp on site, a curved arrow for the way back. */
 const ACTIVE_LEG = 0;
-const LEG_ICONS: EngravedIconId[] = ['ico-target', 'ico-axe', 'ico-gust'];
+const LEG_ICONS: EngravedIconId[] = ['ico-boot', 'ico-tent', 'ico-return'];
 
 /** Vignette geometry (design units): the picture starts just under the north bar's centre line and its top-left corner is a quarter circle of radius CORNER_R. */
 const VIGNETTE_TOP = 22;
@@ -286,13 +311,16 @@ const VIGNETTE_H = 262;
 const CORNER_R = 130;
 
 /** A row that scrolls sideways under the shared engraved band — NOT arrow buttons (Director 2026-11-21: «non voglio pulsanti per andare a
- *  destra o sinistra, ma la barra come hanno già roster e stash»). The band lives in the positioned ancestor; hidden while the row fits. */
+ *  destra o sinistra, ma la barra come hanno già roster e stash»). The band lives in the positioned ancestor; hidden while the row fits.
+ *  R-378 (Director 2026-11-24 «la barra … occupa troppo spazio, falla + piccola (meno spessa)»): the cassetto's bands run slimmer
+ *  than the shared 14 px — `CASSETTO_BAND_PX`. */
+const CASSETTO_BAND_PX = 8;
 const BandedRow: React.FC<{ attrs?: Record<string, string>; rowStyle: React.CSSProperties; children: React.ReactNode }> = ({ attrs, rowStyle, children }) => {
   const ref = React.useRef<HTMLDivElement>(null);
   return (
     <>
       <div ref={ref} data-hud-scroll-band="" {...attrs} style={{ overflowX: 'auto', overflowY: 'hidden', ...rowStyle }}>{children}</div>
-      <HudScrollBandX scrollRef={ref} />
+      <HudScrollBandX scrollRef={ref} heightPx={CASSETTO_BAND_PX} />
     </>
   );
 };
@@ -302,12 +330,14 @@ const BandedRow: React.FC<{ attrs?: Record<string, string>; rowStyle: React.CSSP
  *  clipped seat fades instead of hard-cutting — the overflow affordance the audit asked for. */
 const PARTY_VISIBLE = 3;
 /* OB-7 app-7 (Director 2026-11-21): «le proporzioni vanno ritoccate» — seats slimmed 230→205 u, peek 105→80 u;
- * the well's painted frame and the journey bar below are NOT touched. Keep `grid-auto-columns` in sync. */
-const PARTY_SEAT_U = 205;
+ * the well's painted frame and the journey bar below are NOT touched. Keep `grid-auto-columns` in sync.
+ * R-378 (Director 2026-11-24 «gli slot pg sn troppo grandi e toccano il frame, rimpicciolisci un po'»): seats
+ * 205→170 u, peek 80→62 u — the seat columns now sit clear of the well's painted frame. */
+const PARTY_SEAT_U = 170;
 const PARTY_GAP_U = 12;
 /* Window = 3 full seats + a visible sliver of the 4th: the partial seat under the edge mask is the affordance that
  * says «there is more» — the scroll band alone did not read (R-374 F6). */
-const PARTY_PEEK_U = 80;
+const PARTY_PEEK_U = 62;
 const PartyScroller: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div data-cassetto-party-scroller="" style={{ position: 'relative', display: 'flex', justifyContent: 'center' }}>
     <BandedRow
@@ -464,22 +494,23 @@ export const HudRealCassettoV2: React.FC<HudRealCassettoV2Props> = ({
                 <div aria-hidden style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'radial-gradient(ellipse at 50% 22%, rgba(255,238,170,.22), transparent 62%)' }} />
               </div>
             </div>
-            {/* Title cartouche: one panel for title + briefing, double champagne filet, corner curls and the bottom gem from the golden,
-             *  a separator line between the two. */}
-            <div data-cassetto-cartouche="" style={{ position: 'relative', flex: '0 0 auto', marginTop: u(14), marginBottom: u(8), padding: `${u(14)} ${u(48)} ${u(20)}`, textAlign: 'center', border: `1px solid ${C.gold}cc`, background: 'linear-gradient(180deg, rgba(4,40,30,.45), rgba(3,30,24,.55))' }}>
-              <div aria-hidden style={{ position: 'absolute', inset: u(5), border: `1px solid ${C.gold}66`, pointerEvents: 'none' }} />
-              {([['left', 'top', ''], ['right', 'top', 'scaleX(-1)'], ['left', 'bottom', 'scaleY(-1)'], ['right', 'bottom', 'scale(-1,-1)']] as const).map(([h, v, tf]) => (
-                <img key={`${h}${v}`} aria-hidden alt="" draggable={false} src={`${ASSET}/cart-corner.webp`} style={{ position: 'absolute', [h]: u(-3), [v]: u(-3), width: u(56), height: u(54), transform: tf || undefined, pointerEvents: 'none' }} />
-              ))}
-              <img aria-hidden alt="" draggable={false} src={`${ASSET}/cart-gem.webp`} style={{ position: 'absolute', left: '50%', bottom: u(-22), width: u(132), height: u(42), transform: 'translateX(-50%)', pointerEvents: 'none' }} />
-              <div style={{ position: 'relative', fontFamily: CINZEL, fontSize: fzMin(46), fontWeight: 700, lineHeight: 1.1, letterSpacing: '0.05em', textTransform: 'uppercase',
-                /* HUD gold (the «Day 1» ink, measured (243,225,147)) as a lit gradient — the mockup's title is warm gold (252,235,139) */
-                background: 'linear-gradient(180deg, #fff3b4 0%, #f3e193 45%, #dcb857 100%)', WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent',
-                filter: 'drop-shadow(0 2px 3px rgba(0,0,0,.85))' }}>
-                {quest.title}
+            {/* Title + briefing, FREE-FLOATING on the enamel (R-378, Director 2026-11-24: «la parte del titolo e
+             *  flavour text nn m piace cm è resa» — the boxed cartouche is gone). The engraved title runs between
+             *  two hairline rules that taper into the dark, the golden's gem ornament divides title from
+             *  briefing, and the flavour text breathes without a frame. */}
+            <div data-cassetto-cartouche="" style={{ position: 'relative', flex: '0 0 auto', marginTop: u(2), marginBottom: u(6), padding: `0 ${u(28)}`, textAlign: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: u(18) }}>
+                <span aria-hidden style={{ flex: '1 1 0', height: u(2), background: `linear-gradient(90deg, transparent, ${C.gold}aa)` }} />
+                <div style={{ fontFamily: CINZEL, fontSize: fzMin(46), fontWeight: 700, lineHeight: 1.05, letterSpacing: '0.06em', textTransform: 'uppercase', whiteSpace: 'nowrap',
+                  /* HUD gold (the «Day 1» ink, measured (243,225,147)) as a lit gradient — the mockup's title is warm gold (252,235,139) */
+                  background: 'linear-gradient(180deg, #fff3b4 0%, #f3e193 45%, #dcb857 100%)', WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent',
+                  filter: 'drop-shadow(0 2px 3px rgba(0,0,0,.85))' }}>
+                  {quest.title}
+                </div>
+                <span aria-hidden style={{ flex: '1 1 0', height: u(2), background: `linear-gradient(90deg, ${C.gold}aa, transparent)` }} />
               </div>
-              <div aria-hidden style={{ height: 1, margin: `${u(12)} ${u(8)}`, background: `linear-gradient(90deg, transparent, ${C.gold}, transparent)` }} />
-              <p style={{ position: 'relative', margin: '0 auto', maxWidth: '92%', fontStyle: 'italic', fontSize: fzMin(37), lineHeight: 1.3, color: C.briefing, textShadow: '0 1px 2px rgba(0,0,0,.7)', textWrap: 'balance' }}>
+              <img aria-hidden alt="" draggable={false} src={`${ASSET}/cart-gem.webp`} style={{ display: 'block', width: u(128), height: 'auto', margin: `0 auto`, pointerEvents: 'none' }} />
+              <p style={{ margin: `${u(-4)} auto 0`, maxWidth: '96%', fontStyle: 'italic', fontSize: fzMin(36), lineHeight: 1.32, color: C.briefing, textShadow: '0 1px 2px rgba(0,0,0,.7)', textWrap: 'balance' }}>
                 {quest.briefing}
               </p>
             </div>
@@ -492,7 +523,7 @@ export const HudRealCassettoV2: React.FC<HudRealCassettoV2Props> = ({
                 <ResidentSlotRack
                   slots={slots}
                   layout="detail"
-                  slotSize={42}
+                  slotSize={36}
                   slotMaterial="hud-gold"
                   slotVariant="hud64"
                   bezelPreset="draghiGlifo"
@@ -592,8 +623,9 @@ export const HudRealCassettoV2: React.FC<HudRealCassettoV2Props> = ({
 
           {/* ---------- risk-rewards: TWO wells, NO labels (OB-7 app-5, Director 2026-11-21: «nn voglio le scritte
            *  risk e reward» — amends the 2026-11-21 «Risk/reward + journey» labels ruling). Each well: big emblem
-           *  left, then a column — the sim's % ON TOP and aligned («% sopra, n sotto, e allinearsi bene»), then
-           *  the lit/dimmed emblem scale (5 chests mirror the skulls). The reward well carries the CONCRETE
+           *  left, then a column — the sim's % ON TOP and aligned («% sopra, n sotto, e allinearsi bene»). Risk
+           *  keeps its lit/dimmed skull scale; the chest scale is GONE (R-378, Director 2026-11-24: «elimina i 5
+           *  forzieri speculari ai 5 teschi (i teschi rimangono)»). The reward well carries the CONCRETE
            *  reward under the % («mostriamo nel reward il reward, sotto la % di vittoria, presentato bene») —
            *  visible before the commit (Pillar 4), tooltip keeps the detail. NO cost cell (INV-5). ---------- */}
           <div data-block="risk-rewards" style={{ marginTop: u(22), display: 'flex', gap: u(14), flexShrink: 0 }}>
@@ -608,7 +640,6 @@ export const HudRealCassettoV2: React.FC<HudRealCassettoV2Props> = ({
               <img src={`${ASSET}/chest.webp`} alt="" draggable={false} style={{ width: u(128), height: u(128), flexShrink: 0 }} />
               <div style={{ display: 'flex', flexDirection: 'column', gap: u(10), alignItems: 'flex-start', minWidth: 0 }}>
                 <BigPct pct={quest.successPct} tone="gold" testId="cassetto-success-pct" size={48} label={t('questExpedition.forecast.reward', { pct: Math.round(quest.successPct ?? 0) })} leading={<img src={`${ASSET}/laurel.webp`} alt="" aria-hidden draggable={false} data-laurel="" style={{ width: u(46), height: u(46), flexShrink: 0, opacity: quest.successPct != null ? 1 : 0.4 }} />} />
-                <EmblemLevel src={`${ASSET}/chest.webp`} level={quest.rewardLevel} max={quest.rewardLevelMax ?? 5} testId="cassetto-reward-value" dataAttr="data-chest" label={`${t('gameFrame.cassetto.reward', 'Reward')}: ${quest.rewardLevel != null ? `${quest.rewardLevel}/${quest.rewardLevelMax ?? 5}` : '—'}`} />
                 {/* the concrete reward, in gold-rimmed insets under the victory % — readable at a glance, `title` carries the detail */}
                 <div data-testid="cassetto-reward-items" role="group" aria-label={t('gameFrame.cassetto.reward', 'Reward')} style={{ display: 'flex', flexWrap: 'wrap', gap: u(8), marginTop: u(2) }}>
                   {quest.rewards.map((r) => (
@@ -655,6 +686,16 @@ export const HudRealCassettoV2: React.FC<HudRealCassettoV2Props> = ({
               <img aria-hidden alt="" draggable={false} src={`${ASSET}/cta-plaque.webp`} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }} />
               {/* enamel-only layer: the state filters hit the lacquer and leave the brass gold (Director 2026-11-21: the disabled plaque looked dead) */}
               <img className="confirm-art" aria-hidden alt="" draggable={false} src={`${ASSET}/cta-plaque-enamel.webp`} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }} />
+              {/* R-378 (Director 2026-11-24): when the plan is complete the plaque's jewels LIGHT UP — pulsing
+               *  glows pinned on the three painted emeralds (left tip / crest / right tip of cta-plaque.webp,
+               *  centres measured on the 1500×381 source). Disabled → nothing: the lit gems ARE the affordance. */}
+              {canSend && (
+                <span aria-hidden data-testid="cassetto-cta-jewels" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+                  {CTA_JEWELS.map(([x, y, w, delay]) => (
+                    <i key={`${x}-${y}`} className="cta-jewel" style={{ left: `${x}%`, top: `${y}%`, width: `${w}%`, animationDelay: `${delay}s` }} />
+                  ))}
+                </span>
+              )}
               <span className="confirm-text" style={{ position: 'relative', fontFamily: CINZEL, fontSize: fzMin(36), fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
                 {t('gameFrame.cassetto.confirm', 'CONFIRM')}
               </span>

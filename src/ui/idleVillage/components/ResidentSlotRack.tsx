@@ -549,12 +549,27 @@ const DetailSlot = memo(({
     };
   }, [clearExtractionTimeouts]);
 
-  const handleClick = () => {
-    if (!isAssigned) {
-      onSlotClick?.(slot.id);
-      return;
-    }
-    // For assigned slots, extraction is handled by press-and-hold
+  /* R-378 (Director 2026-11-24 «gli slot dei pg devono aprire il roster»): a quick tap fires `onSlotClick`
+   *  on ANY seat, not only the empty ones. Suppressed when the gesture was a drag (pointer travelled past
+   *  the hold tolerance — swap drags must not open the roster on drop) or when a press-and-hold extraction
+   *  actually completed (the seat was just cleared — a roster opening there reads as a misfire). */
+  const pressPosRef = useRef<{ x: number; y: number } | null>(null);
+  const extractedRef = useRef(false);
+  useEffect(() => {
+    if (extractionProgress >= 1) extractedRef.current = true;
+  }, [extractionProgress]);
+
+  const trackPress = useCallback((point: { clientX?: number; clientY?: number }) => {
+    pressPosRef.current = { x: point.clientX ?? 0, y: point.clientY ?? 0 };
+    extractedRef.current = false;
+  }, []);
+
+  const handleClick = (event: React.MouseEvent) => {
+    const origin = pressPosRef.current;
+    pressPosRef.current = null;
+    if (origin && movedBeyondHold(origin, { x: event.clientX, y: event.clientY })) return;
+    if (extractedRef.current) return;
+    onSlotClick?.(slot.id);
   };
 
   /* Keyboard parity for the empty-slot click path (WS-3): Enter/Space on
@@ -663,9 +678,15 @@ const DetailSlot = memo(({
           },
           onFocus: () => onSlotHover?.(slot.id),
           onBlur: () => onSlotHover?.(null),
-          onMouseDown: isAssigned ? startExtraction : undefined,
+          onMouseDown: (event) => {
+            trackPress(event);
+            if (isAssigned) startExtraction(event);
+          },
           onMouseUp: isAssigned ? cancelExtraction : undefined,
-          onTouchStart: isAssigned ? startExtraction : undefined,
+          onTouchStart: (event) => {
+            trackPress({ clientX: event.touches[0]?.clientX, clientY: event.touches[0]?.clientY });
+            if (isAssigned) startExtraction(event);
+          },
           onTouchEnd: isAssigned ? cancelExtraction : undefined,
           className: [
             'relative',

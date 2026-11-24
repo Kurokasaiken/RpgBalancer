@@ -18,15 +18,17 @@ export interface HudScrollBandXProps {
   scrollRef: RefObject<HTMLElement | null>;
   /** Gap between the scroller's bottom edge and the band, in px (default: inside the scroller's bottom inset). */
   bottomOffsetPx?: number;
+  /** Band thickness in px (default: `HUD_SCROLL_BAND.widthPx`). The R-378 cassetto bands run slimmer. */
+  heightPx?: number;
 }
 
 interface Metrics { top: number; left: number; trackW: number; thumbLeft: number; thumbW: number; overflowing: boolean }
 
-export const HudScrollBandX: React.FC<HudScrollBandXProps> = ({ scrollRef, bottomOffsetPx = 0 }) => {
+export const HudScrollBandX: React.FC<HudScrollBandXProps> = ({ scrollRef, bottomOffsetPx = 0, heightPx }) => {
   const [band, setBand] = useState<HTMLDivElement | null>(null);
   const [m, setM] = useState<Metrics | null>(null);
   const dragRef = useRef<{ startX: number; startLeft: number; range: number } | null>(null);
-  const bandH = HUD_SCROLL_BAND.widthPx;
+  const bandH = heightPx ?? HUD_SCROLL_BAND.widthPx;
 
   const sync = useCallback(() => {
     const target = scrollRef.current;

@@ -87,6 +87,9 @@ export const HudRealCassettoHost: React.FC = () => {
     const m = /[?&]reward=(\d)/.exec(typeof window !== 'undefined' ? window.location.search : '');
     return m ? Number(m[1]) : null;
   }, []);
+  /* Lab-only witness hook: `?cansend=1` forces the plaque lit so the R-378
+   *  jewel pulse can be witnessed without a full party. */
+  const witnessCanSend = useMemo(() => /[?&]cansend=1/.test(typeof window !== 'undefined' ? window.location.search : ''), []);
   const quest: CassettoQuest = useMemo(() => {
     const fasi = poi ? journeyFasiOf(poi) : null;
     const label = session.poiView?.activity?.label ?? scenario?.title ?? 'Spedizione';
@@ -170,11 +173,11 @@ export const HudRealCassettoHost: React.FC = () => {
         onSlotClear={(slotId) => session.handleSlotClear(slotId)}
         suppressedResidentIds={session.suppressedResidentIds}
         loadout={loadout}
-        canSend={session.canSend}
+        canSend={witnessCanSend || session.canSend}
         /* R-339/PLAN-119: same reason rule as the /game adapter — the lab
          *  shows the muted plaque's inline reason too. */
         disabledReason={
-          session.canSend
+          witnessCanSend || session.canSend
             ? null
             : t(session.requiredFilled ? 'gameFrame.cassetto.confirmReason.unavailable' : 'gameFrame.cassetto.confirmReason.partyIncomplete')
         }

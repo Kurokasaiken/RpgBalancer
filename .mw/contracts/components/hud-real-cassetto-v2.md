@@ -84,12 +84,31 @@ invariants:
       - tests/unit/idleVillage/r374CassettoV2.test.ts
   - id: cassetto-v2-reward-visible
     source: director-spec
-    source_ref: OB-7 app-5 + ruling rivisto (Director 2026-11-21, charter cassetto R-375)
+    source_ref: OB-7 app-5 + ruling rivisto (Director 2026-11-21, charter cassetto R-375); amended R-378 (Director 2026-11-24)
     statement: >-
       I pozzi risk/reward NON portano le label testuali RISK/REWARD; la % sta SOPRA la scala di emblemi
-      lit/dimmed e allineata tra i due pozzi; il reward ha 5 simboli (forzieri) come il risk ha i teschi —
-      livello da `rewardLevel`/`rewardLevelMax` (tier authored del POI); il reward concreto (icone+qty)
-      è VISIBILE sotto la % di vittoria — in vista prima dell'impegno (Pillar 4), il tooltip porta il dettaglio.
+      lit/dimmed e allineata tra i due pozzi; il reward concreto (icone+qty) è VISIBILE sotto la % di
+      vittoria — in vista prima dell'impegno (Pillar 4), il tooltip porta il dettaglio.
+      Amend R-378 (Director 2026-11-24 «elimina i 5 forzieri speculari ai 5 teschi (i teschi rimangono)»):
+      la scala di forzieri è rimossa — solo il risk conserva i teschi lit/dimmed; `rewardLevel` resta nel
+      modello come dato di tier ma non è più dipinto.
+    test_refs:
+      - tests/unit/idleVillage/r374CassettoV2.test.ts
+  - id: cassetto-v2-cta-jewels
+    source: director-spec
+    source_ref: R-378 (Director 2026-11-24 «quando è completo si illuminano i gioielli»)
+    statement: >-
+      Quando `canSend` è vero i tre smeraldi dipinti della placca CTA si accendono con un pulse animato
+      (`data-testid="cassetto-cta-jewels"`, glow in screen blend sui centri misurati della placca) —
+      l'affordance «ora cliccabile»; a `canSend` falso non si monta nulla. Rispetta prefers-reduced-motion.
+    test_refs:
+      - tests/unit/idleVillage/r374CassettoV2.test.ts
+  - id: cassetto-v2-journey-glyphs
+    source: director-spec
+    source_ref: R-378 (Director 2026-11-24 «nuove icone x la parte del viaggio»)
+    statement: >-
+      Le tre gambe del viaggio portano i glifi incisi dedicati `ico-boot` (marcia), `ico-tent` (campo),
+      `ico-return` (ritorno) — non più il set target/axe/gust.
     test_refs:
       - tests/unit/idleVillage/r374CassettoV2.test.ts
 ---

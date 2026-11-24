@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react';
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import ResidentSlotRack from '@/ui/idleVillage/components/ResidentSlotRack';
 import type { ResidentSlotViewModel } from '@/ui/idleVillage/slots/types';
 
@@ -153,5 +153,44 @@ describe('ResidentSlotRack', () => {
 
     // Note: overflow detection may not trigger in test, but basic render ok
     expect(screen.getAllByText(/Slot \d+/i).length).toBeGreaterThanOrEqual(1);
+  });
+
+  /* R-378 (Director 2026-11-24 «gli slot dei pg devono aprire il roster»): a quick tap fires
+   *  onSlotClick on ANY seat — empty AND assigned. A drag (pointer moved past the hold
+   *  tolerance before the click) must NOT fire it, so swap drags never open the roster. */
+  it('fires onSlotClick on a quick tap of an assigned seat (R-378)', () => {
+    const onSlotClick = vi.fn();
+    render(
+      <ResidentSlotRack
+        slots={mockSlots}
+        layout="detail"
+        overflowBehavior="wrap"
+        onSlotDrop={noop}
+        onSlotClear={noop}
+        onSlotClick={onSlotClick}
+      />
+    );
+    const seat = screen.getByTestId('slot-button-slot-2');
+    fireEvent.mouseDown(seat, { clientX: 100, clientY: 100 });
+    fireEvent.click(seat, { clientX: 102, clientY: 101 });
+    expect(onSlotClick).toHaveBeenCalledWith('slot-2');
+  });
+
+  it('does NOT fire onSlotClick when the pointer travelled before the click (drag, R-378)', () => {
+    const onSlotClick = vi.fn();
+    render(
+      <ResidentSlotRack
+        slots={mockSlots}
+        layout="detail"
+        overflowBehavior="wrap"
+        onSlotDrop={noop}
+        onSlotClear={noop}
+        onSlotClick={onSlotClick}
+      />
+    );
+    const seat = screen.getByTestId('slot-button-slot-2');
+    fireEvent.mouseDown(seat, { clientX: 100, clientY: 100 });
+    fireEvent.click(seat, { clientX: 140, clientY: 100 });
+    expect(onSlotClick).not.toHaveBeenCalled();
   });
 });

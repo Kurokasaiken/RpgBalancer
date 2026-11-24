@@ -51,23 +51,45 @@ describe('R-374 cassetto V2 — audit fixes', () => {
   });
 
   // INV:cassetto-v2-cqw-geometry — no fixed-px grid geometry or `zoom` inside the cqw column.
-  // Seat width re-tuned OB-7 app-7 (Director: «le proporzioni vanno ritoccate») — 230 → 205 u.
+  // Seat width re-tuned OB-7 app-7 (Director: «le proporzioni vanno ritoccate») — 230 → 205 u;
+  // R-378 (Director 2026-11-24 «slot pg troppo grandi, toccano il frame») — 205 → 170 u.
   it('party rack scales in cqw (no fixed-px columns, no zoom)', () => {
     expect(V2).not.toContain('zoom:');
     expect(V2).not.toMatch(/grid-auto-columns:\s*\d+px/);
-    expect(V2).toContain('grid-auto-columns: ${u(205)}');
+    expect(V2).toContain('grid-auto-columns: ${u(170)}');
     expect(V2).toContain('size={u(52)}'); /* journey icons scale too */
   });
 
   // INV:cassetto-v2-reward-visible — OB-7 app-5 (Director 2026-11-21): no RISK/REWARD labels, % ON TOP of the
-  // lit/dimmed emblem scale (5 chests mirror the skulls), the CONCRETE reward visible under the victory %.
-  it('risk/reward wells: no labels, % on top, emblem scale + visible reward chips', () => {
+  // lit/dimmed emblem scale; the CONCRETE reward visible under the victory %. Amended R-378 (Director
+  // 2026-11-24 «elimina i 5 forzieri speculari ai 5 teschi»): the chest scale is gone — skulls stay.
+  it('risk/reward wells: no labels, % on top, skull scale only + visible reward chips', () => {
     expect(V2).not.toContain('data-testid="cassetto-risk-label"');
     expect(V2).not.toContain('data-testid="cassetto-reward-label"');
-    expect(V2).toContain('testId="cassetto-reward-value"');
+    expect(V2).toContain('testId="cassetto-risk-value"'); /* skulls stay */
+    expect(V2).not.toContain('cassetto-reward-value');
+    expect(V2).not.toContain('data-chest');
     expect(V2).toContain('data-testid="cassetto-reward-items"');
     const quest = V2.slice(V2.indexOf('interface CassettoQuest'), V2.indexOf('export interface CassettoLoadoutSlot'));
     expect(quest).toContain('rewardLevel');
+  });
+
+  // INV:cassetto-v2-cta-jewels — R-378 (Director 2026-11-24): when `canSend` the plaque's jewels pulse —
+  // the «now clickable» affordance; disabled mounts nothing.
+  it('CTA jewels mount only when canSend (lit = clickable affordance)', () => {
+    expect(V2).toContain('data-testid="cassetto-cta-jewels"');
+    expect(V2).toMatch(/canSend && \(/);
+    expect(V2).toContain('cta-jewel');
+    expect(V2).toContain('cassettoJewelPulse');
+  });
+
+  // INV:cassetto-v2-journey-glyphs — R-378 (Director 2026-11-24): the three journey legs carry the new
+  // engraved glyphs (boot / tent / return), not the old target/axe/gust set.
+  it('journey legs use the new engraved glyphs', () => {
+    expect(V2).toContain("'ico-boot'");
+    expect(V2).toContain("'ico-tent'");
+    expect(V2).toContain("'ico-return'");
+    expect(V2).not.toMatch(/LEG_ICONS[^;]*ico-target/);
   });
 
   // INV:cassetto-v2-overflow-fade — the party scroller fades at the edges instead of hard-clipping the 4th seat.
