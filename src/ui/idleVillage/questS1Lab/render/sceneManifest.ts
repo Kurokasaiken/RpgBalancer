@@ -410,6 +410,28 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
       { type: 'glint', at: [0.55, 0.7], period: 12, r: 0.004 },
     ],
   },
+  'sentiero-tracce-v3': {
+    /* f1 exploration (2026-11-24): wall of fallen trunks barring the
+     *  path, dark churned earth low-left (the PER tracks affordance),
+     *  the old climbable oak with low branches right (STR+PER), damp
+     *  ferns, amanitas, a jay. Director-baptized gen (scene-author). */
+    depth: '/assets/depth/sentiero-tracce-v3.webp',
+    depthWidth: 512,
+    depthHeight: 217,
+    imgAspect: 1024 / 434,
+    entrance: 'enter-creep',
+    pose: 'pose-watch',
+    focusAnchor: [0.45, 0.55],
+    atmosphere: [],
+    ambient: [
+      /* Dust motes in the shaft + low mist between the fern banks,
+       *  a wet glint on the churned-earth track mark. */
+      { type: 'dust', count: 12 },
+      { type: 'drift', band: [0.55, 0.7], count: 2, lean: 0.3 },
+      { type: 'glint', at: [0.3, 0.82], period: 9, r: 0.005 },
+      { type: 'glint', at: [0.36, 0.75], period: 12, r: 0.004 },
+    ],
+  },
   'ritorno-v2': {
     /* f8 return (2026-10-26): mountain descent through forest, the
      *  golden-thatched village far below at sunset — warm far / cold
