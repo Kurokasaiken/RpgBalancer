@@ -1,6 +1,8 @@
 # PLAN-133 — Slim delle history git (RPG 8.4G + mind-weaver 5.2G)
 
 **Stato:** draft — richiede via esplicita Director e finestra senza sessioni parallele.
+**Vincolo orario (Director 2026-11-25):** NON in orario lavorativo — solo sera/weekend,
+quando non ci sono sessioni di lavoro attive e il Director può firmare la lista path.
 **Parent:** R-381/R-382 (cernita artefatti; `.git` lasciato fuori scope).
 **Documentation impact:** REQUIRED — plans/INDEX, evidence post-run.
 
