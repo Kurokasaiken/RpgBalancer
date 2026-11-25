@@ -21,7 +21,7 @@ export const ROVINE_IT: ContentOverlay = {
   "intelLabels.mappaRovine": ["the rough map of the ruins", "la mappa approssimativa delle rovine"],
   "intelLabels.contattoViandante": ["the traveler who owes you a favor", "il viandante che ti deve un favore"],
   "offer.objective": ["Recover the treasure from the ruins beneath the river.", "Recuperare il tesoro dalle rovine sotto il fiume."],
-  "offer.slots.required[0].label": ["Expedition leader", "Capospedizione"],
+  "offer.slots.required[0].label": ["Leader", "Leader"],
   "offer.slots.required[0].requirement.label": ["Expedition leader", "Capospedizione"],
   "offer.slots.optional[0].label": ["Porter", "Portatore"],
   "offer.slots.optional[0].requirement.label": ["Porter", "Portatore"],

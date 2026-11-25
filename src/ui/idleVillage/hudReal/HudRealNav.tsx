@@ -17,7 +17,21 @@ import { HudTooltip } from '@/ui/idleVillage/components/gameFrame/HudTooltip';
 import { NAV_BAR as BAR } from './navBarGeometry';
 import { hudPx } from './hudType';
 
-const ASSET = '/assets/ui/hud-real/nav/bar.webp';
+const ASSET = '/assets/ui/hud-real/nav/bar-dark.webp';
+/* R-380 visual fork (Director 2026-11-24): `?navskin=green` swaps in the
+ * emerald-to-black recolour of the dock art; `?navskin=dark` is the
+ * Director-painted variant — green up top, fading to black from the bar's
+ * midline down; `?navskin=capsule` drops the painted art and docks the
+ * voices in a flat enamel capsule (green top → black bottom). */
+const ASSET_ORIG = '/assets/ui/hud-real/nav/bar.webp';
+const ASSET_GREEN = '/assets/ui/hud-real/nav/bar-green.webp';
+const ASSET_DARK = '/assets/ui/hud-real/nav/bar-dark.webp';
+type NavSkin = 'art' | 'green' | 'dark' | 'capsule';
+const navSkin = (): NavSkin => {
+  if (typeof window === 'undefined') return 'dark';
+  const s = new URLSearchParams(window.location.search).get('navskin');
+  return s === 'green' || s === 'dark' || s === 'capsule' || s === 'art' ? s : 'dark';
+};
 const C = { gold: '#f1d88a', dim: '#7d8f86', focus: '#e8c766', glow: 'rgba(240, 201, 135, 0.55)' } as const;
 
 const SCOPED_CSS = `
@@ -62,10 +76,71 @@ export function HudRealNav({ navItems, activeNavId, alsoActiveNavIds, onNavSelec
   const cy = gapL.y + gapL.h / 2;
   const medal = 96;
   const recenter = t('gameFrame.compass.recenter');
+  const skin = navSkin();
+
+  if (skin === 'capsule') {
+    const mid = Math.ceil(Math.min(navItems.length, BAR.slots.length) / 2);
+    const voices = [...navItems.slice(0, mid), null, ...navItems.slice(mid, BAR.slots.length)];
+    const btn = (item: GameFrameNavItemConfig) => {
+      const active = item.id === activeNavId || (alsoActiveNavIds?.includes(item.id) ?? false);
+      const label = t(item.labelKey);
+      return (
+        <HudTooltip key={item.id} label={label} hint={item.locked ? t('gameFrame.nav.locked') : undefined} side="top" wrap when>
+          <button
+            type="button" data-hr-nav={item.id} data-nav-id={item.id} aria-pressed={active} disabled={item.locked}
+            aria-label={item.locked ? `${label} — ${t('gameFrame.nav.locked')}` : label}
+            onClick={item.locked ? undefined : () => onNavSelect?.(item.id)}
+            style={{
+              width: 52, height: 52, display: 'grid', placeItems: 'center', position: 'relative', borderRadius: '50%',
+              boxShadow: active ? `0 0 0 2px ${C.gold}, 0 0 14px ${C.glow}` : undefined,
+              background: active ? 'radial-gradient(circle, rgba(240, 201, 135, 0.18), rgba(240, 201, 135, 0) 70%)' : undefined,
+            }}
+          >
+            <span data-hr-glyph="" style={{ display: 'grid', placeItems: 'center', filter: 'drop-shadow(0 1px 2px rgba(3, 26, 30, 0.9))' }}>
+              <HudGlyph iconId={item.icon} label={label} size={36} style={{ color: item.locked ? '#8fa89b' : active ? '#fff1bd' : C.gold, opacity: item.locked ? 0.55 : 1, filter: item.locked ? 'none' : 'drop-shadow(0 1px 0 rgba(255, 244, 200, 0.55)) drop-shadow(0 -1px 0 rgba(60, 38, 4, 0.8))' }} />
+            </span>
+            {item.locked && (
+              <span aria-hidden="true" style={{
+                position: 'absolute', right: 1, bottom: 1, width: 16, height: 16, borderRadius: '50%', display: 'grid', placeItems: 'center',
+                background: 'radial-gradient(circle at 35% 30%, #4a3a22, #1c1410 70%)', boxShadow: `0 0 0 1px ${C.gold}, 0 1px 3px rgba(0,0,0,0.8)`,
+              }}>
+                <EngravedIcon id="cmd-lock" size={10} style={{ color: C.gold }} />
+              </span>
+            )}
+          </button>
+        </HudTooltip>
+      );
+    };
+    return (
+      <nav data-hudreal-nav="" data-navskin="capsule" aria-label={t('gameFrame.nav.ariaLabel')} style={{ position: 'relative', userSelect: 'none', width: BAR.w, height: BAR.h, marginBottom: 20, display: 'grid', placeItems: 'center' }}>
+        <style>{SCOPED_CSS}</style>
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 14, padding: '14px 26px',
+          borderRadius: 999, border: '1.5px solid #b8933f',
+          background: 'linear-gradient(180deg, #12524b, #08302c 85%)',
+          boxShadow: 'inset 0 0 0 2px rgba(6, 26, 24, 0.9), inset 0 0 12px rgba(0, 0, 0, 0.45), 0 0 0 2px rgba(20, 12, 4, 0.6), 0 6px 14px rgba(0, 0, 0, 0.5)',
+        }}>
+          {voices.map((item, i) =>
+            item == null ? (
+              <HudTooltip key="recenter" label={recenter} side="top" wrap when>
+                <button type="button" data-hr-nav="recenter" aria-label={recenter} onClick={onRecenter}
+                  style={{ width: 52, height: 52, display: 'grid', placeItems: 'center', borderRadius: '50%' }}>
+                  <EngravedIcon id="ico-compass" size={34} style={{ color: C.gold }} />
+                </button>
+              </HudTooltip>
+            ) : (
+              btn(item)
+            ),
+          )}
+        </div>
+      </nav>
+    );
+  }
+
   return (
     <nav data-hudreal-nav="" aria-label={t('gameFrame.nav.ariaLabel')} style={{ position: 'relative', userSelect: 'none', width: BAR.w, height: BAR.h, marginBottom: 20 }}>
       <style>{SCOPED_CSS}</style>
-      <img src={ASSET} alt="" draggable={false} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', display: 'block' }} />
+      <img src={skin === 'green' ? ASSET_GREEN : skin === 'art' ? ASSET_ORIG : ASSET} alt="" draggable={false} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', display: 'block' }} />
       {navItems.slice(0, order.length).map((item, i) => {
         const slot = BAR.slots[order[i]];
         const active = item.id === activeNavId || (alsoActiveNavIds?.includes(item.id) ?? false);

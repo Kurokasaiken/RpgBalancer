@@ -43,7 +43,7 @@ export const LAB_CATALOG: readonly LabEntry[] = [
     family: 'expedition',
     host: 'cassetto',
     provenance: {
-      ruling: 'R-353 «vabene la v2» 2026-11-16 + iterazioni PLAN-125 (edgeMode extracted, DOM vivo)',
+      ruling: 'R-353 «vabene la v2» 2026-11-16 + PLAN-125/OB-7 (2026-11-21) + battesimo campo nero 2026-11-22 + R-378 (2026-11-24/25: seats autofit, pozzi velluto+vignettatura rev6, floor caption 12px rev5, cursor not-allowed rev4)',
       ref: '.mw/specs/expedition-ui/refs/mockup-cassetto-v2.png',
       sha256: 'd2f743ab1f7c6108',
     },
@@ -111,11 +111,12 @@ export const LAB_CATALOG: readonly LabEntry[] = [
     id: 'time-sole',
     kind: 'component',
     title: 'Barra giorno (sole + velocità)',
-    status: 'candidato',
+    status: 'battezzato',
     family: 'chrome',
     host: 'time',
     provenance: {
-      ruling: 'montato su /game; ingrandimento sole = PLAN-125 Fase 3, misura da mockup — ruling pendente',
+      ruling: 'ANCORA estetica HUD — Director 2026-11-23 «va bene al 90%, il resto si allinea a quello»; residui 10%: sole ~1.6×, aletta, cucitura cap (audit)',
+      ref: '.mw/runs/20261123-lingua-audit/AUDIT.md',
     },
   },
   {

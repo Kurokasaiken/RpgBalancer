@@ -1,44 +1,33 @@
 /**
  * GameTopChrome — the slim docked top chrome of /game
- * (R-339 / PLAN-119 T6, mw-debate `20261115-wanderlust-ui-plan`
- * artifact-r004: D3 two separate slimmer elements shifted LEFT, Director
- * ruling D10 2026-11-15 — the top-right zone is RESERVED for the future
- * docked Chronicle surface; no hanging tab. R-350, Director 2026-11-15:
- * the resource bar sits on the frame's absolute horizontal centre).
+ * (R-339 / PLAN-119 T6, artifact-r004 D3; D10 reserved the top-right zone,
+ * which R-386 now assigns to the docked Events bar — no hanging tab).
  *
- * Two of the signed slim bars (generated `bar-slim.webp` art, PLAN-112 F4)
- * kept as ONE adjacent pair: the resource bar centred on `frame.W / 2`,
- * the day banner (phase sun/moon dial seated in the emerald via
- * `timeOfDay.dialSlim`) seated flush to its left (`gapPx` apart). The
- * pair's left edge never passes the bound one `topChrome.marginPx` right
- * of whatever the left dock publishes (`insets.left`, currently unowned —
- * the Roster|Stash rail was reverted 2026-11-15). Never an overlay: the
- * chrome publishes its real occupancy into the shared `useGameLayoutInsets`
- * ledger (`top` = margin + row height × fit, 0 when hidden) so the
- * free-rect math always subtracts it.
+ * Three docked surfaces in blueprint mode: the day banner at its left dock,
+ * the resource bar centred on `frame.W / 2`, and the Events bar inside the
+ * top-right reserve. Time/resources share one `fit` — never past 1, down
+ * only to keep banner/bar inside their bounds and, while viable, outside the
+ * Events reserve. Events scales into the reserve itself; when the reserve
+ * yields on narrow canvases it hides rather than overlapping the centred bar.
  *
- * One shared `fit` scales both bars — never past 1, and down only to keep
- * the pair inside the left bound and the bar's right edge inside the
- * Chronicle reserve (`topChrome.chronicleReservePx`, real px — a soft
- * bound: below `topChrome.minFitScale` the reserve yields). The hard
- * bounds are the left bound and the window edge: the chrome never
- * overflows the screen.
- *
- * Bars render at `fit` scale inside the HUD zoom layer; `--hud-text-k = 1/fit`
- * keeps the text at its designed px, the same compensation the full bars get
- * (T8/narrow and phone layouts keep their own stacked chrome — this surface
- * is blueprint-mode only).
+ * Never an overlay: the chrome publishes its real occupancy into the shared
+ * `useGameLayoutInsets` ledger (`top` = margin + row height × fit, 0 when
+ * hidden). Bars render inside the HUD zoom layer; `--hud-text-k` keeps text
+ * at its designed px, the same compensation the full bars get.
  */
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HudRealTimeConnected } from '@/ui/idleVillage/hudReal/HudRealTimeConnected';
 import { HudRealResources } from '@/ui/idleVillage/hudReal/HudRealResources';
+import { HudRealEventsBar } from '@/ui/idleVillage/hudReal/HudRealEventsBar';
+import { EVENTS_BAR_CONFIG } from '@/balancing/config/idleVillage/eventsBarConfig';
 import { TIME_SLIM_BAR } from '@/ui/idleVillage/hudReal/timeSlimGeometry';
 import { RESOURCES_SLIM_BAR } from '@/ui/idleVillage/hudReal/resourcesSlimGeometry';
 import { CASSETTO_LAYOUT_CONFIG } from '@/balancing/config/idleVillage/cassettoLayoutConfig';
 import { useGameLayoutInsets } from '@/ui/idleVillage/store/useGameLayoutInsets';
 import type { Frame } from '@/ui/idleVillage/hudReal/layout/hudLayoutB';
 import type { ResourceReadoutItem } from './ResourceReadout';
+import type { HudEvent } from './HudEventLedger';
 
 const TC = CASSETTO_LAYOUT_CONFIG.topChrome;
 const RES_SLIM_ASSET = '/assets/ui/hud-real/resources/bar-slim.webp';
@@ -53,6 +42,8 @@ const RES_SLIM_ASSET = '/assets/ui/hud-real/resources/bar-slim.webp';
 const RES_K = (TC.capsulePx.time / TC.capsulePx.resources) * TC.resourcesBoost;
 const RES_W = RESOURCES_SLIM_BAR.w * RES_K;
 const RES_H = RESOURCES_SLIM_BAR.h * RES_K;
+const EVENTS_W = EVENTS_BAR_CONFIG.art.w;
+const EVENTS_H = EVENTS_BAR_CONFIG.art.h;
 /** Row height = the tallest bar. */
 const ROW_H = Math.max(TIME_SLIM_BAR.h, RES_H);
 
@@ -65,9 +56,15 @@ export interface GameTopChromeProps {
   visible?: boolean;
   /** The HUD frame the page resolved for blueprint mode (design px + zoom). */
   frame: Frame;
+  /** Live events shown by the docked Events bar (titles already translated). */
+  events?: HudEvent[];
+  /** Whether the Events panel is open. */
+  eventsOpen?: boolean;
+  /** Toggles the Events panel from the docked bar. */
+  onToggleEvents?: () => void;
 }
 
-export const GameTopChrome: React.FC<GameTopChromeProps> = ({ items, locked = false, visible = true, frame }) => {
+export const GameTopChrome: React.FC<GameTopChromeProps> = ({ items, locked = false, visible = true, frame, events = [], eventsOpen = false, onToggleEvents }) => {
   const { t } = useTranslation('idleVillage');
   const leftInset = useGameLayoutInsets((s) => s.insets.left);
   const publish = useGameLayoutInsets((s) => s.publish);
@@ -101,6 +98,15 @@ export const GameTopChrome: React.FC<GameTopChromeProps> = ({ items, locked = fa
    *  `fit ≤ overlapFit` is exactly banner right + gapPx ≤ bar left. */
   const resLeft = (frame.W - RES_W * fit) / 2;
   const bannerLeft = bannerDock;
+  /* R-386 (Director 2026-11-25): the top-right reserve is no longer empty —
+   *  it docks the Events bar, specular to Time. While the reserve is wide
+   *  enough to bind the chrome (`fitReserved >= minFitScale`) the bar fills
+   *  it minus the symmetric right margin; when the reserve yields on narrow
+   *  canvases the bar hides rather than overlapping the centred resources. */
+  const eventsVisible = fitReserved >= TC.minFitScale;
+  const eventsWidth = Math.max(0, (TC.chronicleReservePx - TC.marginPx) / scale);
+  const eventsFit = eventsVisible ? Math.min(1, eventsWidth / EVENTS_W) : 0;
+  const eventsLeft = frame.W - TC.marginPx - EVENTS_W * eventsFit;
 
   /* Honest occupancy (real px): top margin + the scaled row height. */
   const occupiedTop = visible ? (TC.marginPx + ROW_H * fit) * scale : 0;
@@ -113,8 +119,8 @@ export const GameTopChrome: React.FC<GameTopChromeProps> = ({ items, locked = fa
 
   /* One full-width band; each bar sits at its own left edge, vertically
    *  centred in the scaled row. */
-  const barSlot = (w: number, h: number, slotLeft: number): React.CSSProperties => ({
-    position: 'absolute', left: slotLeft, top: ((ROW_H - h) * fit) / 2, width: w * fit, height: h * fit,
+  const barSlot = (w: number, h: number, slotLeft: number, slotScale = fit): React.CSSProperties => ({
+    position: 'absolute', left: slotLeft, top: (ROW_H * fit - h * slotScale) / 2, width: w * slotScale, height: h * slotScale,
   });
   const barInner = (w: number, h: number, k = 1): React.CSSProperties => ({ position: 'absolute', left: 0, top: 0, width: w, height: h, transform: `scale(${fit * k})`, transformOrigin: 'top left' });
 
@@ -150,6 +156,21 @@ export const GameTopChrome: React.FC<GameTopChromeProps> = ({ items, locked = fa
           <HudRealResources items={items} bar={RESOURCES_SLIM_BAR} asset={RES_SLIM_ASSET} compact centerContent />
         </div>
       </div>
+      {eventsVisible && (
+        <div
+          data-hudslot="events"
+          data-testid="chrome-events"
+          style={{
+            ...barSlot(EVENTS_W, EVENTS_H, eventsLeft, eventsFit),
+            pointerEvents: 'auto',
+            ['--hud-text-k' as string]: String(eventsFit > 0 ? 1 / eventsFit : 1),
+          }}
+        >
+          <div style={{ position: 'absolute', left: 0, top: 0, width: EVENTS_W, height: EVENTS_H, transform: `scale(${eventsFit})`, transformOrigin: 'top left' }}>
+            <HudRealEventsBar events={events} open={eventsOpen} onToggle={onToggleEvents} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

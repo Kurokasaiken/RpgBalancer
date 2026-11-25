@@ -77,7 +77,6 @@ import { useGameMenuFlow } from '@/ui/idleVillage/components/gameFrame/menu/useG
 import { MenuDialogDress } from '@/ui/idleVillage/components/gameFrame/menu/GameMenuDialog';
 import { useHudPanels } from '@/ui/idleVillage/components/gameFrame/useHudPanels';
 import type { HudPanelId } from '@/ui/idleVillage/components/gameFrame/hudPanelRegistry';
-import { EngravedIcon } from '@/ui/idleVillage/components/gameFrame/engravedIcons';
 import { HudRealRoundButton } from '@/ui/idleVillage/hudReal/HudRealRoundButton';
 import { HudRealMenuPanel } from '@/ui/idleVillage/hudReal/HudRealMenuPanel';
 import { saveNowToManualSlot } from '@/ui/idleVillage/state/gameSaveService';
@@ -212,12 +211,14 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
  * re-enables. Production never mounts it (DEV_Q is empty outside dev).
  * Positions picked per biome: open sea is the worst case for the quest blue. */
 const POI_DEMO_CYCLE_TICKS = 90;
+/* R-367 (Director 2026-11-24): demo markers wear the emblem cut-outs too —
+ *  the same strabordante dioramas the real POIs carry (`iconOverflow`). */
 const POI_DEMO_MARKERS = [
-  { id: 'demo-job', type: 'job' as const, x: 0.585, y: 0.52, sizePx: 55, offset: 0.15, iconUrl: '/assets/ui/poi/offer-forage-128.webp' },
-  { id: 'demo-job-64', type: 'job' as const, x: 0.66, y: 0.62, sizePx: 55, offset: 0.65, iconUrl: '/assets/ui/hud-real/poi/poi-icon-logs.webp' },
-  { id: 'demo-quest-sea', type: 'quest' as const, x: 0.24, y: 0.5, sizePx: 55, offset: 0.55, iconUrl: '/assets/ui/poi/poi-goblin-camp-128.webp' },
-  { id: 'demo-quest-lagoon', type: 'quest' as const, x: 0.4, y: 0.68, sizePx: 55, offset: 0.85, iconUrl: '/assets/ui/poi/poi-ruins-128.webp' },
-  { id: 'demo-quest-forest', type: 'quest' as const, x: 0.47, y: 0.36, sizePx: 55, offset: 0.25, iconUrl: '/assets/ui/poi/offer-recon-128.webp' },
+  { id: 'demo-job', type: 'job' as const, x: 0.585, y: 0.52, sizePx: 55, offset: 0.15, iconUrl: '/assets/ui/poi/emblems/emblem-forage-128.webp', iconOverflowFactor: 2.3 },
+  { id: 'demo-job-64', type: 'job' as const, x: 0.66, y: 0.62, sizePx: 55, offset: 0.65, iconUrl: '/assets/ui/poi/emblems/emblem-logs-128.webp', iconOverflowFactor: 2.2 },
+  { id: 'demo-quest-sea', type: 'quest' as const, x: 0.24, y: 0.5, sizePx: 55, offset: 0.55, iconUrl: '/assets/ui/poi/emblems/emblem-goblin-camp-128.webp' },
+  { id: 'demo-quest-lagoon', type: 'quest' as const, x: 0.4, y: 0.68, sizePx: 55, offset: 0.85, iconUrl: '/assets/ui/poi/emblems/emblem-ruins-128.webp' },
+  { id: 'demo-quest-forest', type: 'quest' as const, x: 0.47, y: 0.36, sizePx: 55, offset: 0.25, iconUrl: '/assets/ui/poi/emblems/emblem-recon-128.webp' },
 ] as const;
 const POI_DEMO_ON = import.meta.env.DEV && DEV_Q.get('poiDemo') !== '0';
 
@@ -1063,7 +1064,7 @@ export default function GameMappa2Page() {
           id: demo.id,
           x: demo.x * MAPPA2_CANVAS.w,
           y: demo.y * MAPPA2_CANVAS.h,
-          node: <MapDemoPoi type={demo.type} sizePx={demo.sizePx} fraction={fraction} iconUrl={demo.iconUrl} />,
+          node: <MapDemoPoi type={demo.type} sizePx={demo.sizePx} fraction={fraction} iconUrl={demo.iconUrl} iconOverflow iconOverflowFactor={'iconOverflowFactor' in demo ? demo.iconOverflowFactor : undefined} />,
           zoomScaleExp: POI_ZANARA_CONFIG.anchorZoomScaleExp,
           zoomLod: POI_ZANARA_CONFIG.farBelowZoomRatio,
         });
@@ -1446,11 +1447,19 @@ export default function GameMappa2Page() {
       <div style={{ position: 'absolute', left: 0, top: 0, width: hud.frame.W, height: hud.frame.H, transform: `scale(${hud.frame.scale})`, transformOrigin: 'top left', pointerEvents: 'none', ...barsFade }} data-hud-mode={hud.mode} data-hud-hidden={hudHidden || undefined}>
         {/* each signed bar is scaled whole (PLAN-112 §28); --hud-text-k keeps its text at the designed px (hudPx) */}
         {/* R-339/PLAN-119 T6 (D3 + Director ruling D10): in blueprint mode the
-         *  slim day banner + resource bar dock left/center — GameTopChrome owns
-         *  its placement, keeps the top-right Chronicle zone free and publishes
+         *  slim day banner + resource bar dock left/center and the Events bar docks
+         *  in the top-right reserve — GameTopChrome owns placement and publishes
          *  `insets.top`. The signed full bars stay the phone/landscape chrome. */}
         {hud.mode === 'blueprint' ? (
-          <GameTopChrome frame={hud.frame} items={resources} locked={timeFrozen} visible={!hudHidden} />
+          <GameTopChrome
+            frame={hud.frame}
+            items={resources}
+            locked={timeFrozen}
+            visible={!hudHidden}
+            events={gameEvents}
+            eventsOpen={panels.visible.events}
+            onToggleEvents={() => panels.toggle('events')}
+          />
         ) : (
           <>
             <div data-hudslot="time" style={barStyle(hud.time, hudHidden)}>
@@ -1505,7 +1514,13 @@ export default function GameMappa2Page() {
         )}
       </div>
 
-      <div data-hud-corner="" style={{ position: 'absolute', right: `calc(${CORNER.offsetPx}px + env(safe-area-inset-right, 0px))`, bottom: `calc(${CORNER.offsetPx}px + env(safe-area-inset-bottom, 0px))`, zIndex: 6, display: 'flex', alignItems: 'flex-end', gap: CORNER.gapPx, transform: hud.cornerScale !== 1 ? `scale(${hud.cornerScale})` : undefined, transformOrigin: 'bottom right' }}>
+      {/* HUD critique run 2026-11-24 (Director picks C2+H2): the three discs sit on a shared enamel
+       *  capsule — same family as the resources/nav plaques — and the whole cluster runs at 78%
+       *  brightness, second-level chrome so the top chrome leads the hierarchy. Painted on this
+       *  element: [data-hud-corner] is deliberately outside .skin-scope (R-336), skin rules never
+       *  reach it here. */}
+      <div data-hud-corner="" style={{ position: 'absolute', right: `calc(${CORNER.offsetPx}px + env(safe-area-inset-right, 0px))`, bottom: `calc(${CORNER.offsetPx}px + env(safe-area-inset-bottom, 0px))`, zIndex: 6, display: 'flex', alignItems: 'flex-end', gap: CORNER.gapPx, transform: hud.cornerScale !== 1 ? `scale(${hud.cornerScale})` : undefined, transformOrigin: 'bottom right', filter: 'brightness(.78)' }}>
+        <div aria-hidden="true" style={{ position: 'absolute', inset: '-9px -14px', zIndex: -1, borderRadius: 999, border: '1.5px solid #b8933f', background: 'linear-gradient(180deg, #12524b, #08302c 85%)', boxShadow: 'inset 0 0 0 2px rgba(6, 26, 24, 0.9), inset 0 0 12px rgba(0, 0, 0, 0.45), 0 0 0 2px rgba(20, 12, 4, 0.6), 0 6px 14px rgba(0, 0, 0, 0.5)' }} />
         <div style={barsHidden}>
           <HudGameMenu
             visible={panels.visible}
@@ -1517,7 +1532,7 @@ export default function GameMappa2Page() {
             renderTrigger={({ open, onToggle, label }) => (
               <HudRealRoundButton label={label} shortcut="Esc" active={open} onClick={onToggle} size={CORNER.buttonPx}
                 buttonProps={{ 'aria-haspopup': 'menu', 'aria-expanded': open, 'data-testid': 'hud-menu-trigger' }}>
-                <EngravedIcon id="cmd-menu" size={CORNER.iconPx} />
+                <img src="/assets/ui/nav/ctl-menu-128.webp" alt="" aria-hidden width={CORNER.iconPx} height={CORNER.iconPx} style={{ display: 'block', objectFit: 'contain' }} />
               </HudRealRoundButton>
             )}
             renderPanel={({ children, panelProps }) => <HudRealMenuPanel panelProps={panelProps}>{children}</HudRealMenuPanel>}
@@ -1533,13 +1548,13 @@ export default function GameMappa2Page() {
               size={CORNER.buttonPx}
               buttonProps={{ 'data-testid': 'hud-director-trigger' }}
             >
-              <EngravedIcon id="ico-spark" size={CORNER.iconPx} />
+              <img src="/assets/ui/nav/ctl-director-128.webp" alt="" aria-hidden width={CORNER.iconPx} height={CORNER.iconPx} style={{ display: 'block', objectFit: 'contain' }} />
             </HudRealRoundButton>
           </div>
         )}
         <HudRealRoundButton label={t(hudHidden ? 'gameFrame.hud.show' : 'gameFrame.hud.hide')} shortcut={hideKey} active={hudHidden} onClick={toggleHud} size={CORNER.buttonPx}
           buttonProps={{ 'data-testid': 'hud-hide-toggle' }}>
-          <EngravedIcon id="cmd-eye" size={CORNER.iconPx} />
+          <img src="/assets/ui/nav/ctl-eye-128.webp" alt="" aria-hidden width={CORNER.iconPx} height={CORNER.iconPx} style={{ display: 'block', objectFit: 'contain' }} />
         </HudRealRoundButton>
       </div>
       <MenuDialogDress.Provider value="zanara">{menuFlow.screens}</MenuDialogDress.Provider>

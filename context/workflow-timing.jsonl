@@ -65,16 +65,13 @@
 {"entity":"PLAN-018","kind":"verify-artifact","at":"2026-09-29T19:28:03.253Z","confidence":"low"}
 {"entity":"PLAN-018","kind":"plan-created","at":"2026-09-30T12:04:05+02:00","confidence":"high"}
 {"entity":"PLAN-018","kind":"verify-artifact","at":"2026-09-30T13:39:13.995Z","confidence":"low"}
-{"entity":"PLAN-018","kind":"commit","at":"2026-10-09T20:44:58+02:00","cls":"docs","confidence":"high","meta":"PLAN-019-S3: parte precedente — piano battezzato + T-0 mappatura PLAN-018"}
-{"entity":"PLAN-018","kind":"commit","at":"2026-10-09T20:44:58+02:00","cls":"docs","confidence":"high","meta":"PLAN-019-S3: parte precedente — piano battezzato + T-0 mappatura PLAN-018"}
-{"entity":"PLAN-018","kind":"commit","at":"2026-10-10T06:41:08Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"PLAN-018","kind":"commit","at":"2026-10-10T06:41:08Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
 {"entity":"PLAN-019","kind":"debate","at":"2026-10-01T19:43:47.416Z","confidence":"high","meta":"start","durMs":1845442}
 {"entity":"PLAN-019","kind":"verify-artifact","at":"2026-10-01T20:14:32.857Z","confidence":"low"}
 {"entity":"PLAN-019","kind":"debate","at":"2026-10-01T20:14:32.858Z","confidence":"high","meta":"end"}
 {"entity":"PLAN-019","kind":"debate","at":"2026-10-01T20:59:54.982Z","confidence":"high","meta":"start","durMs":765590}
 {"entity":"PLAN-019","kind":"verify-artifact","at":"2026-10-01T21:12:40.571Z","confidence":"low"}
 {"entity":"PLAN-019","kind":"debate","at":"2026-10-01T21:12:40.572Z","confidence":"high","meta":"end"}
+{"entity":"PLAN-019","kind":"plan-created","at":"2026-10-02T12:38:55+02:00","confidence":"high"}
 {"entity":"PLAN-019","kind":"debate","at":"2026-10-02T11:11:27.348Z","confidence":"high","meta":"start","durMs":172511}
 {"entity":"PLAN-019","kind":"verify-artifact","at":"2026-10-02T11:12:25.921Z","confidence":"low"}
 {"entity":"PLAN-019","kind":"verify-artifact","at":"2026-10-02T11:12:25.922Z","confidence":"low"}
@@ -114,99 +111,14 @@
 {"entity":"PLAN-019","kind":"verify-artifact","at":"2026-10-02T18:02:15.618Z","confidence":"low"}
 {"entity":"PLAN-019","kind":"verify-artifact","at":"2026-10-02T18:03:38.627Z","confidence":"low"}
 {"entity":"PLAN-019","kind":"verify-artifact","at":"2026-10-02T18:05:00.002Z","confidence":"low"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T09:48:58+02:00","cls":"docs","confidence":"low","meta":"Quest POI halo on /game + QuestRunWindow baptized (R-107)"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T09:48:58+02:00","cls":"docs","confidence":"low","meta":"Quest POI halo on /game + QuestRunWindow baptized (R-107)"}
-{"entity":"PLAN-019","kind":"plan-created","at":"2026-10-09T09:48:58+02:00","confidence":"high"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T09:55:53+02:00","cls":"mixed","confidence":"low","meta":"Theatre converges into the baptized window: real adapter on the dev route (PLAN-"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T09:55:53+02:00","cls":"mixed","confidence":"low","meta":"Theatre converges into the baptized window: real adapter on the dev route (PLAN-"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T10:23:33+02:00","cls":"docs","confidence":"high","meta":"docs(plan-019): registra D-J/D-K — halo elapsed puro, nodi a schedule assoluto"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T10:23:33+02:00","cls":"docs","confidence":"high","meta":"docs(plan-019): registra D-J/D-K — halo elapsed puro, nodi a schedule assoluto"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T10:24:33+02:00","cls":"docs","confidence":"high","meta":"docs(plan-019): traccia i sotto-piani S2.1–S2.5 citati dal contenitore"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T10:24:33+02:00","cls":"docs","confidence":"high","meta":"docs(plan-019): traccia i sotto-piani S2.1–S2.5 citati dal contenitore"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T12:14:11+02:00","cls":"mixed","confidence":"high","meta":"feat(plan-019): S2.1 scenario canonico — schema Zod + migrazione goblin/rovine"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T12:14:11+02:00","cls":"mixed","confidence":"high","meta":"feat(plan-019): S2.1 scenario canonico — schema Zod + migrazione goblin/rovine"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T12:51:51+02:00","cls":"mixed","confidence":"high","meta":"PLAN-019-S2.2: party reale — adapter residente→PartyMember, item reali, calibraz"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T12:51:51+02:00","cls":"mixed","confidence":"high","meta":"PLAN-019-S2.2: party reale — adapter residente→PartyMember, item reali, calibraz"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T14:44:36+02:00","cls":"mixed","confidence":"high","meta":"PLAN-019-S2.3: offerta POI + world-scaling — resolveQuestOffer e ScenarioInstanc"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T14:44:36+02:00","cls":"mixed","confidence":"high","meta":"PLAN-019-S2.3: offerta POI + world-scaling — resolveQuestOffer e ScenarioInstanc"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T14:47:55+02:00","cls":"docs","confidence":"high","meta":"PLAN-019-S2.3: offerta POI — questPois, resolveQuestOffer, world-scaling, reward"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T14:47:55+02:00","cls":"docs","confidence":"high","meta":"PLAN-019-S2.3: offerta POI — questPois, resolveQuestOffer, world-scaling, reward"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T15:45:12+02:00","cls":"mixed","confidence":"high","meta":"R-114 / PLAN-019-S2.4: landing su /game + planning surface spedizioni"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T15:45:12+02:00","cls":"mixed","confidence":"high","meta":"R-114 / PLAN-019-S2.4: landing su /game + planning surface spedizioni"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T15:50:37+02:00","cls":"mixed","confidence":"high","meta":"PLAN-019-S2.4: E2E verdi su /game — fix hook expedition + chiusura piano"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T15:50:37+02:00","cls":"mixed","confidence":"high","meta":"PLAN-019-S2.4: E2E verdi su /game — fix hook expedition + chiusura piano"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T15:58:48+02:00","cls":"mixed","confidence":"high","meta":"PLAN-019-S2.4: rack filtrato agli slot offerti dal POI + spec E2E live-compat"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T15:58:48+02:00","cls":"mixed","confidence":"high","meta":"PLAN-019-S2.4: rack filtrato agli slot offerti dal POI + spec E2E live-compat"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T16:37:25+02:00","cls":"docs","confidence":"high","meta":"PLAN-019-S2.4: chiusura — E2E 9/9, parità forecast↔run, badge bivio live"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T16:37:25+02:00","cls":"docs","confidence":"high","meta":"PLAN-019-S2.4: chiusura — E2E 9/9, parità forecast↔run, badge bivio live"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T16:39:35+02:00","cls":"docs","confidence":"high","meta":"PLAN-019-S2.5 T-0: verifica PersistenceService — output scritto"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T16:39:35+02:00","cls":"docs","confidence":"high","meta":"PLAN-019-S2.5 T-0: verifica PersistenceService — output scritto"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T17:31:34+02:00","cls":"mixed","confidence":"high","meta":"PLAN-019-S2.5: settlement idempotente + E2E sequenziale — chiusura slice S2"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T17:31:34+02:00","cls":"mixed","confidence":"high","meta":"PLAN-019-S2.5: settlement idempotente + E2E sequenziale — chiusura slice S2"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T17:32:38+02:00","cls":"docs","confidence":"high","meta":"PLAN-019-S2.5: docs di chiusura — INDEX (slice S2 completed) + QUEST_RULES §8"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T17:32:38+02:00","cls":"docs","confidence":"high","meta":"PLAN-019-S2.5: docs di chiusura — INDEX (slice S2 completed) + QUEST_RULES §8"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T17:55:52+02:00","cls":"docs","confidence":"low","meta":"S2.5 chiusura: ratifiche Director — fuga=fallimento, scale rinviate, conseguenze"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T17:55:52+02:00","cls":"docs","confidence":"low","meta":"S2.5 chiusura: ratifiche Director — fuga=fallimento, scale rinviate, conseguenze"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T18:24:16+02:00","cls":"mixed","confidence":"low","meta":"R-107: gameplay clock canonico su /game — idratazione snapshot + loop 1s (no off"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T18:24:16+02:00","cls":"mixed","confidence":"low","meta":"R-107: gameplay clock canonico su /game — idratazione snapshot + loop 1s (no off"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T19:26:58+02:00","cls":"mixed","confidence":"low","meta":"PLAN-026 T-2: engine v2 — outcome dichiarativi (verdictTable), vars, armRolls, t"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T19:26:58+02:00","cls":"mixed","confidence":"low","meta":"PLAN-026 T-2: engine v2 — outcome dichiarativi (verdictTable), vars, armRolls, t"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T20:44:58+02:00","cls":"docs","confidence":"high","meta":"PLAN-019-S3: parte precedente — piano battezzato + T-0 mappatura PLAN-018"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T20:44:58+02:00","cls":"docs","confidence":"high","meta":"PLAN-019-S3: parte precedente — piano battezzato + T-0 mappatura PLAN-018"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T21:25:01+02:00","cls":"mixed","confidence":"high","meta":"PLAN-019-S3 T-1: modello informazione — certainChecks + revealAtPlanning"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T21:25:01+02:00","cls":"mixed","confidence":"high","meta":"PLAN-019-S3 T-1: modello informazione — certainChecks + revealAtPlanning"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T22:47:18+02:00","cls":"mixed","confidence":"high","meta":"feat(quests): PLAN-019-S3 T-2 — OUTCOME zone nel Planner"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-09T22:47:18+02:00","cls":"mixed","confidence":"high","meta":"feat(quests): PLAN-019-S3 T-2 — OUTCOME zone nel Planner"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-10T08:39:33+02:00","cls":"mixed","confidence":"high","meta":"PLAN-019-S3 T-3: LOADOUT zone — durata reale, eleggibilità onesta, draft persist"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-10T08:39:33+02:00","cls":"mixed","confidence":"high","meta":"PLAN-019-S3 T-3: LOADOUT zone — durata reale, eleggibilità onesta, draft persist"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-10T16:48:21+02:00","cls":"mixed","confidence":"high","meta":"PLAN-019-S3 T-4: preview orientativa aggregata + authoring pass goblin + scoutin"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-10T16:48:21+02:00","cls":"mixed","confidence":"high","meta":"PLAN-019-S3 T-4: preview orientativa aggregata + authoring pass goblin + scoutin"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-10T19:19:24+02:00","cls":"mixed","confidence":"high","meta":"PLAN-019-S3 T-5: misura trade-off — sweep MC party×strategia, evidenza gate"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-10T19:19:24+02:00","cls":"mixed","confidence":"high","meta":"PLAN-019-S3 T-5: misura trade-off — sweep MC party×strategia, evidenza gate"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-10T19:33:55+02:00","cls":"docs","confidence":"high","meta":"PLAN-019-S3 T-6: chiusura — gate Director passato, piano completed"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-10T19:33:55+02:00","cls":"docs","confidence":"high","meta":"PLAN-019-S3 T-6: chiusura — gate Director passato, piano completed"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-10T21:06:01+02:00","cls":"docs","confidence":"high","meta":"PLAN-019-S4: piano Integrazione battezzato (R-123)"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-10T21:06:01+02:00","cls":"docs","confidence":"high","meta":"PLAN-019-S4: piano Integrazione battezzato (R-123)"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-10T23:04:58+02:00","cls":"mixed","confidence":"high","meta":"PLAN-019-S4 T-1 — eventLog villaggio: il settlement racconta esito, caduti, feri"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-10T23:04:58+02:00","cls":"mixed","confidence":"high","meta":"PLAN-019-S4 T-1 — eventLog villaggio: il settlement racconta esito, caduti, feri"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-10T23:17:28+02:00","cls":"mixed","confidence":"high","meta":"PLAN-019-S4 T-2 — epilogo ricco: rapporto di spedizione obbligatorio a fine ques"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-10T23:17:28+02:00","cls":"mixed","confidence":"high","meta":"PLAN-019-S4 T-2 — epilogo ricco: rapporto di spedizione obbligatorio a fine ques"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-10T23:21:23+02:00","cls":"mixed","confidence":"high","meta":"PLAN-019-S4 T-3 — lifecycle POI: repeatable authored, default one-shot"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-10T23:21:23+02:00","cls":"mixed","confidence":"high","meta":"PLAN-019-S4 T-3 — lifecycle POI: repeatable authored, default one-shot"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-10T23:33:20+02:00","cls":"mixed","confidence":"high","meta":"PLAN-019-S4 T-5 — coverRiskDelta cablato nel motore (D-S4-3)"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-10T23:33:20+02:00","cls":"mixed","confidence":"high","meta":"PLAN-019-S4 T-5 — coverRiskDelta cablato nel motore (D-S4-3)"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-10T23:55:11+02:00","cls":"mixed","confidence":"low","meta":"R-123-S4-T6: artefatto «definizione di buona quest» + E2E epilogo/journal — S4 c"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-10T23:55:11+02:00","cls":"mixed","confidence":"low","meta":"R-123-S4-T6: artefatto «definizione di buona quest» + E2E epilogo/journal — S4 c"}
 {"entity":"PLAN-019","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
 {"entity":"PLAN-019","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
 {"entity":"PLAN-020","kind":"plan-created","at":"2026-10-05T14:51:55+02:00","confidence":"high"}
 {"entity":"PLAN-021","kind":"plan-created","at":"2026-10-06T18:25:14+02:00","confidence":"high"}
-{"entity":"PLAN-021","kind":"commit","at":"2026-10-09T12:37:01+02:00","cls":"docs","confidence":"low","meta":"PLAN-025 T-011: final safeguards, harness budget evidence, docs"}
-{"entity":"PLAN-021","kind":"commit","at":"2026-10-09T12:37:01+02:00","cls":"docs","confidence":"low","meta":"PLAN-025 T-011: final safeguards, harness budget evidence, docs"}
-{"entity":"PLAN-021","kind":"commit","at":"2026-10-09T14:31:45+02:00","cls":"docs","confidence":"low","meta":"PLAN-025: fix stale T-012 wording — QuestRunWindow stays canonical"}
-{"entity":"PLAN-021","kind":"commit","at":"2026-10-09T14:31:45+02:00","cls":"docs","confidence":"low","meta":"PLAN-025: fix stale T-012 wording — QuestRunWindow stays canonical"}
 {"entity":"PLAN-021","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
 {"entity":"PLAN-021","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
-{"entity":"PLAN-022","kind":"commit","at":"2026-10-06T19:57:44+02:00","cls":"mixed","confidence":"low","meta":"R-089: Quest S1 Goblin Extermination — lab polish (scroll, phase art, outcome te"}
-{"entity":"PLAN-022","kind":"commit","at":"2026-10-06T19:57:44+02:00","cls":"mixed","confidence":"low","meta":"R-089: Quest S1 Goblin Extermination — lab polish (scroll, phase art, outcome te"}
 {"entity":"PLAN-022","kind":"plan-created","at":"2026-10-06T19:57:44+02:00","confidence":"high"}
-{"entity":"PLAN-022","kind":"commit","at":"2026-10-06T20:31:42+02:00","cls":"mixed","confidence":"low","meta":"R-089 followup: combat check ~50% — goblinCheckDifficulty subtracted, not added"}
-{"entity":"PLAN-022","kind":"commit","at":"2026-10-06T20:31:42+02:00","cls":"mixed","confidence":"low","meta":"R-089 followup: combat check ~50% — goblinCheckDifficulty subtracted, not added"}
-{"entity":"PLAN-022","kind":"commit","at":"2026-10-07T15:35:14+02:00","cls":"mixed","confidence":"low","meta":"R-096: quest fun audit tooling — real engine + decision traces + random policy"}
-{"entity":"PLAN-022","kind":"commit","at":"2026-10-07T15:35:14+02:00","cls":"mixed","confidence":"low","meta":"R-096: quest fun audit tooling — real engine + decision traces + random policy"}
-{"entity":"PLAN-022","kind":"commit","at":"2026-10-07T16:06:36+02:00","cls":"mixed","confidence":"low","meta":"R-097: F5 pursuit becomes a real commitment + consumable 'later' preview"}
-{"entity":"PLAN-022","kind":"commit","at":"2026-10-07T16:06:36+02:00","cls":"mixed","confidence":"low","meta":"R-097: F5 pursuit becomes a real commitment + consumable 'later' preview"}
-{"entity":"PLAN-022","kind":"commit","at":"2026-10-07T16:27:53+02:00","cls":"mixed","confidence":"low","meta":"R-097 v2: F5 inverts the ambush gradient — flee = heavy later, pursue = blood no"}
-{"entity":"PLAN-022","kind":"commit","at":"2026-10-07T16:27:53+02:00","cls":"mixed","confidence":"low","meta":"R-097 v2: F5 inverts the ambush gradient — flee = heavy later, pursue = blood no"}
-{"entity":"PLAN-022","kind":"commit","at":"2026-10-07T21:05:36+02:00","cls":"mixed","confidence":"low","meta":"R-097 follow-up: astrolabe forced-verdict honesty, stat icons, authored F5 toll"}
-{"entity":"PLAN-022","kind":"commit","at":"2026-10-07T21:05:36+02:00","cls":"mixed","confidence":"low","meta":"R-097 follow-up: astrolabe forced-verdict honesty, stat icons, authored F5 toll"}
-{"entity":"PLAN-022","kind":"commit","at":"2026-10-08T01:15:44Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"PLAN-022","kind":"commit","at":"2026-10-08T01:15:44Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"PLAN-023","kind":"commit","at":"2026-10-08T09:46:22+02:00","cls":"mixed","confidence":"high","meta":"R-101 / PLAN-023: quest S1 lab cockpit redesign"}
-{"entity":"PLAN-023","kind":"commit","at":"2026-10-08T09:46:22+02:00","cls":"mixed","confidence":"high","meta":"R-101 / PLAN-023: quest S1 lab cockpit redesign"}
 {"entity":"PLAN-023","kind":"plan-created","at":"2026-10-08T09:46:22+02:00","confidence":"high"}
-{"entity":"PLAN-023","kind":"commit","at":"2026-10-08T17:01:58+02:00","cls":"code","confidence":"low","meta":"Time of day as a slow colour grade over the map (night darker, cooler, less satu"}
-{"entity":"PLAN-023","kind":"commit","at":"2026-10-08T17:01:58+02:00","cls":"code","confidence":"low","meta":"Time of day as a slow colour grade over the map (night darker, cooler, less satu"}
 {"entity":"PLAN-024","kind":"verify-artifact","at":"2026-08-03T06:58:23.653Z","confidence":"low"}
 {"entity":"PLAN-024","kind":"verify-artifact","at":"2026-08-03T07:00:25.078Z","confidence":"low"}
 {"entity":"PLAN-024","kind":"verify-artifact","at":"2026-08-03T07:00:25.078Z","confidence":"low"}
@@ -252,13 +164,7 @@
 {"entity":"PLAN-024","kind":"verify-artifact","at":"2026-08-03T16:30:36.998Z","confidence":"low"}
 {"entity":"PLAN-024","kind":"verify-artifact","at":"2026-08-03T16:35:05.959Z","confidence":"low"}
 {"entity":"PLAN-024","kind":"verify-artifact","at":"2026-08-03T16:35:05.959Z","confidence":"low"}
-{"entity":"PLAN-024","kind":"commit","at":"2026-10-08T11:37:30+02:00","cls":"mixed","confidence":"high","meta":"R-104 / PLAN-024: lab quest S1 restyle in Lacquer Atlas (guida HUD)"}
-{"entity":"PLAN-024","kind":"commit","at":"2026-10-08T11:37:30+02:00","cls":"mixed","confidence":"high","meta":"R-104 / PLAN-024: lab quest S1 restyle in Lacquer Atlas (guida HUD)"}
 {"entity":"PLAN-024","kind":"plan-created","at":"2026-10-08T11:37:30+02:00","confidence":"high"}
-{"entity":"PLAN-024","kind":"commit","at":"2026-10-08T17:18:20+02:00","cls":"code","confidence":"low","meta":"Goblin invasion: teal clouds close over the map again, card above them and small"}
-{"entity":"PLAN-024","kind":"commit","at":"2026-10-08T17:18:20+02:00","cls":"code","confidence":"low","meta":"Goblin invasion: teal clouds close over the map again, card above them and small"}
-{"entity":"PLAN-024","kind":"commit","at":"2026-10-09T00:41:01Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"PLAN-024","kind":"commit","at":"2026-10-09T00:41:01Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"PLAN-025","kind":"verify-artifact","at":"2026-10-08T14:44:04.213Z","confidence":"low"}
 {"entity":"PLAN-025","kind":"verify-artifact","at":"2026-10-08T14:47:16.670Z","confidence":"low"}
 {"entity":"PLAN-025","kind":"verify-artifact","at":"2026-10-08T14:47:24.118Z","confidence":"low"}
@@ -272,59 +178,15 @@
 {"entity":"PLAN-025","kind":"verify-artifact","at":"2026-10-08T15:01:53.221Z","confidence":"low"}
 {"entity":"PLAN-025","kind":"verify-artifact","at":"2026-10-08T15:02:44.506Z","confidence":"low"}
 {"entity":"PLAN-025","kind":"verify-artifact","at":"2026-10-08T15:02:44.507Z","confidence":"low"}
-{"entity":"PLAN-025","kind":"commit","at":"2026-10-08T17:21:22+02:00","cls":"mixed","confidence":"low","meta":"Quest on /game: floating run window, honest outcomes, wipe crash fix (R-106)"}
-{"entity":"PLAN-025","kind":"commit","at":"2026-10-08T17:21:22+02:00","cls":"mixed","confidence":"low","meta":"Quest on /game: floating run window, honest outcomes, wipe crash fix (R-106)"}
 {"entity":"PLAN-025","kind":"plan-created","at":"2026-10-08T17:21:22+02:00","confidence":"high"}
-{"entity":"PLAN-025","kind":"commit","at":"2026-10-08T18:34:04+02:00","cls":"mixed","confidence":"high","meta":"Quest v27 temporal frontier: engine + live clock + persistence (PLAN-025 T-004/T"}
-{"entity":"PLAN-025","kind":"commit","at":"2026-10-08T18:34:04+02:00","cls":"mixed","confidence":"high","meta":"Quest v27 temporal frontier: engine + live clock + persistence (PLAN-025 T-004/T"}
-{"entity":"PLAN-025","kind":"commit","at":"2026-10-08T19:35:07+02:00","cls":"mixed","confidence":"high","meta":"Quest theatre contract v2 + real-runtime adapter (PLAN-025 T-006)"}
-{"entity":"PLAN-025","kind":"commit","at":"2026-10-08T19:35:07+02:00","cls":"mixed","confidence":"high","meta":"Quest theatre contract v2 + real-runtime adapter (PLAN-025 T-006)"}
-{"entity":"PLAN-025","kind":"commit","at":"2026-10-09T09:55:53+02:00","cls":"mixed","confidence":"high","meta":"Theatre converges into the baptized window: real adapter on the dev route (PLAN-"}
-{"entity":"PLAN-025","kind":"commit","at":"2026-10-09T09:55:53+02:00","cls":"mixed","confidence":"high","meta":"Theatre converges into the baptized window: real adapter on the dev route (PLAN-"}
-{"entity":"PLAN-025","kind":"commit","at":"2026-10-09T11:00:21+02:00","cls":"mixed","confidence":"high","meta":"BeatSequencer: committed deltas replay as paced beats in the quest window (PLAN-"}
-{"entity":"PLAN-025","kind":"commit","at":"2026-10-09T11:00:21+02:00","cls":"mixed","confidence":"high","meta":"BeatSequencer: committed deltas replay as paced beats in the quest window (PLAN-"}
-{"entity":"PLAN-025","kind":"commit","at":"2026-10-09T11:21:46+02:00","cls":"mixed","confidence":"high","meta":"CinemaFx: letterbox/edge-flash/typewriter on tone-changing beats (PLAN-025 T-009"}
-{"entity":"PLAN-025","kind":"commit","at":"2026-10-09T11:21:46+02:00","cls":"mixed","confidence":"high","meta":"CinemaFx: letterbox/edge-flash/typewriter on tone-changing beats (PLAN-025 T-009"}
-{"entity":"PLAN-025","kind":"commit","at":"2026-10-09T12:02:57+02:00","cls":"mixed","confidence":"high","meta":"Combat legibility: horde pips, per-member exposure, -HP floater (PLAN-025 T-010)"}
-{"entity":"PLAN-025","kind":"commit","at":"2026-10-09T12:02:57+02:00","cls":"mixed","confidence":"high","meta":"Combat legibility: horde pips, per-member exposure, -HP floater (PLAN-025 T-010)"}
-{"entity":"PLAN-025","kind":"commit","at":"2026-10-09T12:37:01+02:00","cls":"docs","confidence":"high","meta":"PLAN-025 T-011: final safeguards, harness budget evidence, docs"}
-{"entity":"PLAN-025","kind":"commit","at":"2026-10-09T12:37:01+02:00","cls":"docs","confidence":"high","meta":"PLAN-025 T-011: final safeguards, harness budget evidence, docs"}
-{"entity":"PLAN-025","kind":"commit","at":"2026-10-09T14:31:45+02:00","cls":"docs","confidence":"high","meta":"PLAN-025: fix stale T-012 wording — QuestRunWindow stays canonical"}
-{"entity":"PLAN-025","kind":"commit","at":"2026-10-09T14:31:45+02:00","cls":"docs","confidence":"high","meta":"PLAN-025: fix stale T-012 wording — QuestRunWindow stays canonical"}
-{"entity":"PLAN-025","kind":"commit","at":"2026-10-09T19:18:41+02:00","cls":"mixed","confidence":"high","meta":"PLAN-025 T-012: teardown superficie QuestTheatre (rimozione totale) + budget no-"}
-{"entity":"PLAN-025","kind":"commit","at":"2026-10-09T19:18:41+02:00","cls":"mixed","confidence":"high","meta":"PLAN-025 T-012: teardown superficie QuestTheatre (rimozione totale) + budget no-"}
-{"entity":"PLAN-025","kind":"commit","at":"2026-10-10T02:38:50Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"PLAN-025","kind":"commit","at":"2026-10-10T02:38:50Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"PLAN-026","kind":"commit","at":"2026-10-09T19:26:58+02:00","cls":"mixed","confidence":"high","meta":"PLAN-026 T-2: engine v2 — outcome dichiarativi (verdictTable), vars, armRolls, t"}
-{"entity":"PLAN-026","kind":"commit","at":"2026-10-09T19:26:58+02:00","cls":"mixed","confidence":"high","meta":"PLAN-026 T-2: engine v2 — outcome dichiarativi (verdictTable), vars, armRolls, t"}
 {"entity":"PLAN-026","kind":"plan-created","at":"2026-10-09T19:26:58+02:00","confidence":"high"}
-{"entity":"PLAN-026","kind":"commit","at":"2026-10-09T19:48:39+02:00","cls":"docs","confidence":"high","meta":"PLAN-026: T-2 engine v2 marcato fatto (f04cb218)"}
-{"entity":"PLAN-026","kind":"commit","at":"2026-10-09T19:48:39+02:00","cls":"docs","confidence":"high","meta":"PLAN-026: T-2 engine v2 marcato fatto (e4555188)"}
-{"entity":"PLAN-026","kind":"commit","at":"2026-10-09T20:20:20+02:00","cls":"mixed","confidence":"high","meta":"PLAN-026 T-3: primo scenario generato «La Corsa al Passo»"}
-{"entity":"PLAN-026","kind":"commit","at":"2026-10-09T20:20:20+02:00","cls":"mixed","confidence":"high","meta":"PLAN-026 T-3: primo scenario generato «La Corsa al Passo»"}
-{"entity":"PLAN-026","kind":"commit","at":"2026-10-09T20:46:48+02:00","cls":"config","confidence":"high","meta":"PLAN-026 T-3: secondo domain kit — refactor kit/rivestimento + palude"}
-{"entity":"PLAN-026","kind":"commit","at":"2026-10-09T20:46:48+02:00","cls":"config","confidence":"high","meta":"PLAN-026 T-3: secondo domain kit — refactor kit/rivestimento + palude"}
-{"entity":"PLAN-026","kind":"commit","at":"2026-10-09T22:33:05+02:00","cls":"mixed","confidence":"high","meta":"PLAN-026 T-3: secondo gimmick «la volta che allaga» + kit miniera"}
-{"entity":"PLAN-026","kind":"commit","at":"2026-10-09T22:33:05+02:00","cls":"mixed","confidence":"high","meta":"PLAN-026 T-3: secondo gimmick «la volta che allaga» + kit miniera"}
-{"entity":"PLAN-026","kind":"commit","at":"2026-10-10T07:50:08+02:00","cls":"mixed","confidence":"high","meta":"PLAN-026 P4: benchmark MC del catalogo — 3 fix strutturali trovati"}
-{"entity":"PLAN-026","kind":"commit","at":"2026-10-10T07:50:08+02:00","cls":"mixed","confidence":"high","meta":"PLAN-026 P4: benchmark MC del catalogo — 3 fix strutturali trovati"}
-{"entity":"PLAN-026","kind":"commit","at":"2026-10-10T15:21:19+02:00","cls":"config","confidence":"high","meta":"PLAN-026 T4: offline narrative generation pipeline (P3)"}
-{"entity":"PLAN-026","kind":"commit","at":"2026-10-10T15:21:19+02:00","cls":"config","confidence":"high","meta":"PLAN-026 T4: offline narrative generation pipeline (P3)"}
-{"entity":"PLAN-026","kind":"commit","at":"2026-10-10T16:01:40+02:00","cls":"mixed","confidence":"high","meta":"PLAN-026 T5: closed quest-trait registry + schema validation"}
-{"entity":"PLAN-026","kind":"commit","at":"2026-10-10T16:01:40+02:00","cls":"mixed","confidence":"high","meta":"PLAN-026 T5: closed quest-trait registry + schema validation"}
-{"entity":"PLAN-026","kind":"commit","at":"2026-10-10T16:18:33+02:00","cls":"mixed","confidence":"high","meta":"PLAN-026 T4: second narrated imprint — race × miniera"}
-{"entity":"PLAN-026","kind":"commit","at":"2026-10-10T16:18:33+02:00","cls":"mixed","confidence":"high","meta":"PLAN-026 T4: second narrated imprint — race × miniera"}
 {"entity":"PLAN-026","kind":"commit","at":"2026-10-11T23:38:56+02:00","cls":"mixed","confidence":"low","meta":"R-152: primo imprint narrativo compilato in quest reale (gen-impr002-palude)"}
 {"entity":"PLAN-026","kind":"commit","at":"2026-10-11T23:38:56+02:00","cls":"mixed","confidence":"low","meta":"R-152: primo imprint narrativo compilato in quest reale (gen-impr002-palude)"}
 {"entity":"PLAN-026","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
 {"entity":"PLAN-026","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
 {"entity":"PLAN-027","kind":"verify-artifact","at":"2026-08-03T19:21:11.069Z","confidence":"low"}
-{"entity":"PLAN-027","kind":"commit","at":"2026-10-10T19:05:02+02:00","cls":"docs","confidence":"high","meta":"PLAN-027: narration-quality plan — r001 converged via multi-AI web debate"}
-{"entity":"PLAN-027","kind":"commit","at":"2026-10-10T19:05:02+02:00","cls":"docs","confidence":"high","meta":"PLAN-027: narration-quality plan — r001 converged via multi-AI web debate"}
 {"entity":"PLAN-027","kind":"plan-created","at":"2026-10-10T19:05:02+02:00","confidence":"high"}
 {"entity":"PLAN-027","kind":"stamp-open","at":"2026-10-10T19:05:02+02:00","confidence":"high"}
-{"entity":"PLAN-027","kind":"commit","at":"2026-10-10T20:17:19+02:00","cls":"mixed","confidence":"high","meta":"PLAN-027 r001: pipeline qualità narrazione — arc contract, critic, bilingue EN→I"}
-{"entity":"PLAN-027","kind":"commit","at":"2026-10-10T20:17:19+02:00","cls":"mixed","confidence":"high","meta":"PLAN-027 r001: pipeline qualità narrazione — arc contract, critic, bilingue EN→I"}
 {"entity":"PLAN-027","kind":"commit","at":"2026-10-11T15:17:56+02:00","cls":"config","confidence":"high","meta":"PLAN-027 r002: contratto v2 + gate promesse meccaniche"}
 {"entity":"PLAN-027","kind":"commit","at":"2026-10-11T15:17:56+02:00","cls":"config","confidence":"high","meta":"PLAN-027 r002: contratto v2 + gate promesse meccaniche"}
 {"entity":"PLAN-027","kind":"verify-artifact","at":"2026-10-19T07:54:34.389Z","confidence":"low"}
@@ -3856,7 +3718,7 @@
 {"entity":"PLAN-121","kind":"commit","at":"2026-11-15T15:29:52+01:00","cls":"mixed","confidence":"high","meta":"PLAN-121 T-2/T-3: docs read-list + skill refs per split RICHIESTE"}
 {"entity":"PLAN-121","kind":"stamp-close","at":"2026-11-15T14:31:12.469Z","confidence":"high"}
 {"entity":"PLAN-121","kind":"verify-artifact","at":"2026-11-20T14:17:40.403Z","confidence":"low"}
-{"entity":"PLAN-121","kind":"commit","at":"2026-11-20T16:33:55+01:00","cls":"mixed","confidence":"low","meta":"HUD /game: Roster+Stash consolidamento — campo smalto, banda gemma, shelf 3×2, d"}
+{"entity":"PLAN-121","kind":"commit","at":"2026-11-20T22:32:29+01:00","cls":"mixed","confidence":"low","meta":"merge: backup/main-pre-rebase-2026-11-20 into main"}
 {"entity":"PLAN-122","kind":"commit","at":"2026-11-15T15:22:12+01:00","cls":"docs","confidence":"high","meta":"docs(plan): renumber enforcement-matrix plan to PLAN-122 (collision)"}
 {"entity":"PLAN-122","kind":"commit","at":"2026-11-15T15:22:12+01:00","cls":"docs","confidence":"high","meta":"docs(plan): renumber enforcement-matrix plan to PLAN-122 (collision)"}
 {"entity":"PLAN-122","kind":"plan-created","at":"2026-11-15T15:22:12+01:00","confidence":"high"}
@@ -3908,7 +3770,8 @@
 {"entity":"PLAN-125","kind":"commit","at":"2026-11-18T22:52:44+01:00","cls":"mixed","confidence":"low","meta":"fix(verification): closure:lint hang — living:'skip' mode + delegation bypass in"}
 {"entity":"PLAN-125","kind":"commit","at":"2026-11-18T22:52:44+01:00","cls":"mixed","confidence":"low","meta":"fix(verification): closure:lint hang — living:'skip' mode + delegation bypass in"}
 {"entity":"PLAN-125","kind":"commit","at":"2026-11-20T21:49:58+01:00","cls":"mixed","confidence":"high","meta":"R-357 / PLAN-125: restyling HUD /game — cassetto DOM dal golden (palette nav, CT"}
-{"entity":"PLAN-125","kind":"commit","at":"2026-11-20T22:32:29+01:00","cls":"mixed","confidence":"low","meta":"merge: backup/main-pre-rebase-2026-11-20 into main"}
+{"entity":"PLAN-125","kind":"commit","at":"2026-11-22T20:23:52+01:00","cls":"mixed","confidence":"low","meta":"session backlog: PLAN-131 component-charter, hud cassetto contracts+assets, clau"}
+{"entity":"PLAN-125","kind":"commit","at":"2026-11-22T20:24:13+01:00","cls":"code","confidence":"low","meta":"session backlog: hud cassetto UI — skin/config/componenti idleVillage (parte 2/2"}
 {"entity":"PLAN-126","kind":"commit","at":"2026-11-17T19:27:41+01:00","cls":"docs","confidence":"high","meta":"plan: PLAN-126 /game cold-boot byte reduction (full preload preserved)"}
 {"entity":"PLAN-126","kind":"commit","at":"2026-11-17T19:27:41+01:00","cls":"docs","confidence":"high","meta":"plan: PLAN-126 /game cold-boot byte reduction (full preload preserved)"}
 {"entity":"PLAN-126","kind":"plan-created","at":"2026-11-17T19:27:41+01:00","confidence":"high"}
@@ -4154,6 +4017,73 @@
 {"entity":"PLAN-128","kind":"commit","at":"2026-11-19T20:58:36+01:00","cls":"docs","confidence":"high","meta":"plans: PLAN-127 rev.2 (split + receipts fold) + PLAN-128 rev.2, R-365 ledger"}
 {"entity":"PLAN-128","kind":"plan-created","at":"2026-11-19T20:58:36+01:00","confidence":"high"}
 {"entity":"PLAN-129","kind":"stamp-open","at":"2026-11-20T21:50:32.417Z","confidence":"high"}
+{"entity":"PLAN-129","kind":"verify-artifact","at":"2026-11-20T22:12:09.264Z","confidence":"low"}
+{"entity":"PLAN-129","kind":"verify-artifact","at":"2026-11-20T22:12:09.267Z","confidence":"low"}
+{"entity":"PLAN-129","kind":"verify-artifact","at":"2026-11-20T22:12:09.269Z","confidence":"low"}
+{"entity":"PLAN-129","kind":"commit","at":"2026-11-21T12:46:19+01:00","cls":"mixed","confidence":"high","meta":"Cassetto → linguaggio HUD (Director 2026-11-21, battezzato): pezzi standalone ge"}
+{"entity":"PLAN-129","kind":"plan-created","at":"2026-11-21T12:46:19+01:00","confidence":"high"}
+{"entity":"PLAN-130","kind":"verify-artifact","at":"2026-11-21T10:54:15.281Z","confidence":"low"}
+{"entity":"PLAN-130","kind":"verify-artifact","at":"2026-11-21T10:54:26.916Z","confidence":"low"}
+{"entity":"PLAN-130","kind":"verify-artifact","at":"2026-11-21T10:54:51.470Z","confidence":"low"}
+{"entity":"PLAN-130","kind":"verify-artifact","at":"2026-11-21T10:54:53.598Z","confidence":"low"}
+{"entity":"PLAN-130","kind":"verify-artifact","at":"2026-11-21T10:54:56.098Z","confidence":"low"}
+{"entity":"PLAN-130","kind":"verify-artifact","at":"2026-11-21T10:54:56.099Z","confidence":"low"}
+{"entity":"PLAN-130","kind":"bundle","at":"2026-11-21T11:06:21.650Z","confidence":"high"}
+{"entity":"PLAN-130","kind":"commit","at":"2026-11-21T12:51:33+01:00","cls":"mixed","confidence":"high","meta":"PLAN-130 piece-kit: registry + gate + decomposizione cassetto per hud-lab"}
+{"entity":"PLAN-130","kind":"plan-created","at":"2026-11-21T12:51:33+01:00","confidence":"high"}
+{"entity":"PLAN-131","kind":"debate","at":"2026-11-21T15:07:08.000Z","confidence":"high","meta":"start","durMs":6124000}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T15:07:34.447Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T15:13:17.327Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T15:13:43.525Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T15:13:43.895Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T15:13:43.896Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T15:27:22.303Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T15:27:24.908Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T15:27:25.150Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T15:27:25.152Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T15:29:19.090Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T15:32:09.729Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T15:32:10.693Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T15:32:10.709Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T15:35:55.977Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T15:36:00.743Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T15:44:44.882Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T15:45:08.960Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T15:45:09.579Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T15:54:39.235Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T15:58:40.850Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T16:18:19.993Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T16:38:04.498Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T16:46:16.745Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T16:46:37.511Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T16:46:37.953Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T16:46:37.978Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"debate","at":"2026-11-21T16:49:12.000Z","confidence":"high","meta":"end"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T16:49:12.366Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T16:52:00.139Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"stamp-open","at":"2026-11-21T16:59:58.756Z","confidence":"high"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T20:36:56.803Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T20:37:22.996Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T20:37:23.239Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T20:37:23.428Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T20:38:04.357Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T20:38:18.994Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T20:41:39.662Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T20:41:51.786Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T20:41:51.786Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T21:09:10.749Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T21:34:02.673Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"bundle","at":"2026-11-21T21:34:02.750Z","confidence":"high"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-21T22:22:26.050Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"verify-artifact","at":"2026-11-22T06:36:35.775Z","confidence":"low"}
+{"entity":"PLAN-131","kind":"commit","at":"2026-11-22T20:23:52+01:00","cls":"mixed","confidence":"high","meta":"session backlog: PLAN-131 component-charter, hud cassetto contracts+assets, clau"}
+{"entity":"PLAN-131","kind":"plan-created","at":"2026-11-22T20:23:52+01:00","confidence":"high"}
+{"entity":"PLAN-131","kind":"commit","at":"2026-11-22T20:24:07+01:00","cls":"code","confidence":"low","meta":"session backlog: hud cassetto UI — skin/config/componenti idleVillage (parte 1/2"}
+{"entity":"PLAN-132","kind":"stamp-open","at":"2026-11-24T21:10:38.720Z","confidence":"high"}
+{"entity":"PLAN-132","kind":"commit","at":"2026-11-24T22:26:58+01:00","cls":"mixed","confidence":"high","meta":"chore(cleanup): PLAN-132/R-381 — worktree .claude, rigenerabili, out/, tmp scrip"}
+{"entity":"PLAN-132","kind":"plan-created","at":"2026-11-24T22:26:58+01:00","confidence":"high"}
+{"entity":"PLAN-132","kind":"commit","at":"2026-11-24T22:38:02+01:00","cls":"docs","confidence":"high","meta":"docs(cleanup): PLAN-132/R-381 esito — +12GiB, rimandati provider-cache e .git"}
+{"entity":"PLAN-133","kind":"stamp-open","at":"2026-11-24T22:07:36.452Z","confidence":"high"}
 {"entity":"PLAN-2","kind":"debate","at":"2026-09-10T13:58:42.658Z","confidence":"high","meta":"start","durMs":1037918}
 {"entity":"PLAN-2","kind":"verify-artifact","at":"2026-09-10T13:58:42.659Z","confidence":"low"}
 {"entity":"PLAN-2","kind":"verify-artifact","at":"2026-09-10T13:58:42.659Z","confidence":"low"}
@@ -4210,38 +4140,6 @@
 {"entity":"R-056","kind":"debate","at":"2026-08-30T20:10:54.020Z","confidence":"high","meta":"end"}
 {"entity":"R-056","kind":"verify-artifact","at":"2026-08-30T20:10:54.020Z","confidence":"low"}
 {"entity":"R-056","kind":"verify-artifact","at":"2026-08-30T20:10:54.020Z","confidence":"low"}
-{"entity":"R-088","kind":"commit","at":"2026-10-07T09:21:49+02:00","cls":"code","confidence":"high","meta":"R-088: QuestTheatre tab su /primitives"}
-{"entity":"R-088","kind":"commit","at":"2026-10-07T09:21:49+02:00","cls":"code","confidence":"high","meta":"R-088: QuestTheatre tab su /primitives"}
-{"entity":"R-088","kind":"commit","at":"2026-10-07T18:32:07+02:00","cls":"code","confidence":"low","meta":"Remove HUD components orphaned by the page cleanup"}
-{"entity":"R-088","kind":"commit","at":"2026-10-07T18:32:07+02:00","cls":"code","confidence":"low","meta":"Remove HUD components orphaned by the page cleanup"}
-{"entity":"R-088","kind":"commit","at":"2026-10-07T21:29:38Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"R-088","kind":"commit","at":"2026-10-07T21:29:38Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"R-089","kind":"commit","at":"2026-10-06T19:57:44+02:00","cls":"mixed","confidence":"high","meta":"R-089: Quest S1 Goblin Extermination — lab polish (scroll, phase art, outcome te"}
-{"entity":"R-089","kind":"commit","at":"2026-10-06T19:57:44+02:00","cls":"mixed","confidence":"high","meta":"R-089: Quest S1 Goblin Extermination — lab polish (scroll, phase art, outcome te"}
-{"entity":"R-089","kind":"commit","at":"2026-10-06T20:31:42+02:00","cls":"mixed","confidence":"high","meta":"R-089 followup: combat check ~50% — goblinCheckDifficulty subtracted, not added"}
-{"entity":"R-089","kind":"commit","at":"2026-10-06T20:31:42+02:00","cls":"mixed","confidence":"high","meta":"R-089 followup: combat check ~50% — goblinCheckDifficulty subtracted, not added"}
-{"entity":"R-089","kind":"commit","at":"2026-10-07T02:22:19Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"R-089","kind":"commit","at":"2026-10-07T02:22:19Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"R-096","kind":"commit","at":"2026-10-07T15:35:14+02:00","cls":"mixed","confidence":"high","meta":"R-096: quest fun audit tooling — real engine + decision traces + random policy"}
-{"entity":"R-096","kind":"commit","at":"2026-10-07T15:35:14+02:00","cls":"mixed","confidence":"high","meta":"R-096: quest fun audit tooling — real engine + decision traces + random policy"}
-{"entity":"R-096","kind":"commit","at":"2026-10-07T23:44:13Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"R-096","kind":"commit","at":"2026-10-07T23:44:13Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"R-097","kind":"commit","at":"2026-10-07T16:06:36+02:00","cls":"mixed","confidence":"high","meta":"R-097: F5 pursuit becomes a real commitment + consumable 'later' preview"}
-{"entity":"R-097","kind":"commit","at":"2026-10-07T16:06:36+02:00","cls":"mixed","confidence":"high","meta":"R-097: F5 pursuit becomes a real commitment + consumable 'later' preview"}
-{"entity":"R-097","kind":"commit","at":"2026-10-07T16:27:53+02:00","cls":"mixed","confidence":"high","meta":"R-097 v2: F5 inverts the ambush gradient — flee = heavy later, pursue = blood no"}
-{"entity":"R-097","kind":"commit","at":"2026-10-07T16:27:53+02:00","cls":"mixed","confidence":"high","meta":"R-097 v2: F5 inverts the ambush gradient — flee = heavy later, pursue = blood no"}
-{"entity":"R-097","kind":"commit","at":"2026-10-07T21:05:36+02:00","cls":"mixed","confidence":"high","meta":"R-097 follow-up: astrolabe forced-verdict honesty, stat icons, authored F5 toll"}
-{"entity":"R-097","kind":"commit","at":"2026-10-07T21:05:36+02:00","cls":"mixed","confidence":"high","meta":"R-097 follow-up: astrolabe forced-verdict honesty, stat icons, authored F5 toll"}
-{"entity":"R-097","kind":"commit","at":"2026-10-07T21:09:11+02:00","cls":"mixed","confidence":"high","meta":"R-097 follow-up: fold the F5 toll into check forecast odds"}
-{"entity":"R-097","kind":"commit","at":"2026-10-07T21:09:11+02:00","cls":"mixed","confidence":"high","meta":"R-097 follow-up: fold the F5 toll into check forecast odds"}
-{"entity":"R-097","kind":"commit","at":"2026-10-08T01:16:20Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"R-097","kind":"commit","at":"2026-10-08T01:16:20Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"R-099","kind":"commit","at":"2026-10-08T01:41:59+02:00","cls":"mixed","confidence":"high","meta":"R-099: flavor layer cinematografico sul lab S1 (quest goblin)"}
-{"entity":"R-099","kind":"commit","at":"2026-10-08T01:41:59+02:00","cls":"mixed","confidence":"high","meta":"R-099: flavor layer cinematografico sul lab S1 (quest goblin)"}
-{"entity":"R-099","kind":"commit","at":"2026-10-08T12:42:52+02:00","cls":"code","confidence":"low","meta":"See-through sea while dragging: clear water over a sandy bed, two depth layers, "}
-{"entity":"R-099","kind":"commit","at":"2026-10-08T12:42:52+02:00","cls":"code","confidence":"low","meta":"See-through sea while dragging: clear water over a sandy bed, two depth layers, "}
-{"entity":"R-099","kind":"commit","at":"2026-10-08T14:56:17Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"R-099","kind":"commit","at":"2026-10-08T14:56:17Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
 {"entity":"R-1","kind":"debate","at":"2026-10-09T17:53:51.170Z","confidence":"high","meta":"start","durMs":311219}
 {"entity":"R-1","kind":"verify-artifact","at":"2026-10-09T17:59:02.387Z","confidence":"low"}
 {"entity":"R-1","kind":"debate","at":"2026-10-09T17:59:02.389Z","confidence":"high","meta":"end"}
@@ -4252,94 +4150,6 @@
 {"entity":"R-1","kind":"debate","at":"2026-10-09T18:04:08.865Z","confidence":"high","meta":"end"}
 {"entity":"R-1","kind":"verify-artifact","at":"2026-10-09T18:04:13.606Z","confidence":"low"}
 {"entity":"R-1","kind":"verify-artifact","at":"2026-10-09T18:04:18.009Z","confidence":"low"}
-{"entity":"R-1","kind":"commit","at":"2026-10-10T02:39:30Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"R-1","kind":"commit","at":"2026-10-10T02:39:30Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"R-101","kind":"commit","at":"2026-10-08T09:46:22+02:00","cls":"mixed","confidence":"high","meta":"R-101 / PLAN-023: quest S1 lab cockpit redesign"}
-{"entity":"R-101","kind":"commit","at":"2026-10-08T09:46:22+02:00","cls":"mixed","confidence":"high","meta":"R-101 / PLAN-023: quest S1 lab cockpit redesign"}
-{"entity":"R-101","kind":"commit","at":"2026-10-08T16:59:57+02:00","cls":"mixed","confidence":"low","meta":"Glass-globe tilt on Alt (the sea clears only then, not on every drag); brass-and"}
-{"entity":"R-101","kind":"commit","at":"2026-10-08T16:59:57+02:00","cls":"mixed","confidence":"low","meta":"Glass-globe tilt on Alt (the sea clears only then, not on every drag); brass-and"}
-{"entity":"R-102","kind":"commit","at":"2026-10-08T10:01:59+02:00","cls":"mixed","confidence":"high","meta":"R-102: stash loadout picker nella schermata preset del lab S1"}
-{"entity":"R-102","kind":"commit","at":"2026-10-08T10:01:59+02:00","cls":"mixed","confidence":"high","meta":"R-102: stash loadout picker nella schermata preset del lab S1"}
-{"entity":"R-102","kind":"commit","at":"2026-10-08T17:09:31+02:00","cls":"code","confidence":"low","meta":"Day/night without a filter: multiply wash (the world-sized filter rendered at 1x"}
-{"entity":"R-102","kind":"commit","at":"2026-10-08T17:09:31+02:00","cls":"code","confidence":"low","meta":"Day/night without a filter: multiply wash (the world-sized filter rendered at 1x"}
-{"entity":"R-102","kind":"commit","at":"2026-10-08T20:38:12Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"R-102","kind":"commit","at":"2026-10-08T20:38:12Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"R-103","kind":"commit","at":"2026-10-08T11:02:16+02:00","cls":"mixed","confidence":"high","meta":"R-103 P0: rework narrativo/emotivo quest goblin — testo+pacing, zero RNG"}
-{"entity":"R-103","kind":"commit","at":"2026-10-08T11:02:16+02:00","cls":"mixed","confidence":"high","meta":"R-103 P0: rework narrativo/emotivo quest goblin — testo+pacing, zero RNG"}
-{"entity":"R-103","kind":"commit","at":"2026-10-08T17:14:01+02:00","cls":"assets","confidence":"low","meta":"Medieval gauntlet cursors (\"Gauntlet Cursor\" by itsmars, CC0): steel default, go"}
-{"entity":"R-103","kind":"commit","at":"2026-10-08T17:14:01+02:00","cls":"assets","confidence":"low","meta":"Medieval gauntlet cursors (\"Gauntlet Cursor\" by itsmars, CC0): steel default, go"}
-{"entity":"R-103","kind":"commit","at":"2026-10-08T20:39:06Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"R-103","kind":"commit","at":"2026-10-08T20:39:06Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"R-104","kind":"commit","at":"2026-10-08T11:37:30+02:00","cls":"mixed","confidence":"high","meta":"R-104 / PLAN-024: lab quest S1 restyle in Lacquer Atlas (guida HUD)"}
-{"entity":"R-104","kind":"commit","at":"2026-10-08T11:37:30+02:00","cls":"mixed","confidence":"high","meta":"R-104 / PLAN-024: lab quest S1 restyle in Lacquer Atlas (guida HUD)"}
-{"entity":"R-104","kind":"commit","at":"2026-10-08T12:14:07+02:00","cls":"mixed","confidence":"high","meta":"R-104: click sul testo di transizione = avanza subito (skipTransit)"}
-{"entity":"R-104","kind":"commit","at":"2026-10-08T12:14:07+02:00","cls":"mixed","confidence":"high","meta":"R-104: click sul testo di transizione = avanza subito (skipTransit)"}
-{"entity":"R-104","kind":"commit","at":"2026-10-08T12:39:30+02:00","cls":"code","confidence":"high","meta":"R-104: tooltip X-ray in portale + plinth auto-height + belt leggibile"}
-{"entity":"R-104","kind":"commit","at":"2026-10-08T12:39:30+02:00","cls":"code","confidence":"high","meta":"R-104: tooltip X-ray in portale + plinth auto-height + belt leggibile"}
-{"entity":"R-104","kind":"commit","at":"2026-10-08T17:52:15+02:00","cls":"code","confidence":"low","meta":"Clouds are born at the upwind edge and dissolve at the far edge; rare sea wonder"}
-{"entity":"R-104","kind":"commit","at":"2026-10-08T17:52:15+02:00","cls":"code","confidence":"low","meta":"Clouds are born at the upwind edge and dissolve at the far edge; rare sea wonder"}
-{"entity":"R-104","kind":"commit","at":"2026-10-09T00:41:47Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"R-104","kind":"commit","at":"2026-10-09T00:41:47Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"R-106","kind":"commit","at":"2026-10-08T17:21:22+02:00","cls":"mixed","confidence":"high","meta":"Quest on /game: floating run window, honest outcomes, wipe crash fix (R-106)"}
-{"entity":"R-106","kind":"commit","at":"2026-10-08T17:21:22+02:00","cls":"mixed","confidence":"high","meta":"Quest on /game: floating run window, honest outcomes, wipe crash fix (R-106)"}
-{"entity":"R-106","kind":"commit","at":"2026-10-08T19:35:17+02:00","cls":"docs","confidence":"high","meta":"Kanban: R-106-T006 contract v2 + real-runtime adapter row"}
-{"entity":"R-106","kind":"commit","at":"2026-10-08T19:35:17+02:00","cls":"docs","confidence":"high","meta":"Kanban: R-106-T006 contract v2 + real-runtime adapter row"}
-{"entity":"R-106","kind":"commit","at":"2026-10-09T09:56:10+02:00","cls":"docs","confidence":"high","meta":"Kanban: R-106-T007 theatre convergence row"}
-{"entity":"R-106","kind":"commit","at":"2026-10-09T09:56:10+02:00","cls":"docs","confidence":"high","meta":"Kanban: R-106-T007 theatre convergence row"}
-{"entity":"R-106","kind":"commit","at":"2026-10-09T19:27:45Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"R-106","kind":"commit","at":"2026-10-09T19:27:45Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"R-107","kind":"commit","at":"2026-10-09T09:48:58+02:00","cls":"docs","confidence":"high","meta":"Quest POI halo on /game + QuestRunWindow baptized (R-107)"}
-{"entity":"R-107","kind":"commit","at":"2026-10-09T09:48:58+02:00","cls":"docs","confidence":"high","meta":"Quest POI halo on /game + QuestRunWindow baptized (R-107)"}
-{"entity":"R-107","kind":"commit","at":"2026-10-09T18:24:16+02:00","cls":"mixed","confidence":"high","meta":"R-107: gameplay clock canonico su /game — idratazione snapshot + loop 1s (no off"}
-{"entity":"R-107","kind":"commit","at":"2026-10-09T18:24:16+02:00","cls":"mixed","confidence":"high","meta":"R-107: gameplay clock canonico su /game — idratazione snapshot + loop 1s (no off"}
-{"entity":"R-107","kind":"commit","at":"2026-10-09T23:27:09Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"R-107","kind":"commit","at":"2026-10-09T23:27:09Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"R-114","kind":"commit","at":"2026-10-09T15:45:12+02:00","cls":"mixed","confidence":"high","meta":"R-114 / PLAN-019-S2.4: landing su /game + planning surface spedizioni"}
-{"entity":"R-114","kind":"commit","at":"2026-10-09T15:45:12+02:00","cls":"mixed","confidence":"high","meta":"R-114 / PLAN-019-S2.4: landing su /game + planning surface spedizioni"}
-{"entity":"R-114","kind":"commit","at":"2026-10-09T15:58:02+02:00","cls":"docs","confidence":"high","meta":"R-114: chiusura richiesta — landing /game + deploy Vercel verificato"}
-{"entity":"R-114","kind":"commit","at":"2026-10-09T15:58:02+02:00","cls":"docs","confidence":"high","meta":"R-114: chiusura richiesta — landing /game + deploy Vercel verificato"}
-{"entity":"R-114","kind":"commit","at":"2026-10-09T23:26:30Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"R-114","kind":"commit","at":"2026-10-09T23:26:30Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"R-119","kind":"commit","at":"2026-10-09T20:47:29+02:00","cls":"mixed","confidence":"high","meta":"R-119: E2E lifecycle quest goblin su /game — consumo POI + fix doppio clock"}
-{"entity":"R-119","kind":"commit","at":"2026-10-09T20:47:29+02:00","cls":"mixed","confidence":"high","meta":"R-119: E2E lifecycle quest goblin su /game — consumo POI + fix doppio clock"}
-{"entity":"R-119","kind":"commit","at":"2026-10-10T16:10:28+02:00","cls":"tests","confidence":"high","meta":"R-119: lifecycle spec — gold readout HUD nel DOM + pannello alto su 720p"}
-{"entity":"R-119","kind":"commit","at":"2026-10-10T16:10:28+02:00","cls":"tests","confidence":"high","meta":"R-119: lifecycle spec — gold readout HUD nel DOM + pannello alto su 720p"}
-{"entity":"R-119","kind":"commit","at":"2026-10-10T16:44:56+02:00","cls":"docs","confidence":"high","meta":"R-119: guida E2E lifecycle goblin — debugging incrementale del flusso"}
-{"entity":"R-119","kind":"commit","at":"2026-10-10T16:44:56+02:00","cls":"docs","confidence":"high","meta":"R-119: guida E2E lifecycle goblin — debugging incrementale del flusso"}
-{"entity":"R-119","kind":"commit","at":"2026-10-10T20:50:42+02:00","cls":"mixed","confidence":"high","meta":"R-119: prova E2E Director = pipeline POI + fix race ferite (5 tick)"}
-{"entity":"R-119","kind":"commit","at":"2026-10-10T20:50:42+02:00","cls":"mixed","confidence":"high","meta":"R-119: prova E2E Director = pipeline POI + fix race ferite (5 tick)"}
-{"entity":"R-119","kind":"commit","at":"2026-10-10T22:53:30Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"R-119","kind":"commit","at":"2026-10-10T22:53:30Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"R-120","kind":"commit","at":"2026-10-10T18:56:50+02:00","cls":"mixed","confidence":"high","meta":"R-120 + R-121: /game map fixes — paired cloud shadows, island sits above nav"}
-{"entity":"R-120","kind":"commit","at":"2026-10-10T18:56:50+02:00","cls":"mixed","confidence":"high","meta":"R-120 + R-121: /game map fixes — paired cloud shadows, island sits above nav"}
-{"entity":"R-120","kind":"commit","at":"2026-10-10T21:56:45Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"R-120","kind":"commit","at":"2026-10-10T21:56:45Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"R-121","kind":"commit","at":"2026-10-10T18:56:50+02:00","cls":"mixed","confidence":"high","meta":"R-120 + R-121: /game map fixes — paired cloud shadows, island sits above nav"}
-{"entity":"R-121","kind":"commit","at":"2026-10-10T18:56:50+02:00","cls":"mixed","confidence":"high","meta":"R-120 + R-121: /game map fixes — paired cloud shadows, island sits above nav"}
-{"entity":"R-121","kind":"commit","at":"2026-10-10T18:58:38+02:00","cls":"docs","confidence":"high","meta":"R-121: bugfix pattern candidate"}
-{"entity":"R-121","kind":"commit","at":"2026-10-10T18:58:38+02:00","cls":"docs","confidence":"high","meta":"R-121: bugfix pattern candidate"}
-{"entity":"R-121","kind":"commit","at":"2026-10-10T22:52:50Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"R-121","kind":"commit","at":"2026-10-10T22:52:50Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"R-123","kind":"commit","at":"2026-10-10T19:07:17+02:00","cls":"mixed","confidence":"high","meta":"R-123: Director «start goblin quest» converge sul tubo canonico del POI"}
-{"entity":"R-123","kind":"commit","at":"2026-10-10T19:07:17+02:00","cls":"mixed","confidence":"high","meta":"R-123: Director «start goblin quest» converge sul tubo canonico del POI"}
-{"entity":"R-123","kind":"commit","at":"2026-10-10T21:06:01+02:00","cls":"docs","confidence":"high","meta":"PLAN-019-S4: piano Integrazione battezzato (R-123)"}
-{"entity":"R-123","kind":"commit","at":"2026-10-10T21:06:01+02:00","cls":"docs","confidence":"high","meta":"PLAN-019-S4: piano Integrazione battezzato (R-123)"}
-{"entity":"R-123","kind":"commit","at":"2026-10-10T23:55:11+02:00","cls":"mixed","confidence":"high","meta":"R-123-S4-T6: artefatto «definizione di buona quest» + E2E epilogo/journal — S4 c"}
-{"entity":"R-123","kind":"commit","at":"2026-10-10T23:55:11+02:00","cls":"mixed","confidence":"high","meta":"R-123-S4-T6: artefatto «definizione di buona quest» + E2E epilogo/journal — S4 c"}
-{"entity":"R-123","kind":"commit","at":"2026-10-11T07:49:33Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"R-123","kind":"commit","at":"2026-10-11T07:49:33Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"R-124","kind":"commit","at":"2026-10-10T22:14:27+02:00","cls":"mixed","confidence":"high","meta":"R-124 /game: POI nascosti finché la Regia non li rivela + halo semantica (vuota→"}
-{"entity":"R-124","kind":"commit","at":"2026-10-10T22:14:27+02:00","cls":"mixed","confidence":"high","meta":"R-124 /game: POI nascosti finché la Regia non li rivela + halo semantica (vuota→"}
-{"entity":"R-124","kind":"commit","at":"2026-10-11T01:34:53Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"R-124","kind":"commit","at":"2026-10-11T01:34:53Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"R-125","kind":"commit","at":"2026-10-10T22:32:31+02:00","cls":"mixed","confidence":"high","meta":"R-125: «Assigned party» della QuestRunWindow renderizza il PgCard canonico"}
-{"entity":"R-125","kind":"commit","at":"2026-10-10T22:32:31+02:00","cls":"mixed","confidence":"high","meta":"R-125: «Assigned party» della QuestRunWindow renderizza il PgCard canonico"}
-{"entity":"R-125","kind":"commit","at":"2026-10-11T01:35:45Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"R-125","kind":"commit","at":"2026-10-11T01:35:45Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"R-126","kind":"commit","at":"2026-10-10T22:58:06+02:00","cls":"mixed","confidence":"high","meta":"R-126: roster reale 3 eroi + 3 popolani — party completo via drag reale nel life"}
-{"entity":"R-126","kind":"commit","at":"2026-10-10T22:58:06+02:00","cls":"mixed","confidence":"high","meta":"R-126: roster reale 3 eroi + 3 popolani — party completo via drag reale nel life"}
-{"entity":"R-126","kind":"commit","at":"2026-10-11T07:48:57Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"R-126","kind":"commit","at":"2026-10-11T07:48:57Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"R-129","kind":"debate","at":"2026-08-23T15:55:48.338Z","confidence":"high","meta":"start","durMs":0}
 {"entity":"R-129","kind":"debate","at":"2026-08-23T15:55:48.338Z","confidence":"high","meta":"end"}
 {"entity":"R-129","kind":"verify-artifact","at":"2026-08-23T15:55:48.338Z","confidence":"low"}
@@ -6473,6 +6283,7 @@
 {"entity":"R-357","kind":"verify-artifact","at":"2026-11-19T06:45:19.815Z","confidence":"low"}
 {"entity":"R-357","kind":"verify-artifact","at":"2026-11-19T06:45:20.618Z","confidence":"low"}
 {"entity":"R-357","kind":"commit","at":"2026-11-20T21:49:58+01:00","cls":"mixed","confidence":"high","meta":"R-357 / PLAN-125: restyling HUD /game — cassetto DOM dal golden (palette nav, CT"}
+{"entity":"R-357","kind":"commit","at":"2026-11-20T23:15:28+01:00","cls":"mixed","confidence":"low","meta":"chore: quarantine broken merge files (2026-11-20)"}
 {"entity":"R-358","kind":"commit","at":"2026-11-17T20:17:51+01:00","cls":"mixed","confidence":"high","meta":"PLAN-126 (R-358): Phase A misura + Phase B parziale — strumentazione e regressio"}
 {"entity":"R-358","kind":"commit","at":"2026-11-17T20:17:51+01:00","cls":"mixed","confidence":"high","meta":"PLAN-126 (R-358): Phase A misura + Phase B parziale — strumentazione e regressio"}
 {"entity":"R-358","kind":"commit","at":"2026-11-17T21:53:13+01:00","cls":"assets","confidence":"high","meta":"PLAN-126 (R-358) T-B4: re-encode approvato D-1 — wire boot set −29%"}
@@ -6494,222 +6305,59 @@
 {"entity":"R-359","kind":"commit","at":"2026-11-18T21:47:21+01:00","cls":"other","confidence":"low","meta":"contracts: coverage exceptions for slice-kit/hud-real tooling (10 files)"}
 {"entity":"R-365","kind":"commit","at":"2026-11-19T20:58:36+01:00","cls":"docs","confidence":"high","meta":"plans: PLAN-127 rev.2 (split + receipts fold) + PLAN-128 rev.2, R-365 ledger"}
 {"entity":"R-365","kind":"commit","at":"2026-11-19T23:09:28+01:00","cls":"docs","confidence":"high","meta":"ledger: R-365 receipts layer implemented (PLAN-127 OB-11..15)"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-06T23:04:42Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-06T23:04:42Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-06T23:05:24Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-06T23:05:24Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-07T02:21:42Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-07T02:21:42Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-07T07:23:53Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-07T07:23:53Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-07T07:24:34Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-07T07:24:34Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-07T09:01:52Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-07T09:01:52Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-07T09:02:35Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-07T09:02:35Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-07T18:03:38+02:00","cls":"code","confidence":"low","meta":"HUD /game: Lacquer Atlas plaque system, Roster V2, graded map, POI deadline halo"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-07T18:03:38+02:00","cls":"code","confidence":"low","meta":"HUD /game: Lacquer Atlas plaque system, Roster V2, graded map, POI deadline halo"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-07T18:14:40+02:00","cls":"code","confidence":"low","meta":"Remove obsolete test pages and their routes"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-07T18:14:40+02:00","cls":"code","confidence":"low","meta":"Remove obsolete test pages and their routes"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-07T18:14:40+02:00","cls":"code","confidence":"low","meta":"/game: goblin invasion uses the World Surface event sequence"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-07T18:14:40+02:00","cls":"code","confidence":"low","meta":"/game: goblin invasion uses the World Surface event sequence"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-07T18:19:36+02:00","cls":"mixed","confidence":"low","meta":"Invasion card fades in place on /game; self-host EB Garamond and Cinzel"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-07T18:19:36+02:00","cls":"mixed","confidence":"low","meta":"Invasion card fades in place on /game; self-host EB Garamond and Cinzel"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-07T16:23:44Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-07T16:23:44Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-07T16:24:27Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-07T16:24:27Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-07T21:28:58Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-07T21:28:58Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-07T23:43:32Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-07T23:43:32Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T07:32:54Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T07:32:54Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T07:33:35Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T07:33:35Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T10:02:38+02:00","cls":"code","confidence":"low","meta":"Event ledger: two-line titles, danger rows carry a tone edge, rows can be select"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T10:02:38+02:00","cls":"code","confidence":"low","meta":"Event ledger: two-line titles, danger rows carry a tone edge, rows can be select"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T10:03:19+02:00","cls":"mixed","confidence":"low","meta":"Time controls: Space and 1-4 shortcuts with hints, softer held-speed ring while "}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T10:03:19+02:00","cls":"mixed","confidence":"low","meta":"Time controls: Space and 1-4 shortcuts with hints, softer held-speed ring while "}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T10:04:07+02:00","cls":"mixed","confidence":"low","meta":"Roster: hide the normal status, name the bars on hover"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T10:04:07+02:00","cls":"mixed","confidence":"low","meta":"Roster: hide the normal status, name the bars on hover"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T10:06:13+02:00","cls":"code","confidence":"low","meta":"Map: translucent sea over a parallax seabed (ruins, chests, glints)"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T10:06:13+02:00","cls":"code","confidence":"low","meta":"Map: translucent sea over a parallax seabed (ruins, chests, glints)"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T10:16:18+02:00","cls":"code","confidence":"low","meta":"Events: clicking a row glides the camera to where it happens"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T10:16:18+02:00","cls":"code","confidence":"low","meta":"Events: clicking a row glides the camera to where it happens"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T10:41:32+02:00","cls":"mixed","confidence":"low","meta":"Map: clickable regions from one 8-bit id map"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T10:41:32+02:00","cls":"mixed","confidence":"low","meta":"Map: clickable regions from one 8-bit id map"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T10:47:52+02:00","cls":"mixed","confidence":"low","meta":"Map: cloud shadows are now dark (the shipped sprites are pale clouds, multiply h"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T10:47:52+02:00","cls":"mixed","confidence":"low","meta":"Map: cloud shadows are now dark (the shipped sprites are pale clouds, multiply h"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T09:03:22Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T09:03:22Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T11:03:45+02:00","cls":"code","confidence":"low","meta":"Map: clouds thin out over points of interest"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T11:03:45+02:00","cls":"code","confidence":"low","meta":"Map: clouds thin out over points of interest"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T09:04:10Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T09:04:10Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T11:04:23+02:00","cls":"mixed","confidence":"low","meta":"?capture=1 for clean shots; guide notes on seabed, shadows and regions"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T11:04:23+02:00","cls":"mixed","confidence":"low","meta":"?capture=1 for clean shots; guide notes on seabed, shadows and regions"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T11:27:53+02:00","cls":"code","confidence":"low","meta":"Panels registry + Panels menu with dev panels, Tuning panel, POI-types demo, per"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T11:27:53+02:00","cls":"code","confidence":"low","meta":"Panels registry + Panels menu with dev panels, Tuning panel, POI-types demo, per"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T11:28:16+02:00","cls":"docs","confidence":"low","meta":"POI icon prompts (quest, job, event)"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T11:28:16+02:00","cls":"docs","confidence":"low","meta":"POI icon prompts (quest, job, event)"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T11:38:09+02:00","cls":"mixed","confidence":"low","meta":"Merge branch 'main' of https://github.com/Kurokasaiken/RpgBalancer"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T11:38:09+02:00","cls":"mixed","confidence":"low","meta":"Merge branch 'main' of https://github.com/Kurokasaiken/RpgBalancer"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T09:39:14Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T09:39:14Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T09:40:05Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T09:40:05Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T12:08:14+02:00","cls":"code","confidence":"low","meta":"Plaque band thickness is a shared tunable value (Tuning panel slider)"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T12:08:14+02:00","cls":"code","confidence":"low","meta":"Plaque band thickness is a shared tunable value (Tuning panel slider)"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T12:10:40+02:00","cls":"mixed","confidence":"low","meta":"Seabed shows only while dragging (glassy sea, tilt, sinks back); one mask remove"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T12:10:40+02:00","cls":"mixed","confidence":"low","meta":"Seabed shows only while dragging (glassy sea, tilt, sinks back); one mask remove"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T12:11:20+02:00","cls":"code","confidence":"low","meta":"CTA button: teal enamel in a brass frame instead of azure-violet; button guide"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T12:11:20+02:00","cls":"code","confidence":"low","meta":"CTA button: teal enamel in a brass frame instead of azure-violet; button guide"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T12:14:45+02:00","cls":"mixed","confidence":"low","meta":"Merge branch 'main' of https://github.com/Kurokasaiken/RpgBalancer"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T12:14:45+02:00","cls":"mixed","confidence":"low","meta":"Merge branch 'main' of https://github.com/Kurokasaiken/RpgBalancer"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T12:25:41+02:00","cls":"mixed","confidence":"low","meta":"Tuning values persist (autosave + Save button that also copies the values)"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T12:25:41+02:00","cls":"mixed","confidence":"low","meta":"Tuning values persist (autosave + Save button that also copies the values)"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T12:33:54+02:00","cls":"mixed","confidence":"low","meta":"Map: opaque sea rim (no bright rectangle); cloud shadows soft and cast on sea to"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T12:33:54+02:00","cls":"mixed","confidence":"low","meta":"Map: opaque sea rim (no bright rectangle); cloud shadows soft and cast on sea to"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T14:36:47+02:00","cls":"code","confidence":"low","meta":"Map: sea wonders on the Pixi map, spaced waves, region highlight after a 1 s dwe"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T14:36:47+02:00","cls":"code","confidence":"low","meta":"Map: sea wonders on the Pixi map, spaced waves, region highlight after a 1 s dwe"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T14:39:19+02:00","cls":"config","confidence":"low","meta":"Wider mirrored sea so the island can zoom out between the open side panels"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T14:39:19+02:00","cls":"config","confidence":"low","meta":"Wider mirrored sea so the island can zoom out between the open side panels"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T14:59:43+02:00","cls":"mixed","confidence":"low","meta":"Map: deep sea around the canvas instead of mirrored land; quest event type; equa"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T14:59:43+02:00","cls":"mixed","confidence":"low","meta":"Map: deep sea around the canvas instead of mirrored land; quest event type; equa"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T15:02:09+02:00","cls":"assets","confidence":"low","meta":"Clean the cut-outs of islands, forests, mountains and village (no sea/ground hal"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T15:02:09+02:00","cls":"assets","confidence":"low","meta":"Clean the cut-outs of islands, forests, mountains and village (no sea/ground hal"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T15:04:06+02:00","cls":"mixed","confidence":"low","meta":"Map life: wind gusts over forests, village smoke, sea glints; clouds on three la"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T15:04:06+02:00","cls":"mixed","confidence":"low","meta":"Map life: wind gusts over forests, village smoke, sea glints; clouds on three la"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T15:15:20+02:00","cls":"mixed","confidence":"low","meta":"Islands cut free of their baked sea blob; tunable map values with hints; wonders"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T15:15:20+02:00","cls":"mixed","confidence":"low","meta":"Islands cut free of their baked sea blob; tunable map values with hints; wonders"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T15:43:29+02:00","cls":"assets","confidence":"low","meta":"Remove sea glints and forest gusts; close the sea under the cut islands; feather"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T15:43:29+02:00","cls":"assets","confidence":"low","meta":"Remove sea glints and forest gusts; close the sea under the cut islands; feather"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T15:58:44+02:00","cls":"code","confidence":"low","meta":"Hovered territory gets an ink-black border instead of gold"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T15:58:44+02:00","cls":"code","confidence":"low","meta":"Hovered territory gets an ink-black border instead of gold"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T16:15:17+02:00","cls":"code","confidence":"low","meta":"Deep sea: explicit mip level (no 1px dark seam at the canvas edge), true edge co"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T16:15:17+02:00","cls":"code","confidence":"low","meta":"Deep sea: explicit mip level (no 1px dark seam at the canvas edge), true edge co"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T16:28:17+02:00","cls":"assets","confidence":"low","meta":"Forest canopies sway: crowns cut from the base they sit on, base without canopie"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T16:28:17+02:00","cls":"assets","confidence":"low","meta":"Forest canopies sway: crowns cut from the base they sit on, base without canopie"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T16:41:19+02:00","cls":"code","confidence":"low","meta":"Bold anime-style black region border (tunable), forest wind speed, grouped Tunin"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T16:41:19+02:00","cls":"code","confidence":"low","meta":"Bold anime-style black region border (tunable), forest wind speed, grouped Tunin"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T14:55:24Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-08T14:55:24Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T06:48:13Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T06:48:13Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T06:48:51Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T06:48:51Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T07:52:07Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T07:52:07Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T07:52:47Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T07:52:47Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T10:11:07+02:00","cls":"other","confidence":"low","meta":"Remove coordinator cron plist — workflow no longer used"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T10:11:07+02:00","cls":"other","confidence":"low","meta":"Remove coordinator cron plist — workflow no longer used"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T08:12:38Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T08:12:38Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T08:13:30Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T08:13:30Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T10:15:12Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T10:15:12Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T10:15:51Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T10:15:51Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T10:38:18Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T10:38:18Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T10:38:58Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T10:38:58Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T10:52:48Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T10:52:48Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T10:53:28Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T10:53:28Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T12:45:36Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T12:45:36Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T12:46:15Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T12:46:15Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T13:51:50Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T13:51:50Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T13:52:32Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T13:52:32Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T13:56:28Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T13:56:28Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T13:57:13Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T13:57:13Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T14:40:32Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T14:40:32Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T14:41:21Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T14:41:21Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T17:32:28+02:00","cls":"docs","confidence":"low","meta":"plans/INDEX: stato finale slice S2 (5/5 figli completed)"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T17:32:28+02:00","cls":"docs","confidence":"low","meta":"plans/INDEX: stato finale slice S2 (5/5 figli completed)"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T15:33:49Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T15:33:49Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T15:57:26Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T15:57:26Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T15:58:04Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T15:58:04Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T16:25:27Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T16:25:27Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T16:26:05Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T16:26:05Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T17:19:49Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T17:19:49Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T17:20:28Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T17:20:28Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T18:48:26Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T18:48:26Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T18:49:09Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T18:49:09Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T19:26:12Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T19:26:12Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T19:26:53Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T19:26:53Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T20:48:11Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T20:48:11Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T20:48:48Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-09T20:48:48Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T06:40:26Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T06:40:26Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T09:03:55Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T09:03:55Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T09:04:36Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T09:04:36Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T14:49:16Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T14:49:16Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T14:49:55Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T14:49:55Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T15:20:08Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T15:20:08Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T15:20:43Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T15:20:43Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T17:08:44Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T17:08:44Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T17:09:32Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T17:09:32Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T17:20:02Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T17:20:02Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T17:20:44Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T17:20:44Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T19:34:16+02:00","cls":"mixed","confidence":"low","meta":"Merge remote-tracking branch 'origin/main'"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T19:34:16+02:00","cls":"mixed","confidence":"low","meta":"Merge remote-tracking branch 'origin/main'"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T20:32:36+02:00","cls":"config","confidence":"low","meta":"race-miniera: fix nit post-review — titolo coerente, no contatore viveri, EN pro"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T20:32:36+02:00","cls":"config","confidence":"low","meta":"race-miniera: fix nit post-review — titolo coerente, no contatore viveri, EN pro"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T19:25:05Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T19:25:05Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T19:25:44Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T19:25:44Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T20:35:52Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T20:35:52Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T20:36:29Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T20:36:29Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T22:58:49+02:00","cls":"mixed","confidence":"low","meta":"merge: coordinator registry events MP-00"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T22:58:49+02:00","cls":"mixed","confidence":"low","meta":"merge: coordinator registry events MP-00"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T20:59:44Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T20:59:44Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T21:00:24Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T21:00:24Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T23:55:19+02:00","cls":"mixed","confidence":"low","meta":"Merge origin/main: coordinator dispatch housekeeping"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T23:55:19+02:00","cls":"mixed","confidence":"low","meta":"Merge origin/main: coordinator dispatch housekeeping"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T21:56:08Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-10-10T21:56:08Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
+{"entity":"R-377","kind":"commit","at":"2026-11-22T20:24:21+01:00","cls":"mixed","confidence":"high","meta":"R-377: media playback guard nello shutdown manager — film in corso vs addormenta"}
+{"entity":"R-377","kind":"commit","at":"2026-11-22T20:30:29+01:00","cls":"config","confidence":"low","meta":"chore: rigenera deploy-manifest.json (drift assertDeployShape)"}
+{"entity":"R-378","kind":"verify-artifact","at":"2026-11-24T14:36:58.109Z","confidence":"low"}
+{"entity":"R-378","kind":"verify-artifact","at":"2026-11-24T14:38:00.706Z","confidence":"low"}
+{"entity":"R-378","kind":"verify-artifact","at":"2026-11-24T14:44:01.272Z","confidence":"low"}
+{"entity":"R-378","kind":"verify-artifact","at":"2026-11-24T14:54:31.409Z","confidence":"low"}
+{"entity":"R-378","kind":"verify-artifact","at":"2026-11-24T15:33:02.063Z","confidence":"low"}
+{"entity":"R-378","kind":"commit","at":"2026-11-24T17:46:53+01:00","cls":"docs","confidence":"high","meta":"R-378: richiesta Director — cassetto polish (reward, party, viaggio, CTA, apertu"}
+{"entity":"R-378","kind":"commit","at":"2026-11-24T17:59:27+01:00","cls":"mixed","confidence":"high","meta":"R-378: cassetto V2 polish — reward senza scala forzieri, seat piu piccoli, band "}
+{"entity":"R-378","kind":"verify-artifact","at":"2026-11-24T17:05:15.817Z","confidence":"low"}
+{"entity":"R-378","kind":"verify-artifact","at":"2026-11-24T17:05:28.768Z","confidence":"low"}
+{"entity":"R-378","kind":"verify-artifact","at":"2026-11-24T17:08:06.805Z","confidence":"low"}
+{"entity":"R-378","kind":"verify-artifact","at":"2026-11-24T17:10:48.200Z","confidence":"low"}
+{"entity":"R-378","kind":"verify-artifact","at":"2026-11-24T17:12:56.255Z","confidence":"low"}
+{"entity":"R-378","kind":"verify-artifact","at":"2026-11-24T17:36:01.914Z","confidence":"low"}
+{"entity":"R-378","kind":"verify-artifact","at":"2026-11-24T17:36:02.263Z","confidence":"low"}
+{"entity":"R-378","kind":"verify-artifact","at":"2026-11-24T17:36:02.704Z","confidence":"low"}
+{"entity":"R-378","kind":"verify-artifact","at":"2026-11-24T17:36:03.077Z","confidence":"low"}
+{"entity":"R-378","kind":"verify-artifact","at":"2026-11-24T17:36:03.517Z","confidence":"low"}
+{"entity":"R-378","kind":"verify-artifact","at":"2026-11-24T17:36:12.202Z","confidence":"low"}
+{"entity":"R-378","kind":"verify-artifact","at":"2026-11-24T17:36:33.613Z","confidence":"low"}
+{"entity":"R-378","kind":"verify-artifact","at":"2026-11-24T17:36:38.322Z","confidence":"low"}
+{"entity":"R-378","kind":"verify-artifact","at":"2026-11-24T17:36:44.338Z","confidence":"low"}
+{"entity":"R-378","kind":"verify-artifact","at":"2026-11-24T17:36:45.152Z","confidence":"low"}
+{"entity":"R-378","kind":"verify-artifact","at":"2026-11-24T17:36:54.851Z","confidence":"low"}
+{"entity":"R-378","kind":"commit","at":"2026-11-24T18:38:31+01:00","cls":"mixed","confidence":"high","meta":"R-378 rev2 (Director 2026-11-24): slot occupati non aprono il roster, glifi viag"}
+{"entity":"R-378","kind":"commit","at":"2026-11-24T20:06:47+01:00","cls":"mixed","confidence":"high","meta":"R-378: spec e2e reale su /game + master index"}
+{"entity":"R-378","kind":"verify-artifact","at":"2026-11-24T21:43:44.532Z","confidence":"low"}
+{"entity":"R-378","kind":"verify-artifact","at":"2026-11-24T21:43:44.570Z","confidence":"low"}
+{"entity":"R-378","kind":"verify-artifact","at":"2026-11-24T21:44:22.599Z","confidence":"low"}
+{"entity":"R-378","kind":"verify-artifact","at":"2026-11-24T21:44:22.646Z","confidence":"low"}
+{"entity":"R-378","kind":"verify-artifact","at":"2026-11-24T21:45:52.568Z","confidence":"low"}
+{"entity":"R-378","kind":"verify-artifact","at":"2026-11-24T21:46:58.216Z","confidence":"low"}
+{"entity":"R-378","kind":"verify-artifact","at":"2026-11-24T21:46:58.218Z","confidence":"low"}
+{"entity":"R-378","kind":"verify-artifact","at":"2026-11-24T21:49:55.419Z","confidence":"low"}
+{"entity":"R-378","kind":"bundle","at":"2026-11-24T21:49:55.467Z","confidence":"high"}
+{"entity":"R-378","kind":"verify-artifact","at":"2026-11-24T22:07:44.368Z","confidence":"low"}
+{"entity":"R-378","kind":"verify-artifact","at":"2026-11-24T22:07:44.381Z","confidence":"low"}
+{"entity":"R-381","kind":"commit","at":"2026-11-24T22:26:58+01:00","cls":"mixed","confidence":"high","meta":"chore(cleanup): PLAN-132/R-381 — worktree .claude, rigenerabili, out/, tmp scrip"}
+{"entity":"R-381","kind":"commit","at":"2026-11-24T22:38:02+01:00","cls":"docs","confidence":"high","meta":"docs(cleanup): PLAN-132/R-381 esito — +12GiB, rimandati provider-cache e .git"}
+{"entity":"R-382","kind":"commit","at":"2026-11-24T23:05:50+01:00","cls":"docs","confidence":"high","meta":"docs(ledger): R-382 cernita cross-progetto — +33GiB totali"}
+{"entity":"unattributed","kind":"commit","at":"2026-10-10T22:52:50Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
+{"entity":"unattributed","kind":"commit","at":"2026-10-10T22:52:50Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
+{"entity":"unattributed","kind":"commit","at":"2026-10-10T22:53:30Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
+{"entity":"unattributed","kind":"commit","at":"2026-10-10T22:53:30Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
+{"entity":"unattributed","kind":"commit","at":"2026-10-11T01:34:53Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
+{"entity":"unattributed","kind":"commit","at":"2026-10-11T01:34:53Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
+{"entity":"unattributed","kind":"commit","at":"2026-10-11T01:35:45Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
+{"entity":"unattributed","kind":"commit","at":"2026-10-11T01:35:45Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
+{"entity":"unattributed","kind":"commit","at":"2026-10-11T07:48:57Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
+{"entity":"unattributed","kind":"commit","at":"2026-10-11T07:48:57Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
+{"entity":"unattributed","kind":"commit","at":"2026-10-11T07:49:33Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
+{"entity":"unattributed","kind":"commit","at":"2026-10-11T07:49:33Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-10-11T11:14:35Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-10-11T11:14:35Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-10-11T11:15:15Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
@@ -7124,3 +6772,6 @@
 {"entity":"unattributed","kind":"commit","at":"2026-11-19T07:45:37+01:00","cls":"code","confidence":"low","meta":"i18n: prefix idleVillage: on keys resolved via parametric TFunction"}
 {"entity":"unattributed","kind":"commit","at":"2026-11-19T07:45:45+01:00","cls":"mixed","confidence":"low","meta":"Merge origin/main (version bump 1.2.1) into i18n prefix fix"}
 {"entity":"unattributed","kind":"commit","at":"2026-11-19T07:45:45+01:00","cls":"mixed","confidence":"low","meta":"Merge origin/main (version bump 1.2.1) into i18n prefix fix"}
+{"entity":"unattributed","kind":"commit","at":"2026-11-20T16:33:55+01:00","cls":"mixed","confidence":"low","meta":"HUD /game: Roster+Stash consolidamento — campo smalto, banda gemma, shelf 3×2, d"}
+{"entity":"unattributed","kind":"commit","at":"2026-11-24T17:09:45+01:00","cls":"mixed","confidence":"low","meta":"f1 sentiero-tracce v3 battezzata: integrazione completa (depth, manifest, re-poi"}
+{"entity":"unattributed","kind":"commit","at":"2026-11-24T18:46:33+01:00","cls":"mixed","confidence":"low","meta":"feat(quest-art): battezzate anteprima \"occhi nel teal\" + f4 \"carica-goblin\" — co"}

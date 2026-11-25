@@ -80,6 +80,14 @@ async function runJob(file, doc, job) {
       await sleep(w);
       continue;
     }
+    /* exit 7 — FOREGROUND-GUARD: Canary has no open window; a new tab would raise it
+     * (CTR-foreground-001). Not a job failure: park as waiting and stop the queue —
+     * the fix is a human opening/un-minimizing one Canary window. */
+    if (ec === 7) {
+      log(`${job.id}: FOREGROUND-GUARD (nessuna finestra Canary aperta) — job waiting, queue stop`);
+      job.status = 'waiting'; fs.writeFileSync(file, JSON.stringify(doc, null, 2));
+      return 'budget'; /* riusa l'early-exit: la coda si ferma qui */
+    }
     softFails++;
     log(`${job.id}: exit ${ec} (attach/prompt/unknown), soft fail ${softFails}`);
     if (softFails >= 3) { job.status = 'failed'; return 'failed'; }

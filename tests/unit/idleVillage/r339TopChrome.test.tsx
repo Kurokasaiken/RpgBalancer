@@ -21,7 +21,7 @@
  *   `timeOfDay.dialSlim` (the mockup's sun ornament, config-driven).
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { act, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { Provider as TooltipProvider } from '@radix-ui/react-tooltip';
 import '@testing-library/jest-dom';
 import { GameTopChrome } from '@/ui/idleVillage/components/gameFrame/GameTopChrome';
@@ -30,6 +30,10 @@ import { TIME_SLIM_BAR } from '@/ui/idleVillage/hudReal/timeSlimGeometry';
 import { RESOURCES_SLIM_BAR } from '@/ui/idleVillage/hudReal/resourcesSlimGeometry';
 import { useGameLayoutInsets } from '@/ui/idleVillage/store/useGameLayoutInsets';
 import { CASSETTO_LAYOUT_CONFIG } from '@/balancing/config/idleVillage/cassettoLayoutConfig';
+import { EVENTS_BAR_CONFIG } from '@/balancing/config/idleVillage/eventsBarConfig';
+import { HudRealEventsBar } from '@/ui/idleVillage/hudReal/HudRealEventsBar';
+import { selectEventsBarEvent } from '@/ui/idleVillage/components/gameFrame/eventsBarModel';
+import type { HudEvent } from '@/ui/idleVillage/components/gameFrame/HudEventLedger';
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
 import type { ResourceReadoutItem } from '@/ui/idleVillage/components/gameFrame/ResourceReadout';
 
@@ -244,6 +248,79 @@ describe('R-376 — the resource bar is natively specular end-to-end and capsule
     /* The inner unscaled bar is reduced by fit × RES_K. */
     const inner = slot.firstElementChild as HTMLElement;
     expect(inner.style.transform).toBe(`scale(${RES_K})`);
+  });
+});
+
+
+describe('R-386 — the Events bar docks in the top-right reserve, specular to Time', () => {
+  const EVENTS: HudEvent[] = [
+    { id: 'quest-open', typeId: 'quest', title: 'Quest aperta', daysLeft: 1 },
+    { id: 'invasion', typeId: 'threat', title: 'Invasione goblin', daysLeft: 5 },
+  ];
+
+  // INV:game-top-chrome.INV-8
+  it('renders inside the Chronicle reserve with its right edge at the chrome margin', () => {
+    renderChrome({ events: EVENTS });
+    const slot = screen.getByTestId('chrome-events');
+    const left = parseFloat(slot.style.left);
+    const width = parseFloat(slot.style.width);
+    expect(left + width).toBeCloseTo(1440 - TC.marginPx, 6);
+    expect(width).toBeCloseTo(TC.chronicleReservePx - TC.marginPx, 6);
+    const res = screen.getByTestId('chrome-resources');
+    const resRight = parseFloat(res.style.left) + parseFloat(res.style.width);
+    expect(resRight).toBeLessThanOrEqual(left + 1e-6);
+    expect(document.querySelector('[data-hudslot="events"]')).toBeInTheDocument();
+  });
+
+  // INV:game-top-chrome.INV-8
+  it('hides rather than overlapping the centred chrome when the reserve yields', () => {
+    renderChrome({ frame: { scale: 1, W: 800, H: 600 }, events: EVENTS });
+    expect(screen.queryByTestId('chrome-events')).not.toBeInTheDocument();
+  });
+
+  // INV:game-top-chrome.INV-9
+  it('clicking the bar toggles the Events panel contract', () => {
+    const onToggleEvents = vi.fn();
+    renderChrome({ events: EVENTS, eventsOpen: true, onToggleEvents });
+    fireEvent.click(screen.getByTestId('chrome-events').querySelector('button')!);
+    expect(onToggleEvents).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('R-386 — collapsed event selection and gem semantics', () => {
+  const quest: HudEvent = { id: 'quest-open', typeId: 'quest', title: 'Quest aperta', daysLeft: 1 };
+  const threat: HudEvent = { id: 'invasion', typeId: 'threat', title: 'Invasione goblin', daysLeft: 5 };
+
+  // INV:game-top-chrome.INV-9
+  it('a pinned threat outranks a nearer non-threat in the collapsed bar', () => {
+    expect(selectEventsBarEvent([quest, threat], DEFAULT_GAME_FRAME_CONFIG.eventLedger.pinTypesWhenCollapsed)?.id).toBe('invasion');
+  });
+
+  // INV:game-top-chrome.INV-9
+  it('without a pinned threat the nearest deadline wins and arriving rows are ignored', () => {
+    expect(selectEventsBarEvent([quest, { ...threat, typeId: 'visit', daysLeft: 0, arriving: true }], DEFAULT_GAME_FRAME_CONFIG.eventLedger.pinTypesWhenCollapsed)?.id).toBe('quest-open');
+  });
+
+  // INV:game-top-chrome.INV-10
+  it('danger keeps the native red gem; other tones recolour a circular copy of it', () => {
+    const { rerender } = render(<HudRealEventsBar events={[threat]} />);
+    const bar = document.querySelector('[data-hudreal-events-bar]') as HTMLElement;
+    expect(bar.dataset.gemTone).toBe('danger');
+    expect(document.querySelector('[data-events-gem-filter]')).not.toBeInTheDocument();
+
+    rerender(<HudRealEventsBar events={[quest]} />);
+    expect(bar.dataset.gemTone).toBe('warning');
+    const gem = document.querySelector('[data-events-gem-filter]') as HTMLImageElement;
+    expect(gem).toBeInTheDocument();
+    expect(gem.style.clipPath).toContain(`circle(${EVENTS_BAR_CONFIG.gem.r}px`);
+    expect(gem.style.filter).toBe(EVENTS_BAR_CONFIG.gemFilters.warning);
+  });
+
+  // INV:game-top-chrome.INV-10
+  it('the medallion keeps a type glyph so the sign is never colour-only', () => {
+    render(<HudRealEventsBar events={[threat]} />);
+    const glyph = document.querySelector('[data-hudreal-events-bar] [role="img"]');
+    expect(glyph).toBeInTheDocument();
   });
 });
 

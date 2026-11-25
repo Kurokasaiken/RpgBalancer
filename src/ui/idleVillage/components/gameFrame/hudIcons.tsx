@@ -37,13 +37,9 @@ const engraved = (id: EngravedIconId): IconComponent => {
 };
 
 /** Ids drawn as painted images (`HUD_ICON_ASSETS`): they have no engraved glyph. */
-export type PaintedHudIconId = 'gold' | 'food' | 'wood' | 'threat';
+export type PaintedHudIconId = 'gold' | 'food' | 'wood' | 'threat' | 'world' | 'company' | 'stash' | 'settlement';
 
 export const HUD_ICONS: Record<Exclude<HudIconId, PaintedHudIconId>, IconComponent> = {
-  world: engraved('nav-map'),
-  settlement: engraved('nav-village'),
-  company: engraved('nav-company'),
-  stash: engraved('nav-bag'),
   chronicle: engraved('nav-chronicle'),
   workshop: engraved('nav-shop'),
   tavern: engraved('nav-tavern'),
@@ -64,6 +60,15 @@ export const HUD_ICON_ASSETS: Record<PaintedHudIconId, string> = {
   food: '/assets/ui/resources/res-food-128.webp',
   wood: '/assets/ui/resources/res-wood-128.webp',
   threat: '/assets/ui/poi/threat-claws-128.webp',
+  /* R-367 (Director 2026-11-24): painted line-art pictograms — the approved cells
+   * read at 28px where engraved tracings did not ("nn si capisce"). */
+  world: '/assets/ui/nav/nav-map-128.webp',
+  company: '/assets/ui/nav/nav-group-128.webp',
+  /* R-367 (Director 2026-11-24): village + chest re-generated in the same
+   *  line-art voice as map/group; the stash rests on the ground — smaller
+   *  and off-centre, «un forziere appoggiato a terra». */
+  stash: '/assets/ui/nav/nav-stash-ground-128.webp',
+  settlement: '/assets/ui/nav/nav-village-line-128.webp',
 };
 
 const isPainted = (id: HudIconId): id is PaintedHudIconId => id in HUD_ICON_ASSETS;

@@ -111,9 +111,11 @@ describe('placeGameHud', () => {
     });
   }
 
-  it('the corner buttons keep their own size outside the landscape miniature', () => {
+  it('the corner buttons follow the nav proportion on blueprint, keep full size on phones', () => {
     expect(placeGameHud(390, 844, 1).cornerScale).toBe(1);
-    expect(placeGameHud(1920, 1080, 1).cornerScale).toBe(1);
+    /* Director 2026-11-24 («dovrebbero essere proporzionati»): blueprint corners shrink
+     *  by NAV_ART_PROPORTION like the nav dock they sit next to. */
+    expect(placeGameHud(1920, 1080, 1).cornerScale).toBe(0.75);
   });
 
   it('the three bars and /game wire the compensation; /hud-compose keeps its rendering (no variable = factor 1)', () => {

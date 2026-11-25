@@ -1,0 +1,70 @@
+{
+  "component": "C12",
+  "jobs": [
+    {
+      "id": "medallion-1",
+      "zone": "time",
+      "refs": [
+        ".mw/specs/hud-real/time/medallion-ref.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/time/prompt-medallion.txt",
+      "out": ".mw/specs/hud-real/time/gen/medallion-1",
+      "status": "done",
+      "file": ".mw/specs/hud-real/time/gen/medallion-1-0.png",
+      "sha16": "885f967bb8db14e6"
+    },
+    {
+      "id": "medallion-2",
+      "zone": "time",
+      "refs": [
+        ".mw/specs/hud-real/time/medallion-ref.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/time/prompt-medallion.txt",
+      "out": ".mw/specs/hud-real/time/gen/medallion-2",
+      "status": "done",
+      "file": ".mw/specs/hud-real/time/gen/medallion-2-0.png",
+      "sha16": "3724bd3210c9de59"
+    },
+    {
+      "id": "medallion-3",
+      "zone": "time",
+      "refs": [
+        ".mw/specs/hud-real/time/medallion-ref.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/time/prompt-medallion.txt",
+      "out": ".mw/specs/hud-real/time/gen/medallion-3",
+      "status": "done",
+      "file": ".mw/specs/hud-real/time/gen/medallion-3-0.png",
+      "sha16": "ed4b81d471d1e1dd"
+    },
+    {
+      "id": "medallion-4",
+      "zone": "time",
+      "refs": [
+        ".mw/specs/hud-real/time/medallion-ref.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/time/prompt-medallion.txt",
+      "out": ".mw/specs/hud-real/time/gen/medallion-4",
+      "status": "done",
+      "file": ".mw/specs/hud-real/time/gen/medallion-4-0.png",
+      "sha16": "607a11f891b1aa1a"
+    },
+    {
+      "id": "medallion-5",
+      "zone": "time",
+      "refs": [
+        ".mw/specs/hud-real/time/medallion-ref.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/time/prompt-medallion.txt",
+      "out": ".mw/specs/hud-real/time/gen/medallion-5",
+      "status": "done",
+      "file": ".mw/specs/hud-real/time/gen/medallion-5-0.png",
+      "sha16": "ac31eabcf68198ee"
+    }
+  ]
+}

@@ -44,8 +44,8 @@ const CHARTER_DATA: ComponentCharter[] = [
       { material: 'oro-filetto', region: 'frame-corner-bl' },
       { material: 'oro-filetto', region: 'frame-rail-mid' },
       { material: 'oro-filetto', region: 'rim-bottom' },
-      { material: 'oro-filetto', region: 'cartouche-corners' },
-      { material: 'gemma-smeraldo', region: 'cartouche-gem' },
+      { material: 'oro-filetto', region: 'cartouche-corners', note: 'non più montato — cartouche inscatolato rimosso R-378 (titolo+briefing free-floating)' },
+      { material: 'gemma-smeraldo', region: 'cartouche-gem', note: 'ora divisore titolo/briefing (era ornamento inferiore del cartouche)' },
       { material: 'osso', region: 'risk-emblem', note: 'teschio; la morte % usa il bordeaux del teschio stesso (#c9140b)' },
       { material: 'oro-filetto', region: 'reward-emblem' },
       { material: 'oro-filetto', region: 'success-laurel' },
@@ -79,7 +79,7 @@ const CHARTER_DATA: ComponentCharter[] = [
       },
       disabled: {
         changes:
-          'filtro --skin-cassetto-cta-enamel-* SOLO sulla lacca (ottone resta oro) + testo a opacità ridotta; motivo sr-only via aria-describedby, NON dipinto',
+          'filtro --skin-cassetto-cta-enamel-* SOLO sulla lacca (ottone resta oro) + testo a opacità ridotta; motivo sr-only via aria-describedby, NON dipinto; nessun gioiello acceso (R-378: le gemme della placca pulsano SOLO a canSend)',
         legibility: 'placca desaturata ma non spenta; il perché è accessibile via AT, invisibile a schermo',
         ruling:
           'OB-7 2026-11-21: «troppo vivo» → prova −40% sat lacca; «motivo visibile» → il motivo va dipinto (allinea REQ:v38-states)',
@@ -104,12 +104,12 @@ const CHARTER_DATA: ComponentCharter[] = [
         ruling: 'Director 2026-11-21 «Remove frame» + «vignetta da quest» 2026-11-20; confermato OB-7',
       },
       {
-        trait: 'emblemi lit/dimmed (teschio/forziere/alloro) come linguaggio di stato leggibile',
-        ruling: 'R-357 golden + confermato OB-7 2026-11-21 («vanno bene»)',
+        trait: 'emblemi lit/dimmed (teschio/alloro) come linguaggio di stato leggibile',
+        ruling: 'R-357 golden + confermato OB-7 2026-11-21 («vanno bene»); R-378 2026-11-24 — scala forzieri rimossa, resta il teschio',
       },
       {
         trait: 'banda viaggio a pill unico, segmento Outbound smalto + gemme + totale',
-        ruling: 'Director 2026-11-21 «il viaggio è superiore, prendiamo quello» (mockup v3); confermato OB-7',
+        ruling: 'Director 2026-11-21 «il viaggio è superiore, prendiamo quello» (mockup v3); confermato OB-7; R-378 rev2 «i glifi dei villaggi nn vanno bene, guarda cm era il mockup» — glifi gambe dal mockup v3: ico-compass/ico-swords/ico-cycle (bussola / spade incrociate / frecce circolari)',
       },
       {
         trait: 'profondità dello scroller party: peek del 4° seat + fade-mask come prova del contenuto oltre',
@@ -122,14 +122,14 @@ const CHARTER_DATA: ComponentCharter[] = [
     ],
     typeFloor: [
       { role: 'title', ref: 'fzMin(46) — titolo quest (≈23px @1440×900, floor 11px)' },
-      { role: 'label', minPx: 11, ref: 'INV:cassetto-captions-min-size — CASSETTO_MIN_LABEL_PX=11' },
+      { role: 'label', minPx: 12, ref: 'INV:cassetto-captions-min-size — CASSETTO_MIN_LABEL_PX=12 (floor alzato 11→12, R-378 rev5 Director 2026-11-25 «anche + grande»: a 1280×800 metà dei caption stava esattamente al floor)' },
       { role: 'numeric', ref: 'fzMin(66/48) — grandi % rischio/successo (BigPct)' },
     ],
     proportions: {
       basis: 'hybrid',
       unit: 'u(n) = n/1024 della larghezza colonna in cqw; colonna = columnAspect × viewportHeight (512px @1440×900)',
       resize: 'dom-flow',
-      note: 'geometria in cqw scala con la colonna; rack party DOM unscaled; floor tipografico 11px (fzMin)',
+      note: 'geometria in cqw scala con la colonna; rack party DOM unscaled; floor tipografico 12px (fzMin) — R-378 rev5',
     },
     openIssues: [
       {
@@ -139,8 +139,8 @@ const CHARTER_DATA: ComponentCharter[] = [
       },
       {
         summary:
-          'pozzi: troppo nero in proporzione — ribilanciare la ricetta nero-teal/smeraldo (materiale nero-teal confermato, la proporzione no)',
-        ref: 'OB-7 app-1 «troppo nero in proporzione» + iss-b «nero-teal» (D-open-4 chiuso) — IMPLEMENTATO V3 2026-11-22 (glow 0–30/70–100 + core nero-teal); conferma occhio pendente',
+          'pozzi: ricetta velluto+vignettatura — glow orizzontale radiale in alto + vignettatura profonda in basso, zero arte nuova; RISOLTE le varianti scartate: flat nero-teal (superata), marmo riusato (B2/B3 «troppo nero» anche a velo 45%)',
+        ref: 'R-378 rev6 Director 2026-11-25 — fork zoom `.mw/runs/20261125-cassetto-fork/board-zoom-pozzi.png`: scelta «C»; supera la ricetta V3 2026-11-22; conferma occhio pendente sulla ricetta C',
       },
       {
         summary:
@@ -149,18 +149,18 @@ const CHARTER_DATA: ComponentCharter[] = [
       },
       {
         summary:
-          'blocco risk/reward: togliere label RISK/REWARD; % sopra (non sotto) e ben allineate; reward 5 simboli lit/dimmed pari al risk; il reward concreto va MOSTRATO sotto la % di vittoria e presentato "bene" — non nascosto dietro click (ruling rivisto 2026-11-21 dopo advisory esterno: il valore che guida la scelta deve essere in vista prima dell\'impegno); tooltip resta per il dettaglio',
-        ref: 'OB-7 app-5 nota Director — IMPLEMENTATO V3 2026-11-22 (no label, % sopra, 5 forzieri lit/dimmed via rewardLevel=POI tier, chips sotto la %); conferma occhio pendente',
+          'blocco risk/reward: togliere label RISK/REWARD; % sopra (non sotto) e ben allineate; il reward concreto va MOSTRATO sotto la % di vittoria e presentato "bene" — non nascosto dietro click (ruling rivisto 2026-11-21 dopo advisory esterno: il valore che guida la scelta deve essere in vista prima dell\'impegno); tooltip resta per il dettaglio',
+        ref: 'OB-7 app-5 nota Director — IMPLEMENTATO V3 2026-11-22 (no label, % sopra, chips sotto la %); R-378 2026-11-24 «elimina i 5 forzieri speculari ai 5 teschi» — scala forzieri RIMOSSA, restano solo i teschi; R-378 rev2 «la percentuale d vittoria falla verde (solo i numeri)» — tone success #5fd98d sul solo readout, alloro invariato',
       },
       {
         summary:
           'proporzioni scroller party da ritoccare — VINCOLO: non toccare il frame né la barra sotto',
-        ref: 'OB-7 app-7 nota Director — IMPLEMENTATO V3 2026-11-22 (seat 230→205u, peek 105→80u; frame e barra intatti); conferma occhio pendente',
+        ref: 'OB-7 app-7 nota Director — IMPLEMENTATO V3 2026-11-22 (seat 230→205u, peek 105→80u); R-378 2026-11-24 «slot pg troppo grandi e toccano il frame» + «barra meno spessa» — seat 205→170u, peek 80→62u, slotSize 42→36, banda 14→8px; R-378 rev2 «gli slot si devono comportare diversamente se sono occupati o no, solo se sono vuoti» — tap→roster SOLO su seat vuoto, occupato resta press-hold estrazione/swap',
       },
       {
         summary:
-          'disabled troppo vivo — prova −40% saturazione sulla lacca (cornice resta oro)',
-        ref: 'OB-7 iss-c «troppo-vivo» + α «prova-meno40» — IMPLEMENTATO V3 2026-11-22 (enamelDisabled saturate .72→.43); conferma occhio pendente',
+          'disabled: −40% saturazione lacca CONFERMATO a occhio («mi sembra accettabile») + hover `cursor: not-allowed` aggiunto («il divieto d\'accesso grigio»)',
+        ref: 'OB-7 iss-c + α — implementato V3 2026-11-22; CONFERMA OCCHIO Director 2026-11-25 (R-378 rev4) + rev4 cursor not-allowed — CHIUSO',
       },
       {
         summary: 'affordance HudScrollBandX: fade-mask + peek bastano? — lasciato aperto dal Director',
@@ -252,6 +252,14 @@ const CHARTER_DATA: ComponentCharter[] = [
         trait: 'label incise Cinzel uppercase sotto le voci; la voce attiva legge oro, le altre crema',
         ruling: 'PLAN-112 pianta B1 + palette-nav misurata (material-palette-nav)',
       },
+      {
+        trait: 'stessa lingua dell\'ancora: nero/verde 0.52 vs 0.58 (±5%) — la densità d\'oro maggiore (astrolabio+socket) è ricchezza, non divergenza',
+        ruling: 'Director 2026-11-23 dubbio nero/verde chiuso a misura (audit-asset PAL) — DECISION_LOG 2026-11-23',
+      },
+      {
+        trait: 'plancia scalata al 75% della quota blueprint su tutti i placement — altezza in famiglia con le barre top (~98 px vs 75–85), centro e ancora al fondo invariati',
+        ruling: 'Director 2026-11-24 critica HUD multi-AI «N proporzionato a quelli sopra» — NAV_ART_PROPORTION in gameHudPlacement; board mockups/.mw/runs/20261124-hud-critique-multi-ai',
+      },
     ],
     typeFloor: [
       { role: 'label', ref: 'hudPx(13) — label Cinzel uppercase sotto le voci (HudRealNav)' },
@@ -267,6 +275,10 @@ const CHARTER_DATA: ComponentCharter[] = [
       {
         summary: 'nav 452px > 390px a viewport mobile: fuori budget T-24 (componente pre-esistente, non regredito)',
         ref: 'probe 2026-10-23 test-results/mobile-probe-2026-10-23/',
+      },
+      {
+        summary: 'icone interne crema piatte sotto il livello della cornice (home/mappa/people/scroll) — dipinte via programma D-6',
+        ref: 'Director 2026-11-23 «le icone interne non mi fanno impazzire» + PLAN-125 D-6 (plan icone da scrivere)',
       },
     ],
   },
@@ -294,8 +306,8 @@ const CHARTER_DATA: ComponentCharter[] = [
     },
     states: {
       default: {
-        changes: 'banner giorno docked a sinistra; barra risorse centrata su frame.W/2; zona top-right vuota riservata',
-        ruling: 'R-350/R-352 2026-11-15/16 + D10 v38',
+        changes: 'banner giorno docked a sinistra; barra risorse centrata su frame.W/2; zona top-right vuota riservata; chip compatto slim: socket + valore soli (nome in tooltip/aria-label, la riga label 10px non dipinta)',
+        ruling: 'R-350/R-352 2026-11-15/16 + D10 v38; chip slim senza label: critica HUD multi-AI 2026-11-24 → Director «procedi»',
       },
     },
     appreciated: [
@@ -304,12 +316,16 @@ const CHARTER_DATA: ComponentCharter[] = [
         ruling: 'R-350 Director 2026-11-15',
       },
       {
-        trait: 'cap filigrana speculare a un pezzo + sedi simmetriche banner/barra',
-        ruling: 'R-350/R-352 2026-11-15/16',
+        trait: 'capi simmetrici a un pezzo nella lingua del terminale Tempo + sedi simmetriche banner/barra',
+        ruling: 'R-350/R-352 2026-11-15/16; R-379 2026-11-24 — il terminale Tempo è il keeper, i capi Risorse adottano la sua punta più sobria (resCapMirror ritirato)',
       },
       {
         trait: 'zona top-right riservata alla futura Chronicle docked — niente tab pendente',
         ruling: 'D10 Director 2026-11-15 (REQ:v38-top-chrome)',
+      },
+      {
+        trait: 'cluster top-left = ANCORA estetica HUD insieme a time-sole (banner giorno + sede risorse centrata sull\'asse)',
+        ruling: 'Director 2026-11-23 «quello in alto a sinistra va bene al 90%, il resto si allinea a quello» — DECISION_LOG 2026-11-23',
       },
     ],
     typeFloor: [
@@ -334,10 +350,21 @@ const CHARTER_DATA: ComponentCharter[] = [
       { material: 'oro-filetto', region: 'global', note: 'corona di tacche incise attorno al quadrante' },
       { material: 'champagne', region: 'global', note: 'pill velocità + day label' },
     ],
+    anatomy: {
+      kind: 'zones',
+      zones: [
+        { name: 'band', medium: 'art' },
+        { name: 'dial-frame', medium: 'art' },
+        { name: 'phase-dial', medium: 'dom' },
+        { name: 'end-finial', medium: 'art' },
+        { name: 'speed-sockets', medium: 'dom' },
+        { name: 'day-label', medium: 'dom' },
+      ],
+    },
     states: {
       default: {
-        changes: 'quadrante sole/luna piccolo seduto nello smeraldo + corona di tacche; pill velocità data-ctl (radiogroup ≤3 socket)',
-        ruling: 'Director 2026-11-11 (phase dial) + PLAN-112 F4.1',
+        changes: 'medaglione dipinto `dial-frame.webp` (regen battezzata, 8 pinne, no aletta) seduto sul cap di giunzione, sede centrata (29, 26.9 — dock banner 58), Ø85 — dentro la sede il disco sole/luna al 100% e la corona tick di fase sull\'anello oro; pill velocità data-ctl (radiogroup ≤3 socket): velocità ingaggiata = anello ottone pieno 3px + alone caldo + cifra oro brillante (J, niente riempimento), selezionata in pausa = solo anello armato, inattive incise; stessa marcatura J sul pulsante pausa quando il gioco è fermo',
+        ruling: 'Director 2026-11-11 (phase dial) + PLAN-112 F4.1 + Director 2026-11-23 (medaglione gen. Director «prova quella» + posizione via dial-positioner)',
       },
       hover: {
         changes: 'bottone: brightness(1.25) (solo non-locked)',
@@ -359,6 +386,18 @@ const CHARTER_DATA: ComponentCharter[] = [
         trait: 'pill velocità come radiogroup data-ctl — stesso pattern delle tab stash (vocabolario unico)',
         ruling: 'R-353 pattern data-ctl condiviso',
       },
+      {
+        trait: 'ANCORA ESTETICA della HUD — la lingua si misura su questa barra (banda smalto+ottone, medaglione-emblema); ogni altra superficie si allinea a lei',
+        ruling: 'Director 2026-11-23 «va bene al 90%, il resto si allinea a quello» — DECISION_LOG 2026-11-23',
+      },
+      {
+        trait: 'medaglione fase a sbalzo: frame dipinto `dial-frame.webp` (pezzo `dial-frame-v1`, gen. Director + cut alpha + sede centrata) — anello oro inciso, 8 pinne complete, smeraldo profondo, niente aletta, niente foglie-cristallo sx (rimosse via green-marker «nn toccare l\'outer ring»), fermaglio che incontra la giunzione; vecchio medaglione cancellato da `bar-slim.webp` (campo scuro fino al cap); niente backplate («lasciamolo norma»); disco sole/luna al 100% della sede («100%» 2026-11-24) con orbe ricentrato a sub-pixel; dischi alpha («preferisco alfa» 2026-11-24) — niente fondo nero, i raggi/lama stanno sulla gemma dipinta; corona tick di fase sull\'anello oro (r 31)',
+        ruling: 'Director 2026-11-23 — immagine generata a mano dal Director «prova quella» + posizione scelta via `scripts/hud-real/dial-positioner.html` (seat -3.5,26.9, Ø85, fill .82) + ritocchi raster stesso giorno (foglie, micro-slop, bar) + witness `lab-timesole.png`; posizione finale Director 2026-11-24 via positioner v2 (cx 29 — seduto sul cap di giunzione, dock 58)',
+      },
+      {
+        trait: 'terminale destro time-sole piccolo e smeraldino — è il keeper della lingua top-row, non va importato verso il quadrante o i socket',
+        ruling: 'R-379 Director 2026-11-24 — correzione direzione: il componente Tempo resta invariato, la barra Risorse adotta questo capo',
+      },
     ],
     typeFloor: [{ role: 'label', ref: 'day label + pill velocità (hudPx) — nessun testo sotto i socket' }],
     proportions: {
@@ -366,18 +405,7 @@ const CHARTER_DATA: ComponentCharter[] = [
       unit: 'px (BAR.slots della barra tempo)',
       resize: 'fixed',
     },
-    openIssues: [
-      {
-        summary: 'ingrandimento del sole misurato da mockup — ruling estetico non ancora registrato (catalogo: candidato)',
-        ref: 'PLAN-125 Fase 3 + provenance LabEntry time-sole',
-      },
-    ],
-    openExploration: [
-      {
-        dimension: 'dimensione/posizione finale del quadrante fase (ingrandimento da mockup, ruling pendente)',
-        ref: 'PLAN-125 Fase 3 + provenance catalogo «ruling pendente»',
-      },
-    ],
+    openIssues: [],
   },
 
   /* ----------------------------------------------------------- roster --- */

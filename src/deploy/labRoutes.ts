@@ -65,6 +65,7 @@ export const LAB_ROUTE_COMPONENTS: LabRouteComponents = {
   "/game-frame": lazy(() => import('../pages/game-frame').then(m => ({ default: m.default }))),
   "/map-benchmark": lazy(() => import('../pages/map-benchmark').then(m => ({ default: m.default }))),
   "/mappa2-upscale-review": lazy(() => import('../pages/mappa2-upscale-review').then(m => ({ default: m.default }))),
+  "/icon-gallery": lazy(() => import('../pages/icon-gallery').then(m => ({ default: m.default }))),
   "/lab/poi-luogo": lazy(() => import('../pages/poi-luogo-lab').then(m => ({ default: m.default }))),
   "/hud-lab": lazy(() => import('../pages/hud-lab').then(m => ({ default: m.default }))),
   "/hud-charter-review": lazy(() => import('../pages/hud-charter-review').then(m => ({ default: m.default }))),

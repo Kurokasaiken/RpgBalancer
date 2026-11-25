@@ -2,7 +2,7 @@
   "surface": "cassetto",
   "specVersion": 1,
   "generator": "scripts/hud-real/slice-frame.py",
-  "generatedAt": "2026-11-18T20:40:13+00:00",
+  "generatedAt": "2026-11-24T23:12:32+00:00",
   "source": {
     "path": ".mw/specs/expedition-ui/refs/mockup-r357-cassetto-largo.png",
     "sha256": "a5d84b697c5e345ef78e1bbff2a19ae5f605786deef88246eab590b62d9f6633"
@@ -19,7 +19,11 @@
         100,
         360
       ],
-      "bytes": 27562
+      "bytes": 27616,
+      "displaySize": [
+        100,
+        360
+      ]
     },
     {
       "id": "rail-mid",
@@ -31,8 +35,12 @@
         100,
         160
       ],
-      "bytes": 12420,
-      "tileSafe": true
+      "bytes": 12452,
+      "tileSafe": true,
+      "displaySize": [
+        100,
+        160
+      ]
     },
     {
       "id": "rail-bottom",
@@ -44,7 +52,11 @@
         100,
         376
       ],
-      "bytes": 29162
+      "bytes": 29150,
+      "displaySize": [
+        100,
+        376
+      ]
     },
     {
       "id": "frame-top",
@@ -56,7 +68,11 @@
         936,
         24
       ],
-      "bytes": 1748
+      "bytes": 1748,
+      "displaySize": [
+        936,
+        24
+      ]
     },
     {
       "id": "vignette",
@@ -68,7 +84,11 @@
         936,
         262
       ],
-      "bytes": 124590
+      "bytes": 124590,
+      "displaySize": [
+        936,
+        262
+      ]
     },
     {
       "id": "skull",
@@ -80,7 +100,11 @@
         166,
         166
       ],
-      "bytes": 11940
+      "bytes": 11940,
+      "displaySize": [
+        166,
+        166
+      ]
     },
     {
       "id": "chest",
@@ -92,7 +116,11 @@
         160,
         160
       ],
-      "bytes": 13798
+      "bytes": 13828,
+      "displaySize": [
+        160,
+        160
+      ]
     },
     {
       "id": "cta-plaque",
@@ -104,8 +132,12 @@
         1500,
         317
       ],
-      "bytes": 129504,
-      "compositeMode": "hole-bound"
+      "bytes": 129448,
+      "compositeMode": "hole-bound",
+      "displaySize": [
+        1500,
+        317
+      ]
     },
     {
       "id": "supply-bag",
@@ -117,7 +149,59 @@
         192,
         192
       ],
-      "bytes": 30422
+      "bytes": 30540,
+      "displaySize": [
+        192,
+        192
+      ]
+    },
+    {
+      "id": "journey-ico-outbound",
+      "file": "journey-ico-outbound.webp",
+      "role": "ornament",
+      "anchor": "explicit",
+      "stretch": "none",
+      "nativeSize": [
+        192,
+        192
+      ],
+      "bytes": 27510,
+      "displaySize": [
+        192,
+        192
+      ]
+    },
+    {
+      "id": "journey-ico-atsite",
+      "file": "journey-ico-atsite.webp",
+      "role": "ornament",
+      "anchor": "explicit",
+      "stretch": "none",
+      "nativeSize": [
+        192,
+        192
+      ],
+      "bytes": 22658,
+      "displaySize": [
+        192,
+        192
+      ]
+    },
+    {
+      "id": "journey-ico-return",
+      "file": "journey-ico-return.webp",
+      "role": "ornament",
+      "anchor": "explicit",
+      "stretch": "none",
+      "nativeSize": [
+        192,
+        192
+      ],
+      "bytes": 23078,
+      "displaySize": [
+        192,
+        192
+      ]
     }
   ],
   "geometry": {

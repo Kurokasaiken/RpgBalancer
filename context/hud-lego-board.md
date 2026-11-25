@@ -12,6 +12,10 @@ Scope: `/hud-lab` contiene una board di ruling per gli **art piece** di `src/con
 
 `inventoryRev` è SHA-256 della serializzazione canonica di: pezzi validi (`id/kind/status`), mapping Lab→piece, classificazioni unresolved, inclusi i difetti di schema del registry. Qualunque cambio a questi input invalida i packet già esportati.
 
+## Difetto registry noto: `time-disc-v1`
+
+`time-disc-v1` è battezzato nel lavoro parallelo sul tempo ma non valida contro lo schema PLAN-130 corrente: usa `assets.sun`/`assets.moon` e `provenance.sha256_sun`/`sha256_moon` invece di `assets.master` + `provenance.sha256`. Decisione PLAN-134 (2026-11-25): la board **non** estende lo schema al multi-asset e **non** riscrive/splitta il pezzo dentro questo plan, perché entrambe sono mutazioni canoniche fuori scope. La voce resta quindi nella lane unresolved come inventory defect non-rulingable; una canonizzazione futura richiede ruling/plan dedicato (split in revisioni immutabili oppure amend esplicito dello schema multi-asset).
+
 ## Uso della board
 
 1. Aprire `/hud-lab` sul dev server canonico.

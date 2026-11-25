@@ -95,3 +95,61 @@ generazione AI: ogni parte deriva da un golden **già registrato** in
 - **Aperta piena** (sotto): stessa forma con 10 righe **numerate** + banda scroll oro sul bordo dx con cap-frecce.
 
 Delta vs implementazione corrente: medaglione sx sporgente dal frame; righe = icona tonda smalto + testo (niente vignetta di sfondo); numerazione quando molte; chevron-up di collapse in header; tipo "Work" nelle pill.
+
+## 2026-11-21 sera — direzione "uniformato barre top" (in iterazione)
+
+Richiesta Director: eventi uniformati al componente risorse/tempo — stessa famiglia
+visiva (nero/verde petrolio/oro inciso), riuso componenti esistenti.
+Mockup DOM (non AI) nel lab `public/mockups/eventi-lab/index.html` sez. `uni-*`:
+- **UNI chiusa**: `resources/bar-slim.webp` 758×124 scalata a 380×62 come strip intera
+  (punte oro-smeraldo laterali incluse) + medaglione circolare (vignetta threat in
+  circle-mask) + titolo serif oro + countdown + chevron ottone.
+- **UNI aperta**: stessa slim bar come header (`EVENTS · N` + medaglione + chevron-up),
+  corpo = panel lacca con bordo oro 1.5px, righe = capsule "stadium" tipo slot
+  risorse (CSS: radius 999px, border #a8833c, bg petrolio scuro), icona smalto
+  per tipo, numeri oro, banda scroll oro dx.
+- Witness: `.mw/runs/20261121-eventi-chiusa/uni-{chiusa,aperta}.png`.
+- Trade-off vs 3-stati: perde frame5+pendente (famiglia barre, non pannelli).
+- Alternativa non provata: `time/bar-slim.webp` (filigrana sx + pozzetti).
+- Ruling: IN ATTESA.
+- Resume: se approvato → nuovo DOM vivo `HudRealLedgerPanel` forma "bar": strip
+  chiusa = img bar-slim + overlay; aperta = header bar + stadium rows CSS.
+  Asset da registrare: nessuno nuovo (riuso bar-slim + vignette + medallion kit).
+
+## 2026-11-25 — Riferimento Director barra speculare al Tempo (R-386)
+
+`refs/ref-eventi-bar-specular-time-2026-11-25.png` è il riferimento vincolante
+più recente. Richiesta verbatim: *«componente eventi: salva questo come
+referenza e usalo, speculare al compoente tempo. la gemma rossa è x i
+pericoli, altri colori saranno x altro»*.
+
+### Contratto visivo derivato
+
+- La forma chiusa degli Eventi è una **barra orizzontale della famiglia
+  Tempo/Risorse**, non un pannello frame5: fascia petrolio/nero, oro inciso,
+  ornamento/medaglione a sinistra e grande gemma tonda a destra.
+- La gemma rossa nativa significa **pericolo/threat**. Gli altri toni evento
+  ricolorano solo la gemma (warning/good/neutral) secondo la mappa in config;
+  il segno resta leggibile anche senza colore tramite glifo del tipo nel
+  medaglione sinistro.
+- La barra è il collapsed strip: mostra l'evento rappresentativo (threat
+  pinnato se presente, altrimenti scadenza più vicina), il suo countdown e
+  apre/chiude il pannello Eventi esistente. Non introduce una seconda lista né
+  una modale.
+- Il riferimento magenta non si edita mai. La derivazione produzione è
+  deterministicamente rigenerabile con `scripts/hud-real/build-events-bar.py`
+  → `public/assets/ui/hud-real/events/bar.webp`.
+
+### Implementazione corrente
+
+- `HudRealEventsBar` montato da `GameTopChrome` nella riserva top-right già
+  prevista da D10 (`chronicleReservePx`), a destra della resource bar; su
+  canvas troppo stretti la riserva cede e la barra si nasconde invece di
+  sovrapporsi.
+- Il pannello `HudRealLedgerPanel` resta la superficie aperta esistente;
+  questa fase non riscrive ancora il suo corpo.
+- Esito 2026-11-25: implementato e verificato su `/game` headless WebGL.
+  Witness finali in `test-results/r386-events-bar/`: empty, threat nativo
+  con gemma rossa, pannello reale aperto, 1920×1080 e narrowing (visibile a
+  980, nascosto senza overlap a 900 e sotto). Probe: `final-probe.json`,
+  `narrow-probe.json`; confronto visivo: `final-comparison-board.png`.

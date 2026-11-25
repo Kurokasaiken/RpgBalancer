@@ -606,6 +606,55 @@
         "date": "2026-11-21"
       },
       "ornamentScale": 0.24
+    },
+    {
+      "id": "dial-frame-v1",
+      "kind": "ornament",
+      "scope": "hud",
+      "status": "baptized",
+      "role": "seatRing",
+      "dialect": "champagne-filigrana",
+      "materials": [
+        "champagne",
+        "gemma-smeraldo"
+      ],
+      "ornamentScale": 0.3,
+      "assets": {
+        "master": "public/assets/ui/hud-real/time/dial-frame.webp"
+      },
+      "provenance": {
+        "golden": ".mw/specs/hud-real/time/gen3/frame-v1/img-0.png",
+        "sha256": "bb79a818cd44c2548c90fc75cfcd6c77564e0ab632b38208789b95ce702c6eac",
+        "ruling": "Director 2026-11-23: immagine generata a mano dal Director («prova quella») + posizione scelta via dial-positioner (seat -3.5,26.9, frame Ø85, disco 82%) + stesso giorno: foglie-cristallo sx rimosse via green-marker («i pezzi verdi sn da eliminare, nn toccare l'outer ring»), micro-slop ritoccati, niente backplate («lasciamolo norma»). Amend 2026-11-24 («il sole ha ancora un cerchio verde dietro… deve rimanere solo il sole»): la gemma smeraldo e la banda tacche dipinte sono rimosse via flood-fill — resta l'outer ring vuoto; la versione con gemma è preservata in .mw/runs/20261124-time-sun-restore/dial-frame-with-gem.webp. Amend 2: il taglio della gemma era un misread — il «verde» bocciato era il wash scuro, non la gemma; sha ripristinato a c212407e (gemma + foglie tolte). Amend 3 (2026-11-25): asset sostituito con gen3 frame-v1 — rigenerato da Gemini vincolato al battezzato come ref colore/stile («rifallo da gemini… devono essere simmetrici, belli») + pick Director «frame v1 va bene»; keyato magenta→alfa+despill, canvas centrato sulla sede. Battezzato precedente preservato in .mw/runs/20261124-time-sun-restore/dial-frame-baptized-bak.webp",
+        "generator": "Gemini web (CDP batch, ref-vincolato)",
+        "date": "2026-11-25"
+      }
+    },
+    {
+      "id": "time-disc-v1",
+      "kind": "ornament",
+      "scope": "hud",
+      "status": "baptized",
+      "role": "phaseDisc",
+      "dialect": "champagne-filigrana",
+      "materials": [
+        "champagne",
+        "gemma-smeraldo",
+        "cielo-notturno"
+      ],
+      "ornamentScale": 0.3,
+      "assets": {
+        "sun": "public/assets/ui/hud-real/time/sun.webp",
+        "moon": "public/assets/ui/hud-real/time/moon.webp"
+      },
+      "provenance": {
+        "golden": ".mw/specs/hud-real/time/golden/",
+        "sha256_sun": "e31f485e6e726611663214d6df3747d14337ea90f71d3037d8783ae0e53fb5a8",
+        "sha256_moon": "685693549a4e61f19af9f7b33a2c9861c7b953ee1efd15b6e9950c73aa387700",
+        "ruling": "Director 2026-11-25: «battezzo questo componente così com'è, questo è il golden reference per la UI». Sole = gen3 sun-v1 (Gemini CDP vincolato al battezzato come ref colore/stile) + simmetrizzato su ruling «rendi quella sotto uguale a quella sopra» (fiamma bassa = copia ruotata 180°) + orbe centrato nel canvas; keyato magenta→alfa+despill. Luna = battezzata 2026-11-23 (falce oro su disco stellato dipinto), invariata. Asset condivisi col dial della barra full. Witness battezzato: .mw/specs/hud-real/time/golden/witness-day.png + witness-night.png",
+        "generator": "Gemini web (CDP batch, ref-vincolato)",
+        "date": "2026-11-25"
+      }
     }
   ]
 }

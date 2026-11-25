@@ -30,12 +30,16 @@ describe('village stash — capacity has one source (R-234)', () => {
 describe('village stash — stays inside its zone (R-234)', () => {
   // INV:R-234-stash-inside-zone — the panel never grows past the height of the zone the stage
   // solver gives it: the list scrolls inside, title and capacity footer stay on screen.
-  it('caps its height at the zone height and scrolls the list inside', () => {
+  // (clean-frame port 2026-11-25: the panel is aspect-locked 1147:833 — a too-short zone
+  //  shrinks the WIDTH so the painted frame keeps the mockup proportions instead of
+  //  clipping height.)
+  it('fits the zone height by shrinking width, and scrolls the list inside', () => {
     render(
-      React.createElement(VillageStashPanel, { config: VILLAGE_STASH_CONFIG, left: 0, top: 400, widthPx: 320, maxHeightPx: 380, zIndex: 12, onClose: () => {} }),
+      React.createElement(VillageStashPanel, { config: VILLAGE_STASH_CONFIG, left: 0, top: 400, widthPx: 500, maxHeightPx: 300, zIndex: 12, onClose: () => {} }),
     );
     const panel = document.querySelector<HTMLElement>('[data-hud-panel="villageStash"]')!;
-    expect(panel.style.maxHeight).toBe('380px');
+    expect(panel.style.height).toBe('300px');
+    expect(panel.style.width).not.toBe('500px');
     expect(getComputedStyle(screen.getByRole('list')).overflowY).toBe('auto');
   });
 });

@@ -203,6 +203,7 @@ Format: `[filename](path) — one sentence — \`tag\``
 
 ## Pattern
 
+- [pattern-candidate R-380 medaglione Tempo](../.mw/runs/20261124-time-sun-restore/pattern-candidate.md) — learn golden reference: T-33 addendum (stessa tinta su più layer = inventario prima del cut), T-35 (centro cerchio dipinto = fit robusto sul bordo, «decentrato» = anchor+asimmetria), T-36 (copy-rotate symmetry: cuneo stretto + threshold alpha), gen `--ref` vincola palette — `pattern` `learn` `hud` `R-380` `T-33` `T-35` `T-36`
 - [pattern-candidate villaggio](../.mw/runs/2026-11-10-village-building-layers/pattern-candidate.md) — aggiungere un edificio a un dipinto: armonizza nella scena reale, riprendi solo edificio+base — `pattern`
 [src/pages/hud-lab/catalog.ts](src/pages/hud-lab/catalog.ts) — lista viva del vocabolario battezzato su /game (componenti→pezzi, status battezzato/candidato/da-riallineare, provenance ruling+sha); montata da `/hud-lab` PLAN-129 — `vocabulary` `hud` `PLAN-129` `R-369`
 [context/component-charter.md](context/component-charter.md) — PLAN-131: la forma compilata di un componente battezzato (ornamentLevel, materiali per regione, stati, typeFloor, appreciated/openIssues/openExploration, confidence, anatomy.hash); gate `INV:hud-charters`; dati in `src/config/hud/charters.ts` — `vocabulary` `hud` `PLAN-131` `R-375`

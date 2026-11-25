@@ -37,6 +37,13 @@ export interface PoiMagicCircleProps {
    *  punte/jewels live there; the runes «partono dai gioielli» only. Ranges
    *  may wrap past 360. */
   gaps?: ReadonlyArray<readonly number[]>;
+  /** Dark keyline under the band (Director 2026-11-24): when set, the written
+   *  arc is stroked once more — same path, same sweep, same punta mask — wider
+   *  than the band by `keylineRim` per side, so a dark rim is born together
+   *  with the fill instead of being traced around it as an outline. */
+  keylineColor?: string;
+  /** Rim width beyond the band edge, in viewBox units (default 2.8). */
+  keylineRim?: number;
   'data-testid'?: string;
 }
 
@@ -162,6 +169,8 @@ export const PoiMagicCircle: React.FC<PoiMagicCircleProps> = ({
   urgent = false,
   urgentTone,
   gaps,
+  keylineColor,
+  keylineRim = 2.8,
   'data-testid': testId,
 }) => {
   const uid = useId();
@@ -271,6 +280,29 @@ export const PoiMagicCircle: React.FC<PoiMagicCircleProps> = ({
        *  reads as black scribble (Director ruling 2026-11-13). */}
 
       <g mask={gaps && gaps.length > 0 ? `url(#${gid('nogaps')})` : undefined}>
+      {/* Band keyline (Director 2026-11-24 «bordo scuro che nasce insieme
+       *  all'halo»): the same written arc stroked wider in navy UNDER the
+       *  band — it exists only where the fill exists, inherits the punta
+       *  mask, and leaves a dark rim on both edges. Not a traced outline. */}
+      {keylineColor ? (
+        <>
+          <path
+            d={sealArcPath(BAND_R, sealProgress, sweep)}
+            fill="none"
+            stroke={keylineColor}
+            strokeWidth={BAND_W + keylineRim * 2}
+            strokeLinecap="butt"
+          />
+          {sealProgress < 0.999 && (
+            <circle
+              cx={headPoint.x}
+              cy={headPoint.y}
+              r={T4.seal.flow.headRadius + keylineRim * 0.7}
+              fill={keylineColor}
+            />
+          )}
+        </>
+      ) : null}
       <g filter={`url(#${gid('bloom')})`}>
         {/* Single solid band (Director ruling 2026-11-14: «una riga intera
          *  con le scritte sopra, non due righe piccole») — spans the same

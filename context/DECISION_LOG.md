@@ -1119,3 +1119,174 @@ band a smalto condivisa. Artefatto registrato:
 `.mw/specs/hud-real/refs/approved-victory-pergamena-live.png` (witness
 headless run reale, da `.mw/runs/20261121-victory-fix/parchment-alphacut2/`),
 entry in REGISTERED.md. PLAN-125 Fase 7d (N=3 PLAN-127) → completata.
+
+## 2026-11-23 — Ancora estetica HUD: barra giorno top-left = canone per esempio
+
+- **Ruling Director** («l'unico componente che va bene al 90% è quello in alto a sinistra, il resto dovrebbe allinearsi a quello. Anche quello in basso a centro va bene, ma non so se sono la stessa lingua»): **`time-sole` + `top-chrome` = ancora estetica della HUD**. Il canone è per esempio: ogni altra superficie si allinea a quella, non a un documento.
+- **Nav = stessa lingua, confermato a misura** (audit `scripts/hud-real/audit-asset.py` sugli asset reali): ratio nero/verde 0.52 nav vs 0.58 ancora vs 0.55 risorse — proporzioni identiche a ±5%. Differenza percepita = **densità d'oro** (nav 23.9% vs 15.2%, astrolabio+socket) e **pattern** del nero (4 socket concentrati vs pozzo diffuso). Gap residuo = icone interne crema piatte → programma D-6.
+- **Residui 10% dell'ancora** (ruling): sole più grande — target = `mockup-r357-hud-aperta-v4c.png`, medaglione ≈1.9–2.0× altezza barra (oggi ~1.24); «aletta» da eliminare — candidata = finial a freccia+gemma-kite sul bordo destro, conferma + spec sostituto pendenti.
+- **POI rinviati**: «da vicino soddisfatto o quasi, ci pensiamo dopo» — medaglioni blu restano; programma mockup PLAN-125 resta in coda, non aperto.
+- **Audit anti-slop automatico** richiesto («dovrebbe essere fatta automaticamente e al dettaglio»): primo giro su `time/bar-slim.webp` → cucitura cap↔banda a x≈65px design (punta oro troncata, evidenza `seam-5x.png`), asimmetria top/bottom −0.15 (arte organica, da ruling), socket a passo uniforme allineati alla geometry ✓. Script reso permanente `scripts/hud-real/audit-asset.py`; report `.mw/runs/20261123-lingua-audit/AUDIT.md`. Estensione lato DOM (clip/copertura/font via headless) da codificare come passo successivo dello stesso audit.
+
+## 2026-11-23 — Ancora: sole a sbalzo risolve aletta+cucitura+slop (ruling, implementato)
+
+- **Ruling Director** («sostanzialmente sì» su `board-sole-sx.png`, variante C): il quadrante fase diventa il medaglione dominante — **sole/luna Ø82 design px, a sbalzo sul bordo sinistro della barra** (composizione golden `mockup-r357-hud-aperta-v4c.png`), bordo dx ancorato alla giunzione cap↔banda **che resta visibile** come fermaglio oro.
+- **Una mossa, tre fix**: il medaglione DOM copre l'«aletta» sx (punta+foglie), la punta-oro troncata della cucitura e lo slop interno del castone (ghiera dipinta irregolare, spike cardinali diseguali, faccetta decentrata) → **nessun patch raster, nessuna rigenerazione dell'asset**. Patch speculare della cucitura provata e funzionante (`board-patch-cucitura.png`) ma non necessaria.
+- **Implementazione = solo config**: `timeOfDay.dialSlim` in `gameFrameConfig.ts` (cx 18, disc 41, r 48); corona tick spostata sull'anello esterno come i segni incisi del golden. `sun.webp`/`moon.webp` rigenerati a 164px nativi (erano 96 → blur al nuovo Ø). Witness headless: `.mw/runs/20261123-lingua-audit/witness-zoom.png`.
+- **Residuo aperto**: tick della corona leggermente tagliati sul bordo alto/sx viewport a margini stretti — registrato in `openIssues` del charter.
+- Tavole del fork (evidenze): `board-aletta-sx.png`, `board-sole-sx.png`, `delta-aletta.png`, `delta-sole.png`, blink `blink-sole-sx.gif` in `.mw/runs/20261123-lingua-audit/`.
+
+## 2026-11-23 — Medaglione time-sole battezzato: gen. Director + dial-positioner
+
+- Il Director ha generato a mano il nuovo medaglione (`Gemini_Generated_Image_ajgolpajgolpajgo.jpeg` → `.mw/specs/hud-real/time/gen/medallion-director-0.png`): anello oro inciso, 8 pinne complete (fix pinna mancante a ore 10:30 dell'originale), smeraldo profondo senza ritocco, niente aletta, foglie-cristallo sx, fermaglio dx.
+- Posizione scelta dal Director via `scripts/hud-real/dial-positioner.html` (tool drag standalone creato in sessione): sede a (-3.5, 26.9) design px, frame Ø85, disco sole/luna all'82% della sede.
+- Asset: `public/assets/ui/hud-real/time/dial-frame.webp` (170px, alpha, sede al centro); `sun.webp` ricentrato (bug: sole dorato era ~7px sotto il centro del disco); pezzo `dial-frame-v1` in pieces.json.
+- Implementazione: `dialSlim` nuovo campo `frame {url,size}` + layer `<img>` in HudRealTime sotto corona tick e disco.
+- Residuo noto: pinne a ore 9 toccano il bordo viewport alla posizione scelta (regolabile col tool).
+
+## D-20261124-poi-nav-icone — POI stile "extreme overflow" + nav roster/stash (R-367, D-6)
+Ruling Director (in-session 2026-11-24):
+- **POI — stile battezzato**: foglio B "extreme/diorama" — il soggetto dipinto **erutta fuori dal medaglione** rompendo il bordo oro con ombra proiettata sul metallo. Foglio A bocciato («nn strabordano, sn sposte sopra» — soggetti appoggiati, anello intatto sotto). Le icone POI diventano diorami scontornati sopra l'anello live, non glifi 20px nel disco.
+- **"Sterminio goblin"**: nuovo soggetto richiesto nello stesso stile — foglio 2×2 generato (teschio su picca+spade / stendardo goblin strappato+braci / maschera trofeo su pugnale / corona infranta+spada): **tutti e 4 battezzati, TL scelto per poi-goblin**. Rigenerati su magenta piatto → cut-out trasparenti `public/assets/ui/poi/emblems/sterminio-{skull-pike,torn-banner,war-mask,broken-crown}-128.webp` — asset **separati dal componente POI**, riusabili su qualsiasi superficie («scegliam cosa mettere quando»).
+- **Nav destra**: `roster` = crowd di ~7 busti vari (tutti i villager, eroici e non — non il party da 3); `villageStash` = forziere aperto con monete (non lo zaino). **Director ruling: le icone nav sono i cut-out delle immagini generate, NON glifi incisi** («nn sn le icone che ho scelto» — i glifi SVG tracciati erano stati bocciati). Asset `public/assets/ui/nav/nav-{roster,stash}-128.webp` estratti dal foglio (oro champagne su alpha, filtro anti-arco a componenti connessi); `company`/`stash` spostati in `HUD_ICON_ASSETS` (dipinti) in `hudIcons.tsx`. Witness live `/game` verde.
+- **Strabordante montato**: `PoiZanara` prop `iconOverflow` + `iconOverflowFactor: 2.9` in `poiZanaraConfig.ts` — l'emblema dipinge sopra il rim oro (ultimo layer DOM, overflow visibile). `MapQuestPoi.QUEST_GLYPH_OVERFLOW = {poi-goblin}`. Witness `live-poi-overflow2.png`: spade/corvi coprono il rim.
+- **Galleria icone**: `/icon-gallery` (lab route) — tutte le icone del programma raggruppate per tipo, tile socket-lacca + controllo 16px.
+- Aperto: soggetti finali POI rimasti (job/offer icons) nella grammatica Foglio-B; gli altri 3 emblèmi sterminio non hanno ancora una casa.
+
+## D-20261124-stash-1to1 — Stash `/game` ricostruito 1:1 sul mockup (R-367/PLAN-125)
+Ruling Director (2026-11-24): «il risultato su /game è completamente differente… devi darmi un componente uguale, e metterlo in proporzione correttamente in modo che sia 1:1 cn il mockup».
+- **Metodo**: il chrome intero arriva dal backdrop dipinto estratto da `mockup-stash-grid.jpg` (erase dei soli testi/icone nei punti misurati) → `public/assets/ui/hud-real/stash-mockup-backdrop.webp` 752×702; il componente è aspect-locked e gli overlay DOM stanno a % del backing — 1:1 a qualunque larghezza.
+- **Conseguenze contrattuali**: (1) il contatore «N / M» torna nel pannello (`capacityShort` — il ruling 2026-11-20 no-counter decade davanti alla richiesta esplicita 1:1; test `r353StashGrid` aggiornato a nuovo contratto: backdrop + counter presenti); (2) `PanelFrameOrnaments`/slice-kit frame e `HudPlaque` NON montano più qui — il frame è dipinto; (3) la piastrina A resta cornice hover/selected sopra il pozzetto DOM (rim ottone ottagonale clip-path, interno lacca).
+- Witness: `.mw/runs/20261124-poi-nav-icone/gen/live-stash-1to1.png` + `/tmp` crops; confronto mockup↔live quasi identico.
+
+## D-20261124-iconi-tutte — Copertura icone `/game` completa (R-367, D-6)
+Ruling Director (2026-11-24): «fallo x tutte le icone presenti in /game, sia da lontano che da vicino» — estensione del trattamento dipinto/cut-out a OGNI icona visibile su `/game`, con witness a entrambe le scale.
+- **POI emblèmi**: fogli magenta→cut-out in grammatica Foglio-B (diorami che eruttano): `emblem-{ruins,goblin-camp,recon,forage,logs,assault,caravan,delve}-128.webp` in `public/assets/ui/poi/emblems/`. Montati: `poi-rovine`→ruins (aggiunto a `QUEST_GLYPH_OVERFLOW`); i 5 demo marker e il fallback job zanara (`JOB_ZANARA_ICON`) in `game-mappa2.tsx`/`MapDemoPoi` (nuovo prop `iconOverflow`). Gli emblèmi ruins/camp/recon/forage conservano il loro disco lacca dipinto — fonde col dome del medaglione.
+- **Nav sx**: `settlement`/`world` in `HUD_ICON_ASSETS` → `nav-village-128.webp`/`nav-map-128.webp` (stesso pipeline oro-su-alpha di roster/stash). Tutta la nav ora dipinta.
+- **Chrome basso-dx**: i 3 bottoni (menu, director-spark, hide-eye) e il triangolo Resume del speed pill → `ctl-{menu,director,eye,play}-128.webp` (glifi inciso-oro estratti su alpha, droppati come `<img>` al posto di `EngravedIcon`).
+- **Stash questItems**: il catalogo emoji (`🐎🗡️🛡️🚩🧪🪙`) → `item-{horse,dagger,shield,flag,vial,coin}-128.webp` via `ICON_TO_ASSET` — nessun glifo inciso resta nei pozzetti.
+- **Residui incisi (non convertiti)**: pause-bars dello stato running (nessun asset dipinto generato), glifo "giorni di cibo" nella barra risorse, glifi `evt-*` del ledger (non visibili nello stato default), icone edifici della vista villaggio (surface diversa dalla mappa).
+- **Bug pipeline trovato e fixato**: `mag*255` overflowava int16 (NEP50) → bande magenta opache nei cut-out; keying ora in int32.
+- Witness `/game` live 1440×900: `emblems2/live-full.png` (lontano), `zoom-poi-board.png` + `live-nav.png` + `live-corner.png` + `live-stash.png` (vicino). Test 38/38 scope; `build:check` PASS; `closure:lint` rosso solo su file paralleli Director.
+
+### D-20261124b-sterminio-refit — emblem corrected to baptized cell
+The mounted `sterminio-skull-pike` emblem was a Gemini reinterpretation (X-wood totem), not the baptized TL cell (skull on pike + 2 crossed swords + crows). Gemini image-edit refused to drop the medallion; mechanical fix: erased gold ring + gems on the annulus via color-keying + connected-components speck removal (pure-numpy BFS — no scipy), keeping the painted teal disc (consistent with the other 4 sterminio emblems). Asset rebuilt at `public/assets/ui/poi/emblems/sterminio-skull-pike-128.webp`; live zoom witness `gen/emblems2/compare-sterminio.png`.
+
+### D-20261124c-poi-icon-dual — ogni icona POI in due varianti
+Ruling Director: le icone POI esistono **con e senza POI dietro** (come lo sterminio). Implementazione meccanica (Gemini web in "Image Generation Limit Reached"): `sigillo-empty-256.webp` = sigillo reale catturato nudo da /game (emblem imgs nascosti, deviceScaleFactor 4); `markers/marker-*-128.webp` = emblem cut-out composto sul sigillo a proporzioni di gioco (0.72× outer). `emblems/emblem-*` resta la variante senza, montata dal componente sul sigillo DOM. Galleria `/icon-gallery`: sezioni "POI — con POI dietro" / "POI — senza POI" / "sigillo nudo". Regen Gemini con prompt POI-aware rinviata a quota reset.
+
+### D-20261124d-emblem-no-disc — emblem POI rigenerati senza disco
+Ruling Director: gli emblem vanno RIGENERATI dal provider (niente compositing manuale "pessimo") e senza cerchio/disco dietro il soggetto; ogni emblem deve corrispondere alla cella battezzata. Metodo: image-edit Gemini con la cella battezzata allegata come ref, prompt "redraw ONLY the diorama, NO medallion/disc/ring, flat magenta". Scope = solo i 6 emblem montati su /game (sterminio-skull-pike, ruins, goblin-camp, forage, logs, recon); i soggetti scartati Foglio-A (assault, caravan, delve, people, warehouse) NON rigenerati. Cut-out magenta→alpha int32; marker-* ricostruiti sul sigillo reale. Witness: `emblems2/live-poi-new-board.png`. Nota: il CDP browser è morto di mezzo — rilanciato Canary hidden col profilo condiviso MW (`open -g -j`), timeout connectOverCDP alzato a 150s nel driver.
+
+## D-20261124e — Nav: pittogrammi bold battezzati, implementati come glifi incisi (R-367/PLAN-125)
+Ruling Director (2026-11-24): nav `roster`/`stash`/`villaggio` illeggibili a ~40px → servono pittogrammi bold distinguibili in piccolo. Iterazione su fogli Gemini (`nav-legible`, `nav-village`, `nav-roster`, `nav-roster2`) con battezzatura progressiva:
+- **village** = `cottage-front` — casetta sola (tetto annesso posteriore mascherato via componenti connessi su `nav-village.png` middle cell).
+- **roster** = `r2-group` — glifo gruppo stile 👥, max-bold (da `nav-roster2.png`, dopo 2 rifiuti: busti/trio/registro/strumenti/stendardo bocciati).
+- **stash** = `stash-front` — forziere frontale (da `nav-legible.png`).
+**Implementazione**: i cut-out painted `nav-*` non sono cablati — il Director ha riportato `hudIcons.tsx` a all-engraved; quindi i pittogrammi approvati sono riscritti come **path SVG nei `GLYPHS` di `engravedIcons.tsx`** (24×24, fill solid, EO per i fori): `nav-village`→cottage (fumo+camino+porta+finestra), `nav-company`→group (figura frontale + 2 retro), `nav-stash` nuovo id (forziere: coperchio arco+corpo+piastra serratura); `hudIcons.stash` → `engraved('nav-stash')` (era `nav-bag`, che resta per gli usi borsa reali). Witness live `.mw/runs/.../emblems2/live-nav4.png`: 4 socket nav netti e distinti a nav ridotta (~27px glifi).
+- tsc pulito · eslint 0 errori sui file toccati. Nessun commit.
+
+## D-20261124f — Nav: i pittogrammi battezzati montati come PAINTED (non incisi)
+Ruling Director (2026-11-24): «la casa iniziale era meglio, la mappa nuova (cambiala), il nuovo stash nn si capisce» — i glifi SVG tracciati a mano erano illeggibili; le celle dipinte battezzate (line-art oro su lacca) invece leggono a 27px.
+- **village** → revert alla `nav-village` incisa originale (casa semplice+camino).
+- **world (mappa)** → `nav-map-128.webp` painted (scroll-map con X — sostituisce la folded incisa).
+- **company** → `nav-group-128.webp` (cut-out `r2-group` battezzato).
+- **stash** → `nav-stash-front-128.webp` (cut-out `stash-front` battezzato: forziere line-art).
+- I tre id entrano in `PaintedHudIconId`/`HUD_ICON_ASSETS` (escono da `HUD_ICONS`). Il glifo inciso `nav-stash` resta nel registry inutilizzato.
+- Gemini-web in quota fino alle ~20:01 — nessuna nuova generazione; usati i cut-out già approvati.
+- Witness `gen/live-nav5.png`. tsc pulito, eslint 0 errori. Nessun commit.
+
+## D-20261124g — Icone POI: keyline navy «riga attorno» al posto dell'alone avorio
+Ruling Director (2026-11-24): «le icone sui POI nn staccano come vorrei… un colore attorno come abbiamo fatto x la sagoma dei POI». Risposte: **navy come la sagoma** (#101f3a), **sostituire l'alone avorio**.
+- `PoiZanara.iconImg`: il filtro warm-halo (`drop-shadow` avorio diffuso) è rimpiazzato dalla stessa tecnica del pezzo — 4 drop-shadow direzionali `CFG.outlineColor` di spessore `outlinePx` scalato su `sizePx/pieceWidthPx` + grounding shadow. Tutti i POI `/game` (job+quest+demo) passano da qui → copertura completa; `PoiMatericV3_5` non è usato su /game.
+- Il cameo avorio sotto il glifo resta (backing, non alone attorno).
+- Witness `gen/keyline-board.png` (5 POI far). tsc pulito. Nessun commit.
+
+## D-20261124h (APERTA) — Emblemi POI: refit richiesto dal Director
+Ruling Director (2026-11-24 sera): (1) alcuni emblemi troppo grandi vs POI (es. legno); (2) forage/cestino: workflow corretto = emblema generato PRIMA sul POI che straborda, poi versione separata; (3) recon/uccello non è la cella battezzata (reinterpretazione, stesso errore sterminio); (4) goblin-camp/tenda: colori fuori da mappa/HUD → usare screenshot /game come ref di stile. Spec completa: `.mw/runs/20261124-poi-nav-icone/RESUME.md`. Da fare dopo sblocco quota Gemini (~20:01).
+
+## D-20261124i — Emblemi: workflow "prima sul POI poi soggetto-solo" + overflow per-icona
+Ruling Director (2026-11-24): workflow corretto = generare l'emblema SUL POI vero (ref `sigillo-empty-256.webp`), poi la versione separata via **follow-up nella stessa chat** (`_tmp-gemini-follow2.mjs` — le nuove conversazioni ignorano l'edit e ridipinsero il medaglione). Proporzioni battezzate: **75%**.
+- **forage**: `emblem-forage-128.webp` = cestino solo (magenta→alpha, `forage-solo-cut.png`); `iconOverflowFactor: 2.3` (75% battezzato, poi −15% Director).
+- **logs**: `iconOverflowFactor: 2.2` (75% del 2.9 corrente) — asset invariato.
+- Meccanismo: `PoiZanara.iconOverflowFactor?` prop → `MapDemoPoi` passthrough → `POI_DEMO_MARKERS` entries in game-mappa2. Default resta 2.9.
+- Driver note: `KEEP_TARGET=1` env tiene il target per il follow-up; `CHATURL:` emesso su stdout; payload via `fs.writeSync(1,…)` (file scritti dal processo spariscono all'exit 144).
+- Witness `gen/fit-board.png` (forage+logs live). tsc pulito. Nessun commit.
+- Aperto: recon (uccello, rifare con cella battezzata), goblin-camp (tenda, palette da /game), frangia rosa su emblem-logs.
+
+### Update D-20261124i (forage): soggetto rigenerato "piccolo"
+Director: «dimensione giusta ma nn si capisce niente, fattelo rigenerare + piccolo». Nuovo `emblem-forage-128.webp`: cestino semplificato (3-4 funghi grossi, poche masse bold, stile bold-stroke) generato su magenta → chroma-key + despill rosa. Factor invariato 2.3. Witness `/tmp/fit-forage3.png` — leggibile a dimensione POI.
+
+## D-20261124j — Nav: village+stash rigenerati nello stile line-art
+Ruling Director (2026-11-24): soggetti ok ma «village e stash stonano con lo stile degli altri due» → rigenerati in champagne-gold line-art (sheet 1×2, `nav-vs-sheet.png`): cottage fumante + forziere **appoggiato a terra** (più piccolo, sede bassa, spazio lacca sopra — battezzato al volo). Oro→alpha → `nav-village-line-128.webp` / `nav-stash-ground-128.webp`; `settlement` entra in `PaintedHudIconId` (la nav ora è 4/4 painted). Witness `gen/live-nav6.png`. Nessun commit.
+- **Correzione stile (secondo giro)**: map/group sono silhouette **piene** oro con dettagli incisi scuri — i primi sheet erano outline. Rigenerati solid-fill (`nav-solid.png` → `nav-village-line`, `nav-stash-ground` con despill rosa). Witness finale `gen/live-nav8.png`.
+- **Stash pick finale (Director)**: forziere solo (ombra/terra rimossi: taglio riga 98 + filtro viola + clamp oro sul rim 4px). Posizione scelta via `scripts/hud-real/nav-stash-positioner.html` (tool nuovo, stessa famiglia di dial-positioner): **w 61%, y 54%** — 78×57px, centrato X, leggermente sotto mezzeria.
+- **D-20261125a-res-pictogram**: icone risorse rigenerate come pittogrammi oro pieno + incisioni (era render pittorico fuori stile). Foglio Gemini 3 celle magenta → chroma-key → despill ring 4px. Soggetti: monete/pagnotta/ceppi. Tutte le taglie (128/64/32/base). Witness `gen/res-gallery.png` (icon-gallery live); witness /game non catturato — boot veil stuck "Raising the islands" headless (T-04 caveat).
+
+## 2026-11-25 — Learn R-380 medaglione Tempo: 4 pattern, 2 trappole nuove
+
+**Da:** (a) «cerchio verde dietro il sole» → fix diretto sul layer più ovvio (gemma dipinta);
+(b) centro sede circolare = baricentro/fit sui pixel colore; (c) copy-rotate per simmetria = cuneo
+ampio incollato grezzo; (d) regen asset battezzato senza ref colore.
+
+**A:** (a) stessa tinta su più layer = inventario layer prima del cut (T-33 addendum, 2a istanza);
+(b) centro = least-squares robusto sul bordo interno anello + orbe via distance transform;
+«decentrato» = anchor + asimmetria radiale, due cause da scomporre (T-35); (c) cuneo stretto ~28° +
+threshold alpha>60 post-paste (T-36); (d) `--ref` sul battezzato vincola palette — senza, drift.
+
+**Motivo:** regressione piena del medaglione battezzato (gemma tagliata per il wash), 3 falsi
+«decentrato» sovrapposti, banda fantasma da semi-alpha, batch gen1 palette sbagliata vs gen3
+ref-vincolata corretta. Restore possibile solo per approved-references (sha preservato).
+
+**Fonte:** `.mw/runs/20261124-time-sun-restore/pattern-candidate.md`
+
+
+## D-20261125-stash-clean-frame — Backing stash rigenerato pulito da Gemini, toppe bocciate (2026-11-25)
+
+**Ruling Director:** «i 3 problemi sono ancora lì… devi farti rigenerare le cose in modo pulito da
+gemini, non hai preso il protocollo per fare questo tipo di lavoro?»
+
+**Decisione:** applicato il gate 3 di `context/MOCKUP-TO-PRODUCTION-PIPELINE.md` («se l'inpaint
+lascia giunte/ghost, rigenerare il frame vuoto invece di accumulare toppe») e la guida
+`.mw/specs/hud-real/MOCKUP-TO-ASSET-GUIDE.md`. Il backing erase-patchato è SOSTITUITO da
+`stash-frame-clean.webp` (1147×833): frame rigenerato da Gemini via `scripts/gen-mappa2-sprite.mjs`
+(3 job: frame completo → correzione griglia 6×2 → 5×2 ancorata in chat), alpha-cut flood-fill da
+navy #0a1622 (di conseguenza sparisce anche l'halo di mappa cucita — il pannello ora è una finestra
+fluttuante vera). Zone misurate con grid overlay, mai a occhio. Scoperta chiave di diagnosi: la
+«cosa che copre i componenti» erano anche le **toppe CSS** — `WellRim` ridisegnava rim+smalto sopra
+i pozzetti dipinti: rimosso, le celle sono trasparenti sul backing firmato. Contatore «10/24»:
+mai mancato nel DOM — la segnalazione veniva da catture rotte dai reload vite causati dalla
+pipeline asset mappa2 attiva in parallelo (probe resa immune via swallow del websocket HMR).
+Witness: `.mw/runs/stash-compare-20261125/clean2-panel.png`.
+
+## D-20261125-stash-rings-medaglione — Filtri stash a ring sockets + icona medaglione piena (2026-11-25)
+
+**Ruling Director:** «l'icona all'interno del cerchio ha un enorme sfondo verde che non dev'esserci,
+non possiamo usare solo icone normali?» + «le pillole come nel componente tempo (i ring in quel modo)
+per i filtri, non come le pillole del roster».
+
+**Decisione:** (1) filtro kind dello stash = **ring sockets** famiglia tempo/roster (`C1/ring.webp`,
+sede smalto, glifo inciso, halo ottone sull'attivo) — contratto INV-3 invariato (radiogroup
+`stash-tab-*`); le pillole dipinte nel backing sono appiattite. (2) medaglione detail = icona painted
+normale che riempie l'alloro (Ø ≈ 19% panel width) su sede smalto ripitturata — il disco/erase verde
+piatto è stato ripitturato nel backing via `scripts/hud-real/build-stash-backdrop.py` (sorgente
+pristine `stash-mockup-backdrop-src.webp`). (3) fix geometria griglia: columnGap era ×5 troppo largo
+(5ª colonna fuori scaffale) → gap 21 backing px in cq + rowGap; faccia read-only ora riempie la cella.
+
+**Addendum artifact-cleanup (2026-11-25, sera):** la ripittura del backing è stata rifatta come
+campo radiale UNICO (centro alloro (150,538), smeraldo campionato dal mockup originale
+(20,60,38)→(5,13,9), falloff r110) che copre interno alloro + footprint erase sottostante —
+niente cuciture orizzontali/mezzelune. Zona testo detail ripitturata in smalto con bordi
+feathered (x270-690 y420-565): eliminati i fantasmi di testo antialiased e i trattini residui
+dell'erase originale. Pulsante Use/Pack: interno ricostruito come capsula lacca smeraldo
+entro il bordo ottone misurato. Contatore «10 / 24» confermato presente in DOM
+(`stash-capacity`) e visibile — la segnalazione della sua assenza era dovuta a catture rotte
+durante i reload vite. Witness: `.mw/runs/stash-compare-20261125/fix3-panel.png` +
+`board-final.png` (probe headless resa immune ai reload HMR via swallow del websocket vite —
+pipeline asset mappa2 attiva in parallelo).
+**Witness:** `.mw/runs/stash-compare-20261125/board-after-fix.png` + `fix1-panel.png` / `fix1-full.png`
+(headless 1440×900). Test: 67/67 verdi (r353StashGrid, villageStash, itemFace, r339BagAssign, capacity,
+ledger); build:check verde. Lint scope in quarantena legacy preesistente (`src/ui/idleVillage/**`).
+**Residui noti:** bottone Use/Pack read-only dipinto ma vuoto (serve variante backing o stato
+disabilitato — decisione aperta); halo mappa cotto nel backing ai bordi del frame; quantità/contenuti
+seguono la config reale (10/24), non il mockup illustrativo.

@@ -329,7 +329,8 @@ export const ROVINE_SCENARIO_AUTHORED = {
       required: [
         {
           id: 'rovine-slot-leader',
-          label: 'Expedition leader',
+          /* R-378 rev5 (Director 2026-11-25 «nn mettere expedition leader, solo leader») */
+          label: 'Leader',
           role: 'leader',
           statFocus: ['str', 'con'],
           requirement: { label: 'Expedition leader', anyOf: ['fortitude', 'edge'] },

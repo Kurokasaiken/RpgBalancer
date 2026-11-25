@@ -12,7 +12,7 @@ from PIL import Image, ImageDraw
 
 SRC = Path('.mw/specs/hud-real/kit/gen/time-sunmoon-poi-mockup-0.webp')
 OUT = Path('public/assets/ui/hud-real/time')
-SIZE = 96  # px, 2x of the 48-design-px disc box (drawn at ~42 design px)
+SIZE = 164  # px, 2x of the 82-design-px disc (Director 2026-11-23: sole grande a sbalzo)
 
 
 def inner_disc(img, cx, cy, search):

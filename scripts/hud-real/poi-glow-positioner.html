@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>POI glow positioner</title>
+<style>
+  body { margin:0; background:#10151c; color:#f3ead0; font:13px/1.4 system-ui,sans-serif; display:flex; gap:0; height:100vh; }
+  #stage { flex:1; position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; }
+  #scene { position:relative; }
+  .glow { position:absolute; border-radius:50%; pointer-events:none; }
+  .piece { position:absolute; inset:0; width:100%; height:100%; }
+  #side { width:300px; padding:18px 16px; background:#0b0f14; border-left:1px solid #333; }
+  label { display:block; margin:14px 0 4px; color:#c9b98a; letter-spacing:.4px; }
+  input[type=range] { width:100%; }
+  .val { float:right; color:#f0d58c; font-variant-numeric:tabular-nums; }
+  pre { background:#05080b; border:1px solid #2a3542; border-radius:8px; padding:10px; font-size:11px; white-space:pre-wrap; word-break:break-all; color:#9fd0ff; }
+  button { margin-top:8px; width:100%; padding:7px; border-radius:8px; border:1px solid #8a6f35; background:rgba(20,50,41,.9); color:#f0d58c; cursor:pointer; font-size:12px; letter-spacing:1px; }
+  .seg { display:flex; gap:6px; margin-top:6px; }
+  .seg button { flex:1; }
+  .seg button.on { background:linear-gradient(180deg,#2fd4a3,#1fb877); color:#052015; }
+</style>
+</head>
+<body>
+<div id="stage"><div id="scene"></div></div>
+<div id="side">
+  <b>POI glow positioner</b>
+  <div class="seg">
+    <button id="bq" class="on">quest</button><button id="bj">job</button>
+  </div>
+  <div class="seg">
+    <button id="bd" class="on">scuro</button><button id="bl">chiaro</button>
+  </div>
+  <label>parte da (inner edge %) <span class="val" id="vStart"></span></label>
+  <input id="start" type="range" min="30" max="95" value="58">
+  <label>picco (max % ) <span class="val" id="vPeak"></span></label>
+  <input id="peak" type="range" min="50" max="110" value="72">
+  <label>arriva a (outer fade %) <span class="val" id="vEnd"></span></label>
+  <input id="end" type="range" min="70" max="140" value="97">
+  <label>intensità (alpha %) <span class="val" id="vInt"></span></label>
+  <input id="int" type="range" min="15" max="100" value="62">
+  <label>ingombro glow (rispetto alla rail halo %) <span class="val" id="vBox"></span></label>
+  <input id="box" type="range" min="80" max="150" value="118">
+  <pre id="out"></pre>
+  <button id="copy">copia CSS</button>
+  <div style="margin-top:10px;color:#7a8a99;font-size:11px">
+    % = frazione del raggio del wrapper halo (rail 515 quest / 460 job).<br>
+    La silhouette del pezzo sta a ~80% (quest) / ~90% (job).
+  </div>
+</div>
+<script>
+const CANVAS_W=1786, CANVAS_H=1873, CX=892.49, CY=878.20, PIECE_W=1034;
+const RAIL={quest:515, job:460};
+const COL={quest:'#4d82ff', job:'#23c96e'};
+const ASSET={quest:'/assets/ui/hud-real/poi/layers/poi-quest-light.webp',
+             job:'/assets/ui/hud-real/poi/layers/poi-job-light.webp'};
+let fam='quest';
+const scene=document.getElementById('scene');
+const S=Object.fromEntries(['start','peak','end','int','box'].map(id=>[id,document.getElementById(id)]));
+const V=Object.fromEntries(['start','peak','end','int','box'].map(id=>[id,document.getElementById('v'+id[0].toUpperCase()+id.slice(1))]));
+
+function render(){
+  const size=Math.min(innerHeight*0.86, 620);
+  scene.style.width=size+'px'; scene.style.height=size*CANVAS_H/CANVAS_W+'px';
+  scene.innerHTML='';
+  const rail=RAIL[fam];
+  const glowBox=S.box.value/100;              // vs default halo wrapper (2*rail)
+  const side=(2*rail*glowBox)/CANVAS_W*size;  // px
+  const glow=document.createElement('div'); glow.className='glow';
+  const cx=CX/CANVAS_W*size, cy=CY/CANVAS_H*scene.clientHeight;
+  glow.style.left=(cx-side/2)+'px'; glow.style.top=(cy-side/2)+'px';
+  glow.style.width=side+'px'; glow.style.height=side+'px';
+  const col=COL[fam], a=S.int.value, s=S.start.value, p=S.peak.value, e=S.end.value;
+  glow.style.background=`radial-gradient(closest-side, transparent 0%, transparent 42%, `+
+    `color-mix(in srgb, ${col} ${Math.round(a*0.5)}%, transparent) ${s}%, `+
+    `color-mix(in srgb, ${col} ${a}%, transparent) ${p}%, `+
+    `color-mix(in srgb, ${col} ${Math.round(a*0.5)}%, transparent) ${Math.round((p+Number(e))/2)}%, `+
+    `transparent ${e}%)`;
+  scene.appendChild(glow);
+  const img=document.createElement('img'); img.className='piece'; img.src=ASSET[fam];
+  img.style.filter='drop-shadow(0 0 2.1px #101f3a) drop-shadow(0 1.5px 3px rgba(6,10,20,.6))';
+  scene.appendChild(img);
+  document.getElementById('stage').style.background=
+    document.getElementById('bl').classList.contains('on')
+      ? 'radial-gradient(circle at 50% 40%, #b8a878, #8a7a52)'
+      : 'radial-gradient(circle at 50% 40%, #1d3a4a, #0d1f2b)';
+  V.start.textContent=s+'%'; V.peak.textContent=p+'%'; V.end.textContent=e+'%'; V.int.textContent=a+'%'; V.box.textContent=S.box.value+'%';
+  document.getElementById('out').textContent=
+`radial-gradient(closest-side,
+  transparent 0%, transparent 42%,
+  color-mix(in srgb, var(--poi-glow) ${Math.round(a*0.5)}%, transparent) ${s}%,
+  color-mix(in srgb, var(--poi-glow) ${a}%, transparent) ${p}%,
+  color-mix(in srgb, var(--poi-glow) ${Math.round(a*0.5)}%, transparent) ${Math.round((p+Number(e))/2)}%,
+  transparent ${e}%);
+/* inset glow-box: -${(S.box.value-100).toFixed(0)}% */`;
+}
+for(const k in S) S[k].addEventListener('input',render);
+const tgl=(el,cb)=>el.addEventListener('click',()=>{cb();render();});
+tgl(bq,()=>{fam='quest';bq.classList.add('on');bj.classList.remove('on');});
+tgl(bj,()=>{fam='job';bj.classList.add('on');bq.classList.remove('on');});
+tgl(bd,()=>{bd.classList.add('on');bl.classList.remove('on');});
+tgl(bl,()=>{bl.classList.add('on');bd.classList.remove('on');});
+copy.onclick=()=>navigator.clipboard.writeText(document.getElementById('out').textContent);
+render();
+</script>
+</body>
+</html>

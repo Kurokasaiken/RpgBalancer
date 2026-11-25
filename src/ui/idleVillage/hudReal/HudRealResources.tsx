@@ -28,8 +28,11 @@ const C = {
 } as const;
 const G = { pad: 7, socket: 36, glyph: 22, gap: 7, valueSize: 19, labelSize: 12 } as const;
 /** R-339/T6: the slim bar's first slot is 65 design px — the compact chip keeps the
- *  same socket→value/label grammar at a size that seats inside every slim slot. */
-const G_COMPACT = { pad: 4, socket: 26, glyph: 17, gap: 4, valueSize: 15, labelSize: 10 } as const;
+ *  same socket→value grammar at a size that seats inside every slim slot. The
+ *  slim chip does not paint the label line (10 px was under the readable floor):
+ *  the name stays in the tooltip and the chip's aria-label so the value can be
+ *  bigger (HUD critique run 20261124-hud-critique-multi-ai, Director «procedi»). */
+const G_COMPACT = { pad: 4, socket: 26, glyph: 17, gap: 5, valueSize: 17, labelSize: 12 } as const;
 
 const SCOPED_CSS = `
 [data-hudreal-resources] [data-hr-res]:focus { outline: none; }
@@ -37,10 +40,11 @@ const SCOPED_CSS = `
 `;
 
 /** Incised hourglass: the "time is running out" emblem (rubric §1.6b) — rendered
- *  inline after the label, never as value punctuation. */
-function Hourglass({ color }: { color: string }) {
+ *  inline after the label (or after the value on the slim chip), never as value
+ *  punctuation. `w`/`h` scale the drawn path. */
+function Hourglass({ color, w = 9, h = 12 }: { color: string; w?: number; h?: number }) {
   return (
-    <svg width="9" height="12" viewBox="0 0 9 12" aria-hidden="true" style={{ display: 'block', flex: 'none' }}>
+    <svg width={w} height={h} viewBox="0 0 9 12" aria-hidden="true" style={{ display: 'block', flex: 'none', alignSelf: 'center' }}>
       <path d="M1 0.75h7M1 11.25h7M1.6 0.75c0 3 2.9 3.6 2.9 5.25S1.6 8.25 1.6 11.25M7.4 0.75c0 3-2.9 3.6-2.9 5.25s2.9 2.25 2.9 5.25"
         fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" />
     </svg>
@@ -136,15 +140,18 @@ export function HudRealResources({ items, bar: BAR_LOCAL = BAR, asset: ASSET_LOC
                   {item.max !== undefined && String(item.value).length <= 3 && (
                     <span style={{ fontSize: hudPx(S.labelSize), fontWeight: 500, color: C.value, opacity: 0.85 }}>/{item.max}</span>
                   )}
+                  {compact && danger && <Hourglass color={toneColor} w={10} h={13} />}
                 </span>
-                <span style={{
-                  fontFamily: '"Cardo", serif', fontStyle: 'italic', fontSize: hudPx(S.labelSize), lineHeight: hudPx(13), color: C.label, textShadow: C.shadow,
-                  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', letterSpacing: 0.6,
-                  display: 'flex', alignItems: 'center', gap: 5,
-                }}>
-                  {item.label}
-                  {danger && <Hourglass color={toneColor} />}
-                </span>
+                {!compact && (
+                  <span style={{
+                    fontFamily: '"Cardo", serif', fontStyle: 'italic', fontSize: hudPx(S.labelSize), lineHeight: hudPx(13), color: C.label, textShadow: C.shadow,
+                    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', letterSpacing: 0.6,
+                    display: 'flex', alignItems: 'center', gap: 5,
+                  }}>
+                    {item.label}
+                    {danger && <Hourglass color={toneColor} />}
+                  </span>
+                )}
               </div>
             </div>
           </ZanaraTooltip>

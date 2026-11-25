@@ -788,11 +788,23 @@ const gameFrameTimeDialSchema = z.object({
   cy: z.number(),
   r: z.number().positive(),
   disc: z.number().positive(),
+  /** Optional explicit radius for the recessed-well wash (design px). Default `r - 0.5`
+   *  is right on the full bar, where the wash darkens the painted emerald; with a framed
+   *  medallion under the crown it must stop inside the gold ring or it swallows it. */
+  wellR: z.number().positive().optional(),
+  /** Optional navy wash over the faceted gem, shown only under the moon and faded
+   *  with `fadeMs` (Director 2026-11-25, variant B: «scuriamo la gemma dentro»). */
+  nightWash: z.object({ r: z.number().positive(), color: z.string() }).optional(),
   ticks: z.number().int().positive(),
   majorEvery: z.number().int().positive(),
   fadeMs: z.number().nonnegative(),
   sunUrl: z.string(),
   moonUrl: z.string(),
+  /** Optional painted frame seated under the disc (baptized medallion): square image.
+   *  `offset` = where the frame's canvas centre sits relative to the dial centre (cx, cy) —
+   *  measured so the painted gem seat lands exactly on (cx, cy): the painted seat in
+   *  `dial-frame.webp` is off-canvas-centre by (−2.9, −4.0) design px. */
+  frame: z.object({ url: z.string(), size: z.number().positive(), offset: z.object({ x: z.number(), y: z.number() }).optional() }).optional(),
   /** Tick geometry (design px): gap from the disc, inset from the emerald rim (major/minor), stroke widths, glow blur. */
   tick: z.object({ gap: z.number(), insetMajor: z.number(), insetMinor: z.number(), widthMajor: z.number().positive(), widthMinor: z.number().positive(), glowPx: z.number().nonnegative() }),
   /** CSS box-shadow framing the sun/moon disc (thin gold wire + dark seat). */
@@ -1236,15 +1248,37 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
         dayGlow: 'rgba(255, 200, 90, 0.95)', nightGlow: 'rgba(150, 195, 255, 0.95)', well: 'rgba(2, 16, 20, 0.62)',
       },
     },
-    /* R-339/T6: the slim banner's emerald — centre measured on `time/bar-slim.webp`
-     *  (green-glass blob ≈ x40..115 y17..89 @2x → cx 41, cy 26.5, r ≈ 17.5 design px),
-     *  disc and tick crown scaled ×0.63 from the full bar. */
+    /* R-339/T6 + Director ruling 2026-11-23: the dial is the ANCHOR
+     *  ornament — the baptized `dial-frame.webp` medallion (Gemini regen,
+     *  8 fins, no left wing) seated on the slim bar's emerald. R-380
+     *  (Director 2026-11-24, second pick via
+     *  `scripts/hud-real/dial-positioner.html`): seat at (28.5, 26.9).
+     *  R-380-bis: the painted gem seat in the asset is off canvas centre
+     *  by (−2.9, −4.0) — the frame is drawn with `offset` so the seat
+     *  lands exactly on (cx, cy) and disc + tick crown are centred on
+     *  the gem, not the canvas. The sun/moon disc fills the seat edge
+     *  to edge (Ø60 of a Ø62 seat — measured on the asset; the previous
+     *  Ø52.3 left a dead gem ring and read as "small"). */
     dialSlim: {
-      cx: 41, cy: 26.5, r: 17.5, disc: 12, ticks: 24, majorEvery: 3, fadeMs: 600,
+      /* cx,cy = centro della sede dipinta: il pick Director (positioner,
+       *  2026-11-24) ha piazzato il canvas del frame a (28.5, 26.9); nella
+       *  nuova arte gen3 la sede sta a (+0.1, −0.2) dal centro canvas →
+       *  seat = (28.6, 26.7), offset ≈ (−0.1, +0.2).
+       *  Assets gen3 (Director 2026-11-25): frame-v1 + sun-v1 rigenerati
+       *  da Gemini vincolati ai battezzati come ref colore/stile; sole
+       *  simmetrizzato (fiamma bassa copiata dall'alta) e centrato
+       *  sull'orbe; disc 25.2 = 68% della sede dipinta (r~37); corona
+       *  r 35.6 sopra le tacche incise dipinte; wellR 31 = wash incasso
+       *  dentro la fascia tacche.
+       *  Luna (variante B, Director 2026-11-25): `nightWash` scurisce la
+       *  gemma a navy sotto la luna, sfuma con fadeMs. */
+      cx: 28.6, cy: 26.7, r: 35.6, disc: 29.5, wellR: 30.5, ticks: 24, majorEvery: 3, fadeMs: 600,
       sunUrl: '/assets/ui/hud-real/time/sun.webp',
       moonUrl: '/assets/ui/hud-real/time/moon.webp',
-      tick: { gap: 1.7, insetMajor: 1.1, insetMinor: 2.1, widthMajor: 1.1, widthMinor: 0.8, glowPx: 1.1 },
-      discFrame: '0 0 0 1px rgba(60, 40, 10, 0.9), 0 0 0 1.5px rgba(241, 216, 138, 0.55), 0 0 4px 1.5px rgba(2, 14, 18, 0.9)',
+      frame: { url: '/assets/ui/hud-real/time/dial-frame.webp', size: 85, offset: { x: -0.1, y: 0.2 } },
+      tick: { gap: 1.2, insetMajor: 0.3, insetMinor: 0.6, widthMajor: 1.6, widthMinor: 1.1, glowPx: 2 },
+      nightWash: { r: 32, color: 'rgba(5, 18, 46, 0.66)' },
+      discFrame: 'none',
       colors: {
         dayLit: '#ffe7a3', nightLit: '#cfe2ff', unlit: 'rgba(150, 118, 58, 0.55)',
         dayGlow: 'rgba(255, 200, 90, 0.95)', nightGlow: 'rgba(150, 195, 255, 0.95)', well: 'rgba(2, 16, 20, 0.62)',

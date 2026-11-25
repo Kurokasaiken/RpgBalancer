@@ -16,7 +16,7 @@
  * 2026-11-15: roster e stash restano superfici sempre separate, nessuna
  * colonna/tab unificata. `topChrome` is the T6 contract (D3/D10):
  * the slim day banner + resource bar docked left/center, and the top-right
- * zone reserved for the future docked Chronicle surface. `cta` is the T1
+ * zone reserved for the docked Events surface (R-386). `cta` is the T1
  * enabled/muted contract: it declares the skin-token names the CONFIRM
  * plaque reads (values in `BASE_SKIN_CSS_VARS`) so every painted CTA color
  * traces config → registry, never a literal in the component.
@@ -142,7 +142,7 @@ export const cassettoLayoutSchema = z
        *  centre rules, the banner breathes at the left edge (picked live: 40). */
       bannerMarginPx: z.number().nonnegative(),
       /** D10 (Director ruling 2026-11-15): width in REAL px of the top-right zone
-       *  reserved for the future docked Chronicle surface. The chrome cluster
+       *  reserved for the docked Events surface (R-386). The chrome cluster
        *  never enters it while it can stay at or above `minFitScale`. */
       chronicleReservePx: z.number().nonnegative(),
       /** Below this fit scale the Chronicle reserve yields to the screen edge —
@@ -191,7 +191,9 @@ const RAW_CASSETTO_LAYOUT_CONFIG: CassettoLayoutConfig = {
   topChrome: {
     marginPx: 12,
     gapPx: 10,
-    bannerMarginPx: 40,
+    /* Director 2026-11-24: medaglione a sbalzo −46px dalla barra →
+     * dock 58 lascia ~12px di respiro tra pinna ore 9 e bordo viewport. */
+    bannerMarginPx: 58,
     chronicleReservePx: 360,
     minFitScale: 0.55,
     /* Measured on the signed `bar-slim.webp` art (opaque band height at

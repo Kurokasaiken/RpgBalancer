@@ -1,0 +1,13 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch({ headless: true, args: ['--enable-unsafe-swiftshader'] });
+const p = await b.newPage({ viewport: { width: 1440, height: 1000 } });
+const errs = [];
+p.on('pageerror', (e) => errs.push('PAGEERR ' + String(e)));
+p.on('console', (m) => { if (m.type() === 'error') errs.push('CONSOLE ' + m.text().slice(0,300)); });
+await p.goto('http://localhost:5173/hud-lab', { waitUntil: 'domcontentloaded', timeout: 90000 });
+await p.waitForTimeout(12000);
+const blocks = await p.evaluate(() => [...document.querySelectorAll('[data-block]')].map((e) => e.getAttribute('data-block')));
+const cards = await p.evaluate(() => [...document.querySelectorAll('[data-lab-id]')].map((e) => e.getAttribute('data-lab-id')));
+console.log(JSON.stringify({ blocks, cards: cards.slice(0,30), errs: errs.slice(0,10) }, null, 1));
+await p.screenshot({ path: 'test-results/journey-debug.png' });
+await b.close();

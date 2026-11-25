@@ -380,3 +380,14 @@ vignetta per-quest, cost cell rimossa, slide.
 - Width: colonna estratta = 365px@900vh ≈ proporzione golden v2 (~22%); framed
   sarebbe 420px. Eventuale widening > framed richiede rebake (wideFactor ~1.6+)
   o floor nella width rule — in attesa di ruling.
+
+## Fase 10 — Eventi come barra speculare al Tempo (R-386, 2026-11-25)
+
+**Director ruling/verbatim:** *«componente eventi: salva questo come referenza e usalo, speculare al compoente tempo. la gemma rossa è x i pericoli, altri colori saranno x altro»*.
+
+- Nuovo riferimento vincolante registrato in `.mw/specs/hud-eventi/refs/ref-eventi-bar-specular-time-2026-11-25.png` (mai sovrascrivere) e ricetta/generatore salvata in `scripts/hud-real/build-events-bar.py`.
+- Derivato produzione: `public/assets/ui/hud-real/events/bar.webp` (976×186), geometria/toni/copy in `src/balancing/config/idleVillage/eventsBarConfig.ts` (Zod).
+- `HudRealEventsBar` implementa la collapsed bar: evento rappresentativo (threat pinnato, poi scadenza), countdown, glifo tipo nel medaglione sinistro, gemma rossa nativa per threat e ricolorazione circolare config-driven per gli altri toni. Click = toggle del pannello Eventi esistente, nessuna modale.
+- `GameTopChrome` la ancora nella riserva top-right D10; resta fuori dalla resource bar e si nasconde quando la riserva cede su canvas stretti.
+- Contratto aggiornato: `.mw/contracts/components/game-top-chrome.md` INV-8/9/10; regressione permanente in `tests/unit/idleVillage/r339TopChrome.test.tsx`.
+- Stato documentazione: implementazione in corso; chiusura subordinata a safeguard + witness headless + occhio Director.

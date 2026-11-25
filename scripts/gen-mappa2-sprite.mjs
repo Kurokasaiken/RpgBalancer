@@ -204,6 +204,16 @@ async function tryAttach(page, imgPath) {
 const browser = await chromium.connectOverCDP('http://127.0.0.1:9222', { timeout: Number(process.env.CDP_TIMEOUT_MS || 30000) });
 const ctx = browser.contexts()[0];
 
+/* CTR-foreground-001 guard (2026-11-24, Director: «canary in primo piano, non deve succedere»):
+ * `Target.createTarget background:true` keeps the TAB background only if a window exists to host
+ * it. With ZERO page targets the browser has no open window, so creating the target would CREATE
+ * a window and macOS would raise Canary in the foreground. Fail closed instead — the Director
+ * (or browser-runtime) keeps one window open, minimized is fine. */
+if (ctx.pages().length === 0) {
+  console.error('FOREGROUND-GUARD: nessuna finestra/tab aperta in Canary — creare un tab ora solleverebbe una finestra in primo piano. Apri (o ripristina dal dock) una finestra di Canary e riprova.');
+  process.exit(7);
+}
+
 /** Open a tab without stealing the Director's foreground (CTR-foreground-001):
  *  Target.createTarget background:true — same technique as mw-web-turn.py. */
 async function newBackgroundPage(url) {

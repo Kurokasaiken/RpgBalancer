@@ -20,14 +20,15 @@ export type EngravedIconId =
   | 'cmd-close' | 'cmd-filter' | 'cmd-sort' | 'cmd-lock' | 'cmd-recenter' | 'cmd-minimize' | 'cmd-help'
   | 'cmd-chevron-left' | 'cmd-chevron-right' | 'cmd-pin'
   // navigazione
-  | 'nav-village' | 'nav-map' | 'nav-shop' | 'nav-tavern' | 'nav-company' | 'nav-bag' | 'nav-chronicle'
+  | 'nav-village' | 'nav-map' | 'nav-shop' | 'nav-tavern' | 'nav-company' | 'nav-bag' | 'nav-stash' | 'nav-chronicle'
   // tipi evento
   | 'evt-quest' | 'evt-expedition' | 'evt-construction' | 'evt-harvest' | 'evt-visit' | 'evt-combat'
   // ruoli e stato
   | 'role-leader' | 'role-member' | 'role-bodyguard' | 'role-scout' | 'status-wound' | 'status-fallen'
   // oggetti usati dalle finestre HUD
   | 'ico-scroll' | 'ico-axe' | 'ico-gust' | 'ico-chest' | 'ico-pouch' | 'ico-cup' | 'ico-vial' | 'ico-spark'
-  | 'ico-target' | 'ico-grapnel' | 'ico-salve' | 'ico-banner' | 'ico-dot';
+  | 'ico-target' | 'ico-grapnel' | 'ico-salve' | 'ico-banner' | 'ico-dot'
+  | 'ico-compass' | 'ico-swords' | 'ico-cycle';
 
 const EO = { fillRule: 'evenodd', clipRule: 'evenodd' } as const;
 
@@ -131,14 +132,16 @@ const GLYPHS: Record<EngravedIconId, React.ReactNode> = {
       <path d="M4.7 17h14.6c-.2 1.4-.5 2.4-.9 3.4H5.6c-.4-1-.7-2-.9-3.4z" />
     </>
   ),
+  /* R-367 (Director 2026-11-24): group pictogram — one big figure with two heads
+   * tucked behind the shoulders (battezzato `r2-group`); reads at 32px. */
   'nav-company': (
     <>
-      <circle cx="12" cy="7.4" r="3.4" />
-      <path d="M5.6 19.4v-1.6c0-2.8 2.9-4.6 6.4-4.6s6.4 1.8 6.4 4.6v1.6z" />
-      <circle cx="4.8" cy="10.2" r="2.3" />
-      <path d="M.6 19.4v-1.4c0-1.8 1.7-3.1 4.1-3.1.6 0 1.2.1 1.7.2-.9.9-1.4 2-1.4 3.2v1.1z" />
-      <circle cx="19.2" cy="10.2" r="2.3" />
-      <path d="M23.4 19.4v-1.4c0-1.8-1.7-3.1-4.1-3.1-.6 0-1.2.1-1.7.2.9.9 1.4 2 1.4 3.2v1.1z" />
+      <path d="M1.4 20.6v-1.6c0-2.5 1.9-4.1 4.4-4.1s4.4 1.6 4.4 4.1v1.6z" />
+      <path d="M13.8 20.6v-1.6c0-2.5 1.9-4.1 4.4-4.1s4.4 1.6 4.4 4.1v1.6z" />
+      <circle cx="5.8" cy="9.6" r="2.6" />
+      <circle cx="18.2" cy="9.6" r="2.6" />
+      <circle cx="12" cy="6.8" r="3.9" />
+      <path d="M4.4 21.8v-2.1c0-3.1 3.4-5.2 7.6-5.2s7.6 2.1 7.6 5.2v2.1z" />
     </>
   ),
   'nav-bag': (
@@ -147,8 +150,21 @@ const GLYPHS: Record<EngravedIconId, React.ReactNode> = {
       d="M5.04 2.60 L18.96 2.60 L18.96 3.02 L19.07 3.65 L19.17 4.28 L19.38 4.90 L19.59 5.53 L19.80 6.16 L20.01 6.79 L20.22 7.42 L20.22 8.05 L20.43 9.30 L20.64 9.93 L20.95 10.56 L21.16 11.19 L21.48 11.81 L21.69 12.44 L21.79 13.07 L21.90 13.70 L22.00 14.33 L22.00 14.96 L21.90 15.58 L21.79 16.21 L21.48 16.84 L21.06 17.47 L20.53 18.10 L19.80 18.73 L18.02 19.35 L16.87 19.98 L14.77 20.61 L13.20 21.24 L12.00 21.55 L10.80 21.24 L9.23 20.61 L7.13 19.98 L5.98 19.35 L4.20 18.73 L3.47 18.10 L2.94 17.47 L2.52 16.84 L2.21 16.21 L2.10 15.58 L2.00 14.96 L2.00 14.33 L2.10 13.70 L2.21 13.07 L2.31 12.44 L2.52 11.81 L2.84 11.19 L3.05 10.56 L3.36 9.93 L3.57 9.30 L3.78 8.05 L3.78 7.42 L3.99 6.79 L4.20 6.16 L4.41 5.53 L4.62 4.90 L4.83 4.28 L4.93 3.65 L5.04 3.02 L5.04 2.60zM3.99 8.46 L4.83 9.31 L5.69 10.08 L6.55 10.77 L7.43 11.38 L8.32 11.92 L9.23 12.37 L10.14 12.75 L11.06 13.06 L12.00 13.28 L12.94 13.06 L13.86 12.75 L14.77 12.37 L15.68 11.92 L16.57 11.38 L17.45 10.77 L18.31 10.08 L19.17 9.31 L20.01 8.46 L20.58 9.03 L19.72 9.89 L18.83 10.69 L17.92 11.41 L17.00 12.05 L16.06 12.62 L15.11 13.10 L14.14 13.50 L13.15 13.83 L12.00 14.08 L10.85 13.83 L9.86 13.50 L8.89 13.10 L7.94 12.62 L7.00 12.05 L6.08 11.41 L5.17 10.69 L4.28 9.89 L3.42 9.03zM4.79 3.21 L4.79 7.86 L5.49 8.64 L6.21 9.35 L6.96 9.99 L7.73 10.55 L8.54 11.04 L9.36 11.46 L10.22 11.80 L11.09 12.08 L12.00 12.28 L12.91 12.08 L13.78 11.80 L14.64 11.46 L15.46 11.04 L16.27 10.55 L17.04 9.99 L17.79 9.35 L18.51 8.64 L19.21 7.86 L19.21 3.21zM5.49 3.91 L5.49 7.86 L6.18 8.50 L6.88 9.07 L7.58 9.60 L8.30 10.06 L9.02 10.48 L9.75 10.84 L10.49 11.14 L11.24 11.39 L12.00 11.58 L12.76 11.39 L13.51 11.14 L14.25 10.84 L14.98 10.48 L15.70 10.06 L16.42 9.60 L17.12 9.07 L17.82 8.50 L18.51 7.86 L18.51 3.91zM10.8 14.3h.6v1.3h-.6zM12.6 14.3h.6v1.3h-.6zM10.2 15.6h3.6v2.2h-3.6zM10.8 16.2h2.4v1h-2.4zM10.8 17.8h.6v1.2h-.6zM12.6 17.8h.6v1.2h-.6zM10.8 19h2.4v.5h-2.4zM4.26 16.44 L5.45 17.30 L6.64 18.02 L7.83 18.59 L9.02 19.02 L10.21 19.31 L11.40 19.45 L12.60 19.45 L13.79 19.31 L14.98 19.02 L16.17 18.59 L17.36 18.02 L18.55 17.30 L19.74 16.44 L19.74 17.04 L18.55 17.90 L17.36 18.62 L16.17 19.19 L14.98 19.62 L13.79 19.91 L12.60 20.05 L11.40 20.05 L10.21 19.91 L9.02 19.62 L7.83 19.19 L6.64 18.62 L5.45 17.90 L4.26 17.04z"
     />
   ),
+  /* R-367 (Director 2026-11-24): stash = closed chest front-on — arched lid, seam,
+   * lock plate + keyhole (battezzato `stash-front`). nav-bag stays the real bag. */
+  'nav-stash': (
+    <>
+      <path d="M4.6 9.8C4.6 6.5 7.9 4 12 4s7.4 2.5 7.4 5.8v1H4.6z" />
+      <rect x="4.6" y="12" width="14.8" height="8" rx=".8" />
+      <path
+        {...EO}
+        d="M10.9 7.4h2.2v5h-2.2zM12 9.6a.8.8 0 1 1 0 1.6.8.8 0 1 1 0-1.6z"
+      />
+      <rect x="6.6" y="12" width="1.4" height="8" />
+      <rect x="16" y="12" width="1.4" height="8" />
+    </>
+  ),
   'nav-chronicle': <path d="M2.8 5.6c3-1.1 6.1-1 8.4.8V20c-2.3-1.6-5.4-1.9-8.4-.8zM21.2 5.6c-3-1.1-6.1-1-8.4.8V20c2.3-1.6 5.4-1.9 8.4-.8z" />,
-
   'evt-quest': (
     <>
       <path d="M9.2 2.8h5.6l-1 11.4h-3.6z" />
@@ -318,6 +334,38 @@ const GLYPHS: Record<EngravedIconId, React.ReactNode> = {
   /* Plain marker dot — the Director's stamina glyph on roster bars
    *  (reference: heart for HP, dot for stamina). */
   'ico-dot': <circle cx="12" cy="12" r="5.4" />,
+
+  /* Cassetto journey legs (R-378 rev2, Director 2026-11-24 «i glifi dei villaggi nn vanno bene, guarda
+   *  cm era il mockup» — mockup-cassetto-goblin-v3.webp): compass rose = the march out, crossed swords
+   *  = the fight on site, chasing arrows = the way back. */
+  'ico-compass': (
+    <>
+      <path {...EO} d="M12 1.8a10.2 10.2 0 1 0 0 20.4 10.2 10.2 0 0 0 0-20.4zM12 4a8 8 0 1 1 0 16 8 8 0 0 1 0-16z" />
+      <path d="M17.5 6.5l-3.7 5.3-7.3 5.7 3.7-5.3z" />
+    </>
+  ),
+  'ico-swords': (
+    <>
+      <g transform="rotate(45 12 12)">
+        <path d="M12 .8l1.5 2.1v10.4h-3V2.9z" />
+        <rect x="7.8" y="14" width="8.4" height="1.9" rx=".9" />
+        <rect x="11.1" y="15.9" width="1.8" height="3.4" />
+        <circle cx="12" cy="21" r="1.5" />
+      </g>
+      <g transform="rotate(-45 12 12)">
+        <path d="M12 .8l1.5 2.1v10.4h-3V2.9z" />
+        <rect x="7.8" y="14" width="8.4" height="1.9" rx=".9" />
+        <rect x="11.1" y="15.9" width="1.8" height="3.4" />
+        <circle cx="12" cy="21" r="1.5" />
+      </g>
+    </>
+  ),
+  'ico-cycle': (
+    <>
+      <path d="M12 6.2v3.1l4.2-4.2-4.2-4.2v3.1c-4.5 0-8.1 3.6-8.1 8.1 0 1.6.5 3.1 1.3 4.3l1.5-1.5A6 6 0 0 1 6 12.1c0-3.3 2.7-5.9 6-5.9z" />
+      <path d="M18.7 7.6l-1.5 1.5c.4.8.7 1.8.7 2.9 0 3.3-2.7 5.9-6 5.9v-3.1l-4.2 4.2 4.2 4.2v-3.1c4.5 0 8.1-3.6 8.1-8.1 0-1.6-.5-3.1-1.3-4.3z" />
+    </>
+  ),
 
 };
 

@@ -33,7 +33,7 @@ import { CASSETTO_LAYOUT_CONFIG } from '@/balancing/config/idleVillage/cassettoL
 import { CASSETTO_WIDE_BREAKPOINT, cassettoColumnSpec, cassettoColumnWidthFor } from './layout/cassettoColumn';
 import { paintedBoxFrame, paintedNiche, PAINTED_PIECES } from '@/ui/idleVillage/skins/primitives/paintedPieces';
 import { HudScrollBandX } from '@/ui/idleVillage/skins/primitives/HudScrollBandX';
-import { EngravedIcon, type EngravedIconId } from '@/ui/idleVillage/components/gameFrame/engravedIcons';
+
 
 const C = {
   ink: '#f3e7c4',
@@ -132,8 +132,10 @@ export interface HudRealCassettoV2Props {
 const DESIGN_W = 1024;
 const u = (n: number) => `${(n / DESIGN_W) * 100}cqw`;
 
-/** The smallest legible size, in rendered CSS px, for any caption in the drawer (INV:cassetto-captions-min-size). */
-export const CASSETTO_MIN_LABEL_PX = 11;
+/** The smallest legible size, in rendered CSS px, for any caption in the drawer (INV:cassetto-captions-min-size).
+ *  R-378 rev5 (Director 2026-11-25 «Oro + saliente e anche + grande va bene»): floor raised 11 → 12 — at 1280×800
+ *  half the captions sat exactly at the old floor (measured). Vertical cost is recovered inside the wells' padding. */
+export const CASSETTO_MIN_LABEL_PX = 12;
 /** The party rack is rendered unscaled in the DOM drawer; its labels are un-scaled by this factor (kept for API/test compat). */
 export const CASSETTO_RACK_SCALE = 1;
 const fzMin = (n: number) => `max(${CASSETTO_MIN_LABEL_PX}px, ${u(n)})`;
@@ -182,18 +184,56 @@ const CTA_VARS = CASSETTO_LAYOUT_CONFIG.cta.vars;
 
 const CINZEL = 'Marcellus, "Cardo", serif';
 
+/* ---------- shared content-column axis (padL/padR of the drawer body) ---------- */
+/* V2 (R-374 rev2 → OB-7 app-2 «troppo vicini al frame a sinistra, spazio vuoto a destra»): padL 148 u gives ~47 u
+ *  clearance past the rail's right edge (~101 u) and padR 52 u tightens the dead space on the right; the content
+ *  column (148..972) centres on u560, the perceived enamel-card axis the CTA shares. */
+const PAD_L_U = 148;
+const PAD_R_U = 52;
+const CONTENT_W_U = DESIGN_W - PAD_L_U - PAD_R_U; /* 824 */
+
+/* ---------- party seats: AUTO-PROPORTIONED to the well interior ----------
+ * R-378 cont. (Director 2026-11-24 «gli slot dei pg continuano ad essere troppo grandi e ad entrare in
+ * contatto con il frame … dagli una proporzione automatica … troppo vicini tra loro … troppo spazio libero
+ * ai lati»): no hand-tuned geometry — the rack's pads clear the painted frame's drawn edges (x u55 / y u44
+ * + breath), the scroller window is the well interior, the seat column is DERIVED (visible seats + real gap
+ * + a peek sliver of the next), and the fixed-64px hud64 visual scales to `PARTY_SLOT_U` via transform. */
+const PARTY_FRAME_U = { x: 55, y: 44 }; /* wellStyle's paintedBoxFrame drawn edge — keep in sync */
+/* R-378 rev3-cont. (Director 2026-11-24 «usa + spazio laterale x i componenti slot pg»): the side breath
+ *  shrinks 30→12 u — the seats use nearly all the room between the frame's drawn edges (interior 654→690 u). */
+const PARTY_BREATH_U = { x: 12, y: 12 };
+const PARTY_PAD_X_U = PARTY_FRAME_U.x + PARTY_BREATH_U.x; /* 67 */
+const PARTY_PAD_T_U = PARTY_FRAME_U.y + PARTY_BREATH_U.y; /* 56 */
+const PARTY_PAD_B_U = PARTY_FRAME_U.y + 6;                /* 50 */
+const PARTY_INTERIOR_U = CONTENT_W_U - 2 * PARTY_PAD_X_U; /* 690 */
+const PARTY_VISIBLE = 3;
+const PARTY_GAP_U = 34;
+const PARTY_PEEK_U = 70;
+const PARTY_SEAT_U = Math.round((PARTY_INTERIOR_U - (PARTY_VISIBLE - 1) * PARTY_GAP_U - PARTY_PEEK_U) / PARTY_VISIBLE); /* 172 */
+/** The seat visual's rendered edge in u — scales the fixed-64px hud64 assembly (`--cassetto-seat-scale`). */
+const PARTY_SLOT_U = 108;
+/** The hud64 seat paints a FIXED 64 px box (SlotV12Renderer `domSizePx` — `sizePx` is ignored for it). */
+const HUD64_DOM_PX = 64;
+
 const RACK_SCOPED_CSS = `
 [data-hudreal-cassetto] [data-testid="resident-slot-rack"] {
   --slot-rack-gap: 10px;
   display: grid !important;
   grid-auto-flow: column !important;
   /* V2 (R-374): seat columns/gap in cqw so the rack keeps the golden's proportion at any column width —
-   * replaces fixed px + zoom (unsupported on Firefox). 230u ≈ 118 px at the 512 px column. */
-  grid-auto-columns: ${u(170)} !important; /* in sync with PARTY_SEAT_U (R-378) */
+   * replaces fixed px + zoom (unsupported on Firefox). R-378 cont.: derived from the well interior. */
+  grid-auto-columns: ${u(PARTY_SEAT_U)} !important; /* in sync with PARTY_SEAT_U (R-378) */
   grid-template-columns: none !important;
-  gap: ${u(12)} !important;
+  gap: ${u(PARTY_GAP_U)} !important;
   align-items: start !important;
   justify-items: center !important;
+}
+/* R-378 cont. («proporzione automatica»): the hud64 seat visual is a fixed 64 px DOM box — scale the whole
+ * seat assembly (slot + band portal + DOM portrait, all inside the button wrapper) to PARTY_SLOT_U so it
+ * follows the column like every other u() measure. transform, never zoom (Firefox). Layout stays at the
+ * column's width, so the shrink only ADDS air around the visual. */
+[data-hudreal-cassetto] [data-testid^="slot-button-"] {
+  transform: scale(var(--cassetto-seat-scale, 1));
 }
 /* The rack's 9px labels are raised to the legibility floor; two centered balanced lines are fine.
  * Director 2026-11-22 «testo cn font corretti»: the golden paints the seat labels in the ENGRAVED display
@@ -206,6 +246,7 @@ const RACK_SCOPED_CSS = `
   font-family: ${CINZEL} !important;
   text-transform: capitalize !important;
   font-size: ${(CASSETTO_MIN_LABEL_PX / CASSETTO_RACK_SCALE).toFixed(2)}px !important;
+  font-weight: 600 !important; /* R-378 rev5 — «oro + saliente» (Director 2026-11-25) */
   letter-spacing: 0.04em !important;
   line-height: 1.1 !important;
   margin-top: 8px !important;
@@ -262,8 +303,12 @@ const wellStyle: React.CSSProperties = {
   /* WELL recipe — rebalanced toward TEAL (OB-7 app-1, Director 2026-11-21: «troppo nero in proporzione»; was
    * ~80% black / 20% green): the green glow band widens (0–30% / 70–100%, was 16%/84%) and the core lifts
    * toward nero-teal. Saturated emerald stays for accents only (Outbound segment, CTA, gems). */
+  /* R-378 rev6 (Director 2026-11-25): recipe C «velluto + vignettatura» — chosen on the zoom fork over flat
+   * and marble-veiled variants («marmo solo nero», rejected). Emerald luminosity from the top centre,
+   * depth darkening towards the bottom corners; no new art, pure layered gradients. */
   background: [
-    'linear-gradient(180deg, rgba(18,92,66,.52) 0%, rgba(18,92,66,.14) 30%, rgba(18,92,66,.14) 70%, rgba(18,92,66,.44) 100%)',
+    'radial-gradient(ellipse 120% 90% at 50% 0%, rgba(30,130,90,.30) 0%, transparent 55%)',
+    'radial-gradient(ellipse 140% 120% at 50% 115%, rgba(0,0,0,.62) 0%, transparent 60%)',
     'linear-gradient(180deg, #04222b 0%, #01141c 50%, #03302a 100%)',
   ].join(', '),
   boxShadow: 'inset 0 0 0 1px rgba(30,120,84,.42), inset 0 0 18px rgba(24,110,78,.34), inset 0 0 34px rgba(0,0,0,.50)',
@@ -299,14 +344,18 @@ const EmblemLevel: React.FC<{ src: string; level?: number; max: number; label: s
 );
 
 /** Journey pill art: centre of each segment as % of the image width (measured on journey-pill.webp 1498×270:
- *  lit Outbound interior ~60–460 → 17.4%, middle ~580–980 → 52%, right ~1040–1420 → 82%). */
-const JOURNEY_CENTERS = [17.4, 52, 82];
+ *  lit Outbound enamel ~74–471 → 18.3% (R-378 rev5, Director: «la scritta outbound nn è centrata»),
+ *  middle segment between the two slanted cut rails ~500–1010 → 50.4% (rev6, misura sui binari oro),
+ *  right ~1040–1420 → 82%). */
+const JOURNEY_CENTERS = [18.3, 50.4, 82];
 
 /** Journey: the leg shown lit (the mockup lights Outbound) and the engraved glyph of each leg (outbound / on site / return).
- *  R-378 (Director 2026-11-24 «nuove icone x la parte del viaggio»): a striding boot for the march out, a bannered
- *  tent for the camp on site, a curved arrow for the way back. */
+ *  R-378 rev3 (Director 2026-11-24 «le icone del viaggio sono brutte, guarda il mockup»): painted engraved-gold
+ *  glyphs generated by Gemini (sheet `.mw/specs/expedition-ui/refs/icon-journey-glyphs.png`, slices
+ *  journey-ico-* in the cassetto spec) — compass rose for the march out, crossed swords on site,
+ *  chasing arrows for the way back. They replace the flat hand-drawn SVG glyphs. */
 const ACTIVE_LEG = 0;
-const LEG_ICONS: EngravedIconId[] = ['ico-compass', 'ico-swords', 'ico-cycle'];
+const LEG_ICONS = ['journey-ico-outbound.webp', 'journey-ico-atsite.webp', 'journey-ico-return.webp'];
 
 /** Vignette geometry (design units): the picture starts just under the north bar's centre line and its top-left corner is a quarter circle of radius CORNER_R. */
 const VIGNETTE_TOP = 22;
@@ -318,11 +367,33 @@ const CORNER_R = 130;
  *  R-378 (Director 2026-11-24 «la barra … occupa troppo spazio, falla + piccola (meno spessa)»): the cassetto's bands run slimmer
  *  than the shared 14 px — `CASSETTO_BAND_PX`. */
 const CASSETTO_BAND_PX = 8;
-const BandedRow: React.FC<{ attrs?: Record<string, string>; rowStyle: React.CSSProperties; children: React.ReactNode }> = ({ attrs, rowStyle, children }) => {
+const BandedRow: React.FC<{ attrs?: Record<string, string>; rowStyle: React.CSSProperties; autoFade?: boolean; children: React.ReactNode }> = ({ attrs, rowStyle, autoFade = false, children }) => {
   const ref = React.useRef<HTMLDivElement>(null);
+  /* R-378 rev3-cont. (Director 2026-11-24 «il primo a sinistra sia sempre completamente visibile»): the edge
+   *  fade tracks the scroll position — at rest the LEFT seat paints fully (no left fade); the left fade
+   *  appears only once there is real overflow on that side, the right fade only while more seats follow. */
+  const [mask, setMask] = React.useState<string>();
+  const updateMask = React.useCallback(() => {
+    const el = ref.current;
+    if (!el) return;
+    const atL = el.scrollLeft <= 1;
+    const atR = el.scrollLeft + el.clientWidth >= el.scrollWidth - 1;
+    setMask(`linear-gradient(90deg, ${atL ? '#000 0%' : 'transparent 0%, #000 9%'}, ${atR ? '#000 100%' : '#000 91%, transparent 100%'})`);
+  }, []);
+  React.useEffect(() => {
+    if (!autoFade) return;
+    const el = ref.current;
+    if (!el) return;
+    updateMask();
+    el.addEventListener('scroll', updateMask, { passive: true });
+    const ro = new ResizeObserver(updateMask);
+    ro.observe(el);
+    return () => { el.removeEventListener('scroll', updateMask); ro.disconnect(); };
+  }, [autoFade, updateMask]);
+  React.useEffect(() => { if (autoFade) updateMask(); }); /* re-check after every render — content may swap */
   return (
     <>
-      <div ref={ref} data-hud-scroll-band="" {...attrs} style={{ overflowX: 'auto', overflowY: 'hidden', ...rowStyle }}>{children}</div>
+      <div ref={ref} data-hud-scroll-band="" {...attrs} style={{ overflowX: 'auto', overflowY: 'hidden', ...rowStyle, ...(autoFade && mask ? { WebkitMaskImage: mask, maskImage: mask } : {}) }}>{children}</div>
       <HudScrollBandX scrollRef={ref} heightPx={CASSETTO_BAND_PX} />
     </>
   );
@@ -330,26 +401,20 @@ const BandedRow: React.FC<{ attrs?: Record<string, string>; rowStyle: React.CSSP
 
 /** Party seats, THREE visible at a time, bigger (Director 2026-11-20); the rest scroll sideways under the band.
  *  V2 (R-374): all-`u()` geometry (scales with the column, no `zoom`) and a soft mask on the scroller edges so a
- *  clipped seat fades instead of hard-cutting — the overflow affordance the audit asked for. */
-const PARTY_VISIBLE = 3;
-/* OB-7 app-7 (Director 2026-11-21): «le proporzioni vanno ritoccate» — seats slimmed 230→205 u, peek 105→80 u;
- * the well's painted frame and the journey bar below are NOT touched. Keep `grid-auto-columns` in sync.
- * R-378 (Director 2026-11-24 «gli slot pg sn troppo grandi e toccano il frame, rimpicciolisci un po'»): seats
- * 205→170 u, peek 80→62 u — the seat columns now sit clear of the well's painted frame. */
-const PARTY_SEAT_U = 170;
-const PARTY_GAP_U = 12;
-/* Window = 3 full seats + a visible sliver of the 4th: the partial seat under the edge mask is the affordance that
- * says «there is more» — the scroll band alone did not read (R-374 F6). */
-const PARTY_PEEK_U = 62;
-const PartyScroller: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+ *  clipped seat fades instead of hard-cutting — the overflow affordance the audit asked for.
+ *  OB-7 app-7 (Director 2026-11-21): «le proporzioni vanno ritoccate» — seats slimmed 230→205 u, peek 105→80 u;
+ *  R-378 (Director 2026-11-24 «gli slot pg sn troppo grandi e toccano il frame»): 205→170 u, peek 80→62 u;
+ *  R-378 cont. (Director 2026-11-24 «proporzione automatica»): the constants moved above — the window is the
+ *  seats actually present (a peek only when one overflows) capped by the well interior, so the dead side
+ *  space is gone at every party size. */
+const PartyScroller: React.FC<{ windowU: number; children: React.ReactNode }> = ({ windowU, children }) => (
   <div data-cassetto-party-scroller="" style={{ position: 'relative', display: 'flex', justifyContent: 'center' }}>
     <BandedRow
       attrs={{ 'data-cassetto-party-scroll': '' }}
+      autoFade
       rowStyle={{
-        width: u(PARTY_VISIBLE * PARTY_SEAT_U + (PARTY_VISIBLE - 1) * PARTY_GAP_U + PARTY_PEEK_U),
+        width: u(windowU),
         padding: `${u(20)} 0 ${u(30)}`,
-        WebkitMaskImage: 'linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent)',
-        maskImage: 'linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent)',
       }}
     >
       <div style={{ width: 'max-content' }}>{children}</div>
@@ -363,11 +428,19 @@ export const HudRealCassettoV2: React.FC<HudRealCassettoV2Props> = ({
   const { t } = useTranslation('idleVillage');
   const spec = useCassettoColumnSpec();
 
+  /* The rendered column width in px — drives `--cassetto-seat-scale` (R-378 cont.: the seat visual
+   * is a fixed-64px assembly scaled to `PARTY_SLOT_U` of the column, i.e. the "proporzione automatica"). */
+  const [columnPx, setColumnPx] = React.useState(() => cassettoColumnWidthFor(spec, window.innerHeight));
+
   /* The docked drawer publishes the screen width it occupies (`aspect × viewportHeight`, capped) into the shared insets ledger;
    * unmount restores 0 (INV-4). */
   React.useEffect(() => {
     const publish = useGameLayoutInsets.getState().publish;
-    const update = () => publish({ right: Math.round(cassettoColumnWidthFor(spec, window.innerHeight)) });
+    const update = () => {
+      const w = cassettoColumnWidthFor(spec, window.innerHeight);
+      setColumnPx(w);
+      publish({ right: Math.round(w) });
+    };
     update();
     window.addEventListener('resize', update);
     return () => {
@@ -375,6 +448,13 @@ export const HudRealCassettoV2: React.FC<HudRealCassettoV2Props> = ({
       publish({ right: 0 });
     };
   }, [spec]);
+
+  /* The scroller window: the seats actually present (a peek sliver only when one overflows), capped by the
+   * well interior — no dead side space at any party size. */
+  const partyWindowU = Math.min(
+    PARTY_INTERIOR_U,
+    slots.length * PARTY_SEAT_U + Math.max(0, slots.length - 1) * PARTY_GAP_U + (slots.length > PARTY_VISIBLE ? PARTY_PEEK_U : 0),
+  );
 
   /* INV:cassetto-close — Esc (and a click on the map, below) closes (same handler, same discard semantics owned by the adapter). Ignored when
    * another handler already took the key (an open roster/stash menu) or while typing. No onClose → Esc is inert. */
@@ -433,6 +513,7 @@ export const HudRealCassettoV2: React.FC<HudRealCassettoV2Props> = ({
           containerType: 'inline-size',
           pointerEvents: 'auto',
           overflow: 'hidden',
+          ['--cassetto-seat-scale' as string]: (PARTY_SLOT_U * columnPx) / (HUD64_DOM_PX * DESIGN_W),
         }}
       >
         {/* enamel field — starts under the rail, NOT at the column edge (no bar left of the frame). The frame pieces carry
@@ -457,7 +538,7 @@ export const HudRealCassettoV2: React.FC<HudRealCassettoV2Props> = ({
              * shared axis shifts RIGHT — padL 148 u gives ~47 u clearance past the rail's right edge (~101 u)
              * and padR 52 u tightens the dead space on the right; the content column (148..972) centres on
              * u560, the perceived enamel-card axis the CTA shares. */
-            paddingLeft: u(148), paddingRight: u(52), paddingBottom: u(CTA_H + CTA_BOTTOM_GAP + 30),
+            paddingLeft: u(PAD_L_U), paddingRight: u(PAD_R_U), paddingBottom: u(CTA_H + CTA_BOTTOM_GAP + 30),
             boxSizing: 'border-box',
           }}
         >
@@ -521,8 +602,8 @@ export const HudRealCassettoV2: React.FC<HudRealCassettoV2Props> = ({
 
           {/* ---------- party-slots ---------- */}
           <div data-block="party-slots" style={{ ...wellStyle, marginTop: u(18), flex: '1 1 auto', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: u(200) }}>
-            <div data-cassetto-rack="" style={{ padding: `${u(40)} 0 ${u(30)}` }}>
-              <PartyScroller>
+            <div data-cassetto-rack="" style={{ padding: `${u(PARTY_PAD_T_U)} ${u(PARTY_PAD_X_U)} ${u(PARTY_PAD_B_U)}` }}>
+              <PartyScroller windowU={partyWindowU}>
                 <ResidentSlotRack
                   slots={slots}
                   layout="detail"
@@ -602,22 +683,29 @@ export const HudRealCassettoV2: React.FC<HudRealCassettoV2Props> = ({
                *  8 emerald gems — keyed, empty: icons and names stay live DOM on top (i18n). */}
               <img data-cassetto-journey-art="" aria-hidden alt="" draggable={false} src={`${ASSET}/journey-pill.webp`} style={{ display: 'block', width: '100%', height: 'auto' }} />
               {quest.legs.map((leg, i) => (
-                <div key={i} style={{ position: 'absolute', top: 0, bottom: 0, left: `${JOURNEY_CENTERS[i] ?? 50}%`, transform: 'translateX(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: u(2), pointerEvents: 'none' }}>
-                  <EngravedIcon id={LEG_ICONS[i] ?? 'ico-dot'} size={u(52)} style={{ color: i === ACTIVE_LEG ? '#fff3b4' : C.goldInk, filter: 'drop-shadow(0 1px 2px rgba(0,0,0,.8))' }} />
-                  <span style={{ fontFamily: CINZEL, fontSize: fzMin(28), fontWeight: 700, letterSpacing: '0.03em', lineHeight: 1.05, color: i === ACTIVE_LEG ? '#fff6cf' : C.goldInk, textShadow: '0 1px 3px rgba(0,0,0,.9)', whiteSpace: 'nowrap' }}>{leg.label}</span>
+                <div key={i} style={{ position: 'absolute', top: 0, bottom: 0, left: `${JOURNEY_CENTERS[i] ?? 50}%`, transform: `translateX(-50%) translateY(${u(4)})`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: u(4), pointerEvents: 'none' }}>
+                  {/* R-378 rev4 (Director 2026-11-24 «le icone devono avere lo stesso colore delle scritte … più grandi»):
+                   *  glyphs regraded onto the label champagne (#f3e193 / lit #fff6cf) — same ink as the text, big again
+                   *  now that the labels shrank; only the lit leg gets a warm lift.
+                   *  Rev5: the leg group drops translateY u(9) («scendi un po' le icone che toccano ancora il
+                   *  frame») so the glyphs clear the pill's top rim, and the labels shrank another ~5%.
+                   *  Rev6: eased to u(4) — u(9) pushed the labels onto the bottom rim — and At-site re-centred
+                   *  at 50.4% (measured between the pill's slanted cut rails). */}
+                  <img aria-hidden alt="" draggable={false} src={`${ASSET}/${LEG_ICONS[i] ?? 'journey-ico-atsite.webp'}`} style={{ width: u(51), height: u(51), objectFit: 'contain', filter: i === ACTIVE_LEG ? 'brightness(1.12) drop-shadow(0 0 6px rgba(255,235,150,.5)) drop-shadow(0 1px 2px rgba(0,0,0,.8))' : 'drop-shadow(0 1px 2px rgba(0,0,0,.8))' }} />
+                  <span style={{ fontFamily: CINZEL, fontSize: fzMin(22), fontWeight: 700, letterSpacing: '0.04em', lineHeight: 1.05, color: i === ACTIVE_LEG ? '#fff6cf' : C.goldInk, textShadow: '0 1px 3px rgba(0,0,0,.9)', whiteSpace: 'nowrap' }}>{leg.label}</span>
                 </div>
               ))}
             </div>
             <div style={{ display: 'flex', margin: `${u(6)} ${u(56)} 0` }}>
               {quest.legs.map((leg, i) => (
-                <div key={i} data-testid={`cassetto-leg-days-${i}`} style={{ flex: 1, textAlign: 'center', fontFamily: CINZEL, fontSize: fzMin(26), letterSpacing: '0.06em', color: C.muted }}>
+                <div key={i} data-testid={`cassetto-leg-days-${i}`} style={{ flex: 1, textAlign: 'center', fontFamily: CINZEL, fontSize: fzMin(24), fontWeight: 600, letterSpacing: '0.06em', color: C.goldInk }}>
                   {typeof leg.days === 'number' ? t('gameFrame.cassetto.legDays', { count: leg.days }) : leg.days}
                 </div>
               ))}
             </div>
             {quest.totalDays != null && (
               <div data-testid="cassetto-journey-total" style={{ textAlign: 'center', marginTop: u(6) }}>
-                <span style={{ fontFamily: CINZEL, fontSize: fzMin(26), letterSpacing: '0.12em', textTransform: 'uppercase', color: C.muted }}>
+                <span style={{ fontFamily: CINZEL, fontSize: fzMin(26), fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: C.goldInk }}>
                   {t('gameFrame.cassetto.journeyTotal', { count: quest.totalDays })}
                 </span>
               </div>
@@ -680,7 +768,8 @@ export const HudRealCassettoV2: React.FC<HudRealCassettoV2Props> = ({
               style={{
                 position: 'absolute', left: u(CTA_CENTER_U - CTA_W / 2), bottom: u(CTA_BOTTOM_GAP), width: u(CTA_W), height: u(CTA_H),
                 padding: 0, border: 'none', background: 'transparent',
-                cursor: canSend ? 'pointer' : 'default',
+                /* R-378 rev4 (Director 2026-11-25): the «grey no-entry hand» — the hover itself says the plaque is not clickable. */
+                cursor: canSend ? 'pointer' : 'not-allowed',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 /* centre the label on the lacquer BODY, not on the image: measured on cta-plaque.webp the body centre is 29 px below / 7.5 px right of the image centre (crest above, asymmetric tips) → pad = 2×offset */
                 paddingTop: u(CTA_H * 0.152), paddingLeft: u(CTA_W * 0.01),

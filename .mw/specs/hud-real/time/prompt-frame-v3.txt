@@ -1,0 +1,11 @@
+Generate a single game sprite: an ornate circular dial FRAME for a fantasy HUD, matching the attached reference image's EXACT art style and colors.
+
+Match these exactly:
+- Warm aged-gold metal ring (rich champagne gold, NOT pale) with pointed kite-shaped fins protruding outward at cardinal+diagonal positions and a decorative clasp on the right side
+- Deep emerald green faceted gemstone center (dark saturated emerald, NOT light teal), with engraved thin tick marks on the inner band
+- Painted fantasy style, clean edges, no noise, no artifacts, no text
+
+Hard constraints:
+- ONE frame, perfectly centered, perfectly SYMMETRIC left-right and top-bottom (except the single clasp on the right)
+- Solid flat MAGENTA background (#FF00FF) filling the whole canvas, frame does not touch the edges
+- No shadows outside the frame, no glow spilling onto the background

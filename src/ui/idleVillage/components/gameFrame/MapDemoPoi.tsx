@@ -7,8 +7,8 @@ import { ENTER_MS, EXPIRE_FADE_MS } from './MapQuestPoi';
 import type { PoiType } from '@/ui/idleVillage/components/poi/PoiMarker';
 import { poiSizePx, type PoiSizeClass } from './poiSigillo';
 
-/** Baptized work-family icon (logs) — fallback dome glyph for the job exemplar. */
-const JOB_ZANARA_ICON = '/assets/ui/hud-real/poi/poi-icon-logs.webp';
+/** Baptized work-family emblem (logging diorama, R-367 2026-11-24) — fallback dome glyph for the job exemplar. */
+const JOB_ZANARA_ICON = '/assets/ui/poi/emblems/emblem-logs-128.webp';
 
 /**
  * A POI of any type resting on the map with no session behind it: a Director instrument to judge how each
@@ -19,7 +19,7 @@ const JOB_ZANARA_ICON = '/assets/ui/hud-real/poi/poi-icon-logs.webp';
  * `fraction` (elapsed share for job, remaining share for quest) to review the ring on the real terrain.
  */
 /** `magnitude` is the weight of the stake (S/M/L, threats only): it scales the authored base size. */
-export const MapDemoPoi: React.FC<{ type: PoiType; sizePx: number; magnitude?: PoiSizeClass; exiting?: boolean; fraction?: number; iconUrl?: string }> = ({ type, sizePx: baseSizePx, magnitude = 'M', exiting = false, fraction = 0, iconUrl: iconUrlProp }) => {
+export const MapDemoPoi: React.FC<{ type: PoiType; sizePx: number; magnitude?: PoiSizeClass; exiting?: boolean; fraction?: number; iconUrl?: string; iconOverflow?: boolean; iconOverflowFactor?: number }> = ({ type, sizePx: baseSizePx, magnitude = 'M', exiting = false, fraction = 0, iconUrl: iconUrlProp, iconOverflow = false, iconOverflowFactor }) => {
   const sizePx = poiSizePx(baseSizePx, magnitude);
   const familyIconUrl = usePoiTypeIcon(type);
   const iconUrl = iconUrlProp ?? familyIconUrl;
@@ -47,6 +47,8 @@ export const MapDemoPoi: React.FC<{ type: PoiType; sizePx: number; magnitude?: P
         fraction={fraction}
         sizePx={sizePx * POI_ZANARA_CONFIG.markerScale}
         iconUrl={type === 'job' ? (iconUrl ?? JOB_ZANARA_ICON) : iconUrl}
+        iconOverflow={iconOverflow}
+        iconOverflowFactor={iconOverflowFactor}
         data-testid="map-demo-poi-zanara"
       />
     ) : (

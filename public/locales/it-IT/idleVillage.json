@@ -1017,7 +1017,13 @@
       "otherEvents": "Altri eventi · {count}",
       "collapse": "Riduci",
       "expand": "Espandi",
-      "close": "Chiudi"
+      "close": "Chiudi",
+      "bar": {
+        "ariaLabel": "Eventi, {count} in arrivo. {action}",
+        "open": "Apri il pannello eventi",
+        "close": "Chiudi il pannello eventi",
+        "selectedAriaLabel": "Eventi, {count} in arrivo. {type}: {title}, {countdown}. {action}"
+      }
     },
     "questPoi": {
       "open": "{name} — apri la quest",

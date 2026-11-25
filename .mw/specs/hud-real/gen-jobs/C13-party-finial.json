@@ -1,0 +1,57 @@
+{
+  "component": "C13-party-finial",
+  "jobs": [
+    {
+      "id": "crest-swords-1",
+      "zone": "cassetto-party",
+      "refs": [
+        ".mw/specs/hud-real/party-finial/refs/box-frame.png",
+        ".mw/specs/hud-real/party-finial/refs/cart-gem.png"
+      ],
+      "prompt": ".mw/specs/hud-real/party-finial/prompt-crest.txt",
+      "out": ".mw/specs/hud-real/party-finial/gen/crest-1",
+      "status": "done",
+      "file": ".mw/specs/hud-real/party-finial/gen/crest-1-0.png",
+      "sha16": "57e3f7ca9ff50d5a"
+    },
+    {
+      "id": "crest-swords-2",
+      "zone": "cassetto-party",
+      "refs": [
+        ".mw/specs/hud-real/party-finial/refs/box-frame.png",
+        ".mw/specs/hud-real/party-finial/refs/cart-gem.png"
+      ],
+      "prompt": ".mw/specs/hud-real/party-finial/prompt-crest.txt",
+      "out": ".mw/specs/hud-real/party-finial/gen/crest-2",
+      "status": "done",
+      "file": ".mw/specs/hud-real/party-finial/gen/crest-2-0.png",
+      "sha16": "e4f551ee4caeac1c"
+    },
+    {
+      "id": "crest-helm-1",
+      "zone": "cassetto-party",
+      "refs": [
+        ".mw/specs/hud-real/party-finial/refs/box-frame.png",
+        ".mw/specs/hud-real/party-finial/refs/cart-gem.png"
+      ],
+      "prompt": ".mw/specs/hud-real/party-finial/prompt-helm.txt",
+      "out": ".mw/specs/hud-real/party-finial/gen/helm-1",
+      "status": "done",
+      "file": ".mw/specs/hud-real/party-finial/gen/helm-1-0.png",
+      "sha16": "66db0581e200caa8"
+    },
+    {
+      "id": "crest-helm-2",
+      "zone": "cassetto-party",
+      "refs": [
+        ".mw/specs/hud-real/party-finial/refs/box-frame.png",
+        ".mw/specs/hud-real/party-finial/refs/cart-gem.png"
+      ],
+      "prompt": ".mw/specs/hud-real/party-finial/prompt-helm.txt",
+      "out": ".mw/specs/hud-real/party-finial/gen/helm-2",
+      "status": "done",
+      "file": ".mw/specs/hud-real/party-finial/gen/helm-2-0.png",
+      "sha16": "c65ceccde7414e07"
+    }
+  ]
+}

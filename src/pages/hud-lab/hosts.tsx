@@ -145,8 +145,8 @@ export const NavHost: Host = () => (
 
 export const TimeHost: Host = () => (
   <SkinScope>
-    <div style={{ position: 'relative', height: 90 }}>
-      <HudRealTimeConnected />
+    <div style={{ position: 'relative', height: 90, marginLeft: 50 }}>
+      <HudRealTimeConnected slim />
     </div>
   </SkinScope>
 );

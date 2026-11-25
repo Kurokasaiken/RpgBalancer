@@ -56,6 +56,17 @@ How to assemble `Materic*` primitives and Golden Components without visual noise
 - `MatericField` for a single label/value pair.
 - `MatericFieldGroup` for grouped fields.
 
+## 10. Top-level frames are baptized pieces (PLAN-130, 2026-11-23)
+
+- The outer frame/ornament of a `/game` HUD surface is a **baptized piece**
+  from `src/config/hud/pieces.json` (art + geometry) — never a `Materic*`
+  primitive.
+- `MatericSurface` / `MatericInset` / `MatericFrame` are **content-only**
+  primitives: internal sections, data wells, sub-frames inside a baptized
+  frame.
+- New surfaces **compose from existing pieces first**; generate a
+  standalone asset only for the delta (PLAN-130, Director 2026-11-21).
+
 ## Examples
 
 ### Good — PgDetailCard

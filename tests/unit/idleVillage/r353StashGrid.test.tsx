@@ -20,6 +20,7 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string, opts?: Record<string, unknown>) => {
       if (key === 'gameFrame.stash.capacity') return `${opts?.count} of ${opts?.max}`;
+      if (key === 'gameFrame.stash.capacityShort') return `${opts?.count} / ${opts?.max}`;
       if (key === 'gameFrame.stash.qty') return `${opts?.qty} in store`;
       return key;
     },
@@ -123,21 +124,19 @@ describe('stash item detail card (INV-4)', () => {
     expect(useVillageStashStore.getState().lastEvent?.itemId).toBe(CFG.items[0].itemId);
   });
 
-  // INV:village-stash-panel.INV-5 — the plaque mounts the mockup's ornate frame:
-  // PanelFrameOrnaments (data-panel-frame="ornate"), the R-357 9-slice set —
-  // 4 fixed corners + chest clasp <img> + repeat-tile edge strips + inner filet,
-  // decorative only (aria-hidden, pointer-events none), in every mode.
-  it('mounts the mockup ornate frame on the plaque', () => {
+  // INV:village-stash-panel.INV-5 — the panel mounts the mockup 1:1: the whole
+  // chrome is the clean Gemini-regenerated frame (2026-11-25, alpha-cut)
+  // (Director 2026-11-24: «uguale, in proporzione 1:1 con il mockup» —
+  // supersedes the PanelFrameOrnaments contract) with the stock counter the
+  // mockup paints («24 / 24») restored — supersedes the 2026-11-20 no-counter
+  // ruling.
+  it('mounts the mockup painted backdrop and the stock counter', () => {
     const { container } = renderPanel();
-    const frame = container.querySelector('[data-panel-frame="ornate"]') as HTMLElement;
-    expect(frame).toBeTruthy();
-    expect(frame.getAttribute('aria-hidden')).toBe('true');
-    /* PLAN-127 slice-kit: the painted frame now renders from the generated
-     *  manifest (data-frame-manifest), not the legacy 5-img ornate set
-     *  (4 corners + chest clasp — clasp removed by ruling). */
-    expect(frame.getAttribute('data-frame-manifest')).toBeTruthy();
-    /* ≥4: the manifest's fixed corners; edges may be culled at jsdom's
-     *  zero-size rects. */
-    expect(frame.querySelectorAll('img').length).toBeGreaterThanOrEqual(4);
+    const backdrop = container.querySelector('img[src*="stash-frame-clean"]') as HTMLElement;
+    expect(backdrop).toBeTruthy();
+    expect(backdrop.getAttribute('aria-hidden')).toBe('true');
+    const cap = container.querySelector('[data-testid="stash-capacity"]') as HTMLElement;
+    expect(cap).toBeTruthy();
+    expect(cap.textContent).toContain('/');
   });
 });

@@ -65,7 +65,7 @@ const EXPECTED_STAGE: Record<string, CharterStage> = {
   cassetto: 'open',
   nav: 'converged',
   'top-chrome': 'converged',
-  'time-sole': 'open',
+  'time-sole': 'converged',
   roster: 'converged',
   stash: 'converged',
   'victory-reward': 'converged',

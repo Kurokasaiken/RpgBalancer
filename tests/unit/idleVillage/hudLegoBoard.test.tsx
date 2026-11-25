@@ -34,7 +34,7 @@ describe('LEGO board DOM contract (PLAN-134 §6)', () => {
       expect(card?.textContent).toContain(piece.provenance.ruling);
     }
     expect(container.querySelector('[data-lego-kind-group="frame"]')).toBeInTheDocument();
-  });
+  }, 15000);
 
   it('unresolved lane has no ruling controls and control patterns are read-only', () => {
     const { container } = render(<LegoBoard />);

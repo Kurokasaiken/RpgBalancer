@@ -1022,7 +1022,13 @@
       "otherEvents": "Other events · {count}",
       "collapse": "Collapse",
       "expand": "Expand",
-      "close": "Close"
+      "close": "Close",
+      "bar": {
+        "ariaLabel": "Events, {count} upcoming. {action}",
+        "open": "Open events panel",
+        "close": "Close events panel",
+        "selectedAriaLabel": "Events, {count} upcoming. {type}: {title}, {countdown}. {action}"
+      }
     },
     "questPoi": {
       "open": "{name} — open the quest",

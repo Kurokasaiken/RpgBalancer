@@ -33,9 +33,19 @@ const EMOJI_TO_ENGRAVED: Record<string, EngravedIconId> = {
 /** Painted art declared on the stash catalog (R-363 `iconAsset`) — the
  *  config owns which items wear painted icons; the glyph set is the fallback
  *  for catalog-less consumers (questItems catalog, unknown names). */
-const ICON_TO_ASSET: Record<string, string> = Object.fromEntries(
-  QUEST_STASH.items.filter((i) => i.iconAsset).map((i) => [i.icon, i.iconAsset as string]),
-);
+const ICON_TO_ASSET: Record<string, string> = {
+  ...Object.fromEntries(
+    QUEST_STASH.items.filter((i) => i.iconAsset).map((i) => [i.icon, i.iconAsset as string]),
+  ),
+  /* R-367 (Director 2026-11-24): the questItems emoji catalog wears painted
+   *  item cut-outs too — no engraved fallback left in the wells. */
+  '🐎': '/assets/ui/hud-real/stash-icons/item-horse-128.webp',
+  '🗡️': '/assets/ui/hud-real/stash-icons/item-dagger-128.webp',
+  '🛡️': '/assets/ui/hud-real/stash-icons/item-shield-128.webp',
+  '🚩': '/assets/ui/hud-real/stash-icons/item-flag-128.webp',
+  '🧪': '/assets/ui/hud-real/stash-icons/item-vial-128.webp',
+  '🪙': '/assets/ui/hud-real/stash-icons/item-coin-128.webp',
+};
 
 /**
  * One item icon for a stash row — decorative (the row's name carries the

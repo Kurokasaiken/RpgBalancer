@@ -38,6 +38,11 @@ const NAV_BOTTOM = 6;
 /** Landscape windows shorter than this are rotated phones: they get the percentage miniature, not the blueprint
  *  (a landscape phone is ~360–430 px tall; landscape tablets start at ~744 px and keep the blueprint). */
 const LANDSCAPE_MAX_H = 560;
+/** The nav dock renders at this share of its fit scale, so its height sits in the top bars' family
+ *  (Director 2026-11-24, HUD critique run: «proporzionato a quelli sopra» — ~75%: nav ≈ 98 px against
+ *  the 75–85 px time/resources bars). Applied to every placement path; bottom anchoring and centring
+ *  are unchanged — the dock shrinks upward and keeps its slot centre. */
+const NAV_ART_PROPORTION = 0.75;
 /** Reference desktop window the landscape miniature's percentages are measured on. */
 const REF = { W: 1920, H: 1080 };
 
@@ -66,7 +71,7 @@ export function placeGameHud(winW: number, winH: number, zoom: number): GameHudP
     const fit = (w: number, side: number) => Math.min(1, (winW - 2 * side) / w);
     const sR = fit(GAME_HUD_BARS.resources.w, PHONE_SIDE);
     const sT = fit(GAME_HUD_BARS.time.w, PHONE_SIDE);
-    const sN = fit(GAME_HUD_BARS.nav.w, PHONE_SIDE - 2);
+    const sN = fit(GAME_HUD_BARS.nav.w, PHONE_SIDE - 2) * NAV_ART_PROPORTION;
     const resourcesTop = PHONE_SIDE;
     const timeTop = resourcesTop + GAME_HUD_BARS.resources.h * sR + PHONE_GAP; // under the bar's lower edge
     return {
@@ -89,7 +94,7 @@ export function placeHudBlueprint(winW: number, winH: number, zoom: number): Gam
   const resolved = resolveSlots(frame);
   const r = resolveAll(resolved.slots, frame);
   const sR = r.resources.w / GAME_HUD_BARS.resources.w;
-  const sN = r.nav.w / GAME_HUD_BARS.nav.w;
+  const sN = (r.nav.w / GAME_HUD_BARS.nav.w) * NAV_ART_PROPORTION;
   const resources = bar(r.resources.x, r.resources.y + r.resources.h / 2 - GAME_HUD_BARS.resources.rowY * sR, sR);
   /* /game ruling (Director 2026-11-12, R-325): the time bar keeps the page's horizontal centre at EVERY blueprint
    *  width — the signed reflow that parks it under the resources, right-aligned, does not apply on this page.
@@ -114,12 +119,15 @@ export function placeHudBlueprint(winW: number, winH: number, zoom: number): Gam
   const sV = r.voce.w / GAME_HUD_BARS.voce.w;
   return {
     mode: 'blueprint',
-    cornerScale: 1,
+    /* Director 2026-11-24 («dovrebbero essere proporzionati»): the corner discs shrink by the
+     *  same proportion as the nav dock — landscape's cornerScale = sN already ties them together. */
+    cornerScale: NAV_ART_PROPORTION,
     navLabelSpread: 8, // compensated labels: keep «Workshop» and «Tavern» visibly apart
     frame,
     time: bar(timeLeft, timeTop, sT),
     resources,
-    nav: bar(r.nav.x + (r.nav.w - 460) / 2, frame.H - NAV_BOTTOM - GAME_HUD_BARS.nav.h * sN, sN),
+    /* Centre kept where the un-proportioned dock put it (x + w − 230); the bar shrinks around it. */
+    nav: bar(r.nav.x + r.nav.w - 230 - (GAME_HUD_BARS.nav.w * sN) / 2, frame.H - NAV_BOTTOM - GAME_HUD_BARS.nav.h * sN, sN),
     voce: bar(r.voce.x, frame.H - VOCE_BOTTOM - GAME_HUD_BARS.voce.h * sV, sV),
   };
 }

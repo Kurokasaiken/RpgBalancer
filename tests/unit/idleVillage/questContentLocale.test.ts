@@ -61,7 +61,10 @@ describe('quest content overlay — applied where the player reads it', () => {
     const run = createRun(GOBLIN_PRESETS[0].id, 1, 'goblin');
     expect(nodesFor(run)['gob-esplora'].title).toBe('Esplorazione');
     expect(scenarioForQuest('goblin')!.title).toBe('Sterminio dei goblin');
-    expect(scenarioForQuest('goblin')!.offer.slots.required[0].label).toBe('Capospedizione');
+    /* R-378 rev5 (Director 2026-11-25 «solo leader»): the leader seat label is «Leader» in every locale —
+     *  the translation probe moves to the Fighter slot, whose it-IT copy still differs from the EN source. */
+    expect(scenarioForQuest('goblin')!.offer.slots.required[0].label).toBe('Leader');
+    expect(scenarioForQuest('goblin')!.offer.slots.optional[0].label).toBe('Combattente');
   });
 
   it('never changes the base scenario or the offer hash input', () => {

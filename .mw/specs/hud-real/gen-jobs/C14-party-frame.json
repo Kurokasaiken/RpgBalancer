@@ -1,0 +1,41 @@
+{
+  "component": "C14-party-frame",
+  "jobs": [
+    {
+      "id": "frame-top-crest",
+      "zone": "cassetto-party",
+      "refs": [
+        ".mw/specs/hud-real/party-frame/refs/box-frame.png"
+      ],
+      "prompt": ".mw/specs/hud-real/party-frame/prompt-top-crest.txt",
+      "out": ".mw/specs/hud-real/party-frame/gen/frame-top-crest",
+      "status": "done",
+      "file": ".mw/specs/hud-real/party-frame/gen/frame-top-crest-0.png",
+      "sha16": "689d9d8b033a3d95"
+    },
+    {
+      "id": "frame-corner-helms",
+      "zone": "cassetto-party",
+      "refs": [
+        ".mw/specs/hud-real/party-frame/refs/box-frame.png"
+      ],
+      "prompt": ".mw/specs/hud-real/party-frame/prompt-corner-helms.txt",
+      "out": ".mw/specs/hud-real/party-frame/gen/frame-corner-helms",
+      "status": "done",
+      "file": ".mw/specs/hud-real/party-frame/gen/frame-corner-helms-0.png",
+      "sha16": "d1706a1dc3411eeb"
+    },
+    {
+      "id": "frame-sword-rail",
+      "zone": "cassetto-party",
+      "refs": [
+        ".mw/specs/hud-real/party-frame/refs/box-frame.png"
+      ],
+      "prompt": ".mw/specs/hud-real/party-frame/prompt-sword-rail.txt",
+      "out": ".mw/specs/hud-real/party-frame/gen/frame-sword-rail",
+      "status": "done",
+      "file": ".mw/specs/hud-real/party-frame/gen/frame-sword-rail-0.png",
+      "sha16": "0dcdf24cf79f4408"
+    }
+  ]
+}

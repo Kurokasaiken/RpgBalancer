@@ -40,8 +40,8 @@ export const BASE_SKIN_CSS_VARS: SkinCssVarMap = {
 
   /* Typography families — PLAN-125 D-4 «A inciso» (Director ruling 2026-11-21):
      Marcellus display + Cardo serif, previous faces kept as fallbacks. */
-  '--skin-font-display': '"Marcellus", "Marcellus", "Trajan Pro", serif',
-  '--skin-font-serif': '"Cardo", "Cardo", Georgia, serif',
+  '--skin-font-display': '"Marcellus", "Cinzel", "Trajan Pro", serif',
+  '--skin-font-serif': '"Cardo", "EB Garamond", Georgia, serif',
   '--skin-font-sans': 'system-ui, sans-serif',
 
   /* Title (h1/h2 — gold engraved gradient) */
@@ -311,8 +311,8 @@ export const BASE_SKIN_CSS_VARS: SkinCssVarMap = {
   '--skin-tab-active-border': 'var(--skin-title-color)',
 
   /* ── Bridge → legacy WanderlustLayout `--wl-*` variables ─────────────── */
-  '--wl-font-display': '"Marcellus", "Marcellus", "Trajan Pro", serif',
-  '--wl-font-serif': '"Cardo", "Cardo", Georgia, serif',
+  '--wl-font-display': '"Marcellus", "Cinzel", "Trajan Pro", serif',
+  '--wl-font-serif': '"Cardo", "EB Garamond", Georgia, serif',
   '--wl-font-sans': 'system-ui, sans-serif',
   '--wl-title-size': '30px',
   '--wl-body-size': '15.5px',

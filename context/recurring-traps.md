@@ -32,6 +32,9 @@ Un caso singolo resta un pattern-candidate: non viene promosso.
 | `<select>`/`<button>` nativi dentro pill `data-hud-controls`, hit-area, click "che non fa nulla" | T-21 |
 | misura di latenza/percezione, verde E2E con sintomo ancora presente, preview vs dev server | T-22 |
 | prompt per generatori immagini esterni (Gemini/SD), batch su web-UI, style-reference attach, scorecard scene | T-16, T-25, T-26, T-27, T-28 |
+| browser attach CDP (`connectOverCDP`, `Target.createTarget`, gen-queue su :9222) | T-34 |
+| compositing arte in sede circolare dipinta (gemma, medaglione, orbe), «decentrato» riportato | T-35 |
+| simmetrizzare arte per copia-ruotata di un petalo/segmento («rendi sotto uguale a sopra») | T-36 |
 | `build:deploy`, deploy Vercel, `deploy-manifest.json`, asset in `public/` referenziati da codice | T-29 |
 | ricolor/confronto colore su arte dipinta (gemme, ori, smalti), ΔE o mediana come prova «uguale al golden» | T-30 |
 | richieste Director con riferimenti ambigui ("la barra", "sotto il frame", "l'originale"), screenshot allegati a commento | T-31 |
@@ -807,3 +810,63 @@ angoli, gemme, pezzi ripetuti), correzioni iterative su composizione.
      colorato / alone.
   4. Segnalazione ambigua: offrire subito il marking tool (`public/tmp-mark/mark.html` — rettangoli disegnati
      dall'utente sul live + coordinate JSON) invece di indovinare la zona.
+
+## T-34 — CDP `createTarget background:true` non basta: zero finestre = finestra in primo piano
+
+**Surface:** qualsiasi automazione che si attacca a un browser headed via `connectOverCDP` (gen-queue/Gemini,
+mw-web-turn, probe su :9222) e crea tab con `Target.createTarget {background:true}`.
+
+- **Cosa succede (2026-11-24):** la coda Gemini (`gen-mappa2-sprite`) ha aperto Canary in primo piano
+  davanti al Director. Il tab era già `background:true` — corretto — ma il browser aveva **zero finestre
+  aperte** (app viva, finestre tutte chiuse — default macOS): `createTarget` deve *creare* una finestra
+  per ospitare il tab, e la nuova finestra attiva l'app. `background:true` copre i tab, non la window-create.
+- **Regola:**
+  1. Prima di `Target.createTarget` contare i page target (`ctx.pages()`): **zero ⇒ nessuna finestra
+     ospite ⇒ abort fail-closed** (gen-mappa2-sprite exit 7, gen-queue la parcheggia `waiting`),
+     non "sperare" che basti background:true.
+  2. Stessa esposizione in OGNI tool che attacca un browser headed: il check va nel tool, a monte
+     del primo createTarget/newPage.
+  3. La precondizione "almeno una finestra aperta (anche minimizzata)" va dichiarata al Director
+     quando fallisce — il fix è umano (riaprire una finestra), non un retry.
+
+**Addendum T-33 (istanza R-380, 2026-11-25):** il meccanismo si presenta anche come «stessa tinta su
+più layer»: segnalazione «cerchio verde dietro il sole» → il verde esisteva sia dipinto nell'asset
+(gemma smeraldo) sia prodotto da un wash codice (`well rgba(2,16,20,0.62)`) disegnato sopra.
+Tagliata la gemma = regressione piena del componente battezzato; il difetto era il wash. Regola
+aggiuntiva: prima di un cut su asset battezzato, inventariare TUTTI i layer che producono quella
+tinta — e se il fix sul layer sbagliato «sembra funzionare» (il colore sparisce) verificare subito
+contro il golden, perché può star distruggendo il componente.
+
+## T-35 — Centro di un cerchio dipinto ≠ baricentro dei pixel: «decentrato» ha due cause
+
+**Surface:** compositing arte dentro sedi circolari dipinte (gemma sfaccettata, medaglione, orbe);
+segnalazioni «decentrato» dal Director anche con canvas centrato.
+
+- **Cosa succede (2026-11-25, R-380):** baricentro dei pixel smeraldo sfalsato ~40px dalle
+  sfaccettature; `fitEllipse` sui punti colore inquinato da una protuberanza scura (fermaglio);
+  e separatamente l'arte stessa era asimmetrica (fiamme su r512, giù r435 → cerchio dei raggi ~26px
+  sopra l'orbe) + fuori centro nel canvas `(+1,−3.5)`px. Tre «decentrato» diversi sovrapposti.
+- **Regola:**
+  1. Centro sede = **least-squares robusto con σ-clip sul bordo interno dell'anello** — mai
+     centroid-of-color, mai un fit senza scarto outlier. Verificare il fit disegnandolo sull'asset.
+  2. Centro soggetto = misura separata: orbe via **distance transform** (max distanza dai bordi),
+     bbox solo per l'ingombro raggi.
+  3. Scomporre sempre «decentrato» in: Δ(anchor, sede) **e** asimmetria radiale per direzione —
+     se l'arte è storta nessun anchor la centra.
+  4. A display reale il residuo <1-2px è invisibile; nel mockup ingrandito si vede — dichiararlo
+     prima di patchare l'arte.
+
+## T-36 — Copy-rotate symmetry edit: cuneo largo o alpha parziale = banda fantasma
+
+**Surface:** simmetrizzare arte per copia-ruotata di un segmento («la fiamma sotto uguale a quella
+sopra»): incollare un settore ruotato 180° sul lato difettoso.
+
+- **Cosa succede (2026-11-25, R-380):** cuneo 56° copia anche i vuoti tra petali in posizioni non
+  coincidenti col lato destinazione → petali cancellati e non ricoperti = banda fantasma dello
+  sfondo. I pixel semi-trasparenti del cuneo incollato lasciano trasparire la gemma = alone verde.
+- **Regola:**
+  1. Cuneo **stretto** (~28°) attorno alla sola feature da replicare; estremità nei vuoti tra
+     elementi, che coincidono su entrambi i lati dell'asse.
+  2. **Threshold alpha dentro il cuneo** (`>60` → opaco, `<60` → 0) dopo il paste, feather prima.
+  3. Verifica: scan alpha 30..230 nel settore + composito su sfondo contrastante — la banda si vede
+     solo dove dietro c'è colore.

@@ -15,7 +15,8 @@ import { DEFAULT_GAME_FRAME_CONFIG, type GameFrameConfig } from '@/balancing/con
 const ASSET = '/assets/ui/hud-real/time/bar.webp';
 /** Sun / moon dial — every value (geometry measured on bar.webp, ticks, colours, art) from `gameFrameConfig.timeOfDay.dial`. */
 type DialConfig = GameFrameConfig['timeOfDay']['dial'];
-const C = { text: '#f3ead0', gold: '#f1d88a', dim: '#cdbf8e', shadow: '0 1px 2px rgba(3, 26, 30, 0.9)', focus: '#e8c766', glow: 'rgba(240, 201, 135, 0.55)', dayTint: '#f1d88a', nightTint: '#b9d2f0' } as const;
+const C = { text: '#f3ead0', gold: '#f1d88a', dim: '#cdbf8e', shadow: '0 1px 2px rgba(3, 26, 30, 0.9)', focus: '#e8c766', glow: 'rgba(240, 201, 135, 0.55)', dayTint: '#f1d88a', nightTint: '#b9d2f0',
+  seatRing: '#b8933f', seatInk: '#f6e3a4' } as const;
 const SCOPED_CSS = `
 [data-hudreal-time] button { background: transparent; border: 0; padding: 0; cursor: pointer; border-radius: 50%; user-select: none; }
 [data-hudreal-time] button:disabled { cursor: default; opacity: 0.5; }
@@ -41,6 +42,19 @@ export function HudRealTime({ dayLabel, isDayPhase, cycleProgress, isPaused, loc
   const DC = DIAL.colors;
   const f = BAR_LOCAL.field;
   const ring = (on: boolean) => (on ? { boxShadow: `0 0 0 2px ${C.gold}, 0 0 10px ${C.glow}` } : undefined);
+  /* The engaged speed wears a THICK BRASS RING with a warm halo — a marked
+   *  socket, no fill, so the running speed reads at full-frame distance.
+   *  Picked by the Director from the 2nd variant board (J — run
+   *  20261124-hud-critique-multi-ai/variants2/board.png; the recessed well
+   *  alone proved indistinguishable at full screen).
+   *  While the clock is paused the selected speed keeps only the armed ring —
+   *  it will resume at that speed; inactive speeds stay dim. */
+  const seat = (engaged: boolean) =>
+    engaged
+      ? {
+          boxShadow: `0 0 0 3px ${C.seatRing}, 0 0 0 4px rgba(20, 12, 4, 0.7), 0 0 12px 2px ${C.glow}`,
+        }
+      : undefined;
   const pos = (i: number) => ({ position: 'absolute' as const, left: BAR_LOCAL.slots[i].x, top: BAR_LOCAL.slots[i].y, width: BAR_LOCAL.slots[i].w, height: BAR_LOCAL.slots[i].h, display: 'grid', placeItems: 'center' });
   const shown = speed.available.slice(0, BAR_LOCAL.slots.length - 1);
   const progress = Math.max(0, Math.min(1, cycleProgress));
@@ -48,11 +62,19 @@ export function HudRealTime({ dayLabel, isDayPhase, cycleProgress, isPaused, loc
     <section data-hudreal-time="" data-paused={isPaused ? 'true' : 'false'} aria-label={dayLabel} style={{ position: 'relative', userSelect: 'none', width: BAR_LOCAL.w, height: BAR_LOCAL.h }}>
       <style>{SCOPED_CSS}</style>
       <img src={ASSET_LOCAL} alt="" draggable={false} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', display: 'block' }} />
+      {DIAL.frame && (
+        <img src={DIAL.frame.url} alt="" draggable={false}
+          style={{ position: 'absolute', left: DIAL.cx + (DIAL.frame.offset?.x ?? 0) - DIAL.frame.size / 2, top: DIAL.cy + (DIAL.frame.offset?.y ?? 0) - DIAL.frame.size / 2, width: DIAL.frame.size, height: DIAL.frame.size, pointerEvents: 'none' }} />
+      )}
       {/* phase dial (Director 2026-11-11): sun or moon seated small in the emerald, framed by a crown of engraved ticks
        *  that light one by one as the phase runs — warm gold by day, silver-blue by night; unlit ticks stay dull bronze. */}
       <svg aria-hidden="true" width={DIAL.r * 2} height={DIAL.r * 2} viewBox={`${-DIAL.r} ${-DIAL.r} ${DIAL.r * 2} ${DIAL.r * 2}`}
         style={{ position: 'absolute', left: DIAL.cx - DIAL.r, top: DIAL.cy - DIAL.r, overflow: 'visible', pointerEvents: 'none' }}>
-        <circle r={DIAL.r - 0.5} fill={DC.well} />
+        <circle r={DIAL.wellR ?? DIAL.r - 0.5} fill={DC.well} />
+        {DIAL.nightWash && (
+          <circle r={DIAL.nightWash.r} fill={DIAL.nightWash.color}
+            style={{ opacity: isDayPhase ? 0 : 1, transition: `opacity ${DIAL.fadeMs}ms ease` }} />
+        )}
         {Array.from({ length: DIAL.ticks }, (_, i) => {
           const lit = i < Math.round(progress * DIAL.ticks);
           const major = i % DIAL.majorEvery === 0;
@@ -82,17 +104,18 @@ export function HudRealTime({ dayLabel, isDayPhase, cycleProgress, isPaused, loc
       </div>
       <HudTooltip label={isPaused ? labels.resume : labels.pause} shortcut={labels.spaceKey} side="bottom" wrap>
         <button type="button" data-hr-time="pause" aria-pressed={isPaused} aria-label={isPaused ? labels.resume : labels.pause} disabled={locked} onClick={speed.onTogglePause}
-          style={{ ...pos(0), color: isPaused ? C.gold : C.dim, ...ring(isPaused) }}>
+          style={{ ...pos(0), color: isPaused ? C.seatInk : C.dim, textShadow: isPaused ? `0 0 6px ${C.glow}` : C.shadow, ...seat(isPaused) }}>
           <EngravedIcon id={isPaused ? 'cmd-play' : 'cmd-pause'} size={16} />
         </button>
       </HudTooltip>
       <div role="radiogroup" aria-label={labels.speedGroup}>
         {shown.map((s, i) => {
-          const on = speed.multiplier === s && !isPaused;
+          const selected = speed.multiplier === s;
+          const engaged = selected && !isPaused;
           return (
             <HudTooltip key={s} label={labels.speed(s)} shortcut={String(i + 1)} side="bottom" wrap>
-              <button type="button" role="radio" data-hr-time={`x${s}`} aria-checked={speed.multiplier === s} aria-label={labels.speed(s)} disabled={locked} onClick={() => speed.onChange(s)}
-                style={{ ...pos(i + 1), color: on ? C.gold : C.dim, fontFamily: '"Cardo", serif', fontWeight: 700, fontSize: hudPx(HUD_TYPE.secondary), textShadow: C.shadow, ...ring(on) }}>×{s}</button>
+              <button type="button" role="radio" data-hr-time={`x${s}`} aria-checked={selected} aria-label={labels.speed(s)} disabled={locked} onClick={() => speed.onChange(s)}
+                style={{ ...pos(i + 1), color: engaged ? C.seatInk : selected ? C.gold : C.dim, fontFamily: '"Cardo", serif', fontWeight: 700, fontSize: hudPx(HUD_TYPE.secondary), textShadow: engaged ? `0 0 6px ${C.glow}` : C.shadow, ...seat(engaged), ...(selected && !engaged ? ring(true) : undefined) }}>×{s}</button>
             </HudTooltip>
           );
         })}

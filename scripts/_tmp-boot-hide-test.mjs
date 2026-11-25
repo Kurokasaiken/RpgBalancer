@@ -1,0 +1,11 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch({ args: ['--enable-unsafe-swiftshader'] });
+const p = await b.newPage({ viewport: { width: 1600, height: 900 } });
+await p.goto('http://localhost:5173/game', { waitUntil: 'domcontentloaded', timeout: 45000 });
+await p.waitForSelector('canvas', { timeout: 120000 });
+await p.waitForTimeout(2500);
+await p.evaluate(() => { const e = document.querySelector('[data-boot-phase]'); if (e) e.style.display = 'none'; });
+await p.waitForTimeout(1000);
+await p.screenshot({ path: 'test-results/boot-hidden-test.png', timeout: 60000 });
+console.log('done');
+await b.close();

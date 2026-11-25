@@ -1,0 +1,11 @@
+Generate a single game sprite: a golden SUN medallion for a fantasy HUD, matching the attached reference image's EXACT art style and colors.
+
+Match these exactly:
+- Warm champagne-gold orb center with soft glossy gradient (rich saturated gold, NOT pale rose or flat beige)
+- Flame-petal rays: organic pointed petals in two tiers (long + short alternating), radial and perfectly SYMMETRIC around the orb
+- Painted fantasy style, clean edges, no noise, no artifacts, no text
+
+Hard constraints:
+- ONE sun, perfectly centered, circular composition
+- Solid flat MAGENTA background (#FF00FF) filling the whole canvas, sun does not touch the edges
+- No shadows outside the sun, no glow spilling onto the background

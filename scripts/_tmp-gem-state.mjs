@@ -1,0 +1,15 @@
+import { chromium } from 'playwright';
+const b = await chromium.connectOverCDP('http://127.0.0.1:9222', { timeout: 150000 });
+const ctx = b.contexts()[0];
+const cdp = await b.newBrowserCDPSession();
+const { targetId } = await cdp.send('Target.createTarget', { url: 'about:blank', background: true });
+await cdp.detach();
+await new Promise((r) => setTimeout(r, 800));
+const page = ctx.pages().find((p) => p.url() === 'about:blank');
+await page.goto('https://gemini.google.com/app', { waitUntil: 'domcontentloaded' });
+await new Promise((r) => setTimeout(r, 12000));
+const txt = await page.evaluate(() => document.body.innerText.slice(0, 800));
+console.log(JSON.stringify(txt.slice(0, 500)));
+const ed = await page.locator('.ql-editor[contenteditable="true"]').count();
+console.log('editors:', ed, 'url:', page.url());
+await page.screenshot({ path: '/tmp/gem-state.png' });

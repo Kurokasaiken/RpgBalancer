@@ -126,9 +126,12 @@ export const WhenWhereCluster: React.FC<WhenWhereClusterProps> = ({
               style={stripButtonStyle}
             >
               <span style={stripPillStyle(isPaused, false)}>
-                <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" fill="currentColor">
-                  {isPaused ? <path d="M2.5 1.5v9l8-4.5z" /> : <path d="M2 1.5h3v9H2zM7 1.5h3v9H7z" />}
-                </svg>
+                {isPaused
+                  /* R-367: the resume triangle wears the painted cut-out like
+                   *  every other HUD icon; the running-state pause bars stay
+                   *  engraved (no painted counterpart generated yet). */
+                  ? <img src="/assets/ui/nav/ctl-play-128.webp" alt="" aria-hidden width={12} height={12} style={{ display: 'block', objectFit: 'contain' }} />
+                  : <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" fill="currentColor"><path d="M2 1.5h3v9H2zM7 1.5h3v9H7z" /></svg>}
               </span>
             </button>
             </HudTooltip>

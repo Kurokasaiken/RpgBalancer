@@ -31,6 +31,10 @@ export const PoiZanaraConfigSchema = z.object({
   channelOuter: z.number().min(0).max(1),
   /** Icon diameter in the dome as a fraction of ringRadius. */
   iconDiameterFactor: z.number().positive(),
+  /** Overflow (strabordante) emblem multiplier on iconDiameterFactor — the
+   *  emblem diorama crosses the ring edge (Director ruling 2026-11-24:
+   *  «leggermente più grandi di dove dovrebbero stare», Foglio-B style). */
+  iconOverflowFactor: z.number().positive(),
   /** Scale on the marker's authored sizePx for the Zanara material only — the
    *  painted jewel carries less info-density than the sigillo at equal px, so
    *  on the map it renders one notch bigger (live-map ruling 2026-11-13). */
@@ -105,6 +109,9 @@ export const POI_ZANARA_CONFIG: PoiZanaraConfig = PoiZanaraConfigSchema.parse({
   channelInner: 0.845,
   channelOuter: 0.972,
   iconDiameterFactor: 0.78,
+  /* ×0.78·r365 → Ø285 canvas px fits the dome; ×2.9 → Ø~1060 covers part
+   *  of the gold rim so the emblem reads as spilling over it (Foglio B). */
+  iconOverflowFactor: 2.9,
   markerScale: 1.3,
   /* Halo band tone = the DARKEST interior enamel of each dome (Director
    *  ruling 2026-11-14: «il colore sotto la scritta deve essere il più

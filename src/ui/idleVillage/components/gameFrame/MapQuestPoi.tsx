@@ -147,9 +147,14 @@ export function mapQuestPoiView(
 
 /** Painted place glyphs (PLAN-058 T4.2): one per quest POI, keyed by activity id. 128 px master covers the ~24 px medallion centre at 2x. */
 const QUEST_GLYPH_URLS: Readonly<Record<string, string>> = {
-  'poi-goblin': '/assets/ui/poi/poi-goblin-camp-128.webp',
-  'poi-rovine': '/assets/ui/poi/poi-ruins-128.webp',
+  /* R-367 (Director 2026-11-24): quest POIs wear the baptized emblem cut-outs
+   *  (Foglio-B extreme dioramas, sterminio TL for goblin), drawn strabordante —
+   *  the diorama crosses the ring edge (see QUEST_GLYPH_OVERFLOW). */
+  'poi-goblin': '/assets/ui/poi/emblems/sterminio-skull-pike-128.webp',
+  'poi-rovine': '/assets/ui/poi/emblems/emblem-ruins-128.webp',
 };
+/** Glyphs that render strabordante — bigger than the dome, over the ring. */
+const QUEST_GLYPH_OVERFLOW: ReadonlySet<string> = new Set(['poi-goblin', 'poi-rovine']);
 
 export const MapQuestPoi: React.FC<MapQuestPoiProps> = ({ session, sizePx: baseSizePx, availability, poiType = 'quest', tier: tierProp, exiting = false, marker = 'sigillo' }) => {
   const { activity, questStatus, activityProgress, poiDropId, canAcceptPoiDrop, handlePoiClick, draggingResidentId } = session;
@@ -270,6 +275,7 @@ export const MapQuestPoi: React.FC<MapQuestPoiProps> = ({ session, sizePx: baseS
             family={zanaraFamily}
             fraction={zanaraFraction}
             iconUrl={iconUrl}
+            iconOverflow={QUEST_GLYPH_OVERFLOW.has(activity.id)}
             pulse={view.done}
             sizePx={markerSizePx}
             data-testid="map-quest-poi"

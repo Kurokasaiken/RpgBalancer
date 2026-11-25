@@ -121,11 +121,22 @@ export function HudRealVoce({ title, children, messageKey, autoCloseMs, onDismis
       onKeyDown={(e) => { if (e.key === 'Escape') dismiss(); }}
       style={{ position: 'relative', userSelect: 'none', width: P.w, height: P.h }}>
       <style>{SCOPED_CSS}</style>
-      {/* bust: the persistent part — never leaves; a click reopens the plaque over a live message */}
+      {/* bust: the persistent part — never leaves; a click reopens the plaque over a live message.
+       *  Second-level chrome (HUD critique run 2026-11-24, Director pick B2+H2): the bust runs at
+       *  78% brightness so day/resources/nav lead the hierarchy; the gold drop-shadow follows the
+       *  painted silhouette (affordance) and the brass ↻ chip appears only while a dismissed
+       *  message can actually be reopened. The plaque stays full-bright — it is live content. */}
       <button type="button" data-hr-voce-bust="" aria-expanded={plaqueOpen} aria-label={plaqueOpen ? undefined : displayed.children != null ? `${displayed.title ?? ''} — ${labels.expand}` : labels.bust ?? `${labels.expand}`}
         onClick={() => { if (!plaqueOpen && displayed.children != null) { setPlaqueOpen(true); setEntering(true); onReopen?.(); } }}
-        style={{ position: 'absolute', left: 0, width: BUST_W, height: BUST_H, top: 0, padding: 0, border: 0, background: 'none', cursor: !plaqueOpen && displayed.children != null ? 'pointer' : 'default' }}>
-        <img src={BUST_ASSET} alt="" draggable={false} style={{ display: 'block', width: BUST_W, height: BUST_H }} />
+        style={{ position: 'absolute', left: 0, width: BUST_W, height: BUST_H, top: 0, padding: 0, border: 0, background: 'none', cursor: !plaqueOpen && displayed.children != null ? 'pointer' : 'default', filter: 'brightness(.78)' }}>
+        <img src={BUST_ASSET} alt="" draggable={false} style={{ display: 'block', width: BUST_W, height: BUST_H, filter: 'drop-shadow(0 0 10px rgba(240,201,135,.75)) drop-shadow(0 0 3px rgba(20,12,4,.9))' }} />
+        {!plaqueOpen && displayed.children != null && (
+          <span aria-hidden="true" style={{
+            position: 'absolute', left: '50%', top: '66.7%', transform: 'translate(-50%,-50%)', width: 30, height: 30, borderRadius: '50%',
+            background: 'radial-gradient(circle at 42% 32%, #f6e3a4, #8a6a2a 82%)', boxShadow: '0 0 0 1.5px rgba(20,12,4,.85), 0 0 8px rgba(240,201,135,.6)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#241a08', font: '700 16px Georgia', pointerEvents: 'none',
+          }}>↻</span>
+        )}
       </button>
       {/* plaque: the dismissible bandiera — mounted only while a message is current */}
       {plaqueOpen && (

@@ -22,7 +22,7 @@ export const GOBLIN_IT: ContentOverlay = {
   "epilogue.lore[0].label": ["The ashes of the camp still smoke among the trees — seen from the hills, the forest has already closed over them.", "Le ceneri dell’accampamento fumano ancora tra gli alberi — visto dalle colline, il bosco si è già richiuso su di esse."],
   "offer.objective": ["Exterminate the goblin camp.", "Sterminare l’accampamento dei goblin."],
   "offer.dispatch": ["Follow their tracks to the camp. None of them must come back to threaten the village.", "Seguite le loro tracce fino al campo. Nessuno di loro deve tornare a minacciare il villaggio."],
-  "offer.slots.required[0].label": ["Expedition leader", "Capospedizione"],
+  "offer.slots.required[0].label": ["Leader", "Leader"],
   "offer.slots.required[0].requirement.label": ["Expedition leader", "Capospedizione"],
   "offer.slots.optional[0].label": ["Fighter", "Combattente"],
   "offer.slots.optional[0].requirement.label": ["Fighter", "Combattente"],
