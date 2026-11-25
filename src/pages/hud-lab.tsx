@@ -3,6 +3,7 @@ import { LAB_CATALOG, type LabEntry, type LabEntryStatus } from './hud-lab/catal
 import { HOSTS } from './hud-lab/hostRegistry';
 import { charterFor } from '@/config/hud/charters';
 import { CharterSection } from './hud-lab/charterSection';
+import { LegoBoard } from './hud-lab/lego/LegoBoard';
 
 /**
  * PLAN-129 — `/hud-lab` rewritten as the catalog of the baptized vocabulary:
@@ -112,6 +113,8 @@ export default function HudLabPage() {
           La composizione su mappa resta su <code>/hud-compose</code>.
         </p>
       </header>
+
+      <LegoBoard />
 
       <Section title="Componenti" hint="Montati live; quelli senza fixture reale dichiarano la nota (niente dati inventati)." entries={components} />
       <Section title="Pezzi" hint="Atomi riutilizzabili battezzati — cornici, bande, controlli, materiali." entries={pieces} />

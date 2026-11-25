@@ -2635,5 +2635,87 @@
       "activityLabel": "Attività",
       "rosterTitle": "Roster lavori"
     }
+  },
+  "hudLab": {
+    "lego": {
+      "title": "LEGO board — inventario arte HUD",
+      "subtitle": "Inventario di ruling per gli art piece immutabili. Confronta i pezzi a pari scala, tocca decisioni in memoria, esporta un packet per una apply governata successiva.",
+      "piecesCount": "pezzi validi",
+      "unsavedWarning": "La review è solo in memoria. Ricaricando la pagina le decisioni touched si perdono; esporta il JSON prima di chiudere. Questa board non scrive mai pieces.json, charter o file di produzione.",
+      "copyId": "copia ID",
+      "copied": "copiato",
+      "approve": "approva",
+      "reject": "rifiuta",
+      "reset": "reset",
+      "rejectReason": "Motivo del rifiuto",
+      "chooseReason": "scegli…",
+      "note": "Nota / condizioni",
+      "constraint": "Vincolo riutilizzabile (opzionale)",
+      "exportTitle": "Export ruling packet",
+      "touchedCount": "{{count}} touched",
+      "exportToggle": "mostra export",
+      "copyJson": "copia JSON",
+      "unresolvedTitle": "Corsia unresolved — non rulingabile",
+      "controlPatternsTitle": "Control pattern osservati — sola lettura",
+      "coverageTitle": "Matrice copertura stash / roster / quest",
+      "canon": {
+        "candidate": "canon: candidato",
+        "baptized": "canon: battezzato",
+        "retired": "canon: ritirato"
+      },
+      "baseline": {
+        "approved": "baseline approvato",
+        "undecided": "baseline indeciso",
+        "rejected": "baseline rifiutato"
+      },
+      "kinds": {
+        "ground": "ground",
+        "frame": "cornici",
+        "button-plate": "button plate",
+        "band": "bande",
+        "ornament": "ornamenti",
+        "icon-plate": "icon plate"
+      },
+      "filters": {
+        "kind": "filtro kind",
+        "canon": "filtro stato canonico",
+        "review": "filtro review",
+        "allKinds": "tutti i kind",
+        "allCanon": "tutti gli stati canonici",
+        "all": "tutte le review",
+        "touched": "touched",
+        "untouched": "non touched",
+        "approved": "approvati",
+        "undecided": "indecisi",
+        "rejected": "rifiutati"
+      },
+      "reasons": {
+        "scale-mismatch": "scala non coerente",
+        "dialect-intent": "dialetto/intento non coerente",
+        "role-nuance": "nuance di ruolo",
+        "quality-insufficient": "qualità insufficiente",
+        "other": "altro"
+      },
+      "errors": {
+        "missing-reason": "il rifiuto richiede un motivo",
+        "missing-other-note": "il motivo “altro” richiede una nota",
+        "retired-reapproval": "un id ritirato non si revive; serve una nuova revisione",
+        "unknown-piece": "pezzo sconosciuto",
+        "schema-invalid": "schema packet non valido",
+        "inventory-stale": "inventario stale; serve rebase",
+        "status-conflict": "conflitto stato canonico",
+        "no-decisions": "nessuna decisione touched"
+      },
+      "coverageHeaders": {
+        "surface": "superficie",
+        "need": "bisogno",
+        "role": "ruolo",
+        "reusablePieceIds": "pezzi riusabili",
+        "missingDelta": "delta mancante"
+      },
+      "inventoryRevLabel": "inventoryRev",
+      "jsonLabel": "JSON v1",
+      "markdownLabel": "Riepilogo Markdown"
+    }
   }
 }

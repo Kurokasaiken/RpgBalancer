@@ -2662,5 +2662,87 @@
     "sections": {
       "quote": "Quote"
     }
+  },
+  "hudLab": {
+    "lego": {
+      "title": "LEGO board — HUD art inventory",
+      "subtitle": "Ruling inventory for immutable art pieces. Compare pieces at equal size, touch decisions in memory, export a packet for a later governed apply.",
+      "piecesCount": "valid pieces",
+      "unsavedWarning": "Review is in-memory only. Reloading the page loses touched decisions; export JSON before closing. This board never writes pieces.json, charters or production files.",
+      "copyId": "copy ID",
+      "copied": "copied",
+      "approve": "approve",
+      "reject": "reject",
+      "reset": "reset",
+      "rejectReason": "Reject reason",
+      "chooseReason": "choose…",
+      "note": "Note / conditions",
+      "constraint": "Reusable constraint (optional)",
+      "exportTitle": "Ruling packet export",
+      "touchedCount": "{{count}} touched",
+      "exportToggle": "show export",
+      "copyJson": "copy JSON",
+      "unresolvedTitle": "Unresolved lane — not rulingable",
+      "controlPatternsTitle": "Control patterns observed — read only",
+      "coverageTitle": "Coverage matrix stash / roster / quest",
+      "canon": {
+        "candidate": "canon: candidate",
+        "baptized": "canon: baptized",
+        "retired": "canon: retired"
+      },
+      "baseline": {
+        "approved": "baseline approved",
+        "undecided": "baseline undecided",
+        "rejected": "baseline rejected"
+      },
+      "kinds": {
+        "ground": "grounds",
+        "frame": "frames",
+        "button-plate": "button plates",
+        "band": "bands",
+        "ornament": "ornaments",
+        "icon-plate": "icon plates"
+      },
+      "filters": {
+        "kind": "kind filter",
+        "canon": "canonical status filter",
+        "review": "review filter",
+        "allKinds": "all kinds",
+        "allCanon": "all canonical statuses",
+        "all": "all reviews",
+        "touched": "touched",
+        "untouched": "untouched",
+        "approved": "approved",
+        "undecided": "undecided",
+        "rejected": "rejected"
+      },
+      "reasons": {
+        "scale-mismatch": "scale mismatch",
+        "dialect-intent": "dialect/intent mismatch",
+        "role-nuance": "role nuance",
+        "quality-insufficient": "quality insufficient",
+        "other": "other"
+      },
+      "errors": {
+        "missing-reason": "reject requires a reason",
+        "missing-other-note": "reason “other” requires a note",
+        "retired-reapproval": "retired ids cannot be revived; create a new revision",
+        "unknown-piece": "unknown piece",
+        "schema-invalid": "packet schema invalid",
+        "inventory-stale": "inventory is stale; rebase needed",
+        "status-conflict": "canonical status conflict",
+        "no-decisions": "no touched decisions"
+      },
+      "coverageHeaders": {
+        "surface": "surface",
+        "need": "need",
+        "role": "role",
+        "reusablePieceIds": "reusable pieces",
+        "missingDelta": "missing delta"
+      },
+      "inventoryRevLabel": "inventoryRev",
+      "jsonLabel": "JSON v1",
+      "markdownLabel": "Markdown summary"
+    }
   }
 }
