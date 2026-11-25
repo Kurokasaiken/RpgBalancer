@@ -306,3 +306,5 @@ T-001…T-005 implementati in `/hud-lab`:
 - test permanenti `tests/unit/idleVillage/hudLegoBoard*.test.*` sui 10 comportamenti §6; witness headless `scripts/hud-lab-lego-witness.mjs`.
 
 Divergenza/emergenza inventory: `time-disc-v1` non valida contro `pieceSchema` (sha/asset separati sun/moon senza `provenance.sha256`/`assets.master`). Non è stato mutato perché il plan consuma canon read-only: la board lo espone come difetto unresolved non rulingable e l'audit lo registra.
+
+Verifica 2026-11-25: bundle `.mw/runs/plan134-hud-lego-board/bundle.json` prodotto con verdict `BLOCKED`. OB-1…OB-8 PASS; OB-9 raggiunge lint/test/build verdi e fallisce solo al `closure:lint` globale per contaminazione/drift fuori scope del worktree parallelo; OB-10 resta gate Director non assolto.
