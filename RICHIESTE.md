@@ -853,8 +853,9 @@ Triage 2026-10-12 (R-156): 28 voci chiuse su evidenza kanban/artefatto — `cont
 **Richiesta (verbatim, 2026-11-25):** *"spiegami cosa devo fare e come. Ricominciamo ad usare /test-hub, ma solo cne le cose nuove?
 magari chiamiamolo solo hub, csoì m sbrigo prima"*
 **Data:** 2026-11-25
-**Stato:** `da chiarire`
-**Lettura:** il Director vuole riprendere una superficie di prova/verification per i nuovi artefatti, riducendo attrito e lunghezza del nome (`/hub` invece di `/test-hub`). Punto da chiarire prima di pianificare: se “solo con le cose nuove” significa hub vuoto che accoglie solo lavoro futuro oppure migrare anche selezionati pezzi attuali/battezzati.
+**Stato:** `in corso`
+**Lettura:** il Director vuole riprendere una superficie di prova/verification riducendo attrito e lunghezza del nome (`/hub` invece di `/test-hub`). Chiarimento Director (2026-11-25): “le cose nuove” sono **le cose cominciate dalla mappa2 in poi**, non solo lavoro futuro. Quindi `/hub` raccoglie il filone attivo post-mappa2 (mappa viva/HUD/pezzi/review) e lascia `/test-hub` come archivio legacy.
+**Implementazione (2026-11-25):** `/hub` creato come workbench curato post-mappa2, con sezioni `Decide now`, `Canon and living map`, `HUD workbench`, `Reviews and comparisons`; prima card `/hud-lab` per la decisione corrente LEGO board. Esteso `TestHub` con rendering opzionale a sezioni preservando il flat legacy; route `/hub` registrata nel dev registry; copy EN/IT/pseudo aggiunti nel namespace `idleVillage`. Test permanente `tests/unit/idleVillage/hubPage.test.tsx` verifica contenuti curati, assenza di link legacy pre-mappa2 e risolvibilità delle route. Verifiche locali: test 6/6, eslint `--no-ignore` scope PASS, `build:check` PASS, witness headless @1440×900 PASS in `.mw/runs/r385-hub/` (0 errori pagina/console, 15 link attesi, 0 link legacy). Resta `in corso` finché il Director non la usa/accetta come superficie operativa; nessuna transizione `fatta` senza gate di chiusura.
 
 ## R-386 — Componente Eventi: barra speculare al Tempo con gemma semantica
 

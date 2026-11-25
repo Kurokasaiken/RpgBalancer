@@ -2750,5 +2750,77 @@
       "jsonLabel": "JSON v1",
       "markdownLabel": "Markdown summary"
     }
+  },
+  "hub": {
+    "title": "Hub",
+    "subtitle": "Post-mappa2 workbench — active decisions, living map, HUD construction and review surfaces.",
+    "sections": {
+      "now": "Decide now",
+      "canon": "Canon and living map",
+      "hud": "HUD workbench",
+      "review": "Reviews and comparisons"
+    },
+    "pages": {
+      "hudLab": {
+        "title": "LEGO board / HUD vocabulary",
+        "description": "Choose frame and button-plate pieces for the current stash decision."
+      },
+      "game": {
+        "title": "Game",
+        "description": "Canonical post-mappa2 game surface with the signed HUD."
+      },
+      "mappa2Lab": {
+        "title": "Mappa2 lab",
+        "description": "Living-world map testbed: effects, weather, fauna, village stages and tuning."
+      },
+      "hudCompose": {
+        "title": "HUD compose",
+        "description": "Compose approved HUD pieces over the live map."
+      },
+      "hudTarget": {
+        "title": "HUD target board",
+        "description": "Target slots and reference crops for the post-mappa2 HUD."
+      },
+      "hudLayout": {
+        "title": "HUD layout",
+        "description": "Blueprint silhouettes, grid and coverage for the HUD layout."
+      },
+      "hudRealRoster": {
+        "title": "Real roster lab",
+        "description": "Roster with real data on the live map."
+      },
+      "hudZanaraRoster": {
+        "title": "Zanara roster lab",
+        "description": "Zanara roster column in its target slot."
+      },
+      "hudLibrary": {
+        "title": "HUD language library",
+        "description": "Motifs, meanings and reuse guidance for the HUD visual language."
+      },
+      "iconGallery": {
+        "title": "Icon gallery",
+        "description": "HUD icons grouped by type on the in-game dark socket tone."
+      },
+      "hudCharterReview": {
+        "title": "Charter review",
+        "description": "Director review surface for component charter rulings."
+      },
+      "hudCompare": {
+        "title": "HUD compare",
+        "description": "Mockup regions versus generated reconstructions."
+      },
+      "hudPanelCompare": {
+        "title": "Panel compare",
+        "description": "Panel frame candidates with real content over the live map."
+      },
+      "hudDefects": {
+        "title": "HUD defect verdicts",
+        "description": "Per-defect side-by-side verdicts for generated HUD art."
+      },
+      "mappa2UpscaleReview": {
+        "title": "Mappa2 upscale review",
+        "description": "Review hi-res and upscaled mappa2 details."
+      }
+    }
   }
 }

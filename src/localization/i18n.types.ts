@@ -1201,6 +1201,78 @@ export default interface Resources {
       "use": "Use"
     },
     "hitStop": "Hit Stop",
+    "hub": {
+      "pages": {
+        "game": {
+          "description": "Canonical post-mappa2 game surface with the signed HUD.",
+          "title": "Game"
+        },
+        "hudCharterReview": {
+          "description": "Director review surface for component charter rulings.",
+          "title": "Charter review"
+        },
+        "hudCompare": {
+          "description": "Mockup regions versus generated reconstructions.",
+          "title": "HUD compare"
+        },
+        "hudCompose": {
+          "description": "Compose approved HUD pieces over the live map.",
+          "title": "HUD compose"
+        },
+        "hudDefects": {
+          "description": "Per-defect side-by-side verdicts for generated HUD art.",
+          "title": "HUD defect verdicts"
+        },
+        "hudLab": {
+          "description": "Choose frame and button-plate pieces for the current stash decision.",
+          "title": "LEGO board / HUD vocabulary"
+        },
+        "hudLayout": {
+          "description": "Blueprint silhouettes, grid and coverage for the HUD layout.",
+          "title": "HUD layout"
+        },
+        "hudLibrary": {
+          "description": "Motifs, meanings and reuse guidance for the HUD visual language.",
+          "title": "HUD language library"
+        },
+        "hudPanelCompare": {
+          "description": "Panel frame candidates with real content over the live map.",
+          "title": "Panel compare"
+        },
+        "hudRealRoster": {
+          "description": "Roster with real data on the live map.",
+          "title": "Real roster lab"
+        },
+        "hudTarget": {
+          "description": "Target slots and reference crops for the post-mappa2 HUD.",
+          "title": "HUD target board"
+        },
+        "hudZanaraRoster": {
+          "description": "Zanara roster column in its target slot.",
+          "title": "Zanara roster lab"
+        },
+        "iconGallery": {
+          "description": "HUD icons grouped by type on the in-game dark socket tone.",
+          "title": "Icon gallery"
+        },
+        "mappa2Lab": {
+          "description": "Living-world map testbed: effects, weather, fauna, village stages and tuning.",
+          "title": "Mappa2 lab"
+        },
+        "mappa2UpscaleReview": {
+          "description": "Review hi-res and upscaled mappa2 details.",
+          "title": "Mappa2 upscale review"
+        }
+      },
+      "sections": {
+        "canon": "Canon and living map",
+        "hud": "HUD workbench",
+        "now": "Decide now",
+        "review": "Reviews and comparisons"
+      },
+      "subtitle": "Post-mappa2 workbench — active decisions, living map, HUD construction and review surfaces.",
+      "title": "Hub"
+    },
     "map": {
       "activeActivities": "Active Activities",
       "activitySlots": "Activity Slots",

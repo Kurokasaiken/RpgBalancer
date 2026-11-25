@@ -7,6 +7,7 @@ export const LAB_ROUTE_COMPONENTS: LabRouteComponents = {
   "/minimal-gameplay": lazy(() => import('../ui/idleVillage/MinimalGameplayPage')),
   "/test": lazy(() => import('../ui/idleVillage/TestRosterPage')),
   "/test-hub": lazy(() => import('../ui/idleVillage/TestHub').then(m => ({ default: m.TestHub }))),
+  "/hub": lazy(() => import('../pages/hub').then(m => ({ default: m.default }))),
   "/missing-hub": lazy(() => import('../ui/idleVillage/MissingHub').then(m => ({ default: m.MissingHub }))),
   "/test-hub/steam-trailer-hub": lazy(() => import('../ui/idleVillage/SteamTrailerHub').then(m => ({ default: m.SteamTrailerHub }))),
   "/v9-skin-sandbox": lazy(() => import('../pages/v9-skin-sandbox').then(m => ({ default: m.V9SkinSandbox }))),

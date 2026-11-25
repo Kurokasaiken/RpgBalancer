@@ -2723,5 +2723,77 @@
       "jsonLabel": "JSON v1",
       "markdownLabel": "Riepilogo Markdown"
     }
+  },
+  "hub": {
+    "title": "Hub",
+    "subtitle": "Banco post-mappa2 — decisioni attive, mappa viva, costruzione HUD e superfici di review.",
+    "sections": {
+      "now": "Da decidere ora",
+      "canon": "Canonico e mappa viva",
+      "hud": "Banco HUD",
+      "review": "Review e confronti"
+    },
+    "pages": {
+      "hudLab": {
+        "title": "LEGO board / vocabolario HUD",
+        "description": "Scegli cornice e button-plate per la decisione stash corrente."
+      },
+      "game": {
+        "title": "Game",
+        "description": "Superficie di gioco canonica post-mappa2 con HUD firmata."
+      },
+      "mappa2Lab": {
+        "title": "Mappa2 lab",
+        "description": "Banco della mappa viva: effetti, meteo, fauna, stadi villaggio e tuning."
+      },
+      "hudCompose": {
+        "title": "HUD compose",
+        "description": "Componi i pezzi HUD approvati sulla mappa live."
+      },
+      "hudTarget": {
+        "title": "HUD target board",
+        "description": "Slot target e crop di riferimento per la HUD post-mappa2."
+      },
+      "hudLayout": {
+        "title": "HUD layout",
+        "description": "Silhouette blueprint, griglia e copertura del layout HUD."
+      },
+      "hudRealRoster": {
+        "title": "Lab roster reale",
+        "description": "Roster con dati reali sulla mappa live."
+      },
+      "hudZanaraRoster": {
+        "title": "Lab roster Zanara",
+        "description": "Colonna roster Zanara nel suo slot target."
+      },
+      "hudLibrary": {
+        "title": "Libreria linguaggio HUD",
+        "description": "Motivi, significati e guida al riuso del linguaggio visivo HUD."
+      },
+      "iconGallery": {
+        "title": "Galleria icone",
+        "description": "Icone HUD raggruppate per tipo sul tono scuro usato in gioco."
+      },
+      "hudCharterReview": {
+        "title": "Review charter",
+        "description": "Superficie di review Director per i ruling dei charter componente."
+      },
+      "hudCompare": {
+        "title": "Confronto HUD",
+        "description": "Regioni mockup a confronto con le ricostruzioni generate."
+      },
+      "hudPanelCompare": {
+        "title": "Confronto pannelli",
+        "description": "Candidati frame pannello con contenuto reale sulla mappa live."
+      },
+      "hudDefects": {
+        "title": "Verdetti difetti HUD",
+        "description": "Verdetti side-by-side per difetto sulla arte HUD generata."
+      },
+      "mappa2UpscaleReview": {
+        "title": "Review upscale mappa2",
+        "description": "Rivedi i dettagli mappa2 hi-res e upscalati."
+      }
+    }
   }
 }

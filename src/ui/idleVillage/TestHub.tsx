@@ -17,6 +17,15 @@ export interface TestPageLink {
   status?: 'ok' | 'needs-refactor';
 }
 
+export interface TestHubSection {
+  /** Stable section identifier used as React key. */
+  id: string;
+  /** Human-readable section heading. */
+  title: string;
+  /** Pages rendered inside this section. */
+  pages: TestPageLink[];
+}
+
 export interface TestHubProps {
   /** Optional page title. Defaults to "Idle Village Test Hub". */
   title?: string;
@@ -24,6 +33,8 @@ export interface TestHubProps {
   subtitle?: string;
   /** Optional list of pages to show. Defaults to the full generated + extra page list. */
   pages?: TestPageLink[];
+  /** Optional grouped pages. When present, sections replace the flat page grid. */
+  sections?: TestHubSection[];
   /** Optional back link shown above the grid. */
   backTo?: { path: string; label: string };
 }
@@ -321,10 +332,43 @@ const TEST_PAGES: TestPageLink[] = [
   ...EXTRA_PAGES.filter((extra) => !KIT_PAGES.some((kit) => kit.path === extra.path)),
 ];
 
+/** Renders one navigation card for a test or review surface. */
+const TestHubCard: React.FC<{ page: TestPageLink }> = ({ page }) => (
+  <a
+    href={page.path}
+    className={`group block rounded-xl border p-4 transition-all hover:bg-white/10 ${
+      page.status === 'needs-refactor'
+        ? 'border-red-500/50 bg-red-500/5 hover:border-red-500'
+        : 'border-white/10 bg-white/5 hover:border-amber-500/50'
+    }`}
+  >
+    <div className="mb-2 text-2xl">{page.icon}</div>
+    <h3 className="mb-1 text-sm font-semibold text-white group-hover:text-amber-200">
+      {page.title}
+    </h3>
+    <p className="text-xs text-slate-400 line-clamp-2">{page.description}</p>
+    {page.status === 'needs-refactor' && (
+      <div className="mt-2 text-[10px] uppercase tracking-wider text-red-400 font-semibold">
+        ⚠️ DA RIFARE
+      </div>
+    )}
+  </a>
+);
+
+/** Renders the uniform card grid used by both flat and grouped hubs. */
+const TestHubGrid: React.FC<{ pages: TestPageLink[] }> = ({ pages }) => (
+  <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+    {pages.map((page) => (
+      <TestHubCard key={page.id} page={page} />
+    ))}
+  </div>
+);
+
 export const TestHub: React.FC<TestHubProps> = ({
   title = 'Idle Village Test Hub',
   subtitle = 'Pagina centrale per verifica visuale di tutti i componenti',
   pages = TEST_PAGES,
+  sections,
   backTo,
 }) => {
   return (
@@ -349,30 +393,20 @@ export const TestHub: React.FC<TestHubProps> = ({
           </p>
         </header>
 
-        <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-          {pages.map((page) => (
-            <a
-              key={page.id}
-              href={page.path}
-              className={`group block rounded-xl border p-4 transition-all hover:bg-white/10 ${
-                page.status === 'needs-refactor'
-                  ? 'border-red-500/50 bg-red-500/5 hover:border-red-500'
-                  : 'border-white/10 bg-white/5 hover:border-amber-500/50'
-              }`}
-            >
-              <div className="mb-2 text-2xl">{page.icon}</div>
-              <h3 className="mb-1 text-sm font-semibold text-white group-hover:text-amber-200">
-                {page.title}
-              </h3>
-              <p className="text-xs text-slate-400 line-clamp-2">{page.description}</p>
-              {page.status === 'needs-refactor' && (
-                <div className="mt-2 text-[10px] uppercase tracking-wider text-red-400 font-semibold">
-                  ⚠️ DA RIFARE
-                </div>
-              )}
-            </a>
-          ))}
-        </div>
+        {sections ? (
+          <div className="space-y-8">
+            {sections.map((section) => (
+              <section key={section.id}>
+                <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+                  {section.title}
+                </h2>
+                <TestHubGrid pages={section.pages} />
+              </section>
+            ))}
+          </div>
+        ) : (
+          <TestHubGrid pages={pages} />
+        )}
 
         <footer className="mt-8 border-t border-white/10 pt-6 text-center text-xs text-slate-500">
           <p>{title} · Idle Village Vertical Slice</p>
