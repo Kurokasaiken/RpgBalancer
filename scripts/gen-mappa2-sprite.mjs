@@ -344,7 +344,7 @@ for (let i = Math.max(0, genCount - (after - before)); i < genCount && saved < 4
     if ((await dlBtn.count().catch(() => 0)) === 0) {
       // Gemini currently renders the original-download control outside the img ancestor
       // on some chat layouts; the last visible download button corresponds to the newest image.
-      dlBtn = page.locator('button[aria-label*="Scarica immagine" i], button[aria-label*="Download" i]').last();
+      dlBtn = page.locator('button[aria-label*="Scarica" i], button[aria-label*="Download" i]').last();
     }
     const [dl] = await Promise.all([
       page.waitForEvent('download', { timeout: 20000 }),
