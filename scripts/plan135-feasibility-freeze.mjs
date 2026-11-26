@@ -39,6 +39,14 @@ function validateCropPlan(plan) {
     if (c.outputSizePx?.width !== 1024 || c.outputSizePx?.height !== 572) errors.push(`${c.id}: unexpected output size`);
   }
   if (!plan.ownership?.exclusive || plan.ownership?.coverage !== 'complete') errors.push('ownership is not exclusive+complete');
+  const inclusiveWidth = (r) => r.x1 - r.x0 + 1;
+  const inclusiveHeight = (r) => r.y1 - r.y0 + 1;
+  const expectedApronPixels = (plan.canvas.width + plan.apron.left + plan.apron.right) * plan.apron.top + plan.apron.left * plan.canvas.height + plan.apron.right * plan.canvas.height;
+  const ownedPixels = (plan.crops ?? []).reduce((acc, c) => acc + inclusiveWidth(c.keptRegionWorldPx) * inclusiveHeight(c.keptRegionWorldPx), 0);
+  if (ownedPixels !== expectedApronPixels) errors.push(`ownership pixel count ${ownedPixels} != expected apron pixels ${expectedApronPixels}`);
+  for (const c of plan.crops ?? []) {
+    if ((c.strip === 'left' || c.strip === 'right') && inclusiveWidth(c.keptRegionWorldPx) !== plan.apron[c.strip]) errors.push(`${c.id}: kept width does not match approved apron width`);
+  }
   const joinClasses = new Set();
   for (const j of plan.joins ?? []) {
     if (!j.boundary?.orientation || j.bandWidthPx !== 4) errors.push(`${j.id}: missing frozen boundary/band geometry`);
@@ -363,7 +371,23 @@ async function freeze() {
         apronWorldRect: { x0: -560, y0: -200, x1: 3312, y1: 1536 },
         frameClampMinZoomByViewport: Object.fromEntries(measurements.map((m) => [m.viewport.label, m.fit.zFrame])),
       },
-      pilotKillCriteria: { maxRegenerationsPerStrip: 2, pilotCycles: 1, repaintReferenceFail: true, outerWaterFail: true, independentLandFail: true, seamThresholdFail: true },
+      pilotKillCriteria: {
+        maxRegenerationsPerStrip: 2,
+        pilotCycles: 1,
+        repaintReferenceFail: true,
+        repaintReference: {
+          sampling: 'every pixel in paintedReferenceWorldPx, compared against the approved 1x painting',
+          colorSpace: 'CIELAB D65 deltaEab plus normalized sRGB',
+          maxMeanDeltaE: 8,
+          maxP95DeltaE: 18,
+          maxRgbMeanAbsNormalized: 0.08,
+          maxLowFreqRgbMeanAbsNormalized: 0.04,
+          lowFrequencyBlurSigmaPx: 32,
+        },
+        outerWaterFail: true,
+        independentLandFail: true,
+        seamThresholdFail: true,
+      },
       outerWaterBands: cropPlan.outerWaterBands,
       deepSeaVeil: { canvasInteriorIntensity: 0, source: 'PLAN-135 §10.11; shader uniform to be pinned before T5' },
     },

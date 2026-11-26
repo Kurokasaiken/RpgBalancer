@@ -1,0 +1,163 @@
+{
+  "schema": "plan135-pilot-package/v1",
+  "createdAt": "2026-11-26T11:31:55.327372+00:00",
+  "selection": {
+    "cropIds": [
+      "top-05",
+      "top-04",
+      "right-01"
+    ],
+    "order": [
+      "top-05",
+      "top-04",
+      "right-01"
+    ],
+    "rationale": "hard top-right coast/corner crop plus adjacent top and right strips: exercises canvas joins, corner ownership and horizontal/vertical continuity before batch spend"
+  },
+  "generationPreconditions": {
+    "feasibility": {
+      "path": ".mw/specs/mappa2-apron/feasibility.json",
+      "sha256": "749d3fb167e07ac1226834bed86159585ddada0cb5d80b185f6182433069cf49",
+      "status": "FEASIBLE"
+    },
+    "cropPlan": {
+      "path": ".mw/specs/mappa2-apron/crop-plan.json",
+      "sha256": "0ce8536be72aa294b10304d97ffe9ead727c81fca5a8613141c13f012bd15ec0"
+    },
+    "sourcePainting": {
+      "path": "public/assets/world/mappa2/base/layers/base_flat.v2.webp",
+      "sha256": "08f766d78443ef0e06e275b645f6b47addcb5c48e9777944b6336d5f1eb4e256",
+      "note": "approved 1x painting used by the runtime look; hi-res source is not resampled into the scale-locked Gemini crop"
+    },
+    "canary": "one Gemini/Canary window may exist only hidden/background (open -g -j or existing hidden session); automation must never focus it",
+    "scaleLock": "input and output are exactly 1024x572; world_to_crop scale is 1:1; resampling is forbidden"
+  },
+  "acceptedComposite": null,
+  "crops": [
+    {
+      "cropId": "top-05",
+      "orderInPilot": 1,
+      "joinClass": "corner",
+      "input": {
+        "path": ".mw/specs/mappa2-apron/pilot/inputs/top-05.png",
+        "sha256": "f398ad2f69231b48b0ecd91dda04fdce179dfdbc2f7ccf3eb755a59efee1ed75",
+        "width": 1024,
+        "height": 572,
+        "alpha": "transparent pixels are the missing apron/outpaint region"
+      },
+      "prompt": {
+        "path": ".mw/specs/mappa2-apron/pilot/prompts/top-05.txt",
+        "sha256": "a429254a187fc71aa1c7919ba06ccab384210f96dc8cd8d469bb919f4a684706",
+        "verbatimFile": true
+      },
+      "sourceRegionWorldPx": {
+        "x0": 2288,
+        "y0": -200,
+        "x1": 3311,
+        "y1": 371
+      },
+      "paintedReferenceWorldPx": {
+        "x0": 2288,
+        "y0": 0,
+        "x1": 2751,
+        "y1": 371
+      },
+      "keptRegionWorldPx": {
+        "x0": 2288,
+        "y0": -200,
+        "x1": 3311,
+        "y1": -1
+      },
+      "retryBudget": 2
+    },
+    {
+      "cropId": "top-04",
+      "orderInPilot": 2,
+      "joinClass": "coast-crossing",
+      "input": {
+        "path": ".mw/specs/mappa2-apron/pilot/inputs/top-04.png",
+        "sha256": "482fd00cba0417496596987b3898997b9cddcf14c6e12af481902a5b08995fc4",
+        "width": 1024,
+        "height": 572,
+        "alpha": "transparent pixels are the missing apron/outpaint region"
+      },
+      "prompt": {
+        "path": ".mw/specs/mappa2-apron/pilot/prompts/top-04.txt",
+        "sha256": "79db378ad5774181652b05d76c2dc3ad70e3875bc9d2ccf2e0db71888cabe8bc",
+        "verbatimFile": true
+      },
+      "sourceRegionWorldPx": {
+        "x0": 1576,
+        "y0": -200,
+        "x1": 2599,
+        "y1": 371
+      },
+      "paintedReferenceWorldPx": {
+        "x0": 1576,
+        "y0": 0,
+        "x1": 2599,
+        "y1": 371
+      },
+      "keptRegionWorldPx": {
+        "x0": 1576,
+        "y0": -200,
+        "x1": 2287,
+        "y1": -1
+      },
+      "retryBudget": 2
+    },
+    {
+      "cropId": "right-01",
+      "orderInPilot": 3,
+      "joinClass": "coast-crossing",
+      "input": {
+        "path": ".mw/specs/mappa2-apron/pilot/inputs/right-01.png",
+        "sha256": "3ed6f898c9ee9e83990412a9b7aa53241e2f65bd61c341627e637a52f7473767",
+        "width": 1024,
+        "height": 572,
+        "alpha": "transparent pixels are the missing apron/outpaint region"
+      },
+      "prompt": {
+        "path": ".mw/specs/mappa2-apron/pilot/prompts/right-01.txt",
+        "sha256": "5b8e641a5a85a6dd796cdf3aa436bc5aaae9e64d2a562383d077962d334a3823",
+        "verbatimFile": true
+      },
+      "sourceRegionWorldPx": {
+        "x0": 2288,
+        "y0": 0,
+        "x1": 3311,
+        "y1": 571
+      },
+      "paintedReferenceWorldPx": {
+        "x0": 2288,
+        "y0": 0,
+        "x1": 2751,
+        "y1": 571
+      },
+      "keptRegionWorldPx": {
+        "x0": 2752,
+        "y0": 0,
+        "x1": 3311,
+        "y1": 240
+      },
+      "retryBudget": 2
+    }
+  ],
+  "killCriteria": {
+    "maxRegenerationsPerStrip": 2,
+    "pilotCycles": 1,
+    "repaintReferenceFail": true,
+    "repaintReference": {
+      "sampling": "every pixel in paintedReferenceWorldPx, compared against the approved 1x painting",
+      "colorSpace": "CIELAB D65 deltaEab plus normalized sRGB",
+      "maxMeanDeltaE": 8,
+      "maxP95DeltaE": 18,
+      "maxRgbMeanAbsNormalized": 0.08,
+      "maxLowFreqRgbMeanAbsNormalized": 0.04,
+      "lowFrequencyBlurSigmaPx": 32
+    },
+    "outerWaterFail": true,
+    "independentLandFail": true,
+    "seamThresholdFail": true
+  }
+}

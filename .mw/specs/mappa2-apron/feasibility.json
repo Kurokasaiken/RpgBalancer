@@ -1,6 +1,6 @@
 {
   "schema": "plan135-feasibility/v1",
-  "createdAt": "2026-11-26T11:20:02.747Z",
+  "createdAt": "2026-11-26T11:31:14.364Z",
   "generationGate": "NO_GENERATION_BEFORE_THIS_FILE",
   "status": "FEASIBLE",
   "decision": {
@@ -1009,6 +1009,15 @@
       "maxRegenerationsPerStrip": 2,
       "pilotCycles": 1,
       "repaintReferenceFail": true,
+      "repaintReference": {
+        "sampling": "every pixel in paintedReferenceWorldPx, compared against the approved 1x painting",
+        "colorSpace": "CIELAB D65 deltaEab plus normalized sRGB",
+        "maxMeanDeltaE": 8,
+        "maxP95DeltaE": 18,
+        "maxRgbMeanAbsNormalized": 0.08,
+        "maxLowFreqRgbMeanAbsNormalized": 0.04,
+        "lowFrequencyBlurSigmaPx": 32
+      },
       "outerWaterFail": true,
       "independentLandFail": true,
       "seamThresholdFail": true
@@ -1061,11 +1070,11 @@
   "artifacts": {
     "cropPlan": {
       "path": ".mw/specs/mappa2-apron/crop-plan.json",
-      "sha256": "e1bce5d79721f42ad3b7ae72e338b0fa722052f7c3142fce46845c29648b84bc"
+      "sha256": "0ce8536be72aa294b10304d97ffe9ead727c81fca5a8613141c13f012bd15ec0"
     },
     "apronMeasurements": {
       "path": ".mw/specs/mappa2-apron/apron.json",
-      "sha256": "d90877676cc5693e46d47c271ff3e40804da5d83772b22d2c5d63b0898131033"
+      "sha256": "fb886cfff1075e04df1fbdb324edbe00a3aadbe49f069a043632591d2c63f722"
     },
     "paintingBaseline": {
       "path": ".mw/specs/mappa2-apron/painting-baseline.json",
@@ -1086,7 +1095,7 @@
         "viewport": "1280x720",
         "timeOfDay": "day",
         "path": ".mw/specs/mappa2-apron/baseline-render/1280x720-day.png",
-        "sha256": "7665e1cd3601b2c8481f10f08f44d85f3d2c6706650c3f13d296e8643da49bdc",
+        "sha256": "7e83c7638ddcb2b210b064b4a637b93484786bcdbe3e78798efabe613e4890c5",
         "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
         "camera": {
           "panX": 35.191355863073795,
@@ -1110,7 +1119,7 @@
         "viewport": "1366x768",
         "timeOfDay": "day",
         "path": ".mw/specs/mappa2-apron/baseline-render/1366x768-day.png",
-        "sha256": "297d056901e332f6f8c98232743902545ca6d33704e6feabfe6c18d34faa9ff4",
+        "sha256": "c1e101b97f7a9cc84f7c291fdc2e93341e4514984d5a2dc8f9cbb2f370ca2576",
         "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
         "camera": {
           "panX": 53.76318915720003,
@@ -1134,7 +1143,7 @@
         "viewport": "1440x900",
         "timeOfDay": "day",
         "path": ".mw/specs/mappa2-apron/baseline-render/1440x900-day.png",
-        "sha256": "93a1930250894362a8977f0857c0ab2ee735bcd076cc61d19bc0e1714f590e46",
+        "sha256": "0bb32bf5cd6723ea7f77468c527a8a84c095f470e0a152fc739aa35e6b2bd9f4",
         "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
         "camera": {
           "panX": 255.85065764843034,
@@ -1158,7 +1167,7 @@
         "viewport": "1536x864",
         "timeOfDay": "day",
         "path": ".mw/specs/mappa2-apron/baseline-render/1536x864-day.png",
-        "sha256": "6633c94334aafcf3d3216bc60db6a680751aa5e700a7f244498365e02fe42abd",
+        "sha256": "5c69c295ec2e857e456c6ffffd2c2024ab19150686bb87927ee92cc2adb6aadc",
         "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
         "camera": {
           "panX": 102.00203086932606,
@@ -1182,7 +1191,7 @@
         "viewport": "1920x1080",
         "timeOfDay": "day",
         "path": ".mw/specs/mappa2-apron/baseline-render/1920x1080-day.png",
-        "sha256": "6347a0857a2e9acbd05c106ef282571817f6d964f9eda63b31e0cb5b84d11eb4",
+        "sha256": "3ab512368400f9f140c98868695bb31ad2e20a2674b370e654bc3241a87159f0",
         "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
         "camera": {
           "panX": 176.96753589074024,
@@ -1206,7 +1215,7 @@
         "viewport": "1920x1200",
         "timeOfDay": "day",
         "path": ".mw/specs/mappa2-apron/baseline-render/1920x1200-day.png",
-        "sha256": "5f940e182e07e905499a290e50d13ac95bc699c670c5bc05bb0e5e5026f53d00",
+        "sha256": "c52598b12f991f39efa9c41ff40d9b2a026e9fe9c985c310b6a7afaa6f3ccb02",
         "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
         "camera": {
           "panX": 334.22417903986957,
@@ -1230,7 +1239,7 @@
         "viewport": "2000x1024",
         "timeOfDay": "day",
         "path": ".mw/specs/mappa2-apron/baseline-render/2000x1024-day.png",
-        "sha256": "34ec2d6a3a68095803dab317b599d7653a1313abab37b37d902a04d053ac722f",
+        "sha256": "3ecb2fadd566202c161dfbc0d9e58a4ca61ac03d3d8a9e59d156ad8ccc695663",
         "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
         "camera": {
           "panX": 29.270276605839626,
@@ -1254,7 +1263,7 @@
         "viewport": "2560x1440",
         "timeOfDay": "day",
         "path": ".mw/specs/mappa2-apron/baseline-render/2560x1440-day.png",
-        "sha256": "a9508f6c3cac652881b5e389d24dafa48ea2bec18efa48be39041c66a5f82920",
+        "sha256": "bd93f3475b1e293b572f894a2a3c1629511e99592a9d163ef044266054df1b69",
         "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
         "camera": {
           "panX": 189.3155452073006,
@@ -1278,7 +1287,7 @@
         "viewport": "2560x1080",
         "timeOfDay": "day",
         "path": ".mw/specs/mappa2-apron/baseline-render/2560x1080-day.png",
-        "sha256": "4c316107772fb3f21a23ea28edba6d30192f57c8e565cf502058ad3bd83b9924",
+        "sha256": "68dbd38a5eeabe5b70d70d09c6fbc00a943bc4eef92e85bae4993fa258df9e09",
         "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
         "camera": {
           "panX": -263.87661881234635,
@@ -1302,7 +1311,7 @@
         "viewport": "3440x1440",
         "timeOfDay": "day",
         "path": ".mw/specs/mappa2-apron/baseline-render/3440x1440-day.png",
-        "sha256": "614f49d4fb800d6b5c484eacfd555524c5a852ba5d441b1f5c0e225d58dd7ff2",
+        "sha256": "6bac8eca89170c8875431ad149dca9761eba037bf14a9b1297c9b3ee6929d435",
         "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
         "camera": {
           "panX": -261.0603611276897,
@@ -1326,7 +1335,7 @@
         "viewport": "1280x720",
         "timeOfDay": "night",
         "path": ".mw/specs/mappa2-apron/baseline-render/1280x720-night.png",
-        "sha256": "50481d03c601a5794c1a502e9748f3a44aeff6033642c80d41117b122de859dc",
+        "sha256": "87bf58a8eb858332c3edb13b57519243abcd35e8f66bb8a7f7cfc14d11e6db0e",
         "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
         "camera": {
           "panX": 35.191355863073795,
@@ -1350,7 +1359,7 @@
         "viewport": "1366x768",
         "timeOfDay": "night",
         "path": ".mw/specs/mappa2-apron/baseline-render/1366x768-night.png",
-        "sha256": "a6d985288ee887a67da3cf1aa2cf31fb35aa56b8142ec8af2e95550097b85d0a",
+        "sha256": "c2f496411b6c985c7507c3692b666cbc612efb518d0b7a79f5bb49c94695e60b",
         "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
         "camera": {
           "panX": 53.76318915720003,
@@ -1374,7 +1383,7 @@
         "viewport": "1440x900",
         "timeOfDay": "night",
         "path": ".mw/specs/mappa2-apron/baseline-render/1440x900-night.png",
-        "sha256": "ac23521dce82186bf4c06720c56405f147a24fbe217bd07946bad290ddbc0585",
+        "sha256": "96e0f8aee9e859f801811cead4c769a81764b3b95ac7b45b2bce935e8a91fc53",
         "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
         "camera": {
           "panX": 255.85065764843034,
@@ -1398,7 +1407,7 @@
         "viewport": "1536x864",
         "timeOfDay": "night",
         "path": ".mw/specs/mappa2-apron/baseline-render/1536x864-night.png",
-        "sha256": "34cc61a6ab15af4bcf36a1fdc15d370534961f31e371428c00ff30b25659fec6",
+        "sha256": "5ada319cf1c1af8abe9239846da93bff41b5d800110958b1b428d869fad55cab",
         "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
         "camera": {
           "panX": 102.00203086932606,
@@ -1422,7 +1431,7 @@
         "viewport": "1920x1080",
         "timeOfDay": "night",
         "path": ".mw/specs/mappa2-apron/baseline-render/1920x1080-night.png",
-        "sha256": "7dc40d4402a14959c1e4f536c22efa61404088b82db411200b11bc0e3b57b10d",
+        "sha256": "d5ea45b85fc1475ea322cf47a5907f4df61a77d0176ca11709f031033cc2b5ba",
         "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
         "camera": {
           "panX": 176.96753589074024,
@@ -1446,7 +1455,7 @@
         "viewport": "1920x1200",
         "timeOfDay": "night",
         "path": ".mw/specs/mappa2-apron/baseline-render/1920x1200-night.png",
-        "sha256": "96ebbd7a71e0da2bd158be01755bfaf904e6c501db60d4994f55993762bcef81",
+        "sha256": "968068c8d109738926e5e03f0c8caf371da91dd98d5ad4319e608500f40347e4",
         "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
         "camera": {
           "panX": 334.22417903986957,
@@ -1470,7 +1479,7 @@
         "viewport": "2000x1024",
         "timeOfDay": "night",
         "path": ".mw/specs/mappa2-apron/baseline-render/2000x1024-night.png",
-        "sha256": "fbb95a30815ce5954a4f125e05020a3eebb7607c1c609df3ece462e5ea5c971a",
+        "sha256": "007d5f3ef66c05f0dff7ea228ae7777d30237ac786d0c15b3fb1bd4d7bd2ad5e",
         "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
         "camera": {
           "panX": 29.270276605839626,
@@ -1494,7 +1503,7 @@
         "viewport": "2560x1440",
         "timeOfDay": "night",
         "path": ".mw/specs/mappa2-apron/baseline-render/2560x1440-night.png",
-        "sha256": "9084bf4d2bd0a86e7a2031da79c6415d262d7364dd7908b761d2fcd1dc3350ce",
+        "sha256": "61ed316549acdf63934c1f4fb46b336015d42ed5225999c8e894c92a29cb1576",
         "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
         "camera": {
           "panX": 189.3155452073006,
@@ -1518,7 +1527,7 @@
         "viewport": "2560x1080",
         "timeOfDay": "night",
         "path": ".mw/specs/mappa2-apron/baseline-render/2560x1080-night.png",
-        "sha256": "5b019279cc86790b79522c5df5856a71745d1f4c17433c9a970917f20aa70428",
+        "sha256": "f736af8c15592c3685452315f00ce8fd42b85b1f5c7e8e56a6c242c887dd9ba3",
         "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
         "camera": {
           "panX": -263.87661881234635,
@@ -1542,7 +1551,7 @@
         "viewport": "3440x1440",
         "timeOfDay": "night",
         "path": ".mw/specs/mappa2-apron/baseline-render/3440x1440-night.png",
-        "sha256": "b34752b6b1a9e76fef71492005e6280fb65790835780d1e69455372160f2f2a8",
+        "sha256": "fc0ac6c38a078d328c6fb3916817ea36fce1f2c47c4c10493caed98364e87af7",
         "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
         "camera": {
           "panX": -261.0603611276897,
@@ -1565,8 +1574,8 @@
     ]
   },
   "scriptSha256": {
-    "feasibility": "963469e570465f2371a3cef22cac310cf99c2ca74c5bc9fd40ee7ff0dc99b08a",
-    "cropPlanGenerator": "ca035adc76c8f930a0d6e8b23d87f0db6b11120b48fe9ba209fda0bcb8e61cae",
+    "feasibility": "cc459c9482ece2c7f02695fe58b52398dc36ba1c509e869df0c8b66840f67e8d",
+    "cropPlanGenerator": "50caa92d63281aa56090cf920082556ba6c86dc6ea56b27caefbb7f0a6b16119",
     "paintingBaselineGenerator": "23828786ba4121ec36cc1a5d51e4226b07cca9852bc611f17b669a31aa294af7"
   },
   "classifier": {

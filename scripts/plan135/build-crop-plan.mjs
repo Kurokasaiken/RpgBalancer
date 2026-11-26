@@ -104,12 +104,12 @@ function addCrop(strip, index, source, kept, order) {
 {
   const y0 = world.y0;
   const y1 = -1;
-  const maxStartX = world.x1 - cropSize.width + 1;
+  const maxStartX = world.x1 - cropSize.width;
   const starts = evenlySpacedStarts(world.x0, maxStartX, 5);
   starts.forEach((x, i) => {
     const source = rect(x, y0, x + cropSize.width - 1, y0 + cropSize.height - 1);
     const next = starts[i + 1];
-    const kept = rect(x, y0, (next ?? world.x1 + 1) - 1, y1);
+    const kept = rect(x, y0, (next ?? world.x1) - 1, y1);
     addCrop('top', i, source, kept, i + 1);
   });
 }
@@ -124,7 +124,7 @@ for (const side of ['left', 'right']) {
     const source = rect(x0, y, sourceX1, y + cropSize.height - 1);
     const next = starts[i + 1];
     const keptX0 = side === 'left' ? world.x0 : canvas.width;
-    const keptX1 = side === 'left' ? -1 : world.x1;
+    const keptX1 = side === 'left' ? -1 : world.x1 - 1;
     const kept = rect(keptX0, y, keptX1, (next ?? canvas.height) - 1);
     addCrop(side, i, source, kept, 5 + (side === 'right' ? 5 : 0) + i + 1);
   });
@@ -218,7 +218,7 @@ for (const c of crops) {
   if (c.worldToCropScaleX !== 1 || c.worldToCropScaleY !== 1) failures.push(`${c.id}: scale lock broken`);
 }
 const topCover = crops.filter((c) => c.strip === 'top');
-if (topCover[0]?.keptRegionWorldPx.x0 !== world.x0 || topCover.at(-1)?.keptRegionWorldPx.x1 !== world.x1) failures.push('top ownership does not cover the full apron width');
+if (topCover[0]?.keptRegionWorldPx.x0 !== world.x0 || topCover.at(-1)?.keptRegionWorldPx.x1 !== world.x1 - 1) failures.push('top ownership does not cover the full apron pixel width');
 for (let i = 0; i < topCover.length - 1; i += 1) {
   if (topCover[i].keptRegionWorldPx.x1 + 1 !== topCover[i + 1].keptRegionWorldPx.x0) failures.push(`top ownership gap/overlap at ${i}`);
 }
@@ -227,6 +227,17 @@ for (const strip of ['left', 'right']) {
   if (group[0]?.keptRegionWorldPx.y0 !== 0 || group.at(-1)?.keptRegionWorldPx.y1 !== canvas.height - 1) failures.push(`${strip} ownership does not cover y 0..${canvas.height - 1}`);
   for (let i = 0; i < group.length - 1; i += 1) {
     if (group[i].keptRegionWorldPx.y1 + 1 !== group[i + 1].keptRegionWorldPx.y0) failures.push(`${strip} ownership gap/overlap at ${i}`);
+  }
+}
+
+const expectedApronPixels = (canvas.width + apron.left + apron.right) * apron.top + apron.left * canvas.height + apron.right * canvas.height;
+const ownedPixels = crops.reduce((acc, c) => acc + inclusiveWidth(c.keptRegionWorldPx) * inclusiveHeight(c.keptRegionWorldPx), 0);
+if (ownedPixels !== expectedApronPixels) failures.push(`ownership pixel count ${ownedPixels} != expected apron pixels ${expectedApronPixels}`);
+for (const strip of ['left', 'right']) {
+  const group = crops.filter((c) => c.strip === strip);
+  for (const c of group) {
+    const expectedWidth = strip === 'left' ? apron.left : apron.right;
+    if (inclusiveWidth(c.keptRegionWorldPx) !== expectedWidth) failures.push(`${c.id}: kept width ${inclusiveWidth(c.keptRegionWorldPx)} != apron width ${expectedWidth}`);
   }
 }
 
