@@ -1,6 +1,6 @@
 {
   "schema": "plan135-apron-measurements/v2",
-  "createdAt": "2026-11-26T11:31:14.347Z",
+  "createdAt": "2026-11-26T11:36:16.241Z",
   "unit": "CSS px for chrome/viewport; world px for fit, slack and apron",
   "canvas": {
     "width": 2752,

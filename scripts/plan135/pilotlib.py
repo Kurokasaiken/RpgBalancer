@@ -102,6 +102,22 @@ def srgb_to_lab(rgb):
     return np.stack([116 * f[..., 1] - 16, 500 * (f[..., 0] - f[..., 1]), 200 * (f[..., 1] - f[..., 2])], axis=-1)
 
 
+def lab_to_srgb(lab):
+    """CIELAB D65 -> sRGB float 0..1, inverse of srgb_to_lab."""
+    lab = lab.astype(np.float32)
+    fy = (lab[..., 0] + 16.0) / 116.0
+    fx = fy + lab[..., 1] / 500.0
+    fz = fy - lab[..., 2] / 200.0
+    def invf(f):
+        return np.where(f ** 3 > 0.008856, f ** 3, (f - 16.0 / 116.0) / 7.787)
+    white = np.array([0.95047, 1.0, 1.08883], dtype=np.float32)
+    xyz = np.stack([invf(fx), invf(fy), invf(fz)], axis=-1) * white
+    m = np.array([[0.4124, 0.2126, 0.0193], [0.3576, 0.7152, 0.1192], [0.1805, 0.0722, 0.9505]], dtype=np.float32)
+    linear = xyz @ np.linalg.inv(m)
+    rgb = np.where(linear <= 0.0031308, 12.92 * linear, 1.055 * np.power(np.maximum(linear, 0), 1 / 2.4) - 0.055)
+    return np.clip(rgb, 0.0, 1.0).astype(np.float32)
+
+
 def luminance(rgb):
     rgb = rgb.astype(np.float32)
     if rgb.max(initial=0) > 1.5:

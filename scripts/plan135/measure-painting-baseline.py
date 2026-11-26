@@ -196,6 +196,12 @@ payload = {
         'waterMaskAfterOpening': opened_mask_ref,
         'morphologicalOpening': {'kernel': 'square', 'sizePx': 3, 'operation': 'cv2.MORPH_OPEN on binary water mask'},
         'independentLandHardFail': {'areaPx2': 64, 'bboxMaxSidePx': 8},
+        'colorTransfer': {
+            'colorSpace': 'CIELAB D65',
+            'method': 'per-channel mean/std gain-offset computed only on painted-overlap pixels water in the frozen opened water mask; applied only to apron pixels outside the original canvas',
+            'minWaterSamplesPx': 256,
+            'stdFloor': 2.0,
+        },
     },
     'seamMetricSet': {
         'samplingMask': raw_mask_ref,

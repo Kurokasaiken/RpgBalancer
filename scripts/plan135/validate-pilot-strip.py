@@ -150,10 +150,16 @@ def enrich_crop_geometry(crop, crop_plan):
         inter, _ = crop_local_rect(zone, {'sourceRegionWorldPx': kept})
         if inter and positive_rect(inter):
             relevant_zones.append(zone)
+        elif crop['joinClass'] == 'corner' and key in ('left', 'right') and zone['x1'] >= kept['x0'] and zone['x0'] <= kept['x1']:
+            # PLAN-135 §10.6: in corners the union of the side rules applies even
+            # where the side band's canonical y range starts at y=0.
+            relevant_zones.append({**zone, 'y0': kept['y0'], 'y1': kept['y1']})
     for key, outer in outers.items():
         inter, _ = crop_local_rect(outer, {'sourceRegionWorldPx': kept})
         if inter and positive_rect(inter):
             relevant_outers.append(outer)
+        elif crop['joinClass'] == 'corner' and key in ('left', 'right') and outer['x1'] >= kept['x0'] and outer['x0'] <= kept['x1']:
+            relevant_outers.append({**outer, 'y0': kept['y0'], 'y1': kept['y1']})
     c = dict(crop)
     c['continuationZonesWorldPx'] = relevant_zones
     c['outerWaterRectsWorldPx'] = relevant_outers

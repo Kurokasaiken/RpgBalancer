@@ -1,7 +1,7 @@
 {
   "schema": "plan135-painting-baseline/v2",
   "generatedBy": "scripts/plan135/measure-painting-baseline.py",
-  "generatorSha256": "23828786ba4121ec36cc1a5d51e4226b07cca9852bc611f17b669a31aa294af7",
+  "generatorSha256": "d2497311356bd343f983ec7815ccf4ee60296e7fc95edcbf85e2fc83a73a7a34",
   "coordinateSystem": "1 image px = 1 world px; integer x/y are source pixel indices",
   "sourceImages": {
     "painting": {
@@ -983,6 +983,12 @@
     "independentLandHardFail": {
       "areaPx2": 64,
       "bboxMaxSidePx": 8
+    },
+    "colorTransfer": {
+      "colorSpace": "CIELAB D65",
+      "method": "per-channel mean/std gain-offset computed only on painted-overlap pixels water in the frozen opened water mask; applied only to apron pixels outside the original canvas",
+      "minWaterSamplesPx": 256,
+      "stdFloor": 2.0
     }
   },
   "seamMetricSet": {

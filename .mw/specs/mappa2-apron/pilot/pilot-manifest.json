@@ -1,6 +1,6 @@
 {
   "schema": "plan135-pilot-package/v1",
-  "createdAt": "2026-11-26T11:31:55.327372+00:00",
+  "createdAt": "2026-11-26T11:37:35.220310+00:00",
   "selection": {
     "cropIds": [
       "top-05",
@@ -17,7 +17,7 @@
   "generationPreconditions": {
     "feasibility": {
       "path": ".mw/specs/mappa2-apron/feasibility.json",
-      "sha256": "749d3fb167e07ac1226834bed86159585ddada0cb5d80b185f6182433069cf49",
+      "sha256": "d580a4816ce3b3a47e04a34eece2c31a3b7940d388b362d023f0ccabc69e8cc1",
       "status": "FEASIBLE"
     },
     "cropPlan": {
