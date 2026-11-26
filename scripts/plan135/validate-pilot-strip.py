@@ -96,7 +96,8 @@ def component_review(kept_rgb, crop, classifier):
     outer = crop['outerWaterBands'] if 'outerWaterBands' in crop else None
     hard = []
     review = []
-    outer_violations = []
+    outer_hard_violations = []
+    outer_review_components = []
     hard_area = classifier['independentLandHardFail']['areaPx2']
     hard_span = classifier['independentLandHardFail']['bboxMaxSidePx']
     # continuation zones are evaluated in the kept-local frame; corner crops use the union
@@ -125,7 +126,10 @@ def component_review(kept_rgb, crop, classifier):
                     touches_outer = True
         row = {'areaPx2': area, 'bboxPx': {'x': x, 'y': y, 'width': w, 'height': h}, 'touchesContinuation': touches_continuation, 'touchesOuterStrictBand': touches_outer}
         if touches_outer:
-            outer_violations.append(row)
+            if area >= hard_area or max(w, h) >= hard_span:
+                outer_hard_violations.append(row)
+            else:
+                outer_review_components.append(row)
         if not touches_continuation and (area >= hard_area or max(w, h) >= hard_span):
             hard.append(row)
         elif not touches_continuation:
@@ -133,7 +137,8 @@ def component_review(kept_rgb, crop, classifier):
     return {
         'waterPixelRatio': float(np.mean(water)),
         'landComponentCount': count - 1,
-        'outerStrictViolations': outer_violations,
+        'outerStrictViolations': outer_hard_violations,
+        'outerStrictReviewComponents': outer_review_components,
         'independentHardFailComponents': hard,
         'reviewComponents': review,
     }
@@ -241,7 +246,9 @@ def validate(crop_id, image_path, out_path=None):
         kept_crop['sourceRegionWorldPx'] = crop['keptRegionWorldPx']
         land_review = component_review(kept_rgb, kept_crop, feasibility['classifier'])
         if land_review['outerStrictViolations']:
-            errors.append(f'outer strict water band has {len(land_review["outerStrictViolations"])} land component(s)')
+            errors.append(f'outer strict water band has {len(land_review["outerStrictViolations"])} hard-fail land component(s)')
+        if land_review['outerStrictReviewComponents']:
+            flags.append(f'{len(land_review["outerStrictReviewComponents"])} small strict-band component(s) below hard-fail size require human review (foam/noise ambiguity)')
         if land_review['independentHardFailComponents']:
             errors.append(f'independent land hard-fail components: {len(land_review["independentHardFailComponents"])}')
         if land_review['reviewComponents']:

@@ -340,7 +340,12 @@ for (let i = Math.max(0, genCount - (after - before)); i < genCount && saved < 4
   try {
     const gen = page.locator(GEN_IMG_SEL).nth(i);
     const wrap = gen.locator('xpath=ancestor::GENERATED-IMAGE | ancestor::SINGLE-IMAGE').first();
-    const dlBtn = wrap.locator('DOWNLOAD-GENERATED-IMAGE-BUTTON button, DOWNLOAD-GENERATED-IMAGE-BUTTON, [aria-label*="Scarica" i], [aria-label*="Download" i]').first();
+    let dlBtn = wrap.locator('button[aria-label*="Scarica immagine" i], button[aria-label*="Download" i], DOWNLOAD-GENERATED-IMAGE-BUTTON button, button[aria-label*="Scarica" i]').first();
+    if ((await dlBtn.count().catch(() => 0)) === 0) {
+      // Gemini currently renders the original-download control outside the img ancestor
+      // on some chat layouts; the last visible download button corresponds to the newest image.
+      dlBtn = page.locator('button[aria-label*="Scarica immagine" i], button[aria-label*="Download" i]').last();
+    }
     const [dl] = await Promise.all([
       page.waitForEvent('download', { timeout: 20000 }),
       dlBtn.click(),

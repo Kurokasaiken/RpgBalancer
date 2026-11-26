@@ -1,0 +1,53 @@
+{
+  "schema": "plan135-color-transfer/v1",
+  "cropId": "top-04",
+  "status": "APPLIED",
+  "input": {
+    "path": ".mw/specs/mappa2-apron/pilot/generated/top-04-attempt2-0.png",
+    "sha256": "169365b9a654ff0810030d0190d29c09fc32a3eb4f4b0c7207e81ac2434bd54e"
+  },
+  "output": {
+    "path": ".mw/specs/mappa2-apron/pilot/corrected/top-04-attempt2.png",
+    "sha256": "108db876a2922dc346756c7e69ab82bdb080e784ebe7969f46136bde9429a60a"
+  },
+  "parameters": {
+    "sampleCount": 251368,
+    "meanGeneratedLab": [
+      43.67465591430664,
+      -17.215269088745117,
+      -18.340076446533203
+    ],
+    "meanReferenceLab": [
+      44.003936767578125,
+      -16.856616973876953,
+      -19.009891510009766
+    ],
+    "stdGeneratedLab": [
+      11.502982139587402,
+      6.616990566253662,
+      5.667280673980713
+    ],
+    "stdReferenceLab": [
+      11.933585166931152,
+      6.975030899047852,
+      5.350696563720703
+    ],
+    "gain": [
+      1.0374339818954468,
+      1.0541092157363892,
+      0.9441382884979248
+    ],
+    "offsetLab": [
+      -1.305633544921875,
+      1.2901573181152344,
+      -1.6943225860595703
+    ],
+    "stdFloor": 2
+  },
+  "rule": {
+    "colorSpace": "CIELAB D65",
+    "method": "per-channel mean/std gain-offset computed only on painted-overlap pixels water in the frozen opened water mask; applied only to apron pixels outside the original canvas",
+    "minWaterSamplesPx": 256,
+    "stdFloor": 2
+  }
+}

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build the deterministic PLAN-135 pilot input package.
 
-No generative provider is called here. The script materialises the exact 1024x572
+No generative provider is called here. The script materialises the exact 1376x768
 transparent-outpaint inputs, verbatim prompts and manifest for the approved
 3-strip pilot (hard top-right corner + adjacent top/side strips).
 """
@@ -19,26 +19,29 @@ from pilotlib import (
     write_json,
 )
 
-PILOT_CROPS = ['top-05', 'top-04', 'right-01']
+PILOT_CROPS = ['top-04', 'top-03', 'right-01']
 COMPOSITE_PATH = PILOT_DIR / 'apron-composite.png'
 
 
 def prompt_for(crop):
     bits = []
     if crop['strip'] == 'top':
-        bits.append('the top 60 pixels must resolve to clean open water with no land')
+        bits.append('the top 60 pixels must resolve to calm open water with no land, rocks, vegetation, foam or white crests')
     if crop['strip'] == 'right' or (crop['strip'] == 'top' and crop['keptRegionWorldPx']['x1'] >= 3144):
-        bits.append('the rightmost 168 pixels must resolve to clean open water with no land')
+        bits.append('the rightmost 168 pixels must resolve to calm open water with no land, rocks, vegetation, foam or white crests')
     if crop['strip'] == 'left':
-        bits.append('the leftmost 168 pixels must resolve to clean open water with no land')
+        bits.append('the leftmost 168 pixels must resolve to calm open water with no land, rocks, vegetation, foam or white crests')
     outer_rule = '; '.join(bits) if bits else 'the outer apron edge must resolve to clean open water with no land'
+    size = crop['outputSizePx']
+    size_text = f"{size['width']}x{size['height']}"
     return (
-        f"PLAN-135 {crop['id']}: outpaint only the transparent missing areas of this exact 1024x572 image, at the same 1:1 scale and with no cropping, resizing, border or frame. "
-        "Preserve every non-transparent painted pixel as closely as possible; those pixels are the approved reference and must remain visually recognisable. "
+        f"PLAN-135 {crop['id']}: outpaint only the transparent missing areas of this exact {size_text} image, at the same 1:1 scale and with no cropping, resizing, border or frame. "
+        "Preserve every non-transparent painted pixel as an exact pixel-for-pixel copy of the input reference as far as visually possible; those pixels are a locked alignment plate: do not redraw, shift, reshape, restyle, repaint texture/brushstrokes or reinterpret them. If uncertain, copy the reference rather than improving it. "
+        "The new pixels must continue the exact coastline, sea colour and landforms across the painted boundary with no visible horizontal or vertical seam; boundary continuity is more important than adding new detail. "
         "Continue the approved painterly fantasy island map style: saturated turquoise sea, sculpted coastline, cliffs, forests, painterly texture, small natural details, same light and colour grade. "
         "Complete only cliffs, coastline, beaches, islands or landforms already cut by the visible painted reference; do not invent independent new islands or significant new landmasses. "
         f"Strict outer-water rule: {outer_rule}; any allowed continuation must fade to zero before that strict band. "
-        "No text, labels, icons, UI, grid, vignette, frame, ships, creatures, people, buildings, or modern objects. Output exactly one finished 1024x572 pixel image."
+        f"No text, labels, icons, UI, grid, vignette, frame, ships, creatures, people, buildings, or modern objects. Output exactly one finished {size_text} pixel image."
     )
 
 
@@ -129,7 +132,7 @@ def main():
             'cropPlan': {'path': rel(plan_path), 'sha256': sha256_file(plan_path)},
             'sourcePainting': {'path': rel(BASE_PATH), 'sha256': sha256_file(BASE_PATH), 'note': 'approved 1x painting used by the runtime look; hi-res source is not resampled into the scale-locked Gemini crop'},
             'canary': 'one Gemini/Canary window may exist only hidden/background (open -g -j or existing hidden session); automation must never focus it',
-            'scaleLock': 'input and output are exactly 1024x572; world_to_crop scale is 1:1; resampling is forbidden',
+            'scaleLock': f"input and output are exactly {crop_plan['cropSize']['width']}x{crop_plan['cropSize']['height']}; world_to_crop scale is 1:1; resampling is forbidden",
         },
         'acceptedComposite': {'path': rel(COMPOSITE_PATH), 'sha256': sha256_file(COMPOSITE_PATH)} if COMPOSITE_PATH.exists() else None,
         'crops': rows,

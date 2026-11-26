@@ -36,7 +36,7 @@ function validateCropPlan(plan) {
   for (const c of plan.crops ?? []) {
     if (!Number.isFinite(c.canvasBoundaryLandFraction)) errors.push(`${c.id}: missing measured canvas-boundary land fraction`);
     if (c.worldToCropScaleX !== 1 || c.worldToCropScaleY !== 1) errors.push(`${c.id}: scale lock broken`);
-    if (c.outputSizePx?.width !== 1024 || c.outputSizePx?.height !== 572) errors.push(`${c.id}: unexpected output size`);
+    if (c.outputSizePx?.width !== plan.cropSize?.width || c.outputSizePx?.height !== plan.cropSize?.height) errors.push(`${c.id}: unexpected output size`);
   }
   if (!plan.ownership?.exclusive || plan.ownership?.coverage !== 'complete') errors.push('ownership is not exclusive+complete');
   const inclusiveWidth = (r) => r.x1 - r.x0 + 1;

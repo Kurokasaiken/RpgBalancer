@@ -1,0 +1,157 @@
+{
+  "schema": "plan135-pilot-strip-validation/v1",
+  "cropId": "top-04",
+  "image": {
+    "path": ".mw/specs/mappa2-apron/pilot/corrected/top-04-attempt1.png",
+    "sha256": "491c25ff647bb5bbbba88a88843ad5044e5f4531a911b998d4081f72ce4bf843"
+  },
+  "status": "FAIL",
+  "errors": [
+    "painted reference p95DeltaE 23.9139 > 18",
+    "canvas seam aggregate exceeds frozen corner p95"
+  ],
+  "reviewFlags": [
+    "1 small strict-band component(s) below hard-fail size require human review (foam/noise ambiguity)"
+  ],
+  "repaintReference": {
+    "rgbMeanAbsNormalized": [
+      0.04861980304121971,
+      0.04560176655650139,
+      0.04264688119292259
+    ],
+    "maxRgbMeanAbsNormalized": 0.04861980304121971,
+    "lowFreqRgbMeanAbsNormalized": [
+      0.0068361470475792885,
+      0.0068759010173380375,
+      0.008656642399728298
+    ],
+    "maxLowFreqRgbMeanAbsNormalized": 0.008656642399728298,
+    "meanDeltaE": 7.219474792480469,
+    "p95DeltaE": 23.913890838623047
+  },
+  "canvasSeam": {
+    "measurement": {
+      "status": "MEASURED",
+      "aggregate": {
+        "photoRgbMeanAbs": [
+          0.042708326639099556,
+          0.04233091726729816,
+          0.034238510257141155
+        ],
+        "lowFreqRgbMeanAbs": [
+          0.003214185803451321,
+          0.008273264657790687,
+          0.011736572275615552
+        ],
+        "photoLumMeanAbs": 0.039000570943409744,
+        "gradientContinuityMeanAbs": 40.94744318181818
+      },
+      "sampleCount": 11,
+      "positions": [
+        {
+          "x": 2000,
+          "y": 0
+        },
+        {
+          "x": 2064,
+          "y": 0
+        },
+        {
+          "x": 2128,
+          "y": 0
+        },
+        {
+          "x": 2192,
+          "y": 0
+        },
+        {
+          "x": 2256,
+          "y": 0
+        },
+        {
+          "x": 2320,
+          "y": 0
+        },
+        {
+          "x": 2384,
+          "y": 0
+        },
+        {
+          "x": 2448,
+          "y": 0
+        },
+        {
+          "x": 2512,
+          "y": 0
+        },
+        {
+          "x": 2576,
+          "y": 0
+        },
+        {
+          "x": 2640,
+          "y": 0
+        }
+      ]
+    },
+    "thresholdCheck": {
+      "photoRgbMeanAbs": {
+        "value": [
+          0.04270833,
+          0.04233092,
+          0.03423851
+        ],
+        "threshold": [
+          0.10834018,
+          0.11049624,
+          0.10785613
+        ],
+        "pass": true
+      },
+      "lowFreqRgbMeanAbs": {
+        "value": [
+          0.00321419,
+          0.00827326,
+          0.01173657
+        ],
+        "threshold": [
+          0.00729578,
+          0.00657924,
+          0.01134015
+        ],
+        "pass": false
+      },
+      "photoLumMeanAbs": {
+        "value": 0.03900057,
+        "threshold": 0.10804246,
+        "pass": true
+      },
+      "gradientContinuityMeanAbs": {
+        "value": 40.94744318,
+        "threshold": 135.27578125,
+        "pass": true
+      }
+    },
+    "joinClass": "corner"
+  },
+  "landReview": {
+    "waterPixelRatio": 0.9576308139534884,
+    "landComponentCount": 29,
+    "outerStrictViolations": [],
+    "outerStrictReviewComponents": [
+      {
+        "areaPx2": 12,
+        "bboxPx": {
+          "x": 1262,
+          "y": 109,
+          "width": 5,
+          "height": 4
+        },
+        "touchesContinuation": true,
+        "touchesOuterStrictBand": true
+      }
+    ],
+    "independentHardFailComponents": [],
+    "reviewComponents": []
+  }
+}

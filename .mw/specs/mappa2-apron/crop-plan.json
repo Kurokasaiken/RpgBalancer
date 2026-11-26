@@ -1,7 +1,7 @@
 {
   "schema": "plan135-crop-plan/v1",
   "generatedBy": "scripts/plan135/build-crop-plan.mjs",
-  "generatorSha256": "50caa92d63281aa56090cf920082556ba6c86dc6ea56b27caefbb7f0a6b16119",
+  "generatorSha256": "b3b97a60f7e5e6d3463010148027df2b01bf017bc53d5d48e62ab9aa45a291ef",
   "canvas": {
     "width": 2752,
     "height": 1536
@@ -23,8 +23,8 @@
     "cropAndOwnershipRects": "inclusive integer pixel indices at 1 image px = 1 world px"
   },
   "cropSize": {
-    "width": 1024,
-    "height": 572
+    "width": 1376,
+    "height": 768
   },
   "overlap": {
     "designInputPx": {
@@ -33,41 +33,36 @@
     },
     "policy": "source regions overlap for reference/control only; kept regions remain mutually exclusive",
     "topStripHorizontal": {
-      "minPx": 312,
-      "maxPx": 312,
+      "minPx": 544,
+      "maxPx": 544,
       "byJoinPx": [
-        312,
-        312,
-        312,
-        312
+        544,
+        544,
+        544
       ]
     },
     "sideStripVertical": {
       "left": {
-        "minPx": 331,
-        "maxPx": 331,
+        "minPx": 384,
+        "maxPx": 384,
         "byJoinPx": [
-          331,
-          331,
-          331,
-          331
+          384,
+          384
         ]
       },
       "right": {
-        "minPx": 331,
-        "maxPx": 331,
+        "minPx": 384,
+        "maxPx": 384,
         "byJoinPx": [
-          331,
-          331,
-          331,
-          331
+          384,
+          384
         ]
       }
     },
     "paintedCanvasReferencePx": {
-      "top": 372,
-      "left": 464,
-      "right": 464
+      "top": 568,
+      "left": 816,
+      "right": 816
     }
   },
   "scaleLock": {
@@ -134,12 +129,12 @@
       "sourceRegionWorldPx": {
         "x0": -560,
         "y0": -200,
-        "x1": 463,
-        "y1": 371
+        "x1": 815,
+        "y1": 567
       },
       "outputSizePx": {
-        "width": 1024,
-        "height": 572
+        "width": 1376,
+        "height": 768
       },
       "worldToCropScaleX": 1,
       "worldToCropScaleY": 1,
@@ -163,13 +158,13 @@
       "paintedReferenceWorldPx": {
         "x0": 0,
         "y0": 0,
-        "x1": 463,
-        "y1": 371
+        "x1": 815,
+        "y1": 567
       },
       "keptRegionWorldPx": {
         "x0": -560,
         "y0": -200,
-        "x1": 151,
+        "x1": 271,
         "y1": -1
       },
       "ownershipRule": "keptRegionWorldPx is exclusive; painted reference and overlap are control-only",
@@ -182,14 +177,14 @@
       "joinClass": "open-water",
       "canvasBoundaryLandFraction": 0,
       "sourceRegionWorldPx": {
-        "x0": 152,
+        "x0": 272,
         "y0": -200,
-        "x1": 1175,
-        "y1": 371
+        "x1": 1647,
+        "y1": 567
       },
       "outputSizePx": {
-        "width": 1024,
-        "height": 572
+        "width": 1376,
+        "height": 768
       },
       "worldToCropScaleX": 1,
       "worldToCropScaleY": 1,
@@ -197,7 +192,7 @@
         [
           1,
           0,
-          -152
+          -272
         ],
         [
           0,
@@ -211,15 +206,15 @@
         ]
       ],
       "paintedReferenceWorldPx": {
-        "x0": 152,
+        "x0": 272,
         "y0": 0,
-        "x1": 1175,
-        "y1": 371
+        "x1": 1647,
+        "y1": 567
       },
       "keptRegionWorldPx": {
-        "x0": 152,
+        "x0": 272,
         "y0": -200,
-        "x1": 863,
+        "x1": 1103,
         "y1": -1
       },
       "ownershipRule": "keptRegionWorldPx is exclusive; painted reference and overlap are control-only",
@@ -232,14 +227,14 @@
       "joinClass": "open-water",
       "canvasBoundaryLandFraction": 0,
       "sourceRegionWorldPx": {
-        "x0": 864,
+        "x0": 1104,
         "y0": -200,
-        "x1": 1887,
-        "y1": 371
+        "x1": 2479,
+        "y1": 567
       },
       "outputSizePx": {
-        "width": 1024,
-        "height": 572
+        "width": 1376,
+        "height": 768
       },
       "worldToCropScaleX": 1,
       "worldToCropScaleY": 1,
@@ -247,7 +242,7 @@
         [
           1,
           0,
-          -864
+          -1104
         ],
         [
           0,
@@ -261,15 +256,15 @@
         ]
       ],
       "paintedReferenceWorldPx": {
-        "x0": 864,
+        "x0": 1104,
         "y0": 0,
-        "x1": 1887,
-        "y1": 371
+        "x1": 2479,
+        "y1": 567
       },
       "keptRegionWorldPx": {
-        "x0": 864,
+        "x0": 1104,
         "y0": -200,
-        "x1": 1575,
+        "x1": 1935,
         "y1": -1
       },
       "ownershipRule": "keptRegionWorldPx is exclusive; painted reference and overlap are control-only",
@@ -279,67 +274,17 @@
       "id": "top-04",
       "strip": "top",
       "order": 4,
-      "joinClass": "coast-crossing",
-      "canvasBoundaryLandFraction": 0.04810393,
-      "sourceRegionWorldPx": {
-        "x0": 1576,
-        "y0": -200,
-        "x1": 2599,
-        "y1": 371
-      },
-      "outputSizePx": {
-        "width": 1024,
-        "height": 572
-      },
-      "worldToCropScaleX": 1,
-      "worldToCropScaleY": 1,
-      "transformationMatrix": [
-        [
-          1,
-          0,
-          -1576
-        ],
-        [
-          0,
-          1,
-          200
-        ],
-        [
-          0,
-          0,
-          1
-        ]
-      ],
-      "paintedReferenceWorldPx": {
-        "x0": 1576,
-        "y0": 0,
-        "x1": 2599,
-        "y1": 371
-      },
-      "keptRegionWorldPx": {
-        "x0": 1576,
-        "y0": -200,
-        "x1": 2287,
-        "y1": -1
-      },
-      "ownershipRule": "keptRegionWorldPx is exclusive; painted reference and overlap are control-only",
-      "retryBudget": 2
-    },
-    {
-      "id": "top-05",
-      "strip": "top",
-      "order": 5,
       "joinClass": "corner",
-      "canvasBoundaryLandFraction": 0.67726293,
+      "canvasBoundaryLandFraction": 0.42708333,
       "sourceRegionWorldPx": {
-        "x0": 2288,
+        "x0": 1936,
         "y0": -200,
         "x1": 3311,
-        "y1": 371
+        "y1": 567
       },
       "outputSizePx": {
-        "width": 1024,
-        "height": 572
+        "width": 1376,
+        "height": 768
       },
       "worldToCropScaleX": 1,
       "worldToCropScaleY": 1,
@@ -347,7 +292,7 @@
         [
           1,
           0,
-          -2288
+          -1936
         ],
         [
           0,
@@ -361,13 +306,13 @@
         ]
       ],
       "paintedReferenceWorldPx": {
-        "x0": 2288,
+        "x0": 1936,
         "y0": 0,
         "x1": 2751,
-        "y1": 371
+        "y1": 567
       },
       "keptRegionWorldPx": {
-        "x0": 2288,
+        "x0": 1936,
         "y0": -200,
         "x1": 3311,
         "y1": -1
@@ -378,18 +323,18 @@
     {
       "id": "left-01",
       "strip": "left",
-      "order": 6,
-      "joinClass": "open-water",
-      "canvasBoundaryLandFraction": 0,
+      "order": 5,
+      "joinClass": "coast-crossing",
+      "canvasBoundaryLandFraction": 0.25390625,
       "sourceRegionWorldPx": {
         "x0": -560,
         "y0": 0,
-        "x1": 463,
-        "y1": 571
+        "x1": 815,
+        "y1": 767
       },
       "outputSizePx": {
-        "width": 1024,
-        "height": 572
+        "width": 1376,
+        "height": 768
       },
       "worldToCropScaleX": 1,
       "worldToCropScaleY": 1,
@@ -413,14 +358,14 @@
       "paintedReferenceWorldPx": {
         "x0": 0,
         "y0": 0,
-        "x1": 463,
-        "y1": 571
+        "x1": 815,
+        "y1": 767
       },
       "keptRegionWorldPx": {
         "x0": -560,
         "y0": 0,
         "x1": -1,
-        "y1": 240
+        "y1": 383
       },
       "ownershipRule": "keptRegionWorldPx is exclusive; painted reference and overlap are control-only",
       "retryBudget": 2
@@ -428,18 +373,18 @@
     {
       "id": "left-02",
       "strip": "left",
-      "order": 7,
+      "order": 6,
       "joinClass": "coast-crossing",
-      "canvasBoundaryLandFraction": 0.81120332,
+      "canvasBoundaryLandFraction": 0.79427083,
       "sourceRegionWorldPx": {
         "x0": -560,
-        "y0": 241,
-        "x1": 463,
-        "y1": 812
+        "y0": 384,
+        "x1": 815,
+        "y1": 1151
       },
       "outputSizePx": {
-        "width": 1024,
-        "height": 572
+        "width": 1376,
+        "height": 768
       },
       "worldToCropScaleX": 1,
       "worldToCropScaleY": 1,
@@ -452,7 +397,7 @@
         [
           0,
           1,
-          -241
+          -384
         ],
         [
           0,
@@ -462,15 +407,15 @@
       ],
       "paintedReferenceWorldPx": {
         "x0": 0,
-        "y0": 241,
-        "x1": 463,
-        "y1": 812
+        "y0": 384,
+        "x1": 815,
+        "y1": 1151
       },
       "keptRegionWorldPx": {
         "x0": -560,
-        "y0": 241,
+        "y0": 384,
         "x1": -1,
-        "y1": 481
+        "y1": 767
       },
       "ownershipRule": "keptRegionWorldPx is exclusive; painted reference and overlap are control-only",
       "retryBudget": 2
@@ -478,118 +423,18 @@
     {
       "id": "left-03",
       "strip": "left",
-      "order": 8,
+      "order": 7,
       "joinClass": "coast-crossing",
-      "canvasBoundaryLandFraction": 0.85892116,
+      "canvasBoundaryLandFraction": 0.97005208,
       "sourceRegionWorldPx": {
         "x0": -560,
-        "y0": 482,
-        "x1": 463,
-        "y1": 1053
-      },
-      "outputSizePx": {
-        "width": 1024,
-        "height": 572
-      },
-      "worldToCropScaleX": 1,
-      "worldToCropScaleY": 1,
-      "transformationMatrix": [
-        [
-          1,
-          0,
-          560
-        ],
-        [
-          0,
-          1,
-          -482
-        ],
-        [
-          0,
-          0,
-          1
-        ]
-      ],
-      "paintedReferenceWorldPx": {
-        "x0": 0,
-        "y0": 482,
-        "x1": 463,
-        "y1": 1053
-      },
-      "keptRegionWorldPx": {
-        "x0": -560,
-        "y0": 482,
-        "x1": -1,
-        "y1": 722
-      },
-      "ownershipRule": "keptRegionWorldPx is exclusive; painted reference and overlap are control-only",
-      "retryBudget": 2
-    },
-    {
-      "id": "left-04",
-      "strip": "left",
-      "order": 9,
-      "joinClass": "coast-crossing",
-      "canvasBoundaryLandFraction": 0.71784232,
-      "sourceRegionWorldPx": {
-        "x0": -560,
-        "y0": 723,
-        "x1": 463,
-        "y1": 1294
-      },
-      "outputSizePx": {
-        "width": 1024,
-        "height": 572
-      },
-      "worldToCropScaleX": 1,
-      "worldToCropScaleY": 1,
-      "transformationMatrix": [
-        [
-          1,
-          0,
-          560
-        ],
-        [
-          0,
-          1,
-          -723
-        ],
-        [
-          0,
-          0,
-          1
-        ]
-      ],
-      "paintedReferenceWorldPx": {
-        "x0": 0,
-        "y0": 723,
-        "x1": 463,
-        "y1": 1294
-      },
-      "keptRegionWorldPx": {
-        "x0": -560,
-        "y0": 723,
-        "x1": -1,
-        "y1": 963
-      },
-      "ownershipRule": "keptRegionWorldPx is exclusive; painted reference and overlap are control-only",
-      "retryBudget": 2
-    },
-    {
-      "id": "left-05",
-      "strip": "left",
-      "order": 10,
-      "joinClass": "coast-crossing",
-      "canvasBoundaryLandFraction": 1,
-      "sourceRegionWorldPx": {
-        "x0": -560,
-        "y0": 964,
-        "x1": 463,
+        "y0": 768,
+        "x1": 815,
         "y1": 1535
       },
       "outputSizePx": {
-        "width": 1024,
-        "height": 572
+        "width": 1376,
+        "height": 768
       },
       "worldToCropScaleX": 1,
       "worldToCropScaleY": 1,
@@ -602,7 +447,7 @@
         [
           0,
           1,
-          -964
+          -768
         ],
         [
           0,
@@ -612,13 +457,13 @@
       ],
       "paintedReferenceWorldPx": {
         "x0": 0,
-        "y0": 964,
-        "x1": 463,
+        "y0": 768,
+        "x1": 815,
         "y1": 1535
       },
       "keptRegionWorldPx": {
         "x0": -560,
-        "y0": 964,
+        "y0": 768,
         "x1": -1,
         "y1": 1535
       },
@@ -628,18 +473,18 @@
     {
       "id": "right-01",
       "strip": "right",
-      "order": 11,
+      "order": 8,
       "joinClass": "coast-crossing",
       "canvasBoundaryLandFraction": 1,
       "sourceRegionWorldPx": {
-        "x0": 2288,
+        "x0": 1936,
         "y0": 0,
         "x1": 3311,
-        "y1": 571
+        "y1": 767
       },
       "outputSizePx": {
-        "width": 1024,
-        "height": 572
+        "width": 1376,
+        "height": 768
       },
       "worldToCropScaleX": 1,
       "worldToCropScaleY": 1,
@@ -647,7 +492,7 @@
         [
           1,
           0,
-          -2288
+          -1936
         ],
         [
           0,
@@ -661,16 +506,16 @@
         ]
       ],
       "paintedReferenceWorldPx": {
-        "x0": 2288,
+        "x0": 1936,
         "y0": 0,
         "x1": 2751,
-        "y1": 571
+        "y1": 767
       },
       "keptRegionWorldPx": {
         "x0": 2752,
         "y0": 0,
         "x1": 3311,
-        "y1": 240
+        "y1": 383
       },
       "ownershipRule": "keptRegionWorldPx is exclusive; painted reference and overlap are control-only",
       "retryBudget": 2
@@ -678,18 +523,18 @@
     {
       "id": "right-02",
       "strip": "right",
-      "order": 12,
+      "order": 9,
       "joinClass": "coast-crossing",
-      "canvasBoundaryLandFraction": 1,
+      "canvasBoundaryLandFraction": 0.73958333,
       "sourceRegionWorldPx": {
-        "x0": 2288,
-        "y0": 241,
+        "x0": 1936,
+        "y0": 384,
         "x1": 3311,
-        "y1": 812
+        "y1": 1151
       },
       "outputSizePx": {
-        "width": 1024,
-        "height": 572
+        "width": 1376,
+        "height": 768
       },
       "worldToCropScaleX": 1,
       "worldToCropScaleY": 1,
@@ -697,12 +542,12 @@
         [
           1,
           0,
-          -2288
+          -1936
         ],
         [
           0,
           1,
-          -241
+          -384
         ],
         [
           0,
@@ -711,16 +556,16 @@
         ]
       ],
       "paintedReferenceWorldPx": {
-        "x0": 2288,
-        "y0": 241,
+        "x0": 1936,
+        "y0": 384,
         "x1": 2751,
-        "y1": 812
+        "y1": 1151
       },
       "keptRegionWorldPx": {
         "x0": 2752,
-        "y0": 241,
+        "y0": 384,
         "x1": 3311,
-        "y1": 481
+        "y1": 767
       },
       "ownershipRule": "keptRegionWorldPx is exclusive; painted reference and overlap are control-only",
       "retryBudget": 2
@@ -728,118 +573,18 @@
     {
       "id": "right-03",
       "strip": "right",
-      "order": 13,
+      "order": 10,
       "joinClass": "coast-crossing",
-      "canvasBoundaryLandFraction": 0.77178423,
+      "canvasBoundaryLandFraction": 0.84765625,
       "sourceRegionWorldPx": {
-        "x0": 2288,
-        "y0": 482,
-        "x1": 3311,
-        "y1": 1053
-      },
-      "outputSizePx": {
-        "width": 1024,
-        "height": 572
-      },
-      "worldToCropScaleX": 1,
-      "worldToCropScaleY": 1,
-      "transformationMatrix": [
-        [
-          1,
-          0,
-          -2288
-        ],
-        [
-          0,
-          1,
-          -482
-        ],
-        [
-          0,
-          0,
-          1
-        ]
-      ],
-      "paintedReferenceWorldPx": {
-        "x0": 2288,
-        "y0": 482,
-        "x1": 2751,
-        "y1": 1053
-      },
-      "keptRegionWorldPx": {
-        "x0": 2752,
-        "y0": 482,
-        "x1": 3311,
-        "y1": 722
-      },
-      "ownershipRule": "keptRegionWorldPx is exclusive; painted reference and overlap are control-only",
-      "retryBudget": 2
-    },
-    {
-      "id": "right-04",
-      "strip": "right",
-      "order": 14,
-      "joinClass": "coast-crossing",
-      "canvasBoundaryLandFraction": 0.41908714,
-      "sourceRegionWorldPx": {
-        "x0": 2288,
-        "y0": 723,
-        "x1": 3311,
-        "y1": 1294
-      },
-      "outputSizePx": {
-        "width": 1024,
-        "height": 572
-      },
-      "worldToCropScaleX": 1,
-      "worldToCropScaleY": 1,
-      "transformationMatrix": [
-        [
-          1,
-          0,
-          -2288
-        ],
-        [
-          0,
-          1,
-          -723
-        ],
-        [
-          0,
-          0,
-          1
-        ]
-      ],
-      "paintedReferenceWorldPx": {
-        "x0": 2288,
-        "y0": 723,
-        "x1": 2751,
-        "y1": 1294
-      },
-      "keptRegionWorldPx": {
-        "x0": 2752,
-        "y0": 723,
-        "x1": 3311,
-        "y1": 963
-      },
-      "ownershipRule": "keptRegionWorldPx is exclusive; painted reference and overlap are control-only",
-      "retryBudget": 2
-    },
-    {
-      "id": "right-05",
-      "strip": "right",
-      "order": 15,
-      "joinClass": "coast-crossing",
-      "canvasBoundaryLandFraction": 0.96153846,
-      "sourceRegionWorldPx": {
-        "x0": 2288,
-        "y0": 964,
+        "x0": 1936,
+        "y0": 768,
         "x1": 3311,
         "y1": 1535
       },
       "outputSizePx": {
-        "width": 1024,
-        "height": 572
+        "width": 1376,
+        "height": 768
       },
       "worldToCropScaleX": 1,
       "worldToCropScaleY": 1,
@@ -847,12 +592,12 @@
         [
           1,
           0,
-          -2288
+          -1936
         ],
         [
           0,
           1,
-          -964
+          -768
         ],
         [
           0,
@@ -861,14 +606,14 @@
         ]
       ],
       "paintedReferenceWorldPx": {
-        "x0": 2288,
-        "y0": 964,
+        "x0": 1936,
+        "y0": 768,
         "x1": 2751,
         "y1": 1535
       },
       "keptRegionWorldPx": {
         "x0": 2752,
-        "y0": 964,
+        "y0": 768,
         "x1": 3311,
         "y1": 1535
       },
@@ -889,7 +634,7 @@
         "coordinateWorldPx": 0,
         "spanWorldPx": {
           "x0": -560,
-          "x1": 151
+          "x1": 271
         }
       },
       "bandWidthPx": 4,
@@ -906,8 +651,8 @@
         "orientation": "horizontal",
         "coordinateWorldPx": 0,
         "spanWorldPx": {
-          "x0": 152,
-          "x1": 863
+          "x0": 272,
+          "x1": 1103
         }
       },
       "bandWidthPx": 4,
@@ -924,8 +669,8 @@
         "orientation": "horizontal",
         "coordinateWorldPx": 0,
         "spanWorldPx": {
-          "x0": 864,
-          "x1": 1575
+          "x0": 1104,
+          "x1": 1935
         }
       },
       "bandWidthPx": 4,
@@ -934,7 +679,7 @@
     {
       "id": "top-04:canvas",
       "kind": "canvas-apron",
-      "joinClass": "coast-crossing",
+      "joinClass": "corner",
       "cropIds": [
         "top-04"
       ],
@@ -942,25 +687,7 @@
         "orientation": "horizontal",
         "coordinateWorldPx": 0,
         "spanWorldPx": {
-          "x0": 1576,
-          "x1": 2287
-        }
-      },
-      "bandWidthPx": 4,
-      "coordinateConvention": "boundary is a continuous world-coordinate edge; spans are inclusive pixel ranges"
-    },
-    {
-      "id": "top-05:canvas",
-      "kind": "canvas-apron",
-      "joinClass": "corner",
-      "cropIds": [
-        "top-05"
-      ],
-      "boundary": {
-        "orientation": "horizontal",
-        "coordinateWorldPx": 0,
-        "spanWorldPx": {
-          "x0": 2288,
+          "x0": 1936,
           "x1": 3311
         }
       },
@@ -970,7 +697,7 @@
     {
       "id": "left-01:canvas",
       "kind": "canvas-apron",
-      "joinClass": "open-water",
+      "joinClass": "coast-crossing",
       "cropIds": [
         "left-01"
       ],
@@ -979,7 +706,7 @@
         "coordinateWorldPx": 0,
         "spanWorldPx": {
           "y0": 0,
-          "y1": 240
+          "y1": 383
         }
       },
       "bandWidthPx": 4,
@@ -996,8 +723,8 @@
         "orientation": "vertical",
         "coordinateWorldPx": 0,
         "spanWorldPx": {
-          "y0": 241,
-          "y1": 481
+          "y0": 384,
+          "y1": 767
         }
       },
       "bandWidthPx": 4,
@@ -1014,43 +741,7 @@
         "orientation": "vertical",
         "coordinateWorldPx": 0,
         "spanWorldPx": {
-          "y0": 482,
-          "y1": 722
-        }
-      },
-      "bandWidthPx": 4,
-      "coordinateConvention": "boundary is a continuous world-coordinate edge; spans are inclusive pixel ranges"
-    },
-    {
-      "id": "left-04:canvas",
-      "kind": "canvas-apron",
-      "joinClass": "coast-crossing",
-      "cropIds": [
-        "left-04"
-      ],
-      "boundary": {
-        "orientation": "vertical",
-        "coordinateWorldPx": 0,
-        "spanWorldPx": {
-          "y0": 723,
-          "y1": 963
-        }
-      },
-      "bandWidthPx": 4,
-      "coordinateConvention": "boundary is a continuous world-coordinate edge; spans are inclusive pixel ranges"
-    },
-    {
-      "id": "left-05:canvas",
-      "kind": "canvas-apron",
-      "joinClass": "coast-crossing",
-      "cropIds": [
-        "left-05"
-      ],
-      "boundary": {
-        "orientation": "vertical",
-        "coordinateWorldPx": 0,
-        "spanWorldPx": {
-          "y0": 964,
+          "y0": 768,
           "y1": 1535
         }
       },
@@ -1069,7 +760,7 @@
         "coordinateWorldPx": 2752,
         "spanWorldPx": {
           "y0": 0,
-          "y1": 240
+          "y1": 383
         }
       },
       "bandWidthPx": 4,
@@ -1086,8 +777,8 @@
         "orientation": "vertical",
         "coordinateWorldPx": 2752,
         "spanWorldPx": {
-          "y0": 241,
-          "y1": 481
+          "y0": 384,
+          "y1": 767
         }
       },
       "bandWidthPx": 4,
@@ -1104,43 +795,7 @@
         "orientation": "vertical",
         "coordinateWorldPx": 2752,
         "spanWorldPx": {
-          "y0": 482,
-          "y1": 722
-        }
-      },
-      "bandWidthPx": 4,
-      "coordinateConvention": "boundary is a continuous world-coordinate edge; spans are inclusive pixel ranges"
-    },
-    {
-      "id": "right-04:canvas",
-      "kind": "canvas-apron",
-      "joinClass": "coast-crossing",
-      "cropIds": [
-        "right-04"
-      ],
-      "boundary": {
-        "orientation": "vertical",
-        "coordinateWorldPx": 2752,
-        "spanWorldPx": {
-          "y0": 723,
-          "y1": 963
-        }
-      },
-      "bandWidthPx": 4,
-      "coordinateConvention": "boundary is a continuous world-coordinate edge; spans are inclusive pixel ranges"
-    },
-    {
-      "id": "right-05:canvas",
-      "kind": "canvas-apron",
-      "joinClass": "coast-crossing",
-      "cropIds": [
-        "right-05"
-      ],
-      "boundary": {
-        "orientation": "vertical",
-        "coordinateWorldPx": 2752,
-        "spanWorldPx": {
-          "y0": 964,
+          "y0": 768,
           "y1": 1535
         }
       },
@@ -1157,17 +812,17 @@
       ],
       "boundary": {
         "orientation": "vertical",
-        "coordinateWorldPx": 152,
+        "coordinateWorldPx": 272,
         "spanWorldPx": {
           "y0": -200,
           "y1": -1
         }
       },
       "sourceOverlapWorldPx": {
-        "x0": 152,
+        "x0": 272,
         "y0": -200,
-        "x1": 463,
-        "y1": 371
+        "x1": 815,
+        "y1": 567
       },
       "bandWidthPx": 4,
       "coordinateConvention": "boundary is the exclusive ownership edge; source overlap is inclusive pixel indices"
@@ -1182,17 +837,17 @@
       ],
       "boundary": {
         "orientation": "vertical",
-        "coordinateWorldPx": 864,
+        "coordinateWorldPx": 1104,
         "spanWorldPx": {
           "y0": -200,
           "y1": -1
         }
       },
       "sourceOverlapWorldPx": {
-        "x0": 864,
+        "x0": 1104,
         "y0": -200,
-        "x1": 1175,
-        "y1": 371
+        "x1": 1647,
+        "y1": 567
       },
       "bandWidthPx": 4,
       "coordinateConvention": "boundary is the exclusive ownership edge; source overlap is inclusive pixel indices"
@@ -1200,49 +855,24 @@
     {
       "id": "top-03:top-04",
       "kind": "strip-strip",
-      "joinClass": "coast-crossing",
+      "joinClass": "corner",
       "cropIds": [
         "top-03",
         "top-04"
       ],
       "boundary": {
         "orientation": "vertical",
-        "coordinateWorldPx": 1576,
+        "coordinateWorldPx": 1936,
         "spanWorldPx": {
           "y0": -200,
           "y1": -1
         }
       },
       "sourceOverlapWorldPx": {
-        "x0": 1576,
+        "x0": 1936,
         "y0": -200,
-        "x1": 1887,
-        "y1": 371
-      },
-      "bandWidthPx": 4,
-      "coordinateConvention": "boundary is the exclusive ownership edge; source overlap is inclusive pixel indices"
-    },
-    {
-      "id": "top-04:top-05",
-      "kind": "strip-strip",
-      "joinClass": "corner",
-      "cropIds": [
-        "top-04",
-        "top-05"
-      ],
-      "boundary": {
-        "orientation": "vertical",
-        "coordinateWorldPx": 2288,
-        "spanWorldPx": {
-          "y0": -200,
-          "y1": -1
-        }
-      },
-      "sourceOverlapWorldPx": {
-        "x0": 2288,
-        "y0": -200,
-        "x1": 2599,
-        "y1": 371
+        "x1": 2479,
+        "y1": 567
       },
       "bandWidthPx": 4,
       "coordinateConvention": "boundary is the exclusive ownership edge; source overlap is inclusive pixel indices"
@@ -1257,7 +887,7 @@
       ],
       "boundary": {
         "orientation": "horizontal",
-        "coordinateWorldPx": 241,
+        "coordinateWorldPx": 384,
         "spanWorldPx": {
           "x0": -560,
           "x1": -1
@@ -1265,9 +895,9 @@
       },
       "sourceOverlapWorldPx": {
         "x0": -560,
-        "y0": 241,
-        "x1": 463,
-        "y1": 571
+        "y0": 384,
+        "x1": 815,
+        "y1": 767
       },
       "bandWidthPx": 4,
       "coordinateConvention": "boundary is the exclusive ownership edge; source overlap is inclusive pixel indices"
@@ -1282,7 +912,7 @@
       ],
       "boundary": {
         "orientation": "horizontal",
-        "coordinateWorldPx": 482,
+        "coordinateWorldPx": 768,
         "spanWorldPx": {
           "x0": -560,
           "x1": -1
@@ -1290,59 +920,9 @@
       },
       "sourceOverlapWorldPx": {
         "x0": -560,
-        "y0": 482,
-        "x1": 463,
-        "y1": 812
-      },
-      "bandWidthPx": 4,
-      "coordinateConvention": "boundary is the exclusive ownership edge; source overlap is inclusive pixel indices"
-    },
-    {
-      "id": "left-03:left-04",
-      "kind": "strip-strip",
-      "joinClass": "coast-crossing",
-      "cropIds": [
-        "left-03",
-        "left-04"
-      ],
-      "boundary": {
-        "orientation": "horizontal",
-        "coordinateWorldPx": 723,
-        "spanWorldPx": {
-          "x0": -560,
-          "x1": -1
-        }
-      },
-      "sourceOverlapWorldPx": {
-        "x0": -560,
-        "y0": 723,
-        "x1": 463,
-        "y1": 1053
-      },
-      "bandWidthPx": 4,
-      "coordinateConvention": "boundary is the exclusive ownership edge; source overlap is inclusive pixel indices"
-    },
-    {
-      "id": "left-04:left-05",
-      "kind": "strip-strip",
-      "joinClass": "coast-crossing",
-      "cropIds": [
-        "left-04",
-        "left-05"
-      ],
-      "boundary": {
-        "orientation": "horizontal",
-        "coordinateWorldPx": 964,
-        "spanWorldPx": {
-          "x0": -560,
-          "x1": -1
-        }
-      },
-      "sourceOverlapWorldPx": {
-        "x0": -560,
-        "y0": 964,
-        "x1": 463,
-        "y1": 1294
+        "y0": 768,
+        "x1": 815,
+        "y1": 1151
       },
       "bandWidthPx": 4,
       "coordinateConvention": "boundary is the exclusive ownership edge; source overlap is inclusive pixel indices"
@@ -1357,17 +937,17 @@
       ],
       "boundary": {
         "orientation": "horizontal",
-        "coordinateWorldPx": 241,
+        "coordinateWorldPx": 384,
         "spanWorldPx": {
           "x0": 2752,
           "x1": 3311
         }
       },
       "sourceOverlapWorldPx": {
-        "x0": 2288,
-        "y0": 241,
+        "x0": 1936,
+        "y0": 384,
         "x1": 3311,
-        "y1": 571
+        "y1": 767
       },
       "bandWidthPx": 4,
       "coordinateConvention": "boundary is the exclusive ownership edge; source overlap is inclusive pixel indices"
@@ -1382,67 +962,17 @@
       ],
       "boundary": {
         "orientation": "horizontal",
-        "coordinateWorldPx": 482,
+        "coordinateWorldPx": 768,
         "spanWorldPx": {
           "x0": 2752,
           "x1": 3311
         }
       },
       "sourceOverlapWorldPx": {
-        "x0": 2288,
-        "y0": 482,
+        "x0": 1936,
+        "y0": 768,
         "x1": 3311,
-        "y1": 812
-      },
-      "bandWidthPx": 4,
-      "coordinateConvention": "boundary is the exclusive ownership edge; source overlap is inclusive pixel indices"
-    },
-    {
-      "id": "right-03:right-04",
-      "kind": "strip-strip",
-      "joinClass": "coast-crossing",
-      "cropIds": [
-        "right-03",
-        "right-04"
-      ],
-      "boundary": {
-        "orientation": "horizontal",
-        "coordinateWorldPx": 723,
-        "spanWorldPx": {
-          "x0": 2752,
-          "x1": 3311
-        }
-      },
-      "sourceOverlapWorldPx": {
-        "x0": 2288,
-        "y0": 723,
-        "x1": 3311,
-        "y1": 1053
-      },
-      "bandWidthPx": 4,
-      "coordinateConvention": "boundary is the exclusive ownership edge; source overlap is inclusive pixel indices"
-    },
-    {
-      "id": "right-04:right-05",
-      "kind": "strip-strip",
-      "joinClass": "coast-crossing",
-      "cropIds": [
-        "right-04",
-        "right-05"
-      ],
-      "boundary": {
-        "orientation": "horizontal",
-        "coordinateWorldPx": 964,
-        "spanWorldPx": {
-          "x0": 2752,
-          "x1": 3311
-        }
-      },
-      "sourceOverlapWorldPx": {
-        "x0": 2288,
-        "y0": 964,
-        "x1": 3311,
-        "y1": 1294
+        "y1": 1151
       },
       "bandWidthPx": 4,
       "coordinateConvention": "boundary is the exclusive ownership edge; source overlap is inclusive pixel indices"
@@ -1459,41 +989,32 @@
         "keptRegionWorldPx": {
           "x0": -560,
           "y0": -200,
-          "x1": 151,
+          "x1": 271,
           "y1": -1
         }
       },
       {
         "cropId": "top-02",
         "keptRegionWorldPx": {
-          "x0": 152,
+          "x0": 272,
           "y0": -200,
-          "x1": 863,
+          "x1": 1103,
           "y1": -1
         }
       },
       {
         "cropId": "top-03",
         "keptRegionWorldPx": {
-          "x0": 864,
+          "x0": 1104,
           "y0": -200,
-          "x1": 1575,
+          "x1": 1935,
           "y1": -1
         }
       },
       {
         "cropId": "top-04",
         "keptRegionWorldPx": {
-          "x0": 1576,
-          "y0": -200,
-          "x1": 2287,
-          "y1": -1
-        }
-      },
-      {
-        "cropId": "top-05",
-        "keptRegionWorldPx": {
-          "x0": 2288,
+          "x0": 1936,
           "y0": -200,
           "x1": 3311,
           "y1": -1
@@ -1505,41 +1026,23 @@
           "x0": -560,
           "y0": 0,
           "x1": -1,
-          "y1": 240
+          "y1": 383
         }
       },
       {
         "cropId": "left-02",
         "keptRegionWorldPx": {
           "x0": -560,
-          "y0": 241,
+          "y0": 384,
           "x1": -1,
-          "y1": 481
+          "y1": 767
         }
       },
       {
         "cropId": "left-03",
         "keptRegionWorldPx": {
           "x0": -560,
-          "y0": 482,
-          "x1": -1,
-          "y1": 722
-        }
-      },
-      {
-        "cropId": "left-04",
-        "keptRegionWorldPx": {
-          "x0": -560,
-          "y0": 723,
-          "x1": -1,
-          "y1": 963
-        }
-      },
-      {
-        "cropId": "left-05",
-        "keptRegionWorldPx": {
-          "x0": -560,
-          "y0": 964,
+          "y0": 768,
           "x1": -1,
           "y1": 1535
         }
@@ -1550,41 +1053,23 @@
           "x0": 2752,
           "y0": 0,
           "x1": 3311,
-          "y1": 240
+          "y1": 383
         }
       },
       {
         "cropId": "right-02",
         "keptRegionWorldPx": {
           "x0": 2752,
-          "y0": 241,
+          "y0": 384,
           "x1": 3311,
-          "y1": 481
+          "y1": 767
         }
       },
       {
         "cropId": "right-03",
         "keptRegionWorldPx": {
           "x0": 2752,
-          "y0": 482,
-          "x1": 3311,
-          "y1": 722
-        }
-      },
-      {
-        "cropId": "right-04",
-        "keptRegionWorldPx": {
-          "x0": 2752,
-          "y0": 723,
-          "x1": 3311,
-          "y1": 963
-        }
-      },
-      {
-        "cropId": "right-05",
-        "keptRegionWorldPx": {
-          "x0": 2752,
-          "y0": 964,
+          "y0": 768,
           "x1": 3311,
           "y1": 1535
         }

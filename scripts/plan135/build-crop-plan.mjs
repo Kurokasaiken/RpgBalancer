@@ -12,7 +12,8 @@ const root = process.cwd();
 const outPath = process.argv[2] ?? '.mw/specs/mappa2-apron/crop-plan.json';
 const canvas = { width: 2752, height: 1536 };
 const apron = { top: 200, right: 560, bottom: 0, left: 560 };
-const cropSize = { width: 1024, height: 572 };
+const cropSize = { width: 1376, height: 768 };
+const cropCounts = { top: 4, side: 3 };
 const world = {
   x0: -apron.left,
   y0: -apron.top,
@@ -100,12 +101,12 @@ function addCrop(strip, index, source, kept, order) {
   });
 }
 
-// Top strip owns every corner (y < 0). Five crops span the 3872 world px width.
+// Top strip owns every corner (y < 0). Four native-resolution crops span the 3872 world px width.
 {
   const y0 = world.y0;
   const y1 = -1;
   const maxStartX = world.x1 - cropSize.width;
-  const starts = evenlySpacedStarts(world.x0, maxStartX, 5);
+  const starts = evenlySpacedStarts(world.x0, maxStartX, cropCounts.top);
   starts.forEach((x, i) => {
     const source = rect(x, y0, x + cropSize.width - 1, y0 + cropSize.height - 1);
     const next = starts[i + 1];
@@ -116,17 +117,18 @@ function addCrop(strip, index, source, kept, order) {
 
 // Side strips own only y >= 0, so top/side ownership is mutually exclusive by construction.
 for (const side of ['left', 'right']) {
-  const x0 = side === 'left' ? world.x0 : canvas.width - 464;
+  // Native 1376px-wide side crops are aligned to the outer apron edge, maximising painted reference/control overlap.
+  const x0 = side === 'left' ? world.x0 : world.x1 - cropSize.width;
   const sourceX1 = x0 + cropSize.width - 1;
   const maxStartY = canvas.height - cropSize.height;
-  const starts = evenlySpacedStarts(0, maxStartY, 5);
+  const starts = evenlySpacedStarts(0, maxStartY, cropCounts.side);
   starts.forEach((y, i) => {
     const source = rect(x0, y, sourceX1, y + cropSize.height - 1);
     const next = starts[i + 1];
     const keptX0 = side === 'left' ? world.x0 : canvas.width;
     const keptX1 = side === 'left' ? -1 : world.x1 - 1;
     const kept = rect(keptX0, y, keptX1, (next ?? canvas.height) - 1);
-    addCrop(side, i, source, kept, 5 + (side === 'right' ? 5 : 0) + i + 1);
+    addCrop(side, i, source, kept, cropCounts.top + (side === 'right' ? cropCounts.side : 0) + i + 1);
   });
 }
 
@@ -201,7 +203,7 @@ const measuredOverlap = {
     left: adjacentOverlap('left', false),
     right: adjacentOverlap('right', false),
   },
-  paintedCanvasReferencePx: { top: 372, left: 464, right: 464 },
+  paintedCanvasReferencePx: { top: cropSize.height - apron.top, left: cropSize.width - apron.left, right: cropSize.width - apron.right },
 };
 
 const ownership = {

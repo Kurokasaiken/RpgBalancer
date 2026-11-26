@@ -69,7 +69,7 @@ def main():
         raise SystemExit('pilot-state.json missing: no accepted strips')
     state = load_json(STATE_PATH)
     accepted = [r['cropId'] for r in state.get('accepted', [])]
-    required = ['top-05', 'top-04', 'right-01']
+    required = ['top-04', 'top-03', 'right-01']
     missing = [c for c in required if c not in accepted]
     if missing:
         errors.append(f'pilot incomplete; missing accepted strips: {missing}')
@@ -85,11 +85,20 @@ def main():
         rgb = comp[..., :3].astype(np.float32) / 255.0
         alpha = comp[..., 3]
         feasibility = load_json(SPEC_DIR / 'feasibility.json')
-        # Vertical strip-strip ownership seam: top-04 | top-05, x=2288, y=-200..-1.
+        crop_plan = load_json(SPEC_DIR / 'crop-plan.json')
+        crops = {c['id']: c for c in crop_plan['crops']}
+        top03 = crops['top-03']['keptRegionWorldPx']
+        top04 = crops['top-04']['keptRegionWorldPx']
+        right01 = crops['right-01']['keptRegionWorldPx']
+        # Vertical strip-strip ownership seam, derived from exclusive kept ownership.
         rows = {}
-        rows['top-04:top-05'] = boundary_metrics(rgb, alpha, boundary_world_x=2288, span={'y0': -200, 'y1': -1}, vertical=True)
-        # Horizontal corner ownership seam: top-05 over right-01, y=0, x=2752..3311.
-        rows['top-05/right-01:corner-ownership'] = boundary_metrics(rgb, alpha, boundary_world_y=0, span={'x0': 2752, 'x1': 3311}, vertical=False)
+        rows['top-03:top-04'] = boundary_metrics(
+            rgb, alpha, boundary_world_x=top04['x0'],
+            span={'y0': max(top03['y0'], top04['y0']), 'y1': min(top03['y1'], top04['y1'])}, vertical=True)
+        # Horizontal corner ownership seam: top-04 owns y<0, right-01 owns y>=0.
+        rows['top-04/right-01:corner-ownership'] = boundary_metrics(
+            rgb, alpha, boundary_world_y=right01['y0'],
+            span={'x0': max(top04['x0'], right01['x0']), 'x1': min(top04['x1'], right01['x1'])}, vertical=False)
         for name, row in rows.items():
             if row['missingPositions']:
                 errors.append(f'{name}: missing composite pixels at {len(row["missingPositions"])} lattice position(s)')

@@ -366,3 +366,23 @@ Questa sezione prevale su §8–§10 in caso di conflitto.
    Copertura incompleta oppure overlap di ownership = FAIL automatico di crop-plan/pilot prima della spesa
    ulteriore. Il montaggio T3 include una ownership/debug view dei corner così il Director può ispezionare
    la zona senza inferenze.
+
+## 12. Emendamento output nativo Gemini — 1376×768 (decisione Director 2026-11-26)
+
+Questa sezione prevale su D2/T2 e su ogni frase precedente in conflitto.
+
+1. **Assunzione 1024×572 falsificata.** La prima probe pilot ha prodotto un download originale “massima risoluzione” di `1376×768` anche con input/prompt `1024×572`. Quell'immagine è automaticamente invalida per dimensioni/scale-lock e resta solo evidenza della probe, non una striscia produzione.
+2. **Nuovo formato frozen.** Il crop-plan deterministico usa output/input nativi `1376×768`, quindi `world_to_crop_scale_x = world_to_crop_scale_y = 1.0` resta invariante. Output size diversa, rescaling o crop implicito restano FAIL automatici; è ancora vietato “adattare” una striscia scalandola.
+3. **Geometria emendata.** Il piano ricalcolato copre l'apron con 4 crop top e 3 crop per lato (10 totali), con overlap maggiori di 256 px e ownership mutuamente esclusiva invariata. La pilot diventa `top-04` (corner top-right difficile), `top-03` e `right-01`.
+4. **Formato file.** Il download Gemini può essere JPEG anche quando il runner usa un prefisso `.png`; la validazione avviene sui pixel decodificati. Artefatti di compressione sono valutati dalle metriche congelate e dal gate human-eye, non ignorati.
+5. **Budget.** Il retry budget pre-registrato si applica ai crop della geometria emendata. La probe 1024×572 è registrata come costo/evidenza che ha falsificato l'assunzione, non come rigenerazione qualità di un crop ancora esistente.
+
+
+## 13. Esito pilot `top-04` — hard stop qualità (2026-11-26)
+
+Questa sezione registra l'esito vincolante della prima pilot della geometria emendata 1376×768.
+
+1. **Retry budget esaurito.** `top-04` attempt1 e attempt2 sono falliti sul gate frozen della painted reference. L'attempt3 non ha prodotto output/chat ed è stato classificato dal Director come harness failure; la singola recovery autorizzata ha prodotto attempt4. Nessun'altra rigenerazione è consentita senza una nuova decisione esplicita del Director.
+2. **Esito attempt4.** Output nativo JPEG 1376×768, scale lock 1:1, chat `https://gemini.google.com/app/7bfd7fef22cea5fe`. La validazione ha un solo hard error: `painted reference p95DeltaE 22.5323 > 18`. Canvas seam, strict outer-water e independent-land passano; non ci sono review flags.
+3. **Stop operativo.** La striscia non è ingested, il composite non viene costruito e `top-03`/`right-01` non vengono generate. È vietato continuare con patching infinito, nuovi retry impliciti o rilassamento retroattivo delle soglie.
+4. **Decisione richiesta.** Il prossimo passo è una scelta Director: fallback esplicito allo strumento full-res (D2) oppure nuovo emendamento della strategia/gate, motivato e registrato prima di qualunque ulteriore spesa.
