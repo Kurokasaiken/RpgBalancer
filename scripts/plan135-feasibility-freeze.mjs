@@ -145,10 +145,41 @@ function installApronCameraHarness(page) {
   };
 }
 
+async function waitForRuntimeReady(page, { requireEvents = false, timeoutMs = 60000 } = {}) {
+  await page.waitForFunction((needEvents) => {
+    const bootGone = document.querySelector('[data-testid="game-boot-screen"]') == null;
+    const eventsReady = !needEvents || document.querySelector('[data-hudslot="events"]') != null;
+    return window.__worldCam != null && window.__worldCamCtl != null && bootGone && eventsReady;
+  }, { timeout: timeoutMs }, requireEvents);
+}
+
+async function reloadAndWaitForRuntime(page, options) {
+  await page.reload({ waitUntil: 'domcontentloaded', timeout: 30000 });
+  await waitForRuntimeReady(page, options);
+}
+
 async function waitTwoAnimationFrames(page) {
   await page.evaluate(() => new Promise((resolve) => {
     requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
   }));
+}
+
+async function setCameraChecked(page, cameraFit, label, tod) {
+  let lastError;
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      await waitForRuntimeReady(page, { timeoutMs: 20000 });
+      await page.evaluate((camera) => window.__worldCamCtl.set(camera), { panX: cameraFit.panX, panY: cameraFit.panY, zoom: cameraFit.zoom });
+      await waitTwoAnimationFrames(page);
+      const camCheck = await page.evaluate(() => window.__worldCam ? { panX: window.__worldCam.panX, panY: window.__worldCam.panY, zoom: window.__worldCam.zoom } : null);
+      if (camCheck && Math.abs(camCheck.panX - cameraFit.panX) <= 1e-5 && Math.abs(camCheck.panY - cameraFit.panY) <= 1e-5 && Math.abs(camCheck.zoom - cameraFit.zoom) <= 1e-5) return camCheck;
+      throw new Error(`camera mismatch for baseline capture ${label}/${tod}: ${JSON.stringify({ wanted: cameraFit, actual: camCheck })}`);
+    } catch (err) {
+      lastError = err;
+      if (attempt < 2) await reloadAndWaitForRuntime(page, { timeoutMs: 60000 }).catch(() => {});
+    }
+  }
+  throw lastError;
 }
 
 async function freeze() {
@@ -184,8 +215,7 @@ async function freeze() {
       let booted = false;
       for (let attempt = 0; attempt < 3 && !booted; attempt += 1) {
         try {
-          await page.waitForFunction(() => window.__worldCam != null && window.__worldCamCtl != null && document.querySelector('[data-hudslot="events"]') != null, { timeout: 90000 });
-          await page.waitForFunction(() => document.querySelector('[data-testid="game-boot-screen"]') == null, { timeout: 90000 });
+          await waitForRuntimeReady(page, { requireEvents: true, timeoutMs: 90000 });
           booted = true;
         } catch (err) {
           if (attempt === 2) throw err;
@@ -199,8 +229,7 @@ async function freeze() {
         try {
           measured = await measureStableRects(page, vp.width, vp.height);
         } catch (err) {
-          await page.reload({ waitUntil: 'domcontentloaded', timeout: 30000 }).catch(() => {});
-          await page.waitForFunction(() => window.__worldCam != null && window.__worldCamCtl != null, { timeout: 60000 }).catch(() => {});
+          await reloadAndWaitForRuntime(page, { timeoutMs: 60000 }).catch(() => {});
           measured = await measureStableRects(page, vp.width, vp.height);
         }
         if (tod === 'day') {
@@ -219,12 +248,7 @@ async function freeze() {
         const cameraFit = fitByViewport.get(vp.label);
         if (!cameraFit) throw new Error(`missing resting fit for baseline capture ${vp.label}`);
         console.error(`capture ${tod}/${vp.label}: setting camera`);
-        await page.evaluate((camera) => window.__worldCamCtl.set(camera), { panX: cameraFit.panX, panY: cameraFit.panY, zoom: cameraFit.zoom });
-        await waitTwoAnimationFrames(page);
-        const camCheck = await page.evaluate(() => window.__worldCam ? { panX: window.__worldCam.panX, panY: window.__worldCam.panY, zoom: window.__worldCam.zoom } : null);
-        if (!camCheck || Math.abs(camCheck.panX - cameraFit.panX) > 1e-5 || Math.abs(camCheck.panY - cameraFit.panY) > 1e-5 || Math.abs(camCheck.zoom - cameraFit.zoom) > 1e-5) {
-          throw new Error(`camera mismatch for baseline capture ${vp.label}/${tod}: ${JSON.stringify({ wanted: cameraFit, actual: camCheck })}`);
-        }
+        await setCameraChecked(page, cameraFit, vp.label, tod);
         const canvasScreen = {
           x0: (0 - cameraFit.panX) * cameraFit.zoom,
           y0: (0 - cameraFit.panY) * cameraFit.zoom,
