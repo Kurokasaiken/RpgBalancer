@@ -148,6 +148,14 @@ export const cassettoLayoutSchema = z
       /** Below this fit scale the Chronicle reserve yields to the screen edge —
        *  the cluster may shrink past the reserve but never leaves the window. */
       minFitScale: z.number().positive().max(1),
+      /** Director 2026-11-26: «nn ha la stessa distanza dal bordo destro, deve
+       *  essere la stessa che tempo ha dal bordo sinistro» — measured how far
+       *  the sun medallion's visual mass sticks out left of the day banner's
+       *  box (~10 design px at fit 1; the wispy alpha rays reach further but
+       *  carry no visual weight). The Events bar's right edge docks at
+       *  bannerMarginPx − sunTipOverhangPx × fit so both components read at
+       *  the same distance from their window edge. */
+      sunTipOverhangPx: z.number().nonnegative(),
       /** R-352: capsule heights measured on the signed slim art (design px —
        *  the plain parallel band only, medallions/filigree/pendant ignored).
        *  The resource bar renders scaled by `capsulePx.time /
@@ -194,7 +202,12 @@ const RAW_CASSETTO_LAYOUT_CONFIG: CassettoLayoutConfig = {
     /* Director 2026-11-24: medaglione a sbalzo −46px dalla barra →
      * dock 58 lascia ~12px di respiro tra pinna ore 9 e bordo viewport. */
     bannerMarginPx: 58,
-    chronicleReservePx: 360,
+    /* Director 2026-11-26: 360 capped the Events bar at 348 real px —
+     *  visibly smaller than Time/Resources (419-420). Sized so the heightRatio
+     *  cap binds: bar width 419.6 + the symmetric right margin (bannerMarginPx
+     *  − sunTipOverhang ≈ 48) → 468. */
+    chronicleReservePx: 468,
+    sunTipOverhangPx: 10,
     minFitScale: 0.55,
     /* Measured on the signed `bar-slim.webp` art (opaque band height at
      *  interior columns): time 105/2 = 52.5, resources 114/2 = 57.0 (R-376

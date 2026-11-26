@@ -35,6 +35,16 @@ describe('hud LEGO inventory audit (PLAN-134 T-001)', () => {
     expect(buildInventoryAudit(snapshot).orphanMappings).toEqual([]);
   });
 
+  it('canonizes time-disc-v1 as a valid multi-asset piece, not an inventory defect', () => {
+    const snapshot = createInventorySnapshot();
+    const piece = snapshot.pieces.find((entry) => entry.id === 'time-disc-v1');
+    expect(piece).toBeTruthy();
+    expect(piece?.role).toBe('phaseDisc');
+    const assets = piece && 'assets' in piece ? piece.assets : undefined;
+    expect(Object.keys(assets ?? {}).sort()).toEqual(['moon', 'sun']);
+    expect(snapshot.invalidRegistryEntries.map((entry) => entry.id)).not.toContain('time-disc-v1');
+  });
+
   it('marks unresolved entries as non-rulingable and keeps token/control entries outside piece ruling', () => {
     const snapshot = createInventorySnapshot();
     expect(snapshot.labReconciliation.piastrina.classification).toBe('unresolved');

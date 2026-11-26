@@ -1,10 +1,10 @@
-import React, { useMemo, useState, type CSSProperties } from 'react';
+import React, { useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { SkinScope } from '@/ui/idleVillage/skins/primitives/SkinScope';
 import { useHudPanelDrag } from './useHudPanelDrag';
 import { villageStashViewModel, type VillageStashRowView } from './villageStashViewModel';
-import { stashItemBonus, stashItemCovers, StashQtyBadge, StashItemTooltipBody, STASH_TOOLTIP_STYLE } from './stashItemFace';
+import { stashItemCovers, StashQtyBadge, StashItemTooltipBody, STASH_TOOLTIP_STYLE } from './stashItemFace';
 import { VillageStashItemIcon } from './villageStashItemIcons';
 import { EngravedIcon, type EngravedIconId } from './engravedIcons';
 import {
@@ -59,10 +59,10 @@ const titleId = 'village-stash-panel-title';
  *  MOCKUP-TO-ASSET-GATE 3 («se l'inpaint lascia giunte/ghost, rigenerare il
  *  frame vuoto invece di accumulare toppe»). Zone geometry measured on the
  *  asset with grid overlay (scripts/hud-real/build-stash-frame-clean.py). */
-const STASH_BACKDROP_SRC = '/assets/ui/hud-real/stash-frame-clean.webp';
+const STASH_BACKDROP_SRC = '/assets/ui/hud-real/stash-frame-no-grid.webp';
 /* Backing-image pixel size; the panel keeps its aspect (1147/833 ≈ 1.377). */
-const STASH_BACKDROP_W: number = 1147.0;
-const STASH_BACKDROP_H: number = 833.0;
+const STASH_BACKDROP_W: number = 1146.0;
+const STASH_BACKDROP_H: number = 831.0;
 
 /* Painted wells (asset px, measured): interior centres x 144, 349, 550, 752,
  *  954 (pitch ≈ 202.5), rows y centres 280 & 428 (pitch 148); interior
@@ -70,20 +70,31 @@ const STASH_BACKDROP_H: number = 833.0;
  *  outer box so overlays ride the painted rims exactly; the wells are fully
  *  painted in the asset — no CSS rim, no enamel cover (Director 2026-11-25:
  *  «c'è qualcosa che copre i componenti» — the CSS rim WAS the cover). */
-const GRID_LEFT: number = 79.0 / STASH_BACKDROP_W;
-const GRID_TOP: number = 220.0 / STASH_BACKDROP_H;
-const GRID_WIDTH: number = 940.0 / STASH_BACKDROP_W;
-const GRID_HEIGHT: number = 268.0 / STASH_BACKDROP_H;
+const GRID_LEFT: number = 74.0 / STASH_BACKDROP_W;
+const GRID_TOP: number = 209.0 / STASH_BACKDROP_H;
+const GRID_WIDTH: number = 949.0 / STASH_BACKDROP_W;
+const GRID_HEIGHT: number = 427.0 / STASH_BACKDROP_H;
 /* cell 130px wide / pitch 202.5 → gap 72.5; rows: cell 120 / pitch 148 → 28.
  *  (container math: 5 cells of 130 + 4 gaps of 72.5 = 940; 2×120 + 28 = 268) */
-const GRID_COLGAP_CQW: number = (72.5 / STASH_BACKDROP_W) * 100;
-const GRID_ROWGAP_CQH: number = (28.0 / STASH_BACKDROP_H) * 100;
+const GRID_COLGAP_CQW: number = (63.5 / STASH_BACKDROP_W) * 100;
+const GRID_ROWGAP_CQH: number = (17.5 / STASH_BACKDROP_H) * 100;
+/* Row height is explicit (asset px 122 of 831), not 1fr: the wells are CSS now, so the alcove can sit
+ *  lower in the frame, clear of the filters (Director 2026-11-26). */
+const SQUARE_SOCKET_SRC = '/assets/ui/hud-real/controls/square-socket-normal.webp';
+
+/* Three rows of five, as the frame shows at rest. */
+const ALCOVE_MIN_SLOTS = 15;
+/* Scrollbar track in the right gutter (asset px). Drawn in the DOM, not in the backing. */
+const SCROLL_TRACK_X: number = 1018.0;
+const SCROLL_TRACK_Y: number = 225.0;
+const SCROLL_TRACK_W: number = 22.0;
+const SCROLL_TRACK_H: number = 445.0;
+const GRID_ROW_CQH: number = (130.5 / STASH_BACKDROP_H) * 100;
 
 /* Kind filter rings (Director 2026-11-25): round socket buttons in the
  *  time-control/roster ring family seated on the plain recessed enamel
  *  strip (asset rows 125–205, centre 165). Ring Ø keeps the protruding
  *  socket proportion of the time controls. */
-const RING_SRC = '/assets/ui/hud-real/C1/ring.webp';
 /* Filter-ring glyphs — visual vocabulary of the kind filter, not gameplay
  *  data: `all` wears the stash pouch, each kind its engraved family glyph. */
 const STASH_FILTER_RING_ICON: Record<string, EngravedIconId> = {
@@ -91,55 +102,8 @@ const STASH_FILTER_RING_ICON: Record<string, EngravedIconId> = {
   equipment: 'ico-swords',
   consumable: 'ico-vial',
 };
-const RING_STRIP_CX: number = 516.0 / STASH_BACKDROP_W;
-const RING_PITCH: number = 0.1256;
-const RING_CY_H: number = (165.0 / STASH_BACKDROP_H) * 100;
-const RING_W: number = (99.0 / STASH_BACKDROP_W) * 100;
-const RING_H: number = RING_W * (STASH_BACKDROP_W / STASH_BACKDROP_H);
 
-/* Inspector card (asset px, measured): laurel medallion emerald seat centre
- *  (196, 642), interior r ≈ 95; detail text column right of x 400; Use/Pack
- *  lacquer button brass border x 832–1075, y 702–782. No painted chip pill
- *  in the clean frame — the chip renders as engraved caps on the enamel. */
-const MEDAL_CX: number = 196.0 / STASH_BACKDROP_W;
-const MEDAL_CY: number = 642.0 / STASH_BACKDROP_H;
-const DETAIL_TEXT_LEFT: number = 400.0 / STASH_BACKDROP_W;
-const CHIP_LEFT: number = 400.0 / STASH_BACKDROP_W;
-const CHIP_TOP: number = 713.0 / STASH_BACKDROP_H;
-const CHIP_W: number = 340.0 / STASH_BACKDROP_W;
-const CHIP_H: number = 38.0 / STASH_BACKDROP_H;
-const QTY_LEFT: number = 400.0 / STASH_BACKDROP_W;
-const QTY_TOP: number = 752.0 / STASH_BACKDROP_H;
-const USE_LEFT: number = 832.0 / STASH_BACKDROP_W;
-const USE_TOP: number = 702.0 / STASH_BACKDROP_H;
-const USE_W: number = 243.0 / STASH_BACKDROP_W;
-const USE_H: number = 80.0 / STASH_BACKDROP_H;
 
-/* D-6/R-367 piastrina (Director 2026-11-20): the ornate brass cornice is the
- *  cell's HOVER/SELECTED treatment — it rides ON the well as an overlay, the
- *  painted icon + ×N badge stay live DOM above it. At rest the shelf keeps
- *  its plain wells; the cornice marks the cell whose item the card previews
- *  (sticky preview = the mockup's selected cell). */
-const PIASTRINA_CORNICE_SRC = '/assets/ui/hud-real/piastrina/cornice-hover-a.webp';
-const PiastrinaCornice: React.FC<{ visible: boolean }> = ({ visible }) => (
-  <img
-    src={PIASTRINA_CORNICE_SRC}
-    alt=""
-    aria-hidden
-    data-piastrina-cornice=""
-    draggable={false}
-    style={{
-      position: 'absolute',
-      inset: -3,
-      width: 'calc(100% + 6px)',
-      height: 'calc(100% + 6px)',
-      objectFit: 'fill',
-      opacity: visible ? 1 : 0,
-      transition: 'opacity 140ms ease-out',
-      pointerEvents: 'none',
-    }}
-  />
-);
 
 /** Visually-hidden text kept inside every shelf cell so the grid carries the
  *  same name/description vocabulary the list rows did (screen readers and the
@@ -231,6 +195,7 @@ const useStashPack = () => {
  * assign eligibility BEFORE the click — `data-assign-state` mirrors the
  * ledger's own reject reasons (`eligible` | `packed` | `bagFull`). */
 const faceChrome = (interactive: boolean, assignState?: BagAssignEligibility): CSSProperties => ({
+  ...alcoveSocketStyle,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -244,7 +209,6 @@ const faceChrome = (interactive: boolean, assignState?: BagAssignEligibility): C
     ? {
         padding: 0,
         border: 0,
-        background: 'none',
         color: 'inherit',
         cursor: 'pointer',
         ...(assignState === 'eligible'
@@ -262,24 +226,21 @@ const faceChrome = (interactive: boolean, assignState?: BagAssignEligibility): C
 const InteractiveStashCell: React.FC<{
   row: VillageStashRowView;
   assignState: BagAssignEligibility;
-  onPreview: (itemId: string) => void;
   iconPx: number;
-  highlighted: boolean;
-}> = ({ row, assignState, onPreview, iconPx, highlighted }) => {
+}> = ({ row, assignState, iconPx }) => {
   const { t } = useTranslation('idleVillage');
   const pack = useStashPack();
   return (
     <div role="listitem" style={{ position: 'relative', width: '100%', height: '100%' }}>
-      <PiastrinaCornice visible={highlighted} />
       <StashRowTooltip row={row}>
         <button
           type="button"
           data-testid={`stash-item-${row.itemId}`}
           data-assign-state={assignState}
+          data-alcove="square"
+          className="stash-alcove-face"
           aria-label={t('gameFrame.stash.addToBag', { item: t(row.nameKey) })}
           onClick={() => pack(row.itemId)}
-          onMouseEnter={() => onPreview(row.itemId)}
-          onFocus={() => onPreview(row.itemId)}
           style={faceChrome(true, assignState)}
         >
           <StashCellFace row={row} iconPx={iconPx} />
@@ -327,15 +288,22 @@ const P = (x: number, y: number, w: number, h: number): CSSProperties => ({
   height: `${h}%`,
 });
 
+const alcoveSocketStyle: CSSProperties = {
+  backgroundImage: `url(${SQUARE_SOCKET_SRC})`,
+  backgroundRepeat: 'no-repeat',
+  backgroundPosition: 'center',
+  backgroundSize: '100% 100%',
+};
+
 export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, left, top, widthPx, maxHeightPx, zIndex, onClose }) => {
   const { t } = useTranslation('idleVillage');
   const { panelStyle, handleProps } = useHudPanelDrag();
   const hydration = useVillageStashStore((s) => s.hydration);
   const bags = useVillageStashStore((s) => s.bags);
   const committed = useVillageStashStore((s) => s.committed);
+  const elsewhere = useVillageStashStore((s) => reservedElsewhereCount(s, s.activeStashOwner));
   const activeStashOwner = useVillageStashStore((s) => s.activeStashOwner);
   const lastEvent = useVillageStashStore((s) => s.lastEvent);
-  const elsewhere = useVillageStashStore((s) => reservedElsewhereCount(s, s.activeStashOwner));
 
   const reserved = useMemo(() => countReservations(bags, committed), [bags, committed]);
   const vm = useMemo(() => villageStashViewModel(config, reserved), [config, reserved]);
@@ -351,13 +319,25 @@ export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, le
     return [...seen];
   }, [config.items]);
   const [tab, setTab] = useState<string>('all');
-  const [detailItemId, setDetailItemId] = useState<string | null>(null);
+  /* Scroll thumb state: the shelf scrolls inside; the DOM bar shows only when the rows overflow. */
+  const [scrollTop, setScrollTop] = useState(0);
+  const [shelfEl, setShelfEl] = useState<HTMLDivElement | null>(null);
+  const [trackEl, setTrackEl] = useState<HTMLDivElement | null>(null);
+  const [scrollMetrics, setScrollMetrics] = useState({ scrollHeight: 0, clientHeight: 0 });
   const visibleRows = useMemo(
     () => (tab === 'all' ? vm.rows : vm.rows.filter((r) => defaultQuestItems[r.itemId]?.kind === tab)),
     [tab, vm.rows],
   );
-  const detailRow = visibleRows.find((r) => r.itemId === detailItemId) ?? visibleRows[0] ?? null;
-  const pack = useStashPack();
+  const visibleCapacity = ALCOVE_MIN_SLOTS;
+  const needsScroll = visibleRows.length > visibleCapacity;
+  useEffect(() => {
+    if (!shelfEl) return;
+    const measure = () => setScrollMetrics({ scrollHeight: shelfEl.scrollHeight, clientHeight: shelfEl.clientHeight });
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(shelfEl);
+    return () => observer.disconnect();
+  }, [shelfEl, visibleRows.length, tab]);
   const boundBag = activeStashOwner ? bags[activeStashOwner] : undefined;
   const assignStates = useMemo(() => {
     if (!interactive) return {};
@@ -366,7 +346,7 @@ export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, le
     for (const row of vm.rows) states[row.itemId] = bagAssignEligibility(boundBag, row.itemId, capacity);
     return states;
   }, [interactive, boundBag, vm.rows]);
-  const bagFullHint = interactive && Object.values(assignStates).some((s) => s === 'bagFull');
+  const bagFullHint = interactive && Object.values(assignStates).some((state) => state === 'bagFull');
   const announcement = lastEvent && lastEvent.poiId === undefined ? stashAnnouncement(t, lastEvent) : null;
 
   /* 1:1 geometry: the panel is the backing image itself — width sets the
@@ -382,6 +362,22 @@ export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, le
   /* Painted icons fill ≈ 80% of the 102px well interior (asset px) —
    *  in panel px that's ≈ 0.071·w. */
   const cellIconPx = Math.max(8, Math.round(w * 0.078));
+  const fillerCount = visibleRows.length === 0
+    ? visibleCapacity
+    : visibleRows.length < visibleCapacity
+      ? visibleCapacity - visibleRows.length
+      : (5 - (visibleRows.length % 5)) % 5;
+  const scrollOverflow = needsScroll && scrollMetrics.scrollHeight > scrollMetrics.clientHeight + 1;
+  const thumbHeightPct = scrollOverflow ? Math.max(18, Math.min(100, (scrollMetrics.clientHeight / scrollMetrics.scrollHeight) * 100)) : 100;
+  const scrollRange = Math.max(1, scrollMetrics.scrollHeight - scrollMetrics.clientHeight);
+  const thumbTopPct = scrollOverflow ? (scrollTop / scrollRange) * (100 - thumbHeightPct) : 0;
+  const scrollTrackTo = (clientY: number) => {
+    if (!shelfEl || !trackEl || !scrollOverflow) return;
+    const rect = trackEl.getBoundingClientRect();
+    const thumbPx = (thumbHeightPct / 100) * rect.height;
+    const ratio = (clientY - rect.top - thumbPx / 2) / Math.max(1, rect.height - thumbPx);
+    shelfEl.scrollTop = Math.max(0, Math.min(1, ratio)) * scrollRange;
+  };
 
   return (
     <div
@@ -401,8 +397,7 @@ export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, le
     >
       <SkinScope data-hud-controls="" style={{ position: 'relative', width: '100%', height: '100%' }}>
         <Tooltip.Provider delayDuration={120}>
-        <section
-          aria-labelledby={titleId}
+        <section data-hud-controls="" aria-labelledby={titleId}
           style={{ position: 'relative', width: '100%', height: '100%', containerType: 'size', overflow: 'hidden' }}
         >
           <img src={STASH_BACKDROP_SRC} alt="" aria-hidden draggable={false} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }} />
@@ -431,90 +426,67 @@ export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, le
               {t('gameFrame.stash.title')}
             </span>
           </div>
-          {/* «N / M» stock counter before the painted X */}
-          <span
-            data-testid="stash-capacity"
-            style={{
-              ...P(60.0, 3.6, 27.0, 10.5),
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'flex-end',
-              font: `italic 4.0cqw var(--skin-font-serif)`,
-              color: 'var(--skin-title-color)',
-              textShadow: '0 1px 2px rgba(0,0,0,0.8)',
-            }}
-          >
-            {t('gameFrame.stash.capacityShort', { count: vm.storedCount, max: vm.capacityMax })}
-          </span>
-          {/* Close: transparent hit-ring over the painted X button */}
+          {/* Close — the same round control as the kind filters (data-ctl=round), so the two read as one family. */}
           <button
             type="button"
+            data-ctl="round"
             data-panel-close=""
             aria-label={t('gameFrame.panels.close')}
             title={t('gameFrame.panels.close')}
             onClick={onClose}
-            style={{ ...P(89.4, 1.0, 7.8, 10.8), background: 'none', border: 0, borderRadius: '50%', cursor: 'pointer' }}
-          />
-
-          {/* Kind filter rings — round sockets in the time-component family
-           *  (Director 2026-11-25), centred as a group on the flattened strip.
-           *  Same contract as the pills: radiogroup of stash-tab-{kind}. */}
-          <span
-            role="radiogroup"
-            aria-label={t('gameFrame.stash.filterLabel')}
-            data-testid="stash-tabs"
+            style={{
+              position: 'absolute',
+              left: `calc(${(1054 / STASH_BACKDROP_W) * 100}% - 21px)`,
+              top: `calc(${(74 / STASH_BACKDROP_H) * 100}% - 21px)`,
+              ['--round-size' as string]: '42px',
+            }}
           >
-            {tabs.map((id, i) => {
+            <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" style={{ width: 24, height: 24 }}>
+              <path d="M5.5 5.5 L18.5 18.5 M18.5 5.5 L5.5 18.5" stroke="currentColor" strokeWidth="3.1" strokeLinecap="round" fill="none" />
+            </svg>
+          </button>
+
+          {/* Kind filters — same round socket family, seated in the title row
+           *  immediately left of the close control (R-391). */}
+          <div
+            role="group"
+            aria-label={t('gameFrame.stash.filterLabel')}
+            data-testid="stash-filters"
+            style={{
+              position: 'absolute',
+              right: `calc(${100 - (1054 / STASH_BACKDROP_W) * 100}% + 32px)`,
+              top: `calc(${(74 / STASH_BACKDROP_H) * 100}% - 15px)`,
+              display: 'flex',
+              justifyContent: 'flex-end',
+              gap: 8,
+            }}
+          >
+            {tabs.map((id) => {
               const active = tab === id;
-              const cxFrac = (RING_STRIP_CX + (i - (tabs.length - 1) / 2) * RING_PITCH) * 100;
               const label = id === 'all' ? t('gameFrame.stash.tabs.all') : t(`gameFrame.stash.tabs.${id}`);
               return (
                 <button
                   key={id}
                   type="button"
-                  role="radio"
-                  aria-checked={active}
+                  data-ctl="round"
+                  data-testid={`stash-filter-${id}`}
+                  aria-pressed={active}
+                  data-state={active ? 'selected' : undefined}
                   aria-label={label}
                   title={label}
-                  data-testid={`stash-tab-${id}`}
                   onClick={() => setTab(id)}
-                  style={{
-                    ...P(cxFrac - RING_W / 2, RING_CY_H - RING_H / 2, RING_W, RING_H),
-                    border: 0,
-                    borderRadius: '50%',
-                    background: 'radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--skin-hud-enamel-base) 88%, black) 0%, color-mix(in srgb, var(--skin-hud-lacquer-deep) 92%, black) 68%, black 100%)',
-                    boxShadow: active
-                      ? '0 0 0 2px var(--skin-title-color), 0 0 10px 2px color-mix(in srgb, var(--skin-hud-brass-hi) 55%, transparent), inset 0 2px 5px rgba(0,0,0,0.65)'
-                      : 'inset 0 2px 5px rgba(0,0,0,0.65)',
-                    color: active ? 'var(--skin-title-color)' : 'color-mix(in srgb, var(--skin-hud-brass-hi) 70%, var(--skin-text-secondary))',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: 0,
-                  }}
                 >
-                  {/* glyph seated inside the ring hole — the hole is ≈ 60% of
-                   *  the ring art, the glyph ≈ 2/3 of that */}
-                  <span style={{ display: 'inline-flex', width: '40%', height: '40%' }}>
-                    <EngravedIcon id={STASH_FILTER_RING_ICON[id] ?? 'ico-dot'} size="100%" />
-                  </span>
-                  <img
-                    src={RING_SRC}
-                    alt=""
-                    aria-hidden
-                    draggable={false}
-                    style={{ position: 'absolute', inset: '-7%', width: '114%', height: '114%', objectFit: 'fill', pointerEvents: 'none' }}
-                  />
-                  <span style={srOnlyText}>{label}</span>
+                  <EngravedIcon id={STASH_FILTER_RING_ICON[id] ?? 'ico-dot'} className="h-3 w-3 shrink-0" />
                 </button>
               );
             })}
-          </span>
+          </div>
 
           {/* Shelf — the painted 5×2 cell block; cells scroll when more than
            *  ten wells of stock exist (painted scrollbar is decorative). */}
           <div
+            ref={setShelfEl}
+            onScroll={(e) => setScrollTop(e.currentTarget.scrollTop)}
             role="list"
             data-testid="stash-shelf"
             data-stash-mode={interactive ? 'interactive' : 'readonly'}
@@ -523,7 +495,7 @@ export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, le
               ...P(GRID_LEFT * 100, GRID_TOP * 100, GRID_WIDTH * 100, GRID_HEIGHT * 100),
               display: 'grid',
               gridTemplateColumns: 'repeat(5, 1fr)',
-              gridAutoRows: '1fr',
+              gridAutoRows: `${GRID_ROW_CQH}cqh`,
               columnGap: `${GRID_COLGAP_CQW}cqw`,
               rowGap: `${GRID_ROWGAP_CQH}cqh`,
               overflowY: 'auto',
@@ -547,129 +519,80 @@ export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, le
                   key={row.itemId}
                   row={row}
                   assignState={assignStates[row.itemId] ?? 'eligible'}
-                  onPreview={setDetailItemId}
                   iconPx={cellIconPx}
-                  highlighted={detailRow?.itemId === row.itemId}
                 />
               ) : (
                 <StashRowTooltip key={row.itemId} row={row}>
-                  <div role="listitem" style={{ position: 'relative', width: '100%', height: '100%' }} onMouseEnter={() => setDetailItemId(row.itemId)}>
-                    <PiastrinaCornice visible={detailRow?.itemId === row.itemId} />
-                    <div style={faceChrome(false)}>
+                  <div role="listitem" style={{ position: 'relative', width: '100%', height: '100%' }}>
+                    <div data-alcove="square" className="stash-alcove-face" style={faceChrome(false)}>
                       <StashCellFace row={row} iconPx={cellIconPx} />
                     </div>
                   </div>
                 </StashRowTooltip>
               ),
             )}
+            {Array.from({ length: fillerCount }, (_, i) => (
+              <div
+                key={`empty-alcove-${i}`}
+                aria-hidden="true"
+                data-testid="stash-empty-alcove"
+                data-alcove="square"
+                className="stash-alcove-face"
+                style={{ ...alcoveSocketStyle, width: '100%', height: '100%' }}
+              />
+            ))}
           </div>
 
-          {/* Inspector card — texts at the painted card's positions; the
-           *  laurel medallion and card fillet are in the backdrop. */}
-          {detailRow && (() => {
-            const bonus = stashItemBonus(detailRow.itemId);
-            const covers = stashItemCovers(detailRow.itemId);
-            return (
-            <div data-testid="stash-detail" aria-label={t('gameFrame.stash.detailLabel')}>
-              {/* Item icon inside the painted laurel medallion — the plain
-               *  painted cut-out fills the ring like the mockup (Director
-               *  2026-11-25: no baked disc behind it, just the normal icon
-               *  on the medallion's dark enamel seat). Interior r ≈ 95
-               *  backing px → seat Ø ≈ 25% of panel width, icon ≈ 70%. */}
-              <span
+          {scrollOverflow && (
+            <div
+              ref={setTrackEl}
+              data-testid="stash-scroll-track"
+              aria-hidden="true"
+              onPointerDown={(e) => {
+                e.currentTarget.setPointerCapture(e.pointerId);
+                scrollTrackTo(e.clientY);
+              }}
+              onPointerMove={(e) => {
+                if (e.buttons === 1) scrollTrackTo(e.clientY);
+              }}
+              style={{
+                ...P((SCROLL_TRACK_X / STASH_BACKDROP_W) * 100, (SCROLL_TRACK_Y / STASH_BACKDROP_H) * 100, (SCROLL_TRACK_W / STASH_BACKDROP_W) * 100, (SCROLL_TRACK_H / STASH_BACKDROP_H) * 100),
+                borderRadius: 999,
+                border: '1px solid rgba(184, 147, 63, 0.72)',
+                background: 'linear-gradient(180deg, rgba(5, 24, 20, 0.92), rgba(9, 44, 33, 0.9))',
+                boxShadow: 'inset 0 1px 5px rgba(0,0,0,0.75)',
+                cursor: 'pointer',
+              }}
+            >
+              <div
+                data-testid="stash-scroll-thumb"
                 style={{
-                  ...P(MEDAL_CX * 100 - 8.3, MEDAL_CY * 100 - 11.45, 16.6, 22.9),
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'var(--skin-title-color)',
+                  position: 'absolute',
+                  left: '18%',
+                  width: '64%',
+                  top: `${thumbTopPct}%`,
+                  height: `${thumbHeightPct}%`,
+                  borderRadius: 999,
+                  background: 'linear-gradient(180deg, #9ed7af, #2f7754 45%, #173f30)',
+                  boxShadow: '0 0 5px rgba(98, 210, 151, 0.55), inset 0 1px 2px rgba(255,255,255,0.28)',
                 }}
-              >
-                <VillageStashItemIcon icon={detailRow.icon} size={Math.round(w * 0.14)} />
-              </span>
-              <div style={{ ...P(DETAIL_TEXT_LEFT * 100, 62.3, 38.0, 8.0), font: `600 3.9cqw var(--skin-font-display)`, letterSpacing: '0.03em', color: 'var(--skin-title-color)', textShadow: '0 1px 2px rgba(0,0,0,0.8)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {t(detailRow.nameKey)}
-              </div>
-              {bonus ? (
-                <div style={{ ...P(DETAIL_TEXT_LEFT * 100, 68.6, 38.0, 5.5), font: `italic 3.0cqw var(--skin-font-serif)`, color: 'color-mix(in srgb, var(--skin-icon-accent) 85%, var(--skin-title-color))', textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}>
-                  +{bonus.bonus} {bonus.stats.map((s) => t(`questExpedition.statName.${s}`)).join(' · ')}
-                </div>
-              ) : covers.length > 0 ? (
-                <div style={{ ...P(DETAIL_TEXT_LEFT * 100, 68.6, 38.0, 5.5), font: `italic 3.0cqw var(--skin-font-serif)`, color: 'var(--skin-icon-accent)' }}>
-                  {t('questExpedition.bag.covers')} {covers.join(' · ')}
-                </div>
-              ) : null}
-              <div style={{ ...P(DETAIL_TEXT_LEFT * 100, 74.0, 38.0, 10.0), font: `italic 2.4cqw var(--skin-font-serif)`, lineHeight: 1.25, color: 'color-mix(in srgb, var(--skin-text-primary) 90%, white)', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                {t(detailRow.descKey)}
-              </div>
-              {/* painted «Usable in Expeditions» chip label */}
-              <span
-                style={{
-                  ...P(CHIP_LEFT * 100, CHIP_TOP * 100, CHIP_W * 100, CHIP_H * 100),
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  font: `600 1.75cqw var(--skin-font-display)`,
-                  letterSpacing: '0.06em',
-                  textTransform: 'uppercase',
-                  color: 'color-mix(in srgb, var(--skin-icon-accent) 80%, white)',
-                  textShadow: '0 1px 1px rgba(0,0,0,0.9)',
-                }}
-              >
-                {t('gameFrame.stash.usableInExpeditions')}
-              </span>
-              {/* painted «Quantity: N» line */}
-              <span style={{ ...P(QTY_LEFT * 100, QTY_TOP * 100, 22.0, 7.0), display: 'flex', alignItems: 'center', font: `italic 3.0cqw var(--skin-font-serif)`, color: 'var(--skin-title-color)', textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}>
-                {t('gameFrame.stash.qty', { qty: detailRow.qty })}
-              </span>
-              {/* Use button — painted green button in the backdrop; the hit
-               *  area mounts only when a bag is actually bound (Pack). */}
-              {interactive && (
-                <button
-                  type="button"
-                  data-testid="stash-pack-detail"
-                  data-assign-state={assignStates[detailRow.itemId] ?? 'eligible'}
-                  aria-label={t('gameFrame.stash.addToBag', { item: t(detailRow.nameKey) })}
-                  onClick={() => pack(detailRow.itemId)}
-                  style={{
-                    ...P(USE_LEFT * 100, USE_TOP * 100, USE_W * 100, USE_H * 100),
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    background: 'none',
-                    border: 0,
-                    font: `600 3.6cqw var(--skin-font-display)`,
-                    letterSpacing: '0.03em',
-                    color: 'color-mix(in srgb, var(--skin-title-color) 92%, white)',
-                    textShadow: '0 1px 2px rgba(0,0,0,0.9), 0 0 6px color-mix(in srgb, var(--skin-icon-accent) 50%, transparent)',
-                    cursor: 'pointer',
-                  }}
-                >
-                  {t('gameFrame.stash.pack')}
-                </button>
-              )}
+              />
             </div>
-            );
-          })()}
-
-          {/* Mode hints land in the card's text zone (painted zone, DOM text) */}
-          {!interactive && (
-            <span data-testid="stash-mode-hint" style={{ ...P(69.0, 62.5, 26.0, 18.0), display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', font: `italic 1.8cqw var(--skin-font-serif)`, color: 'var(--skin-text-secondary)', overflow: 'hidden' }}>
-              {hydration !== 'ready' ? t('gameFrame.stash.notReady') : t('gameFrame.stash.openHint')}
-            </span>
           )}
-          {interactive && bagFullHint && (
-            <span data-testid="stash-bag-full-hint" style={{ ...P(69.0, 62.5, 26.0, 10.0), display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', font: `italic 1.8cqw var(--skin-font-serif)`, color: 'var(--skin-text-secondary)' }}>
+
+
+
+          {bagFullHint && (
+            <span data-testid="stash-bag-full-hint" style={srOnlyText}>
               {t('gameFrame.stash.bagFullHint')}
             </span>
           )}
           {elsewhere > 0 && (
-            <span data-testid="stash-elsewhere" style={{ ...P(69.0, 72.5, 26.0, 6.0), display: 'flex', alignItems: 'center', justifyContent: 'center', font: `1.6cqw var(--skin-font-display)`, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--skin-text-secondary)' }}>
+            <span data-testid="stash-elsewhere" style={srOnlyText}>
               {t('gameFrame.stash.elsewhere', { count: elsewhere })}
             </span>
           )}
-
-          <span aria-live="polite" style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)', whiteSpace: 'nowrap' }}>
+          <span aria-live="polite" style={srOnlyText}>
             {announcement}
           </span>
         </section>

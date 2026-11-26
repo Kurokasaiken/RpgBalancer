@@ -80,17 +80,36 @@ export const PiecePreview: React.FC<{ piece: Piece }> = ({ piece }) => {
       </div>
     );
   }
-  const master = 'assets' in piece ? piece.assets?.master : undefined;
-  if (master) {
+  const assetEntries = 'assets' in piece && piece.assets
+    ? Object.entries(piece.assets).sort(([a], [b]) => (a === 'master' ? -1 : b === 'master' ? 1 : a.localeCompare(b)))
+    : [];
+  if (assetEntries.length > 0) {
     const isGround = piece.kind === 'ground';
     return (
-      <div data-piece-preview={piece.id} style={{ height: 126, margin: 10, overflow: 'hidden', borderRadius: 6, background: '#071410', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <img
-          src={publicAssetUrl(master)}
-          alt=""
-          draggable={false}
-          style={{ width: '100%', height: '100%', objectFit: isGround ? 'cover' : 'contain', display: 'block' }}
-        />
+      <div
+        data-piece-preview={piece.id}
+        style={{
+          height: 126,
+          margin: 10,
+          overflow: 'hidden',
+          borderRadius: 6,
+          background: '#071410',
+          display: 'grid',
+          gridTemplateColumns: assetEntries.length > 1 ? `repeat(${assetEntries.length}, minmax(0, 1fr))` : 'minmax(0, 1fr)',
+          alignItems: 'center',
+          justifyItems: 'center',
+        }}
+      >
+        {assetEntries.map(([assetKey, assetPath]) => (
+          <img
+            key={assetKey}
+            data-piece-asset={assetKey}
+            src={publicAssetUrl(assetPath)}
+            alt=""
+            draggable={false}
+            style={{ width: '100%', height: '100%', objectFit: isGround ? 'cover' : 'contain', display: 'block', minWidth: 0 }}
+          />
+        ))}
       </div>
     );
   }

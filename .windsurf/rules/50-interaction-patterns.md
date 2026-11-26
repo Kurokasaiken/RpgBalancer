@@ -44,3 +44,30 @@ deve produrre. I componenti sono mattoni; i pattern definiscono lo stile del gio
    mai matrici allowedWith.
 4. Due pattern con la stessa struttura ma `referenceIntent` diverso sono pattern
    DIVERSI: non unificarli.
+
+## Grammatica dei gesti (globale)
+
+Regola trasversale: ogni superficie che mostra oggetti o residenti assegnabili (Roster,
+Stash, slot delle spedizioni, bag del planner, e future) usa gli stessi gesti con lo stesso
+significato. Nessuna superficie introduce un gesto proprio per la stessa azione.
+
+| Gesto | Significato | Note |
+|---|---|---|
+| Hover / focus | Tooltip ancorato all'elemento col dettaglio | Stesso componente ovunque; niente pannelli di dettaglio fissi che cambiano sotto il cursore |
+| Click | Assegna al primo slot libero del contenitore aperto | Se nessun contenitore è aperto: nessuna azione, il dettaglio resta il tooltip |
+| Drag | Assegna a uno slot preciso | Alternativa a puntatore singolo al drag richiesta da WCAG 2.5.7: il click assegna già |
+| Pressione lunga (touch) | Mostra il tooltip | Tap = click |
+| Tastiera | Focus mostra il tooltip; Invio assegna | Requisito WCAG 2.1.1 |
+| Doppio click | Non usato | Non introdurlo come schema |
+
+**Why:** il Director vuole che gesti simili si comportino allo stesso modo in tutto il gioco;
+lo Stash aveva il dettaglio fisso e il Roster il tooltip, cioè due modi per la stessa cosa.
+**How to apply:** prima di aggiungere un gesto a una superficie, verificare la tabella; se
+una superficie deve deviare, chiedere al Director e registrare la deroga qui.
+
+Stato: approvata dal Director. Decisione 2026-11-26: click senza contenitore aperto = nessuna
+azione, solo tooltip (nessuna selezione persistente). Storico: R-246 (2026-10-21, click-only,
+drag rimosso) è superato da questa regola per lo Stash.
+Conseguenza da implementare: il Roster oggi usa il click per `onSelect`; va allineato a questa
+regola (click assegna se un contenitore è aperto, altrimenti niente), con il tooltip al posto
+del dettaglio fisso. Da fare in una slice separata, con test.

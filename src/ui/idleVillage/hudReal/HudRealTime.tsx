@@ -11,8 +11,10 @@ import { EngravedIcon } from '@/ui/idleVillage/components/gameFrame/engravedIcon
 import { HUD_TYPE, hudPx } from './hudType';
 import { TIME_BAR as BAR } from './timeGeometry';
 import { DEFAULT_GAME_FRAME_CONFIG, type GameFrameConfig } from '@/balancing/config/idleVillage/gameFrameConfig';
+import { HudRealTimeShellLayers } from './HudRealTimeShell';
 
-const ASSET = '/assets/ui/hud-real/time/bar.webp';
+const ASSET = '/assets/ui/hud-real/time/bar-controlless.webp';
+const ROUND_SOCKET = '/assets/ui/hud-real/controls/round-socket-normal.webp';
 /** Sun / moon dial — every value (geometry measured on bar.webp, ticks, colours, art) from `gameFrameConfig.timeOfDay.dial`. */
 type DialConfig = GameFrameConfig['timeOfDay']['dial'];
 const C = { text: '#f3ead0', gold: '#f1d88a', dim: '#cdbf8e', shadow: '0 1px 2px rgba(3, 26, 30, 0.9)', focus: '#e8c766', glow: 'rgba(240, 201, 135, 0.55)', dayTint: '#f1d88a', nightTint: '#b9d2f0',
@@ -24,6 +26,13 @@ const SCOPED_CSS = `
 [data-hudreal-time] button:focus-visible { outline: 2px solid ${C.focus}; outline-offset: 2px; }
 [data-hudreal-time] button:not(:disabled):hover { filter: brightness(1.25); }
 `;
+
+const roundSocketStyle = {
+  backgroundImage: `url(${ROUND_SOCKET})`,
+  backgroundRepeat: 'no-repeat',
+  backgroundPosition: 'center',
+  backgroundSize: '100% 100%',
+} as const;
 
 export interface HudRealTimeLabels {
   pause: string; resume: string; speedGroup: string; speed: (s: number) => string; spaceKey: string; paused: string;
@@ -61,11 +70,7 @@ export function HudRealTime({ dayLabel, isDayPhase, cycleProgress, isPaused, loc
   return (
     <section data-hudreal-time="" data-paused={isPaused ? 'true' : 'false'} aria-label={dayLabel} style={{ position: 'relative', userSelect: 'none', width: BAR_LOCAL.w, height: BAR_LOCAL.h }}>
       <style>{SCOPED_CSS}</style>
-      <img src={ASSET_LOCAL} alt="" draggable={false} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', display: 'block' }} />
-      {DIAL.frame && (
-        <img src={DIAL.frame.url} alt="" draggable={false}
-          style={{ position: 'absolute', left: DIAL.cx + (DIAL.frame.offset?.x ?? 0) - DIAL.frame.size / 2, top: DIAL.cy + (DIAL.frame.offset?.y ?? 0) - DIAL.frame.size / 2, width: DIAL.frame.size, height: DIAL.frame.size, pointerEvents: 'none' }} />
-      )}
+      <HudRealTimeShellLayers bar={BAR_LOCAL} asset={ASSET_LOCAL} dial={DIAL} />
       {/* phase dial (Director 2026-11-11): sun or moon seated small in the emerald, framed by a crown of engraved ticks
        *  that light one by one as the phase runs — warm gold by day, silver-blue by night; unlit ticks stay dull bronze. */}
       <svg aria-hidden="true" width={DIAL.r * 2} height={DIAL.r * 2} viewBox={`${-DIAL.r} ${-DIAL.r} ${DIAL.r * 2} ${DIAL.r * 2}`}
@@ -103,8 +108,8 @@ export function HudRealTime({ dayLabel, isDayPhase, cycleProgress, isPaused, loc
         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{dayLabel}</span>
       </div>
       <HudTooltip label={isPaused ? labels.resume : labels.pause} shortcut={labels.spaceKey} side="bottom" wrap>
-        <button type="button" data-hr-time="pause" aria-pressed={isPaused} aria-label={isPaused ? labels.resume : labels.pause} disabled={locked} onClick={speed.onTogglePause}
-          style={{ ...pos(0), color: isPaused ? C.seatInk : C.dim, textShadow: isPaused ? `0 0 6px ${C.glow}` : C.shadow, ...seat(isPaused) }}>
+        <button type="button" data-ctl="round" data-hr-time="pause" aria-pressed={isPaused} aria-label={isPaused ? labels.resume : labels.pause} disabled={locked} onClick={speed.onTogglePause}
+          style={{ ...pos(0), ...roundSocketStyle, color: isPaused ? C.seatInk : C.dim, textShadow: isPaused ? `0 0 6px ${C.glow}` : C.shadow, ...seat(isPaused) }}>
           <EngravedIcon id={isPaused ? 'cmd-play' : 'cmd-pause'} size={16} />
         </button>
       </HudTooltip>
@@ -114,8 +119,8 @@ export function HudRealTime({ dayLabel, isDayPhase, cycleProgress, isPaused, loc
           const engaged = selected && !isPaused;
           return (
             <HudTooltip key={s} label={labels.speed(s)} shortcut={String(i + 1)} side="bottom" wrap>
-              <button type="button" role="radio" data-hr-time={`x${s}`} aria-checked={selected} aria-label={labels.speed(s)} disabled={locked} onClick={() => speed.onChange(s)}
-                style={{ ...pos(i + 1), color: engaged ? C.seatInk : selected ? C.gold : C.dim, fontFamily: '"Cardo", serif', fontWeight: 700, fontSize: hudPx(HUD_TYPE.secondary), textShadow: engaged ? `0 0 6px ${C.glow}` : C.shadow, ...seat(engaged), ...(selected && !engaged ? ring(true) : undefined) }}>×{s}</button>
+              <button type="button" role="radio" data-ctl="round" data-hr-time={`x${s}`} aria-checked={selected} aria-label={labels.speed(s)} disabled={locked} onClick={() => speed.onChange(s)}
+                style={{ ...pos(i + 1), ...roundSocketStyle, color: engaged ? C.seatInk : selected ? C.gold : C.dim, fontFamily: '"Cardo", serif', fontWeight: 700, fontSize: hudPx(HUD_TYPE.secondary), textShadow: engaged ? `0 0 6px ${C.glow}` : C.shadow, ...seat(engaged), ...(selected && !engaged ? ring(true) : undefined) }}>×{s}</button>
             </HudTooltip>
           );
         })}

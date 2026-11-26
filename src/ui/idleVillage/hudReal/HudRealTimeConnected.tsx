@@ -7,10 +7,9 @@ import { useTranslation } from 'react-i18next';
 import { useMinimalGameplayWithIdleVillageConfig } from '@/store/useMinimalGameplay';
 import { HudRealTime } from './HudRealTime';
 import { TIME_SLIM_BAR } from './timeSlimGeometry';
+const TIME_SLIM_CONTROLLESS_ASSET = '/assets/ui/hud-real/time/bar-slim-controlless.webp';
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
 import { offeredSpeeds } from '@/ui/idleVillage/config/timeOfDay';
-
-const SLIM_ASSET = '/assets/ui/hud-real/time/bar-slim.webp';
 
 export function HudRealTimeConnected({ locked = false, slim = false }: { locked?: boolean; /** R-339/T6: the slim day banner of the left-shifted top chrome. */ slim?: boolean }) {
   const { t } = useTranslation('idleVillage');
@@ -32,7 +31,7 @@ export function HudRealTimeConnected({ locked = false, slim = false }: { locked?
         speed: (s) => `${t('gameFrame.speed.ariaLabel')} ×${s}`, spaceKey: t('gameFrame.speed.spaceKey'), paused: t('gameFrame.speed.paused'),
       }}
       bar={slim ? TIME_SLIM_BAR : undefined}
-      asset={slim ? SLIM_ASSET : undefined}
+      asset={slim ? TIME_SLIM_CONTROLLESS_ASSET : undefined}
       dial={slim ? DEFAULT_GAME_FRAME_CONFIG.timeOfDay.dialSlim : undefined}
     />
   );

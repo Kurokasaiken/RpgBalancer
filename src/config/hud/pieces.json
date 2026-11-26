@@ -15,7 +15,8 @@
     "smalto-smeraldo",
     "gemma-smeraldo",
     "osso",
-    "smalto-rosso"
+    "smalto-rosso",
+    "cielo-notturno"
   ],
   "pieces": [
     {
@@ -649,11 +650,54 @@
       },
       "provenance": {
         "golden": ".mw/specs/hud-real/time/golden/",
-        "sha256_sun": "e31f485e6e726611663214d6df3747d14337ea90f71d3037d8783ae0e53fb5a8",
-        "sha256_moon": "685693549a4e61f19af9f7b33a2c9861c7b953ee1efd15b6e9950c73aa387700",
-        "ruling": "Director 2026-11-25: «battezzo questo componente così com'è, questo è il golden reference per la UI». Sole = gen3 sun-v1 (Gemini CDP vincolato al battezzato come ref colore/stile) + simmetrizzato su ruling «rendi quella sotto uguale a quella sopra» (fiamma bassa = copia ruotata 180°) + orbe centrato nel canvas; keyato magenta→alfa+despill. Luna = battezzata 2026-11-23 (falce oro su disco stellato dipinto), invariata. Asset condivisi col dial della barra full. Witness battezzato: .mw/specs/hud-real/time/golden/witness-day.png + witness-night.png",
+        "sha256": "793f9f037d54b1f0f7c320582117609bfb22470baf7e778e2033b8b2ea1391d7",
+        "ruling": "Director 2026-11-25: «battezzo questo componente così com'è, questo è il golden reference per la UI». Sole = gen3 sun-v1 (Gemini CDP vincolato al battezzato come ref colore/stile) + simmetrizzato su ruling «rendi quella sotto uguale a quella sopra» (fiamma bassa = copia ruotata 180°) + orbe centrato nel canvas; keyato magenta→alfa+despill. Luna = battezzata 2026-11-23 (falce oro su disco stellato dipinto), invariata. Asset condivisi col dial della barra full. Witness battezzato: .mw/specs/hud-real/time/golden/witness-day.png + witness-night.png Canonizzazione multi-asset Director 2026-11-26: «multi asset, ma il cerchio verrà riutilizzato anche da altre parti» — scope hud, nessuno split in revisioni indipendenti.",
         "generator": "Gemini web (CDP batch, ref-vincolato)",
         "date": "2026-11-25"
+      }
+    },
+    {
+      "id": "round-socket-events-v1",
+      "kind": "button-plate",
+      "scope": "hud",
+      "status": "candidate",
+      "role": "controlSocket",
+      "dialect": "nav-filetto",
+      "materials": [
+        "ottone",
+        "smalto-smeraldo"
+      ],
+      "assets": {
+        "master": "public/assets/ui/hud-real/controls/round-socket-normal.webp"
+      },
+      "provenance": {
+        "golden": ".mw/specs/hud-real/refs/ref-round-filter-sockets-2026-11-26.png",
+        "sha256": "ee978b6b6e1583d9bcdf9944b43beac3666c96f69464b2c2f21fe77e5d7e0908",
+        "ruling": "R-391/PLAN-136: socket Eventi come controllo default filtri/chiusura; derivato candidate fino a gate human-eye",
+        "generator": "scripts/hud-real/build-round-socket-control.py (estrazione deterministica da events/panel-bodytop.webp)",
+        "date": "2026-11-26"
+      }
+    },
+    {
+      "id": "square-socket-events-v1",
+      "kind": "icon-plate",
+      "scope": "hud",
+      "status": "candidate",
+      "role": "alcoveSocket",
+      "dialect": "nav-filetto",
+      "materials": [
+        "ottone",
+        "smalto-smeraldo"
+      ],
+      "assets": {
+        "master": "public/assets/ui/hud-real/controls/square-socket-normal.webp"
+      },
+      "provenance": {
+        "golden": ".mw/specs/hud-real/refs/ref-round-filter-sockets-2026-11-26.png",
+        "sha256": "6209cf8a243fa176515664946f29075972c04563e3bd2614e9a8bedbf2234b36",
+        "ruling": "R-391/PLAN-136: alcova quadrata stessa materia/colore del socket rotondo; derivato candidate fino a gate human-eye",
+        "generator": "scripts/hud-real/build-square-socket.py (costruzione deterministica, seed=136)",
+        "date": "2026-11-26"
       }
     }
   ]

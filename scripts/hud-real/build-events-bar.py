@@ -12,6 +12,7 @@ registered reference.
 from pathlib import Path
 from PIL import Image, ImageFilter
 import numpy as np
+from goldgrade import grade_gold_toward_time
 
 ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / '.mw/specs/hud-eventi/refs/ref-eventi-bar-specular-time-2026-11-25.png'
@@ -49,6 +50,7 @@ def build() -> tuple[int, int]:
         raise RuntimeError('events bar matte is empty')
     crop = image.crop((int(xs.min()), int(ys.min()), int(xs.max()) + 1, int(ys.max()) + 1))
     OUT.parent.mkdir(parents=True, exist_ok=True)
+    crop = grade_gold_toward_time(crop)
     crop.save(OUT, 'WEBP', lossless=True)
     return crop.size
 

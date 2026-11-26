@@ -65,39 +65,43 @@ invariants:
       `data-assign-state` = eligible | packed | bagFull, derivato via `bagAssignEligibility` sulla bag
       sparsa `bags[activeStashOwner]` (stessa logica dei reject del ledger, mai una seconda autorità:
       il click passa sempre a `store.assign`, i reject annunciano via lastEvent). Bag piena ⇒ hint
-      localizzato `stash-bag-full-hint` (`gameFrame.stash.bagFullHint`); read-only ⇒ nessun marker.
+      localizzato `stash-bag-full-hint` (`gameFrame.stash.bagFullHint`) mantenuto screen-reader-only
+      (R-391: nessuna scritta visibile nel footer); read-only ⇒ nessun marker.
     test_refs:
       - tests/unit/idleVillage/r339BagAssign.test.tsx
   - id: village-stash-panel.INV-3
     source: plan
     source_ref: R-353
     statement: >-
-      R-353 mockup (mockup-stash-grid.jpg, ruling Director: restyle estetico, pannelli flottanti): la
-      shelf è una GRIGLIA di celle tile — ogni `listitem` porta la StashItemTile condivisa (lacca +
-      badge angolare ×N) e nome/descrizione come testo sr-only, stesso vocabolario su entrambe le
-      modalità. Sopra la griglia un `radiogroup` di tab kind derivato dai `kind` presenti in config
-      (`stash-tab-all`/`stash-tab-{kind}`, role=radio, filtro view-only: mai una mutation).
+      R-353 mockup + emendamento R-391/PLAN-136 (Director 2026-11-26): la shelf è una GRIGLIA 5×3
+      di socket quadrati `square-socket-events-v1` nella stessa materia del controllo round Events;
+      ogni `listitem` porta icona + badge ×N + nome/descrizione sr-only. I filtri kind NON stanno più
+      sotto la griglia: siedono nella title row immediatamente a sinistra del close, come
+      `button[data-ctl=round]` sul socket canonico `round-socket-events-v1` (`stash-filter-{id}`,
+      `aria-pressed`, gruppo `stash-filters`). Ogni filtro filtra davvero lo scaffale; è view-only,
+      mai una mutation. Il contatore «N / M», gli helper visivi e ogni scritta nel footer sono ritirati;
+      contatore riservati/hint restano solo sr-only quando semanticamente necessari.
     test_refs:
       - tests/unit/idleVillage/r353StashGrid.test.tsx
   - id: village-stash-panel.INV-4
     source: plan
     source_ref: R-353
     statement: >-
-      Detail card (`stash-detail`): preview dell'ultimo item hover/focus (sticky, fallback alla prima
-      riga visibile) nel vocabolario tooltip condiviso (nome, effetto, covers, stock). L'affordance
-      `stash-pack-detail` esiste SOLO in modo bound e passa per la stessa autorità `store.assign`
-      delle celle (reject via lastEvent); in read-only la card è informativa senza bottoni extra.
+      Nessuna card di dettaglio fissa (ritirata 2026-11-26, Director): ogni item si descrive col tooltip
+      condiviso su hover/focus (nome, effetto, covers, stock). Il click assegna SOLO in modo bound, sulla
+      cella stessa (`stash-item-{id}`, stessa autorità `store.assign`, reject via lastEvent); in read-only
+      il click non fa nulla e non ci sono bottoni. Regola globale: `.windsurf/rules/50-interaction-patterns.md`.
     test_refs:
       - tests/unit/idleVillage/r353StashGrid.test.tsx
   - id: village-stash-panel.INV-5
     source: plan
     source_ref: R-353
     statement: >-
-      Cornice ornata del mockup (ruling Director «anche la cornice del mockup x entrambi»): la
-      plaque del pannello monta `PanelFrameOrnaments` (`data-panel-frame="ornate"`) — quattro
-      angoli in filigrana ottone/smeraldo firmati (famiglia cassetto R-323) sopra il bordo +
-      filetto interno. Puro decoro (aria-hidden, pointer-events none): non tocca header, tab,
-      griglia, detail né alcun anchor di contratto.
+      Backing pieno dello stash (catena R-353 → D-20261125-clean-frame → R-391/PLAN-136): la plaque
+      monta `stash-frame-no-grid.webp`, derivato deterministico pulito da `stash-frame-clean.webp`
+      senza pozzetti, track scroll o contenuto vivo dipinto. Il backing resta decoro aria-hidden;
+      alcove, controlli, scroll track/thumb e testi sono DOM vivo. Geometria 5×3, close/filtri in
+      testata e track laterale condizionale sono contratto runtime, non pixel cotti nel backing.
     test_refs:
       - tests/unit/idleVillage/r353StashGrid.test.tsx
   - id: expedition-bag-assign.INV-1

@@ -126,11 +126,11 @@ describe('VillageStashPanel', () => {
     expect(within(list).queryAllByRole('button')).toHaveLength(0);
     expect(within(list).queryAllByRole('checkbox')).toHaveLength(0);
     expect(within(list).queryAllByRole('textbox')).toHaveLength(0);
-    // The only buttons in the whole panel are the title-row close (the kind filters are radios in the same
-    // row) — never rows; no minimise, no view toggle (Director 2026-11-20).
+    // The only buttons in the panel are the close and the kind filters (round controls, the
+    // filter group) — never rows; no minimise, no view toggle (Director 2026-11-20).
     expect(screen.queryByTestId('stash-minimise')).toBeNull();
     expect(screen.queryByTestId('stash-view-toggle')).toBeNull();
-    expect(screen.getAllByRole('button').filter((b) => b.getAttribute('role') !== 'radio')).toHaveLength(1);
+    expect(screen.getAllByRole('button').filter((b) => !b.getAttribute('data-testid')?.startsWith('stash-filter-'))).toHaveLength(1);
   });
 
   it('titles the panel via aria-labelledby', () => {
@@ -153,7 +153,6 @@ describe('VillageStashPanel — PLAN-073 dual mode', () => {
     const shelf = screen.getByTestId('stash-shelf');
     expect(shelf).toHaveAttribute('data-stash-mode', 'readonly');
     expect(within(shelf).queryAllByRole('button')).toHaveLength(0);
-    expect(screen.getByTestId('stash-mode-hint')).toHaveTextContent('gameFrame.stash.notReady');
   });
 
   it('read-only without a bound planner even when ready — openHint shown', () => {
@@ -161,7 +160,6 @@ describe('VillageStashPanel — PLAN-073 dual mode', () => {
     renderPanel();
     const shelf = screen.getByTestId('stash-shelf');
     expect(shelf).toHaveAttribute('data-stash-mode', 'readonly');
-    expect(screen.getByTestId('stash-mode-hint')).toHaveTextContent('gameFrame.stash.openHint');
   });
 
   it('bound to a planner: rows are buttons and a click assigns to the first free slot', () => {

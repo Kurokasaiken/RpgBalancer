@@ -1,0 +1,11 @@
+{
+  "id": "square-socket-events-v1",
+  "status": "candidate",
+  "output": "public/assets/ui/hud-real/controls/square-socket-normal.webp",
+  "shape": "rounded-square-alpha",
+  "construction": "deterministic brass rim + green lacquer well, seed 136",
+  "usage": "stash alcove/cell frame; interaction states remain DOM/CSS",
+  "generator": "scripts/hud-real/build-square-socket.py",
+  "reference": ".mw/specs/hud-real/refs/ref-round-filter-sockets-2026-11-26.png",
+  "plan": "PLAN-136"
+}

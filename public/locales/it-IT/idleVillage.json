@@ -1186,7 +1186,7 @@
       "openRejected": "{name} sarà disponibile a quest conclusa"
     },
     "stash": {
-      "title": "Magazzino del villaggio",
+      "title": "Magazzino",
       "capacity": "{count} di {max} beni in deposito",
       "goodsCount": "{count} di {max} beni",
       "qty": "{qty} in deposito",

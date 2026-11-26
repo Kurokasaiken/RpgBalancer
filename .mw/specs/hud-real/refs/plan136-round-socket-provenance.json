@@ -1,0 +1,14 @@
+{
+  "artifact": "public/assets/ui/hud-real/controls/round-socket-normal.webp",
+  "sha256": "ee978b6b6e1583d9bcdf9944b43beac3666c96f69464b2c2f21fe77e5d7e0908",
+  "source": "public/assets/ui/hud-real/events/panel-bodytop.webp",
+  "crop": [
+    276,
+    10,
+    392,
+    126
+  ],
+  "mask": "circle feather 0.7px",
+  "reference": ".mw/specs/hud-real/refs/ref-round-filter-sockets-2026-11-26.png",
+  "plan": "PLAN-136"
+}

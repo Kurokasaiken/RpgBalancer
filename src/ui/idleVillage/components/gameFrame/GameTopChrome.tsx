@@ -20,7 +20,8 @@ import { useTranslation } from 'react-i18next';
 import { HudRealTimeConnected } from '@/ui/idleVillage/hudReal/HudRealTimeConnected';
 import { HudRealResources } from '@/ui/idleVillage/hudReal/HudRealResources';
 import { HudRealEventsBar } from '@/ui/idleVillage/hudReal/HudRealEventsBar';
-import { EVENTS_BAR_CONFIG } from '@/balancing/config/idleVillage/eventsBarConfig';
+import { HudRealEventsPanel } from '@/ui/idleVillage/hudReal/HudRealEventsPanel';
+import { EVENTS_PANEL_CONFIG } from '@/balancing/config/idleVillage/eventsPanelConfig';
 import { TIME_SLIM_BAR } from '@/ui/idleVillage/hudReal/timeSlimGeometry';
 import { RESOURCES_SLIM_BAR } from '@/ui/idleVillage/hudReal/resourcesSlimGeometry';
 import { CASSETTO_LAYOUT_CONFIG } from '@/balancing/config/idleVillage/cassettoLayoutConfig';
@@ -42,8 +43,11 @@ const RES_SLIM_ASSET = '/assets/ui/hud-real/resources/bar-slim.webp';
 const RES_K = (TC.capsulePx.time / TC.capsulePx.resources) * TC.resourcesBoost;
 const RES_W = RESOURCES_SLIM_BAR.w * RES_K;
 const RES_H = RESOURCES_SLIM_BAR.h * RES_K;
-const EVENTS_W = EVENTS_BAR_CONFIG.art.w;
-const EVENTS_H = EVENTS_BAR_CONFIG.art.h;
+/* Events is the same Time shell object mirrored: its dimensions are Time's,
+ *  not a parallel Events-art contract. */
+const EVENTS_W = TIME_SLIM_BAR.w;
+const EVENTS_H = TIME_SLIM_BAR.h;
+const EVENTS_PANEL_SCALE = EVENTS_W / EVENTS_PANEL_CONFIG.art.w;
 /** Row height = the tallest bar. */
 const ROW_H = Math.max(TIME_SLIM_BAR.h, RES_H);
 
@@ -62,9 +66,11 @@ export interface GameTopChromeProps {
   eventsOpen?: boolean;
   /** Toggles the Events panel from the docked bar. */
   onToggleEvents?: () => void;
+  /** Row selection inside the open Events panel (the host pans the camera). */
+  onSelectEvent?: (event: HudEvent) => void;
 }
 
-export const GameTopChrome: React.FC<GameTopChromeProps> = ({ items, locked = false, visible = true, frame, events = [], eventsOpen = false, onToggleEvents }) => {
+export const GameTopChrome: React.FC<GameTopChromeProps> = ({ items, locked = false, visible = true, frame, events = [], eventsOpen = false, onToggleEvents, onSelectEvent }) => {
   const { t } = useTranslation('idleVillage');
   const leftInset = useGameLayoutInsets((s) => s.insets.left);
   const publish = useGameLayoutInsets((s) => s.publish);
@@ -104,9 +110,16 @@ export const GameTopChrome: React.FC<GameTopChromeProps> = ({ items, locked = fa
    *  it minus the symmetric right margin; when the reserve yields on narrow
    *  canvases the bar hides rather than overlapping the centred resources. */
   const eventsVisible = fitReserved >= TC.minFitScale;
-  const eventsWidth = Math.max(0, (TC.chronicleReservePx - TC.marginPx) / scale);
-  const eventsFit = eventsVisible ? Math.min(1, eventsWidth / EVENTS_W) : 0;
-  const eventsLeft = frame.W - TC.marginPx - EVENTS_W * eventsFit;
+  /* Director 2026-11-26: the Events right edge must sit at the same distance
+   *  from the right window edge as the Time sun reads from the left — the
+   *  banner's dock minus the sun medallion's visual overhang (scaled by fit). */
+  const eventsRightMargin = Math.max(TC.marginPx, TC.bannerMarginPx - TC.sunTipOverhangPx * fit);
+  const eventsWidth = Math.max(0, (TC.chronicleReservePx - eventsRightMargin) / scale);
+  /* The Events shell is literally the Time shell mirrored: same geometry,
+   *  same scale. Only reserve width can reduce it; there is no separate
+   *  Events height ratio. */
+  const eventsFit = eventsVisible ? Math.min(1, eventsWidth / EVENTS_W, fit) : 0;
+  const eventsLeft = frame.W - eventsRightMargin - EVENTS_W * eventsFit;
 
   /* Honest occupancy (real px): top margin + the scaled row height. */
   const occupiedTop = visible ? (TC.marginPx + ROW_H * fit) * scale : 0;
@@ -168,6 +181,24 @@ export const GameTopChrome: React.FC<GameTopChromeProps> = ({ items, locked = fa
         >
           <div style={{ position: 'absolute', left: 0, top: 0, width: EVENTS_W, height: EVENTS_H, transform: `scale(${eventsFit})`, transformOrigin: 'top left' }}>
             <HudRealEventsBar events={events} open={eventsOpen} onToggle={onToggleEvents} />
+            {/* R-386-open (Director 2026-11-26): the open panel hangs directly
+             *  below the bar — the bar stays the visual header while "the part
+             *  below" stretches downward into the signed sliced body; more
+             *  events simply make it longer. Same scaled space as the bar, so
+             *  alignment and zoom compensation come for free. */}
+            <div
+              style={{
+                position: 'absolute',
+                left: 0,
+                top: EVENTS_PANEL_CONFIG.behavior.dockTopPx,
+                width: EVENTS_PANEL_CONFIG.art.w,
+                transform: `scale(${EVENTS_PANEL_SCALE})`,
+                transformOrigin: 'top left',
+                ['--hud-text-k' as string]: String(eventsFit > 0 ? 1 / (eventsFit * EVENTS_PANEL_SCALE) : 1),
+              }}
+            >
+              <HudRealEventsPanel events={events} open={eventsOpen} onSelect={onSelectEvent} />
+            </div>
           </div>
         </div>
       )}

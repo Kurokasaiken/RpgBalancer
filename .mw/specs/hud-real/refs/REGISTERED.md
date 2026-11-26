@@ -1,5 +1,9 @@
 # Registered reference artifacts (rule 46-approved-references)
 
+## HUD Night 11 (R-392, 2026-11-26)
+
+- `ref-hud-night-11.png`: copia integrale dell'originale esterno `Mappa fantasy strategica di Night 11.png`, 1672×941, SHA-256 `27a4ec7b8e1ed7dcc679d2bb6e830fc0af9f13039624b4ebc3ba8a434ed3e271`. Director: «è il nuovo mockup d riferimento x la HUD». Ambito ed eccezioni in `plans/PLAN-137-hud-night-11.md`: nuovo riferimento per il socket, smalto navbar dal gioco, stash da deliberare pezzo per pezzo. Nessun precedente golden eliminato.
+
 ## Cassetto (PLAN-116, ruling R-323 2026-11-10)
 
 - `approved-cassetto-rich.png` — mockup Gemini scelto dal Director per il cassetto
@@ -51,3 +55,16 @@
   recuperato da `a4cc3a023^:dev-public/mockups/bands.html`; conserva le etichette
   delle tre varianti. Non è il generatore dell'immagine, solo il contesto di
   presentazione ritrovato.
+
+## Round filter sockets — controllo default filtri/chiusura (R-391, 2026-11-26)
+
+- `ref-round-filter-sockets-2026-11-26.png` — crop incollato dal Director dei 4 socket circolari del pannello Eventi, sha256 `f64631afc7cb928e79970544d78572b5420573ec607cadf03eddb92a7163970f` (372×96). Ruling verbatim: **«la seconda immagine (dal compoentne eventi) è la reference corretta x i filtri... E' anche lo stesso elemento x fare il pulsante x perchiudere (la x grande)»**. Significato: questo socket circolare diventa il controllo visuale default per filtri e chiusura su stash/magazzino, roster e tempo; va documentato come elemento standard e non re-interpretato con altri ring/pill.
+- `stash-current-state-2026-11-26.png` — screenshot dello stash corrente incollato dal Director come punto di partenza («siamo arrivati qua»), sha256 `9723b328d74e211834ca0cf883da6f5db815dc1829217e7222fc20bdd8fa49ed`. Non è golden: è baseline di stato per il prima/dopo.
+
+## PLAN-136 round/square socket candidates + stash/time derivatives (R-391, 2026-11-26)
+
+- `public/assets/ui/hud-real/controls/round-socket-normal.webp` — socket rotondo canonico estratto deterministicamente da `events/panel-bodytop.webp` da `scripts/hud-real/build-round-socket-control.py`, sha256 `ee978b6b6e1583d9bcdf9944b43beac3666c96f69464b2c2f21fe77e5d7e0908` (116×116). Reference concettuale battezzata: `ref-round-filter-sockets-2026-11-26.png`. Pezzo `round-socket-events-v1` registrato **candidate** finché il Director non battezza il derivato montato.
+- `public/assets/ui/hud-real/controls/square-socket-normal.webp` — alcova quadrata nella stessa materia/cromia del socket rotondo, costruita deterministicamente da `scripts/hud-real/build-square-socket.py`, sha256 `6209cf8a243fa176515664946f29075972c04563e3bd2614e9a8bedbf2234b36` (128×128). Pezzo `square-socket-events-v1` **candidate**; hover/focus restano effetti DOM/CSS.
+- `public/assets/ui/hud-real/stash-frame-no-grid.webp` — backing stash derivato da `stash-frame-clean.webp` da `scripts/hud-real/clean-stash-backing.py`, sha256 `45572296a2846132751d7cd9ac1527739e34f2529f60b9efbd17a69a66405032` (1146×831), senza pozzetti/track cotti nella fascia shelf.
+- `public/assets/ui/hud-real/time/bar-controlless.webp` e `bar-slim-controlless.webp` — varianti Time control-neutral da `scripts/hud-real/build-time-controlless-bars.py`; rimuovono i vecchi socket rettangolari dipinti così pausa/velocità montano il round socket canonico. Provenance/sha in `.mw/specs/hud-real/refs/plan136-time-controlless-provenance.json`.
+- Witness finale: `test-results/plan136-stash-round-sockets/final-board.png` (2×2: reference, stash, tempo, hover alcova).

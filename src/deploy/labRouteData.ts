@@ -26,6 +26,7 @@ export const LAB_PATHS: readonly string[] = [
  "/hud-roster-crop",
  "/hud-roster-mockup",
  "/hud-target",
+ "/events-tuner",
  "/hud-zanara-roster",
  "/icon-gallery",
  "/lab/poi-luogo",

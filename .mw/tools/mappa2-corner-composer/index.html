@@ -1,0 +1,1075 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mappa2 Corner Composer</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b1220;
+      --panel: #151f30;
+      --panel-2: #1c293d;
+      --line: #354763;
+      --text: #f2ead6;
+      --muted: #aab7c9;
+      --accent: #f0c84f;
+      --green: #53e29a;
+      --red: #ff5d68;
+      --blue: #59c6ff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #142036 0, var(--bg) 58%);
+      color: var(--text);
+      font: 14px/1.4 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow: hidden;
+    }
+    header {
+      padding: 12px 16px 10px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(13, 20, 33, 0.94);
+    }
+    h1 {
+      margin: 0 0 6px;
+      font-size: 20px;
+      letter-spacing: 0.02em;
+    }
+    .subtitle {
+      color: var(--muted);
+      max-width: 1080px;
+      margin-bottom: 10px;
+    }
+    .toolbar, .toolbar-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .toolbar-row { margin-top: 8px; }
+    button, select, input {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-2);
+      color: var(--text);
+      padding: 7px 9px;
+      font: inherit;
+    }
+    button { cursor: pointer; }
+    button:hover, select:hover, input:hover { border-color: #60799f; }
+    button.active {
+      border-color: var(--accent);
+      color: #fff4c7;
+      box-shadow: 0 0 0 1px rgba(240, 200, 79, 0.25) inset;
+    }
+    button.danger { border-color: #7f3942; color: #ffc5c9; }
+    label {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    input[type="number"] { width: 68px; }
+    input[type="checkbox"] { accent-color: var(--accent); }
+    main {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 330px;
+      height: calc(100vh - 154px);
+      min-height: 480px;
+    }
+    #stageWrap {
+      position: relative;
+      overflow: hidden;
+      background: #07101d;
+    }
+    #stage {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: crosshair;
+      touch-action: none;
+    }
+    #status {
+      position: absolute;
+      left: 12px;
+      bottom: 10px;
+      max-width: calc(100% - 24px);
+      padding: 6px 9px;
+      border-radius: 8px;
+      background: rgba(7, 14, 24, 0.78);
+      color: #d9e5f4;
+      font-size: 12px;
+      pointer-events: none;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    aside {
+      border-left: 1px solid var(--line);
+      background: rgba(15, 23, 37, 0.98);
+      padding: 12px;
+      overflow: auto;
+    }
+    aside h2 {
+      margin: 0 0 8px;
+      font-size: 16px;
+    }
+    .hint {
+      color: var(--muted);
+      font-size: 12px;
+      margin: 6px 0 12px;
+    }
+    .piece {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 9px;
+      margin-bottom: 8px;
+      background: var(--panel);
+    }
+    .piece.active { border-color: var(--accent); }
+    .piece-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 7px;
+    }
+    .piece-title strong { font-size: 13px; }
+    .piece small { color: var(--muted); display: block; margin-top: 5px; }
+    .piece .row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .piece button { padding: 4px 7px; font-size: 12px; }
+    .piece select { padding: 4px 6px; font-size: 12px; }
+    .piece input[type="number"] { width: 62px; padding: 4px 6px; font-size: 12px; }
+    .piece input[type="range"] { width: 112px; padding: 0; accent-color: var(--accent); }
+    .scale-row { margin-top: 6px; }
+    kbd {
+      border: 1px solid #52657f;
+      border-bottom-width: 2px;
+      border-radius: 5px;
+      padding: 0 4px;
+      background: #101929;
+      color: #e8eef8;
+      font-size: 11px;
+    }
+    #fileInput { display: none; }
+    @media (max-width: 980px) {
+      main { grid-template-columns: 1fr; }
+      aside { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Mappa2 Corner Composer</h1>
+    <div class="subtitle">
+      Strumento interno per indicare con poligoni grossolani quali pezzi decorativi di bordo/corner spostare e dove devono finire nella composizione allargata. I poligoni non devono essere ritagli precisi: identificano semanticamente le parti di terra. La scala visiva serve solo a ragionare sul fitting; non genera immagini e non ridimensiona gli asset reali.
+    </div>
+    <div class="toolbar">
+      <button id="drawMode" class="active">Disegna poligono</button>
+      <button id="dragMode">Trascina target</button>
+      <label>tipo
+        <select id="labelSelect">
+          <option value="corner-tl">corner alto-sinistra</option>
+          <option value="corner-tr" selected>corner alto-destra</option>
+          <option value="corner-bl">corner basso-sinistra</option>
+          <option value="corner-br">corner basso-destra</option>
+          <option value="edge-left">bordo sinistro</option>
+          <option value="edge-right">bordo destro</option>
+          <option value="edge-top">bordo alto</option>
+          <option value="edge-bottom">bordo basso</option>
+          <option value="foreground-bottom">foreground basso</option>
+          <option value="other">altro</option>
+        </select>
+      </label>
+      <button id="closePolygon">Chiudi poligono</button>
+      <button id="undoPoint">Annulla punto</button>
+      <button id="cancelDraft" class="danger">Annulla bozza</button>
+      <button id="deletePiece" class="danger">Elimina pezzo</button>
+    </div>
+    <div class="toolbar-row">
+      <span style="color: var(--muted)">apron px</span>
+      <label>sx <input id="apronLeft" type="number" min="0" step="10" value="560"></label>
+      <label>alto <input id="apronTop" type="number" min="0" step="10" value="200"></label>
+      <label>dx <input id="apronRight" type="number" min="0" step="10" value="560"></label>
+      <label>basso <input id="apronBottom" type="number" min="0" step="10" value="0"></label>
+      <label><input id="previewHoles" type="checkbox" checked> riempi buchi come mare</label>
+      <label><input id="showArrows" type="checkbox" checked> frecce spostamento</label>
+      <button id="fitZoom">Fit</button>
+      <button id="resetView">Reset vista</button>
+      <button id="exportJson">Export JSON</button>
+      <button id="copyJson">Copia JSON</button>
+      <button id="saveRepo">Salva in repo</button>
+      <button id="importJson">Import JSON</button>
+      <button id="clearAll" class="danger">Pulisci tutto</button>
+    </div>
+  </header>
+  <main>
+    <div id="stageWrap">
+      <canvas id="stage"></canvas>
+      <div id="status">caricamento mappa…</div>
+    </div>
+    <aside>
+      <h2>Pezzi selezionati</h2>
+      <div class="hint">
+        In modalità disegno: click = punto, <kbd>Enter</kbd> = chiudi, <kbd>Esc</kbd> = annulla, <kbd>Backspace</kbd> = toglie punto.
+        Il poligono può restare grossolano: serve solo a indicare quale parte di terra intendi, non a ritagliarla pixel-perfect.
+        In modalità drag: trascina la copia del pezzo. Trascinando il fondo muovi la vista; rotella = zoom;
+        <kbd>Alt</kbd>+rotella = scala visiva del pezzo sotto il puntatore/attivo. La scala è solo authoring della composizione.
+      </div>
+      <div id="pieceList"></div>
+    </aside>
+  </main>
+  <input id="fileInput" type="file" accept="application/json" />
+
+  <script>
+    (() => {
+      const SOURCE_WIDTH = 2752;
+      const SOURCE_HEIGHT = 1536;
+      const BASE_URL = './composite.webp';
+      const IS_FILE_PROTOCOL = window.location.protocol === 'file:';
+      const FOREGROUND_URL = '/assets/world/mappa2/base/layers/Foreground.webp';
+      const STORAGE_KEY = 'mappa2-corner-composer-v1';
+      const SCHEMA_V1 = 'mappa2-corner-composer/v1';
+      const SCHEMA_V2 = 'mappa2-corner-composer/v2';
+      const SCALE_MIN = 0.25;
+      const SCALE_MAX = 3;
+
+      const canvas = document.getElementById('stage');
+      const ctx = canvas.getContext('2d');
+      const statusEl = document.getElementById('status');
+      const pieceList = document.getElementById('pieceList');
+      const fileInput = document.getElementById('fileInput');
+
+      const baseImg = new Image();
+      const fgImg = new Image();
+      const composite = document.createElement('canvas');
+      composite.width = SOURCE_WIDTH;
+      composite.height = SOURCE_HEIGHT;
+      const compositeCtx = composite.getContext('2d');
+
+      const state = {
+        mode: 'draw',
+        apron: { left: 560, top: 200, right: 560, bottom: 0 },
+        pieces: [],
+        draft: [],
+        activePieceId: null,
+        nextPieceNumber: 1,
+        view: { scale: 0.25, x: 30, y: 30 },
+        previewHoles: true,
+        showArrows: true,
+        imagesReady: false,
+      };
+
+      let dragState = null;
+      let assetKey = 0;
+
+      function loadImage(img, src) {
+        return new Promise((resolve, reject) => {
+          img.onload = resolve;
+          img.onerror = reject;
+          img.src = src;
+        });
+      }
+
+      async function loadAssets() {
+        try {
+          await loadImage(baseImg, BASE_URL);
+          compositeCtx.clearRect(0, 0, SOURCE_WIDTH, SOURCE_HEIGHT);
+          compositeCtx.drawImage(baseImg, 0, 0, SOURCE_WIDTH, SOURCE_HEIGHT);
+          state.imagesReady = true;
+          assetKey += 1;
+          setStatus(IS_FILE_PROTOCOL
+            ? 'mappa caricata in modalità file: puoi lavorare, ma Salva in repo richiede http://localhost:5201/'
+            : 'mappa caricata: disegna un poligono attorno a un pezzo corner/bordo');
+          fitView();
+          render();
+        } catch (err) {
+          setStatus('errore caricamento mappa: controllare dev server/assets');
+          console.error(err);
+        }
+      }
+
+      function saveLocal() {
+        const payload = serialise(false);
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+        } catch (err) {
+          console.warn('localStorage non disponibile', err);
+        }
+      }
+
+      function restoreLocal() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return;
+          const data = JSON.parse(raw);
+          applyImported(data, false);
+        } catch (err) {
+          console.warn('ripristino locale fallito', err);
+        }
+      }
+
+      function serialise(includeMeta = true) {
+        const pieces = state.pieces.map((piece) => {
+          const sourceCentroid = centroid(piece.polygon);
+          const targetCentroid = { x: sourceCentroid.x + piece.dx, y: sourceCentroid.y + piece.dy };
+          return {
+            id: piece.id,
+            label: piece.label,
+            polygon: piece.polygon.map((p) => ({ x: round2(p.x), y: round2(p.y) })),
+            polygonNormalized: piece.polygon.map((p) => ({ x: round5(p.x / SOURCE_WIDTH), y: round5(p.y / SOURCE_HEIGHT) })),
+            target: { dx: round2(piece.dx), dy: round2(piece.dy), scale: round3(pieceScale(piece)) },
+            targetNormalized: { dx: round5(piece.dx / SOURCE_WIDTH), dy: round5(piece.dy / SOURCE_HEIGHT) },
+            transformModel: 'uniform-scale-about-source-centroid-then-translate',
+            scaleSemantics: 'planning-footprint-only; production assets are not implicitly resized',
+            centroidSource: { x: round2(sourceCentroid.x), y: round2(sourceCentroid.y) },
+            centroidTarget: { x: round2(targetCentroid.x), y: round2(targetCentroid.y) },
+          };
+        });
+        const payload = {
+          schema: SCHEMA_V2,
+          sourceImage: BASE_URL,
+          foregroundImage: FOREGROUND_URL,
+          sourceWidth: SOURCE_WIDTH,
+          sourceHeight: SOURCE_HEIGHT,
+          apron: { ...state.apron },
+          pieces,
+        };
+        if (includeMeta) payload.exportedAt = new Date().toISOString();
+        return payload;
+      }
+
+      function applyImported(data, announce = true) {
+        if (!data || ![SCHEMA_V1, SCHEMA_V2].includes(data.schema)) return;
+        if (data.apron) {
+          state.apron = {
+            left: Number(data.apron.left) || 0,
+            top: Number(data.apron.top) || 0,
+            right: Number(data.apron.right) || 0,
+            bottom: Number(data.apron.bottom) || 0,
+          };
+          syncApronInputs();
+        }
+        state.pieces = (data.pieces || []).map((piece, index) => ({
+          id: piece.id || `piece-${index + 1}`,
+          label: piece.label || 'other',
+          polygon: (piece.polygon || []).map((p) => ({ x: Number(p.x), y: Number(p.y) })),
+          dx: Number(piece.target && piece.target.dx) || 0,
+          dy: Number(piece.target && piece.target.dy) || 0,
+          scale: clampScale(Number(piece.target && piece.target.scale != null ? piece.target.scale : piece.scale) || 1),
+        })).filter((piece) => piece.polygon.length >= 3);
+        state.nextPieceNumber = state.pieces.length + 1;
+        state.activePieceId = state.pieces.length ? state.pieces[0].id : null;
+        if (announce) setStatus(`importati ${state.pieces.length} pezzi`);
+        renderPieceList();
+        render();
+      }
+
+      function round2(n) { return Math.round(n * 100) / 100; }
+      function round3(n) { return Math.round(n * 1000) / 1000; }
+      function round5(n) { return Math.round(n * 100000) / 100000; }
+      function clampScale(value) { return Math.max(SCALE_MIN, Math.min(SCALE_MAX, value)); }
+      function pieceScale(piece) { return clampScale(Number(piece.scale) || 1); }
+
+      function expandedSize() {
+        return {
+          width: SOURCE_WIDTH + state.apron.left + state.apron.right,
+          height: SOURCE_HEIGHT + state.apron.top + state.apron.bottom,
+        };
+      }
+
+      function worldToScreen(p) {
+        return {
+          x: p.x * state.view.scale + state.view.x,
+          y: p.y * state.view.scale + state.view.y,
+        };
+      }
+
+      function screenToWorld(p) {
+        return {
+          x: (p.x - state.view.x) / state.view.scale,
+          y: (p.y - state.view.y) / state.view.scale,
+        };
+      }
+
+      function sourceToWorld(p) {
+        return { x: p.x + state.apron.left, y: p.y + state.apron.top };
+      }
+
+      function screenToSource(p) {
+        const world = screenToWorld(p);
+        return { x: world.x - state.apron.left, y: world.y - state.apron.top };
+      }
+
+      function getCanvasPoint(evt) {
+        const rect = canvas.getBoundingClientRect();
+        return { x: evt.clientX - rect.left, y: evt.clientY - rect.top };
+      }
+
+      function resizeCanvas() {
+        const rect = canvas.parentElement.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = Math.max(1, Math.round(rect.width * dpr));
+        canvas.height = Math.max(1, Math.round(rect.height * dpr));
+        canvas.style.width = `${rect.width}px`;
+        canvas.style.height = `${rect.height}px`;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        render();
+      }
+
+      function fitView() {
+        const rect = canvas.parentElement.getBoundingClientRect();
+        const size = expandedSize();
+        const scale = Math.min((rect.width - 50) / size.width, (rect.height - 50) / size.height);
+        state.view.scale = Math.max(0.05, Math.min(1, scale));
+        state.view.x = (rect.width - size.width * state.view.scale) / 2;
+        state.view.y = (rect.height - size.height * state.view.scale) / 2;
+        render();
+      }
+
+      function setStatus(text) {
+        statusEl.textContent = text;
+      }
+
+      function pathFromPoints(points, offset = { x: 0, y: 0 }) {
+        ctx.beginPath();
+        points.forEach((p, index) => {
+          const world = sourceToWorld({ x: p.x + offset.x, y: p.y + offset.y });
+          const s = worldToScreen(world);
+          if (index === 0) ctx.moveTo(s.x, s.y);
+          else ctx.lineTo(s.x, s.y);
+        });
+        ctx.closePath();
+      }
+
+      function centroid(points) {
+        if (!points.length) return { x: 0, y: 0 };
+        const sum = points.reduce((acc, p) => ({ x: acc.x + p.x, y: acc.y + p.y }), { x: 0, y: 0 });
+        return { x: sum.x / points.length, y: sum.y / points.length };
+      }
+
+      function pointInPolygon(point, polygon) {
+        let inside = false;
+        for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+          const xi = polygon[i].x, yi = polygon[i].y;
+          const xj = polygon[j].x, yj = polygon[j].y;
+          const intersect = ((yi > point.y) !== (yj > point.y)) &&
+            (point.x < (xj - xi) * (point.y - yi) / ((yj - yi) || 0.00001) + xi);
+          if (intersect) inside = !inside;
+        }
+        return inside;
+      }
+
+      function activePiece() {
+        return state.pieces.find((piece) => piece.id === state.activePieceId) || null;
+      }
+
+      function polygonBounds(points) {
+        return points.reduce((acc, p) => ({
+          minX: Math.min(acc.minX, p.x),
+          minY: Math.min(acc.minY, p.y),
+          maxX: Math.max(acc.maxX, p.x),
+          maxY: Math.max(acc.maxY, p.y),
+        }), { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity });
+      }
+
+      function transformSourcePoint(piece, point, includeTranslation = true) {
+        const c = centroid(piece.polygon);
+        const scale = pieceScale(piece);
+        return {
+          x: c.x + (point.x - c.x) * scale + (includeTranslation ? piece.dx : 0),
+          y: c.y + (point.y - c.y) * scale + (includeTranslation ? piece.dy : 0),
+        };
+      }
+
+      function inverseTransformPoint(piece, point) {
+        const c = centroid(piece.polygon);
+        const scale = pieceScale(piece);
+        return {
+          x: c.x + (point.x - c.x - piece.dx) / scale,
+          y: c.y + (point.y - c.y - piece.dy) / scale,
+        };
+      }
+
+      function transformedPolygon(piece, includeTranslation = true) {
+        return piece.polygon.map((point) => transformSourcePoint(piece, point, includeTranslation));
+      }
+
+      function snapPieceToCorner(piece, corner) {
+        const b = polygonBounds(transformedPolygon(piece, false));
+        const outer = {
+          left: -state.apron.left,
+          top: -state.apron.top,
+          right: SOURCE_WIDTH + state.apron.right,
+          bottom: SOURCE_HEIGHT + state.apron.bottom,
+        };
+        if (corner.includes('l')) piece.dx = round2(outer.left - b.minX);
+        if (corner.includes('r')) piece.dx = round2(outer.right - b.maxX);
+        if (corner.includes('t')) piece.dy = round2(outer.top - b.minY);
+        if (corner.includes('b')) piece.dy = round2(outer.bottom - b.maxY);
+        state.activePieceId = piece.id;
+        setStatus(`${piece.id} snap ${corner}: dx ${piece.dx}, dy ${piece.dy}`);
+        renderPieceList();
+        saveLocal();
+        render();
+      }
+
+      function render() {
+        const rect = canvas.parentElement.getBoundingClientRect();
+        ctx.clearRect(0, 0, rect.width, rect.height);
+        ctx.fillStyle = '#07101d';
+        ctx.fillRect(0, 0, rect.width, rect.height);
+        if (!state.imagesReady) return;
+
+        const size = expandedSize();
+        const outerA = worldToScreen({ x: 0, y: 0 });
+        const outerB = worldToScreen({ x: size.width, y: size.height });
+
+        const gradient = ctx.createLinearGradient(outerA.x, outerA.y, outerB.x, outerB.y);
+        gradient.addColorStop(0, '#087b98');
+        gradient.addColorStop(0.55, '#075f82');
+        gradient.addColorStop(1, '#043d62');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(outerA.x, outerA.y, outerB.x - outerA.x, outerB.y - outerA.y);
+
+        const imgPos = worldToScreen({ x: state.apron.left, y: state.apron.top });
+        const imgW = SOURCE_WIDTH * state.view.scale;
+        const imgH = SOURCE_HEIGHT * state.view.scale;
+        ctx.drawImage(composite, imgPos.x, imgPos.y, imgW, imgH);
+
+        if (state.previewHoles) {
+          for (const piece of state.pieces) {
+            ctx.save();
+            pathFromPoints(piece.polygon);
+            ctx.clip();
+            ctx.fillStyle = 'rgba(5, 113, 143, 0.74)';
+            ctx.fill();
+            ctx.restore();
+          }
+        }
+
+        for (const piece of state.pieces) {
+          drawMovedPiece(piece);
+        }
+
+        drawFrames(size);
+        for (const piece of state.pieces) {
+          drawPieceOverlays(piece);
+        }
+        drawDraft();
+      }
+
+      function drawFrames(size) {
+        const outerA = worldToScreen({ x: 0, y: 0 });
+        const outerB = worldToScreen({ x: size.width, y: size.height });
+        ctx.save();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = 'rgba(83, 226, 154, 0.95)';
+        ctx.strokeRect(outerA.x, outerA.y, outerB.x - outerA.x, outerB.y - outerA.y);
+
+        const a = worldToScreen({ x: state.apron.left, y: state.apron.top });
+        const b = worldToScreen({ x: state.apron.left + SOURCE_WIDTH, y: state.apron.top + SOURCE_HEIGHT });
+        ctx.strokeStyle = 'rgba(255, 190, 55, 0.95)';
+        ctx.setLineDash([9, 6]);
+        ctx.strokeRect(a.x, a.y, b.x - a.x, b.y - a.y);
+        ctx.setLineDash([]);
+        ctx.fillStyle = 'rgba(83, 226, 154, 0.95)';
+        ctx.font = '12px system-ui';
+        ctx.fillText('nuovo rettangolo/apron', outerA.x + 8, outerA.y + 18);
+        ctx.fillStyle = 'rgba(255, 210, 90, 0.95)';
+        ctx.fillText('canvas originale', a.x + 8, a.y + 18);
+        ctx.restore();
+      }
+
+      function drawMovedPiece(piece) {
+        ctx.save();
+        pathFromPoints(transformedPolygon(piece));
+        ctx.clip();
+        const scale = pieceScale(piece);
+        const c = centroid(piece.polygon);
+        const screenScale = state.view.scale * scale;
+        const tx = state.view.x + (state.apron.left + c.x - c.x * scale + piece.dx) * state.view.scale;
+        const ty = state.view.y + (state.apron.top + c.y - c.y * scale + piece.dy) * state.view.scale;
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.transform(screenScale, 0, 0, screenScale, tx, ty);
+        ctx.drawImage(composite, 0, 0);
+        ctx.restore();
+      }
+
+      function drawPieceOverlays(piece) {
+        const isActive = piece.id === state.activePieceId;
+        ctx.save();
+        ctx.lineWidth = isActive ? 3 : 2;
+        ctx.strokeStyle = isActive ? 'rgba(240, 200, 79, 0.98)' : 'rgba(240, 200, 79, 0.52)';
+        ctx.setLineDash([7, 5]);
+        pathFromPoints(piece.polygon);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.strokeStyle = isActive ? 'rgba(83, 226, 154, 0.98)' : 'rgba(83, 226, 154, 0.58)';
+        pathFromPoints(transformedPolygon(piece));
+        ctx.stroke();
+
+        const c = centroid(piece.polygon);
+        const sourceC = worldToScreen(sourceToWorld(c));
+        const targetC = worldToScreen(sourceToWorld(transformSourcePoint(piece, c)));
+        if (state.showArrows && (Math.abs(piece.dx) > 0.5 || Math.abs(piece.dy) > 0.5)) {
+          drawArrow(sourceC, targetC, isActive ? 'rgba(89, 198, 255, 0.95)' : 'rgba(89, 198, 255, 0.45)');
+        }
+        ctx.fillStyle = isActive ? '#fff0a8' : '#e6d8a5';
+        ctx.font = '12px system-ui';
+        ctx.fillText(piece.label, targetC.x + 6, targetC.y - 6);
+        ctx.restore();
+      }
+
+      function drawArrow(a, b, color) {
+        const angle = Math.atan2(b.y - a.y, b.x - a.x);
+        const len = Math.hypot(b.x - a.x, b.y - a.y);
+        if (len < 8) return;
+        ctx.save();
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
+        const head = 9;
+        ctx.beginPath();
+        ctx.moveTo(b.x, b.y);
+        ctx.lineTo(b.x - head * Math.cos(angle - 0.45), b.y - head * Math.sin(angle - 0.45));
+        ctx.lineTo(b.x - head * Math.cos(angle + 0.45), b.y - head * Math.sin(angle + 0.45));
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function drawDraft() {
+        if (!state.draft.length) return;
+        ctx.save();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#ffdf65';
+        ctx.fillStyle = 'rgba(255, 223, 101, 0.14)';
+        ctx.beginPath();
+        state.draft.forEach((p, index) => {
+          const s = worldToScreen(sourceToWorld(p));
+          if (index === 0) ctx.moveTo(s.x, s.y);
+          else ctx.lineTo(s.x, s.y);
+        });
+        if (state.draft.length > 2) {
+          ctx.closePath();
+          ctx.fill();
+        }
+        ctx.stroke();
+        for (const p of state.draft) {
+          const s = worldToScreen(sourceToWorld(p));
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, 4, 0, Math.PI * 2);
+          ctx.fillStyle = '#fff0a0';
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      function closeDraft() {
+        if (state.draft.length < 3) {
+          setStatus('servono almeno 3 punti per chiudere un poligono');
+          return;
+        }
+        const label = document.getElementById('labelSelect').value;
+        const piece = {
+          id: `piece-${state.nextPieceNumber++}`,
+          label,
+          polygon: state.draft.map((p) => ({ x: round2(p.x), y: round2(p.y) })),
+          dx: 0,
+          dy: 0,
+          scale: 1,
+        };
+        state.pieces.push(piece);
+        state.activePieceId = piece.id;
+        state.draft = [];
+        state.mode = 'drag';
+        syncModeButtons();
+        setStatus(`${piece.id} creato: ora trascina la copia verso la posizione target`);
+        renderPieceList();
+        saveLocal();
+        render();
+      }
+
+      function renderPieceList() {
+        pieceList.innerHTML = '';
+        if (!state.pieces.length) {
+          pieceList.innerHTML = '<div class="hint">Nessun pezzo selezionato.</div>';
+          return;
+        }
+        for (const piece of state.pieces) {
+          const div = document.createElement('div');
+          div.className = `piece${piece.id === state.activePieceId ? ' active' : ''}`;
+          const moved = Math.hypot(piece.dx, piece.dy);
+          div.innerHTML = `
+            <div class="piece-title"><strong>${piece.id}</strong><span>${piece.label}</span></div>
+            <div class="row">
+              <button data-action="select">seleziona</button>
+              <button data-action="delete">elimina</button>
+              <button data-action="snap-tl" title="snap alto-sinistra">↖</button>
+              <button data-action="snap-tr" title="snap alto-destra">↗</button>
+              <button data-action="snap-bl" title="snap basso-sinistra">↙</button>
+              <button data-action="snap-br" title="snap basso-destra">↘</button>
+              <select data-action="label">
+                ${labelOptions(piece.label)}
+              </select>
+            </div>
+            <div class="row scale-row">
+              <label>scala visiva
+                <input data-action="scale" type="range" min="${SCALE_MIN}" max="${SCALE_MAX}" step="0.01" value="${pieceScale(piece)}">
+              </label>
+              <input data-action="scale-number" type="number" min="${SCALE_MIN}" max="${SCALE_MAX}" step="0.05" value="${round2(pieceScale(piece))}">
+              <button data-action="scale-reset" title="ripristina scala 1">1×</button>
+            </div>
+            <small>punti: ${piece.polygon.length} · spostamento: ${round2(piece.dx)}, ${round2(piece.dy)} (${round2(moved)} px) · scala: ${round2(pieceScale(piece))}×</small>
+          `;
+          div.querySelector('[data-action="select"]').addEventListener('click', () => {
+            state.activePieceId = piece.id;
+            renderPieceList();
+            render();
+          });
+          div.querySelector('[data-action="delete"]').addEventListener('click', () => {
+            state.pieces = state.pieces.filter((p) => p.id !== piece.id);
+            if (state.activePieceId === piece.id) state.activePieceId = state.pieces[0]?.id || null;
+            renderPieceList();
+            saveLocal();
+            render();
+          });
+          for (const corner of ['tl', 'tr', 'bl', 'br']) {
+            div.querySelector(`[data-action="snap-${corner}"]`).addEventListener('click', () => snapPieceToCorner(piece, corner));
+          }
+          div.querySelector('[data-action="label"]').addEventListener('change', (evt) => {
+            piece.label = evt.target.value;
+            renderPieceList();
+            saveLocal();
+            render();
+          });
+          const scaleRange = div.querySelector('[data-action="scale"]');
+          const scaleNumber = div.querySelector('[data-action="scale-number"]');
+          scaleRange.addEventListener('input', (evt) => {
+            piece.scale = clampScale(Number(evt.target.value) || 1);
+            scaleNumber.value = round2(pieceScale(piece));
+            state.activePieceId = piece.id;
+            saveLocal();
+            render();
+          });
+          scaleRange.addEventListener('change', () => {
+            renderPieceList();
+            saveLocal();
+            render();
+          });
+          scaleNumber.addEventListener('change', (evt) => {
+            piece.scale = clampScale(Number(evt.target.value) || 1);
+            state.activePieceId = piece.id;
+            renderPieceList();
+            saveLocal();
+            render();
+          });
+          div.querySelector('[data-action="scale-reset"]').addEventListener('click', () => {
+            piece.scale = 1;
+            state.activePieceId = piece.id;
+            renderPieceList();
+            saveLocal();
+            render();
+          });
+          pieceList.appendChild(div);
+        }
+      }
+
+      function labelOptions(selected) {
+        return [
+          ['corner-tl', 'corner alto-sinistra'],
+          ['corner-tr', 'corner alto-destra'],
+          ['corner-bl', 'corner basso-sinistra'],
+          ['corner-br', 'corner basso-destra'],
+          ['edge-left', 'bordo sinistro'],
+          ['edge-right', 'bordo destro'],
+          ['edge-top', 'bordo alto'],
+          ['edge-bottom', 'bordo basso'],
+          ['foreground-bottom', 'foreground basso'],
+          ['other', 'altro'],
+        ].map(([value, text]) => `<option value="${value}"${value === selected ? ' selected' : ''}>${text}</option>`).join('');
+      }
+
+      function hitTestPieces(sourcePoint) {
+        for (let i = state.pieces.length - 1; i >= 0; i -= 1) {
+          const piece = state.pieces[i];
+          const targetPoint = inverseTransformPoint(piece, sourcePoint);
+          if (pointInPolygon(targetPoint, piece.polygon)) return { piece, target: true };
+        }
+        for (let i = state.pieces.length - 1; i >= 0; i -= 1) {
+          const piece = state.pieces[i];
+          if (pointInPolygon(sourcePoint, piece.polygon)) return { piece, target: false };
+        }
+        return null;
+      }
+
+      canvas.addEventListener('click', (evt) => {
+        if (state.mode !== 'draw' || dragState?.moved) return;
+        const p = screenToSource(getCanvasPoint(evt));
+        if (p.x < 0 || p.y < 0 || p.x > SOURCE_WIDTH || p.y > SOURCE_HEIGHT) {
+          setStatus('punto fuori dal dipinto originale: il pezzo deve partire dalla mappa esistente');
+          return;
+        }
+        state.draft.push({ x: round2(p.x), y: round2(p.y) });
+        setStatus(`punti bozza: ${state.draft.length} — Enter per chiudere`);
+        render();
+      });
+
+      canvas.addEventListener('dblclick', (evt) => {
+        if (state.mode !== 'draw') return;
+        evt.preventDefault();
+        if (state.draft.length > 3) state.draft.pop();
+        closeDraft();
+      });
+
+      canvas.addEventListener('pointerdown', (evt) => {
+        canvas.setPointerCapture(evt.pointerId);
+        const screenPoint = getCanvasPoint(evt);
+        const sourcePoint = screenToSource(screenPoint);
+        if (state.mode === 'drag') {
+          const hit = hitTestPieces(sourcePoint);
+          if (hit) {
+            state.activePieceId = hit.piece.id;
+            dragState = {
+              type: 'piece',
+              pointerId: evt.pointerId,
+              startWorld: screenToWorld(screenPoint),
+              startDx: hit.piece.dx,
+              startDy: hit.piece.dy,
+              pieceId: hit.piece.id,
+              moved: false,
+            };
+            setStatus(`trascinando ${hit.piece.id}`);
+          } else {
+            dragState = {
+              type: 'pan',
+              pointerId: evt.pointerId,
+              startScreen: screenPoint,
+              startView: { ...state.view },
+              moved: false,
+            };
+          }
+          renderPieceList();
+          render();
+        } else {
+          dragState = {
+            type: 'maybe-click',
+            pointerId: evt.pointerId,
+            startScreen: screenPoint,
+            startView: { ...state.view },
+            moved: false,
+          };
+        }
+      });
+
+      canvas.addEventListener('pointermove', (evt) => {
+        if (!dragState || dragState.pointerId !== evt.pointerId) return;
+        const screenPoint = getCanvasPoint(evt);
+        if (dragState.type === 'piece') {
+          const world = screenToWorld(screenPoint);
+          const piece = state.pieces.find((p) => p.id === dragState.pieceId);
+          if (!piece) return;
+          piece.dx = round2(dragState.startDx + world.x - dragState.startWorld.x);
+          piece.dy = round2(dragState.startDy + world.y - dragState.startWorld.y);
+          dragState.moved = true;
+          setStatus(`${piece.id}: dx ${piece.dx}, dy ${piece.dy}`);
+          renderPieceList();
+          render();
+        } else if (dragState.type === 'pan' || (dragState.type === 'maybe-click' && evt.buttons === 1 && state.mode === 'draw' && evt.altKey)) {
+          if (dragState.type === 'maybe-click') dragState.type = 'pan';
+          const dx = screenPoint.x - dragState.startScreen.x;
+          const dy = screenPoint.y - dragState.startScreen.y;
+          if (Math.hypot(dx, dy) > 2) dragState.moved = true;
+          state.view.x = dragState.startView.x + dx;
+          state.view.y = dragState.startView.y + dy;
+          render();
+        }
+      });
+
+      canvas.addEventListener('pointerup', (evt) => {
+        if (dragState?.type === 'piece') saveLocal();
+        dragState = null;
+        try { canvas.releasePointerCapture(evt.pointerId); } catch (_) {}
+      });
+
+      canvas.addEventListener('wheel', (evt) => {
+        evt.preventDefault();
+        const p = getCanvasPoint(evt);
+        if (evt.altKey) {
+          const hit = hitTestPieces(screenToSource(p));
+          const piece = hit?.piece || activePiece();
+          if (!piece) return;
+          const factor = evt.deltaY < 0 ? 1.04 : 1 / 1.04;
+          piece.scale = clampScale(pieceScale(piece) * factor);
+          state.activePieceId = piece.id;
+          setStatus(`${piece.id}: scala visiva ${round2(piece.scale)}×`);
+          renderPieceList();
+          saveLocal();
+          render();
+          return;
+        }
+        const before = screenToWorld(p);
+        const factor = evt.deltaY < 0 ? 1.12 : 0.89;
+        state.view.scale = Math.max(0.05, Math.min(2.8, state.view.scale * factor));
+        const after = screenToWorld(p);
+        state.view.x += (after.x - before.x) * state.view.scale;
+        state.view.y += (after.y - before.y) * state.view.scale;
+        render();
+      }, { passive: false });
+
+      function syncModeButtons() {
+        document.getElementById('drawMode').classList.toggle('active', state.mode === 'draw');
+        document.getElementById('dragMode').classList.toggle('active', state.mode === 'drag');
+        canvas.style.cursor = state.mode === 'draw' ? 'crosshair' : 'grab';
+      }
+
+      function syncApronInputs() {
+        document.getElementById('apronLeft').value = state.apron.left;
+        document.getElementById('apronTop').value = state.apron.top;
+        document.getElementById('apronRight').value = state.apron.right;
+        document.getElementById('apronBottom').value = state.apron.bottom;
+      }
+
+      function readApronInputs() {
+        state.apron.left = Math.max(0, Number(document.getElementById('apronLeft').value) || 0);
+        state.apron.top = Math.max(0, Number(document.getElementById('apronTop').value) || 0);
+        state.apron.right = Math.max(0, Number(document.getElementById('apronRight').value) || 0);
+        state.apron.bottom = Math.max(0, Number(document.getElementById('apronBottom').value) || 0);
+        saveLocal();
+        render();
+      }
+
+      document.getElementById('drawMode').addEventListener('click', () => { state.mode = 'draw'; syncModeButtons(); setStatus('modalità disegno: click per aggiungere punti'); });
+      document.getElementById('dragMode').addEventListener('click', () => { state.mode = 'drag'; syncModeButtons(); setStatus('modalità drag: trascina il pezzo selezionato'); });
+      document.getElementById('closePolygon').addEventListener('click', closeDraft);
+      document.getElementById('undoPoint').addEventListener('click', () => { state.draft.pop(); render(); });
+      document.getElementById('cancelDraft').addEventListener('click', () => { state.draft = []; setStatus('bozza annullata'); render(); });
+      document.getElementById('deletePiece').addEventListener('click', () => {
+        const piece = activePiece();
+        if (!piece) return;
+        state.pieces = state.pieces.filter((p) => p.id !== piece.id);
+        state.activePieceId = state.pieces[0]?.id || null;
+        renderPieceList();
+        saveLocal();
+        render();
+      });
+      document.getElementById('previewHoles').addEventListener('change', (evt) => { state.previewHoles = evt.target.checked; saveLocal(); render(); });
+      document.getElementById('showArrows').addEventListener('change', (evt) => { state.showArrows = evt.target.checked; saveLocal(); render(); });
+      document.getElementById('fitZoom').addEventListener('click', fitView);
+      document.getElementById('resetView').addEventListener('click', () => { state.view = { scale: 0.25, x: 30, y: 30 }; render(); });
+      for (const id of ['apronLeft', 'apronTop', 'apronRight', 'apronBottom']) {
+        document.getElementById(id).addEventListener('input', readApronInputs);
+      }
+
+      document.getElementById('exportJson').addEventListener('click', () => {
+        const blob = new Blob([JSON.stringify(serialise(true), null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'mappa2-corner-composer.json';
+        a.click();
+        URL.revokeObjectURL(url);
+        setStatus('JSON esportato');
+      });
+
+      document.getElementById('copyJson').addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(JSON.stringify(serialise(true), null, 2));
+          setStatus('JSON copiato negli appunti');
+        } catch (err) {
+          setStatus('copia non riuscita: usa Export JSON');
+        }
+      });
+
+      document.getElementById('saveRepo').addEventListener('click', async () => {
+        if (IS_FILE_PROTOCOL) {
+          setStatus('Salva in repo non disponibile da file:// — apri http://localhost:5201/ e rifai/importa il JSON');
+          return;
+        }
+        try {
+          const response = await fetch('/save', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify(serialise(true), null, 2),
+          });
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.error || 'save failed');
+          setStatus(`spec salvata: ${result.path}`);
+        } catch (err) {
+          setStatus(`salvataggio repo fallito: ${err.message}`);
+        }
+      });
+
+      document.getElementById('importJson').addEventListener('click', () => fileInput.click());
+      fileInput.addEventListener('change', async () => {
+        const file = fileInput.files && fileInput.files[0];
+        if (!file) return;
+        try {
+          applyImported(JSON.parse(await file.text()));
+          saveLocal();
+        } catch (err) {
+          setStatus('import fallito: JSON non valido');
+        } finally {
+          fileInput.value = '';
+        }
+      });
+
+      document.getElementById('clearAll').addEventListener('click', () => {
+        if (!confirm('Eliminare tutti i pezzi selezionati?')) return;
+        state.pieces = [];
+        state.draft = [];
+        state.activePieceId = null;
+        state.nextPieceNumber = 1;
+        renderPieceList();
+        saveLocal();
+        render();
+      });
+
+      window.addEventListener('keydown', (evt) => {
+        if (evt.target && ['INPUT', 'SELECT', 'TEXTAREA'].includes(evt.target.tagName)) return;
+        if (evt.key === 'Enter') closeDraft();
+        if (evt.key === 'Escape') { state.draft = []; render(); }
+        if (evt.key === 'Backspace') { state.draft.pop(); render(); evt.preventDefault(); }
+        if (evt.key.toLowerCase() === 'd') { state.mode = 'draw'; syncModeButtons(); }
+        if (evt.key.toLowerCase() === 'm') { state.mode = 'drag'; syncModeButtons(); }
+        if (evt.key === '+' || evt.key === '=' || evt.key === '-') {
+          const piece = activePiece();
+          if (piece) {
+            const factor = evt.key === '-' ? 1 / 1.05 : 1.05;
+            piece.scale = clampScale(pieceScale(piece) * factor);
+            setStatus(`${piece.id}: scala visiva ${round2(piece.scale)}×`);
+            renderPieceList();
+            saveLocal();
+            render();
+          }
+        }
+      });
+
+      window.addEventListener('resize', resizeCanvas);
+
+      window.__cornerComposer = {
+        state,
+        serialise,
+        applyImported,
+        fitView,
+      };
+
+      restoreLocal();
+      syncApronInputs();
+      syncModeButtons();
+      renderPieceList();
+      resizeCanvas();
+      loadAssets();
+    })();
+  </script>
+</body>
+</html>

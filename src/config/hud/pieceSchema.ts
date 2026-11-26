@@ -6,7 +6,8 @@
  * (globale, in closure:lint) e mai importati a runtime dal primitivo.
  * Convenzioni: revisioni immutabili nell'id `<slug>-vN`; `canonical` e
  * `superseded` sono derivati; sha256 unico in provenance (frame/slice-kit:
- * sha(spec)+sha(golden), MAI del manifest rigenerabile).
+ * sha(spec)+sha(golden), MAI del manifest rigenerabile; raster multi-asset:
+ * fingerprint canonico delle varianti ordinate, ruling Director 2026-11-26).
  */
 import { z } from 'zod';
 
@@ -35,6 +36,13 @@ export const ROLE_KIND_TABLE = {
   panelGround: 'ground',
   iconPlate: 'icon-plate',
   poiIcon: 'icon-plate',
+  // Director ruling 2026-11-26: disco di fase sole/luna multi-asset,
+  // riusabile come ornament HUD fuori dalla sola barra Tempo.
+  phaseDisc: 'ornament',
+  // PLAN-136/R-391: shared Events-derived round control socket and its
+  // square alcove sibling. Candidate until Director human-eye baptism.
+  controlSocket: 'button-plate',
+  alcoveSocket: 'icon-plate',
   // pilota PLAN-130 (provisori, in attesa di ruling Director OB-10):
   nicheFrame: 'frame',
   seatRing: 'ornament',
@@ -57,6 +65,24 @@ const provenanceSchema = z.object({
   deltaE: z.number().optional(),
   partialFields: z.array(z.string()).optional(),
 });
+
+const ASSET_KEY_RE = /^[a-z][a-z0-9]*(?:[-_][a-z0-9]+)*$/;
+
+/**
+ * Raster assets of a piece. `master` is the legacy single-file form; named
+ * variants (for example `sun`/`moon`) make one logical reusable piece
+ * multi-asset without splitting immutable revisions that are not independent
+ * artworks. Keys are constrained so the provenance fingerprint in the gate
+ * is unambiguous and deterministic.
+ */
+const rasterAssetsSchema = z
+  .record(
+    z.string().regex(ASSET_KEY_RE, 'asset keys must be lowercase slugs'),
+    z.string().min(1),
+  )
+  .refine((assets) => Object.keys(assets).length > 0, {
+    message: 'at least one raster asset is required',
+  });
 
 const pieceBase = {
   id: pieceIdSchema,
@@ -84,7 +110,7 @@ const rasterPieceSchema = z
   .object({
     ...pieceBase,
     kind: z.enum(rasterKinds),
-    assets: z.object({ master: z.string().min(1) }),
+    assets: rasterAssetsSchema,
   })
   .strict();
 
@@ -94,7 +120,7 @@ const framePieceSchema = z
     kind: z.literal('frame'),
     source: z.enum(['slice-kit', 'standalone']),
     specRef: z.string().optional(),
-    assets: z.object({ master: z.string().min(1) }).optional(),
+    assets: rasterAssetsSchema.optional(),
   })
   .strict()
   .superRefine((piece, ctx) => {
@@ -110,10 +136,13 @@ const framePieceSchema = z
         message: 'frame/slice-kit must not carry assets (derived by the slicer)',
       });
     }
-    if (piece.source === 'standalone' && !piece.assets) {
+    if (
+      piece.source === 'standalone' &&
+      (!piece.assets?.master || Object.keys(piece.assets).length !== 1)
+    ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'frame/standalone requires assets.master (autonomous raster)',
+        message: 'frame/standalone requires exactly one assets.master raster',
       });
     }
   });

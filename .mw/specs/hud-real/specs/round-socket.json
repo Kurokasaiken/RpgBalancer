@@ -1,0 +1,12 @@
+{
+  "id": "round-socket-events-v1",
+  "status": "candidate",
+  "source": "public/assets/ui/hud-real/events/panel-bodytop.webp",
+  "output": "public/assets/ui/hud-real/controls/round-socket-normal.webp",
+  "cropSourcePx": [276, 10, 392, 126],
+  "shape": "circle-alpha-feather-0.7px",
+  "usage": "data-ctl=round shared control socket for filters, sort, close and small round HUD commands",
+  "generator": "scripts/hud-real/build-round-socket-control.py",
+  "reference": ".mw/specs/hud-real/refs/ref-round-filter-sockets-2026-11-26.png",
+  "plan": "PLAN-136"
+}

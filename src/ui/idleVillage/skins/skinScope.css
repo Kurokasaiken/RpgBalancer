@@ -525,19 +525,19 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
-  min-width: 30px;
+  width: var(--round-size, 30px);
+  height: var(--round-size, 30px);
+  min-width: var(--round-size, 30px);
   flex-shrink: 0;
   padding: 0;
   border: 0;
   border-radius: 0;
   box-shadow: none;
   background-color: transparent;
-  background-image: url('/assets/ui/hud-real/slicekit/controls/round-normal.webp');
+  background-image: url('/assets/ui/hud-real/controls/round-socket-normal.webp');
   background-repeat: no-repeat;
   background-position: center;
-  background-size: 30px 30px;
+  background-size: var(--round-size, 30px) var(--round-size, 30px);
   color: var(--skin-title-color);
   cursor: pointer;
 }
@@ -549,17 +549,24 @@
 }
 .skin-scope [data-ctl="round"] svg { width: 14px; height: 14px; }
 .skin-scope [data-ctl="round"]:hover:not(:disabled) {
-  background-image: url('/assets/ui/hud-real/slicekit/controls/round-hover.webp');
+  background-image: url('/assets/ui/hud-real/controls/round-socket-normal.webp');
 }
 .skin-scope [data-ctl="round"]:active:not(:disabled) {
-  background-image: url('/assets/ui/hud-real/slicekit/controls/round-pressed.webp');
+  background-image: url('/assets/ui/hud-real/controls/round-socket-normal.webp');
 }
 .skin-scope [data-ctl="round"][aria-pressed="true"],
 .skin-scope [data-ctl="round"][data-state="selected"] {
-  background-image: url('/assets/ui/hud-real/slicekit/controls/round-selected.webp');
+  background-image: url('/assets/ui/hud-real/controls/round-socket-normal.webp');
+}
+.skin-scope [data-ctl="round"]:hover:not(:disabled) {
+  filter: brightness(1.16) drop-shadow(0 0 2px rgba(218, 178, 92, 0.38));
+}
+.skin-scope [data-ctl="round"][aria-pressed="true"],
+.skin-scope [data-ctl="round"][data-state="selected"] {
+  filter: brightness(1.12) drop-shadow(0 0 4px rgba(94, 213, 158, 0.58));
 }
 .skin-scope [data-ctl="round"]:disabled {
-  background-image: url('/assets/ui/hud-real/slicekit/controls/round-disabled.webp');
+  background-image: url('/assets/ui/hud-real/controls/round-socket-normal.webp');
   cursor: default;
 }
 .skin-scope [data-ctl="round"]:focus-visible {
@@ -574,9 +581,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
-  min-width: 30px;
+  width: var(--round-size, 30px);
+  height: var(--round-size, 30px);
+  min-width: var(--round-size, 30px);
   flex-shrink: 0;
   max-width: none;
   padding: 0;
@@ -584,29 +591,39 @@
   border-radius: 0;
   box-shadow: none;
   background-color: transparent;
-  background-image: url('/assets/ui/hud-real/slicekit/controls/round-normal.webp');
+  background-image: url('/assets/ui/hud-real/controls/round-socket-normal.webp');
   background-repeat: no-repeat;
   background-position: center;
-  background-size: 30px 30px;
+  background-size: var(--round-size, 30px) var(--round-size, 30px);
   color: var(--skin-title-color);
 }
 .skin-scope [data-hud-controls] label[data-ctl="round"]::after { display: none; }
 .skin-scope [data-hud-controls] label[data-ctl="round"] [data-roster-pill-value] { display: none; }
 .skin-scope [data-hud-controls] label[data-ctl="round"]:hover,
 .skin-scope [data-hud-controls] button[data-ctl="round"]:hover:not(:disabled) {
-  background-image: url('/assets/ui/hud-real/slicekit/controls/round-hover.webp');
+  background-image: url('/assets/ui/hud-real/controls/round-socket-normal.webp');
 }
 .skin-scope [data-hud-controls] button[data-ctl="round"]:active:not(:disabled) {
-  background-image: url('/assets/ui/hud-real/slicekit/controls/round-pressed.webp');
+  background-image: url('/assets/ui/hud-real/controls/round-socket-normal.webp');
 }
 .skin-scope [data-hud-controls] button[data-ctl="round"][aria-pressed="true"],
 .skin-scope [data-hud-controls] button[data-ctl="round"][aria-checked="true"],
 .skin-scope [data-hud-controls] label[data-ctl="round"][data-state="selected"],
 .skin-scope [data-hud-controls] button[data-ctl="round"][data-state="selected"] {
-  background-image: url('/assets/ui/hud-real/slicekit/controls/round-selected.webp');
+  background-image: url('/assets/ui/hud-real/controls/round-socket-normal.webp');
+}
+.skin-scope [data-hud-controls] label[data-ctl="round"]:hover,
+.skin-scope [data-hud-controls] button[data-ctl="round"]:hover:not(:disabled) {
+  filter: brightness(1.16) drop-shadow(0 0 2px rgba(218, 178, 92, 0.38));
+}
+.skin-scope [data-hud-controls] button[data-ctl="round"][aria-pressed="true"],
+.skin-scope [data-hud-controls] button[data-ctl="round"][aria-checked="true"],
+.skin-scope [data-hud-controls] label[data-ctl="round"][data-state="selected"],
+.skin-scope [data-hud-controls] button[data-ctl="round"][data-state="selected"] {
+  filter: brightness(1.12) drop-shadow(0 0 4px rgba(94, 213, 158, 0.58));
 }
 .skin-scope [data-hud-controls] button[data-ctl="round"]:disabled {
-  background-image: url('/assets/ui/hud-real/slicekit/controls/round-disabled.webp');
+  background-image: url('/assets/ui/hud-real/controls/round-socket-normal.webp');
   cursor: default;
 }
 .skin-scope [data-hud-controls] label[data-ctl="round"]:focus-within,
@@ -614,6 +631,21 @@
   box-shadow: none;
   filter: drop-shadow(0 0 3px var(--skin-icon-accent));
 }
+/* PLAN-136 square alcove socket: the asset is the cell frame; interaction
+   states stay DOM/CSS so the raster remains a single neutral reusable piece. */
+.skin-scope .stash-alcove-face {
+  transition: filter 120ms ease-out, transform 120ms ease-out;
+}
+.skin-scope .stash-alcove-face:hover,
+.skin-scope .stash-alcove-face:focus-visible,
+.skin-scope .stash-alcove-face:focus-within {
+  filter: drop-shadow(0 0 5px rgba(76, 217, 168, 0.72)) brightness(1.12);
+}
+.skin-scope .stash-alcove-face[data-assign-state="packed"],
+.skin-scope .stash-alcove-face[data-assign-state="bagFull"] {
+  filter: saturate(0.65) brightness(0.78);
+}
+
 /* The status menu is a pill with its own chevron; the native control is stripped. */
 .skin-scope [data-hud-controls] label { padding: 0 26px 0 12px; max-width: 120px; }
 .skin-scope [data-hud-controls] label::after {

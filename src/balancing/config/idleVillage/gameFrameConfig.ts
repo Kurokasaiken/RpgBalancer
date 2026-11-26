@@ -1271,7 +1271,13 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
        *  r 35.6 sopra le tacche incise dipinte; wellR 31 = wash incasso
        *  dentro la fascia tacche.
        *  Luna (variante B, Director 2026-11-25): `nightWash` scurisce la
-       *  gemma a navy sotto la luna, sfuma con fadeMs. */
+       *  gemma a navy sotto la luna, sfuma con fadeMs.
+       *  Frame gen4 (Director 2026-11-26, pick finale lacq-2 dopo confronto
+       *  live — lacq-1 teneva gli highlight sul bordo e la corona visibile
+       *  restava scura): gemma ripaint smalto laccato smeraldo vincolata allo
+       *  smalto della barra (geometria invariata, edit ancorato sulla gen3 —
+       *  offset/cx/cy ancora validi); well a velo neutro 0.2: alpha maggiori
+       *  affogano la lacca, tinte colorate appiattiscono il contrasto. */
       cx: 28.6, cy: 26.7, r: 35.6, disc: 29.5, wellR: 30.5, ticks: 24, majorEvery: 3, fadeMs: 600,
       sunUrl: '/assets/ui/hud-real/time/sun.webp',
       moonUrl: '/assets/ui/hud-real/time/moon.webp',
@@ -1281,7 +1287,7 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
       discFrame: 'none',
       colors: {
         dayLit: '#ffe7a3', nightLit: '#cfe2ff', unlit: 'rgba(150, 118, 58, 0.55)',
-        dayGlow: 'rgba(255, 200, 90, 0.95)', nightGlow: 'rgba(150, 195, 255, 0.95)', well: 'rgba(2, 16, 20, 0.62)',
+        dayGlow: 'rgba(255, 200, 90, 0.95)', nightGlow: 'rgba(150, 195, 255, 0.95)', well: 'rgba(2, 16, 20, 0.2)',
       },
     },
   },

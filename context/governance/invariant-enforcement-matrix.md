@@ -5,7 +5,7 @@ approvati come tali, disposizioni accettate come proposte. Demozioni restano
 subordinate a check fixture-validated (P3) — nessuna demozione automatica da
 questo sign-off.
 
-**Sorgente:** `context/governance/invariant-ledger.json` (167 invarianti
+**Sorgente:** `context/governance/invariant-ledger.json` (176 invarianti
 atomiche, doppia estrazione anti-T-06). Ogni riga cita l'ID del ledger; il
 verbatim vincolante sta nel ledger, non duplicato qui.
 
@@ -226,20 +226,28 @@ verbatim vincolante sta nel ledger, non duplicato qui.
 | INV-16-FAILURE | foreground window = task failed; log .mw/bugs/ + flag | kernel: | "A task that opens a foreground window is **failed**, not complete: log it in `.mw/bugs/` and flag the Coordinator." | Kernel. |
 | INV-16-DOUBT | in doubt choose headless + report unverified (T-04) | human-review: | report honesty review | T-04-adjacent. |
 
-### `.windsurf/rules/17-resource-lifecycle.md` (model_decision — 10)
+### `.windsurf/rules/17-resource-lifecycle.md` (model_decision — 18)
 
 | invariant ID | invariant (short) | disposition | proposed check name or kernel line | notes |
 |---|---|---|---|---|
 | INV-17-DECLARED-END | every spawned resource has declared end (scoped/leased/kept) | check: | closure:lint → resourceLifecycleGate → `mw-reap --gate` (existing — residue detection) | Gate detects unowned resources at closure; the "declared at creation" discipline is tool use (kernel residual). |
+| INV-17-TOOL-SYMLINK | canonical lifecycle tools exposed in RPG as live symlink; no copied tool files | check: | `tests/unit/verification/resourceLifecycleGate.test.ts` — canonical link + resolver priority | Repo-local regression added with R-389; target content remains Mind Weaver-owned. |
 | INV-17-MWRUN | mw-run for commands that can hang/fork | kernel: | "Use for every command that can hang or fork children (probes, screenshots, builds)." | Tool discipline — kernel. |
 | INV-17-LEASE | mw-run --lease for detached servers; never stack a second | kernel: | "run `mw-ps --port 5173` first, never stack a second." | Kernel. |
-| INV-17-KEEP-PURPOSE | mw-keep fail-closed without --purpose | check: | mw-keep tool enforcement (existing — fail-closed in ~/.mw/bin) | Tool-enforced, not repo lint. |
-| INV-17-MWPW | mw-pw for Playwright probes; never raw node -e chromium.launch | check: | lifecycle:no-raw-playwright (proposed — post-v1) | Lint on raw `chromium.launch` outside mw-pw wrappers; incident 2026-11-13 motivates. |
+| INV-17-KEEP-PURPOSE | mw-keep fail-closed without --purpose | check: | mw-keep tool enforcement (canonical MW tool) | Tool-enforced, not repo lint. |
+| INV-17-MWPW | mw-pw for Playwright probes; never raw node -e chromium.launch | check: | mw-pw cleanup enforcement + lifecycle:no-raw-playwright (proposed — post-v1) | Lint on raw `chromium.launch` outside mw-pw wrappers remains proposed; incident 2026-11-13 motivates. |
+| INV-17-PW-FLOCK | max 1 heavy browser-test with OS-released lock, not stale pid files | check: | mw-pw flock enforcement (canonical MW tool) | Lock is released by the OS even on crash. |
+| INV-17-PRESSURE-GATE | CPU/memory pressure blocks new heavy spawn; override explicit/logged; never kills live tests | check: | mw-pw pressure-gate enforcement (canonical MW tool); soft throttle remains kernel | Hard gate is tool-enforced; the 1.5×load deferral is agent discipline until MW implements it. |
+| INV-17-CANARY-ONLY | automatic tab close only inside Canary/provider automation perimeter; personal Chrome never touched | check: | mw-provider-tabs perimeter enforcement (canonical MW tool) | Target identity depends on provider profile + known/registered CDP port. |
+| INV-17-TAB-RESNAPSHOT | tab close requires immediate same-target/same-url/page resnapshot; ambiguity fail-closed | check: | mw-provider-tabs resnapshot enforcement (canonical MW tool) | CDP down, target drift or inconsistent registry means no action. |
+| INV-17-TAB-RETENTION | run-active protected; terminal close only after sync/report; visual artifacts protected until persisted | check: | mw-provider-tabs retention-class enforcement (canonical MW tool) | Visual/mockup backstop is 72h if `artifact_persisted` is never written. |
+| INV-17-TAB-TTL | legacy-unbound/duplicate close only after 24h first-seen TTL; manual/unknown never auto-closed | check: | mw-provider-tabs inventory/TTL enforcement (canonical MW tool) | First seen is recorded, never backdated. |
 | INV-17-TMP | mw-tmp for temp dirs | kernel: | "`mw-tmp` for temp dirs (`mw-<project>-*` prefix, sweepable)." | Kernel. |
 | INV-17-ADOPT | mw-adopt orphans as kept with purpose | kernel: | "`mw-adopt <pid|--port N> --purpose \"…\"` — adopt an orphan as kept." | Kernel. |
 | INV-17-PS-DONE | mw-ps --mine before done; paste output | kernel: | "`mw-ps --mine` before declaring done: stop or adopt everything listed; paste output in the final message." | Gate covers residue; the paste-discipline is kernel. |
-| INV-17-REAP-GATE | mw-reap --gate fails on unowned resources | check: | closure:lint → resourceLifecycleGate (existing) | Wired in closure:lint (verified in scripts/closureLint.ts). |
-| INV-17-REAP-L3 | L3 orphan servers: report only, never killed — Director decides | kernel: | "L3 orphan servers in project cwd: **report only** — never killed. Only the Director decides which servers die." | Director-only decision — kernel. |
+| INV-17-REAP-GATE | mw-reap --gate fails on unowned resources | check: | closure:lint → resourceLifecycleGate (repo symlink first, ~/.mw/bin fallback) | Wired in closure:lint; resolver regression covered by `resourceLifecycleGate.test.ts`. |
+| INV-17-REAP-L3 | L3 orphan servers: auto-kill process group by default; explicit env restores report-only | check: | mw-reap L3 ladder enforcement (canonical MW tool) | Director ruling 2026-11-14/PLAN-075 port: `MW_REAP_L3_REPORT_ONLY=1` is the escape hatch. |
+| INV-17-PARENT-ALIVE | parent-alive unregistered dev servers are report-only, never auto-killed | check: | mw-reap `unregistered-live` classification (canonical MW tool) | Report/gate visibility without direct kill; adoption via `mw-adopt`. |
 
 ### `.windsurf/rules/45-director-intent-to-spec.md` (model_decision — 6)
 
@@ -324,3 +332,9 @@ verbatim vincolante sta nel ledger, non duplicato qui.
 
 > **Gate reminder (§0b):** nessuna demozione (T-7) senza check fixture-validated,
 > anche con sign-off acquisito. Sviluppo check (T-2/T-3) non subordinato alla firma.
+
+### Grammatica dei gesti (globale) — registrata 2026-11-26
+
+| invariant ID | invariant (short) | disposition | notes |
+|---|---|---|---|
+| INV-50IP-GESTURE-GLOBAL | stessi gesti con stesso significato in tutte le superfici assegnabili; nessun doppio click | human-review: | design review su ogni nuova superficie; deroghe registrate in 50-interaction-patterns.md |

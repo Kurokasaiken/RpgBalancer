@@ -12,7 +12,8 @@
  *   `ornamentScale`;
  * - `supersedes` punta a un pezzo esistente;
  * - sha256: frame/slice-kit → sha256(sha256(spec)+":"+sha256(golden));
- *   raster/standalone → sha256(assets.master);
+ *   raster/standalone mono-asset → sha256(assets.master); raster multi-asset
+ *   → sha256 del fingerprint canonico `<key>:<sha256(file)>`, chiavi ordinate;
  * - doppioni: due pezzi `baptized` con stesso role+dialect (e scala entro
  *   tolerance quando definita) richiedono `supersedes` o `nonFusionReason`;
  * - ogni `<id>-vN` citato in barrel/manifest/regions esiste ed è
@@ -54,6 +55,36 @@ const sha256File = (absPath: string): string =>
 
 const combinedSha = (specSha: string, goldenSha: string): string =>
   createHash('sha256').update(`${specSha}:${goldenSha}`).digest('hex');
+
+/**
+ * Canonical multi-asset fingerprint (Director ruling 2026-11-26): sort the
+ * asset keys, hash every file, then hash the newline-joined `<key>:<sha>`
+ * rows. A single legacy `master` keeps the historical plain file sha so all
+ * pre-existing immutable pieces remain valid without a rewrite.
+ */
+const rasterProvenanceSha = (
+  repoRoot: string,
+  assets: Record<string, string>,
+): { expected: string; missing: string[] } => {
+  const entries = Object.entries(assets).sort(([a], [b]) => a.localeCompare(b));
+  const rows: string[] = [];
+  const missing: string[] = [];
+  for (const [key, rel] of entries) {
+    const abs = path.join(repoRoot, rel);
+    if (!existsSync(abs)) {
+      missing.push(`${key}: ${rel}`);
+      continue;
+    }
+    rows.push(`${key}:${sha256File(abs)}`);
+  }
+  if (entries.length === 1 && entries[0][0] === 'master' && rows.length === 1) {
+    return { expected: rows[0].slice('master:'.length), missing };
+  }
+  return {
+    expected: createHash('sha256').update(rows.join('\n')).digest('hex'),
+    missing,
+  };
+};
 
 export function checkPiecesGate(repoRoot: string): PiecesGateReport {
   const report: PiecesGateReport = { checked: [], errors: [], warnings: [] };
@@ -136,12 +167,16 @@ export function checkPiecesGate(repoRoot: string): PiecesGateReport {
           );
         }
       }
-    } else if (piece.assets?.master) {
-      const masterAbs = path.join(repoRoot, piece.assets.master);
-      if (!existsSync(masterAbs)) {
-        report.errors.push(`${tag}: assets.master inesistente (${piece.assets.master})`);
-      } else if (sha256File(masterAbs) !== piece.provenance.sha256) {
-        report.errors.push(`${tag}: sha256(assets.master) ≠ provenance.sha256`);
+    } else if (piece.assets) {
+      const provenance = rasterProvenanceSha(repoRoot, piece.assets);
+      for (const missing of provenance.missing) {
+        report.errors.push(`${tag}: asset inesistente (${missing})`);
+      }
+      if (provenance.missing.length === 0 && provenance.expected !== piece.provenance.sha256) {
+        const mode = Object.keys(piece.assets).length === 1 && piece.assets.master
+          ? 'sha256(assets.master)'
+          : 'sha256(fingerprint multi-asset canonico)';
+        report.errors.push(`${tag}: ${mode} ≠ provenance.sha256`);
       }
     }
   }

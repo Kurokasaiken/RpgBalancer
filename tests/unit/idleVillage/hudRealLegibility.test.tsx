@@ -61,6 +61,15 @@ describe('speed radiogroup — filled seat, armed ring, dim idle', () => {
     expect(idle.style.color).toBe('rgb(205, 191, 142)');
   });
 
+  it('mounts pause/speed controls on the shared Events round socket (PLAN-136)', () => {
+    const { container } = renderTime(2, false);
+    for (const selector of ['[data-hr-time="pause"]', '[data-hr-time="x1"]', '[data-hr-time="x2"]', '[data-hr-time="x4"]']) {
+      const el = container.querySelector(selector) as HTMLElement;
+      expect(el).toHaveAttribute('data-ctl', 'round');
+      expect(el.style.backgroundImage).toContain('round-socket-normal.webp');
+    }
+  });
+
   it('paused: the selected speed keeps only the armed ring (no fill)', () => {
     const { container } = renderTime(2, true);
     const armed = container.querySelector('[data-hr-time="x2"]') as HTMLElement;

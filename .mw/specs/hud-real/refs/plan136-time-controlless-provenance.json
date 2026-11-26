@@ -1,0 +1,67 @@
+{
+  "plan": "PLAN-136",
+  "artifacts": [
+    {
+      "artifact": "public/assets/ui/hud-real/time/bar-controlless.webp",
+      "sha256": "ca06ba8115cce3dbd240895cd5302df78aaac45fc0eccd3ef25418bbd602b3ec",
+      "source": "public/assets/ui/hud-real/time/bar.webp",
+      "rects": [
+        [
+          508,
+          54,
+          578,
+          124
+        ],
+        [
+          594,
+          54,
+          664,
+          124
+        ],
+        [
+          680,
+          53,
+          749,
+          124
+        ],
+        [
+          766,
+          53,
+          836,
+          124
+        ]
+      ]
+    },
+    {
+      "artifact": "public/assets/ui/hud-real/time/bar-slim-controlless.webp",
+      "sha256": "5cb01c71f807838de839981efebc01ce49784d226528ae8fbc276eb3242ec899",
+      "source": "public/assets/ui/hud-real/time/bar-slim.webp",
+      "rects": [
+        [
+          398,
+          17,
+          465,
+          88
+        ],
+        [
+          480,
+          17,
+          547,
+          88
+        ],
+        [
+          562,
+          17,
+          629,
+          88
+        ],
+        [
+          644,
+          17,
+          711,
+          88
+        ]
+      ]
+    }
+  ]
+}

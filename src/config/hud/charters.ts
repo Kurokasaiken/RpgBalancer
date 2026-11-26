@@ -363,7 +363,7 @@ const CHARTER_DATA: ComponentCharter[] = [
     },
     states: {
       default: {
-        changes: 'medaglione dipinto `dial-frame.webp` (regen battezzata, 8 pinne, no aletta) seduto sul cap di giunzione, sede centrata (29, 26.9 — dock banner 58), Ø85 — dentro la sede il disco sole/luna al 100% e la corona tick di fase sull\'anello oro; pill velocità data-ctl (radiogroup ≤3 socket): velocità ingaggiata = anello ottone pieno 3px + alone caldo + cifra oro brillante (J, niente riempimento), selezionata in pausa = solo anello armato, inattive incise; stessa marcatura J sul pulsante pausa quando il gioco è fermo',
+        changes: 'medaglione dipinto `dial-frame.webp` (regen battezzata, 8 pinne, no aletta) seduto sul cap di giunzione, sede centrata (29, 26.9 — dock banner 58), Ø85 — dentro la sede il disco sole/luna al 100% e la corona tick di fase sull\'anello oro; pill velocità data-ctl=round sul socket Events canonico (radiogroup ≤3 socket, barra control-neutral baked): velocità ingaggiata = anello ottone pieno 3px + alone caldo + cifra oro brillante (J, niente riempimento), selezionata in pausa = solo anello armato, inattive incise; stessa marcatura J sul pulsante pausa quando il gioco è fermo',
         ruling: 'Director 2026-11-11 (phase dial) + PLAN-112 F4.1 + Director 2026-11-23 (medaglione gen. Director «prova quella» + posizione via dial-positioner)',
       },
       hover: {
@@ -383,7 +383,7 @@ const CHARTER_DATA: ComponentCharter[] = [
         ruling: 'Director 2026-11-11 (phase dial)',
       },
       {
-        trait: 'pill velocità come radiogroup data-ctl — stesso pattern delle tab stash (vocabolario unico)',
+        trait: 'pill velocità come radiogroup data-ctl sul socket rotondo Events canonico — stesso controllo di stash/roster (R-391)',
         ruling: 'R-353 pattern data-ctl condiviso',
       },
       {
@@ -486,10 +486,10 @@ const CHARTER_DATA: ComponentCharter[] = [
     confidence: 'reconstructed',
     materials: [
       { material: 'smalto-smeraldo', region: 'panel-frame', note: 'corniciStash panel-frame7 thin ×0.5' },
-      { material: 'smalto-smeraldo', region: 'detail-card', note: 'medaglione smeraldo+ottone della detail card (R-363)' },
-      { material: 'ottone', region: 'stash-grid', note: 'piastrina: cornice hover/selected sulle celle' },
-      { material: 'oro-filetto', region: 'scroll-band', note: 'banda oro inciso condivisa' },
-      { material: 'champagne', region: 'kind-tabs', note: 'glifi incisi sui tab data-ctl=round' },
+      { material: 'ottone', region: 'stash-grid', note: 'socket quadrato events-family: rim ottone + pozzo laccato' },
+      { material: 'smalto-smeraldo', region: 'stash-grid', note: 'interno scuro/laccato delle alcove quadrate' },
+      { material: 'oro-filetto', region: 'scroll-track', note: 'thumb/track DOM verde-oro, solo overflow' },
+      { material: 'champagne', region: 'kind-tabs', note: 'glifi incisi sui socket round canonici data-ctl=round' },
     ],
     anatomy: {
       kind: 'zones',
@@ -497,18 +497,17 @@ const CHARTER_DATA: ComponentCharter[] = [
         { name: 'panel-frame', medium: 'art' },
         { name: 'kind-tabs', medium: 'dom' },
         { name: 'stash-grid', medium: 'dom' },
-        { name: 'detail-card', medium: 'dom' },
-        { name: 'scroll-band', medium: 'dom' },
+        { name: 'scroll-track', medium: 'dom' },
       ],
     },
     states: {
       default: {
-        changes: 'griglia well-cells (il pozzo È la cornice della cella) + kind tabs + detail card a riposo',
-        ruling: 'R-353 stash griglia+tab+detail 2026-11-16',
+        changes: 'griglia 5×3 di square-socket DOM + filtri/close nella title row; nessuna scritta visibile nel footer',
+        ruling: 'R-391/PLAN-136 stash round sockets 2026-11-26',
       },
       hover: {
-        changes: 'piastrina ottone sulla cella + anteprima nella detail card (hover/focus condivisi)',
-        ruling: 'D-20261120-piastrina + ri-significato 2026-11-21; R-353 preview',
+        changes: 'bordo/esterno della square alcove si colora con glow smeraldo; dettaglio solo nel tooltip condiviso',
+        ruling: 'R-391/PLAN-136 hover alcova 2026-11-26',
       },
       focus: {
         changes: 'stessa anteprima della hover + focus-visible sul controllo',
@@ -522,7 +521,7 @@ const CHARTER_DATA: ComponentCharter[] = [
         changes: 'cella shelf vuota: testo sr-only dentro la cella (la griglia porta il vuoto, non lo nasconde)',
       },
       full: {
-        changes: 'shelf oltre capienza: banda oro inciso pilota lo scroll (HudScrollBand)',
+        changes: 'track/thumb laterale DOM appare solo se gli item filtrati superano le 15 alcove visibili; sparisce quando rientrano',
       },
     },
     appreciated: [
@@ -539,8 +538,8 @@ const CHARTER_DATA: ComponentCharter[] = [
         ruling: 'R-353 stash griglia+tab 2026-11-16',
       },
       {
-        trait: 'medaglione smeraldo+ottone battezzato della detail card',
-        ruling: 'R-363 detail card',
+        trait: 'socket rotondo Events canonico condiviso per filtri/close su stash, roster e tempo',
+        ruling: 'R-391/PLAN-136 Director 2026-11-26',
       },
     ],
     typeFloor: [
@@ -549,9 +548,9 @@ const CHARTER_DATA: ComponentCharter[] = [
     ],
     proportions: {
       basis: 'dom',
-      unit: 'px (VILLAGE_STASH_CONFIG.panel.widthPx; shelf 3×2)',
+      unit: 'px (VILLAGE_STASH_CONFIG.panel.widthPx; shelf 5×3)',
       resize: 'dom-flow',
-      note: 'shelf 3×2 = PLAN-125 Fase 9 + piastrina hover 2026-11-20/21',
+      note: 'shelf 5×3 + header controls = PLAN-136; backing `stash-frame-no-grid.webp` senza pozzetti/track dipinti',
     },
     openIssues: [
       {

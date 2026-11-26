@@ -64,62 +64,81 @@ describe('stash shelf grid (INV-3)', () => {
     });
   });
 
-  it('offers a radiogroup of kind tabs derived from the config kinds', () => {
+  it('offers a row of round kind filters derived from the config kinds', () => {
     renderPanel();
-    const tabs = screen.getByRole('radiogroup', { name: 'gameFrame.stash.filterLabel' });
-    expect(within(tabs).getByTestId('stash-tab-all')).toHaveAttribute('aria-checked', 'true');
-    // Every configured kind gets a tab; the shelf config stocks consumables.
+    const group = screen.getByRole('group', { name: 'gameFrame.stash.filterLabel' });
+    expect(within(group).getByTestId('stash-filter-all')).toHaveAttribute('aria-pressed', 'true');
     const expectedKinds = [...new Set(CFG.items.map((i) => defaultQuestItems[i.itemId]?.kind).filter(Boolean))];
     for (const kind of expectedKinds) {
-      expect(within(tabs).getByTestId(`stash-tab-${kind}`)).toBeInTheDocument();
+      expect(within(group).getByTestId(`stash-filter-${kind}`)).toBeInTheDocument();
     }
   });
 
   it('keeps the full stock visible under a kind tab whose kind covers every row', () => {
     renderPanel();
-    fireEvent.click(screen.getByTestId('stash-tab-consumable'));
+    fireEvent.click(screen.getByTestId('stash-filter-consumable'));
     const list = screen.getByRole('list');
     expect(within(list).getAllByRole('listitem')).toHaveLength(CFG.items.length);
-    fireEvent.click(screen.getByTestId('stash-tab-all'));
+    fireEvent.click(screen.getByTestId('stash-filter-all'));
     expect(within(list).getAllByRole('listitem')).toHaveLength(CFG.items.length);
+  });
+
+  it('seats filters in the header before close, keeps empty alcoves visible, and hides the scroll control at capacity', () => {
+    renderPanel();
+    const group = screen.getByTestId('stash-filters');
+    expect(group.style.position).toBe('absolute');
+    expect(group.style.right).not.toBe('');
+    expect(group.style.left).toBe('');
+    expect(screen.getAllByTestId('stash-empty-alcove')).toHaveLength(Math.max(0, 15 - CFG.items.length));
+    expect(screen.queryByTestId('stash-scroll-track')).toBeNull();
+    expect(screen.queryByTestId('stash-mode-hint')).toBeNull();
+    expect(screen.queryByTestId('stash-bag-full-hint')).toBeNull(); // read-only fixture: hint may exist only sr-only when a bound bag is full
+  });
+
+  it('shows the lateral scroll control only when filtered rows exceed the fifteen visible alcoves', () => {
+    const overflowConfig = {
+      ...CFG,
+      items: Array.from({ length: 16 }, (_, i) => ({ itemId: `quest_overflow_${i}`, qty: 1 })),
+    } as typeof CFG;
+    const scrollHeight = vi.spyOn(HTMLDivElement.prototype, 'scrollHeight', 'get').mockImplementation(function () {
+      return this.getAttribute('data-testid') === 'stash-shelf' ? 640 : 0;
+    });
+    const clientHeight = vi.spyOn(HTMLDivElement.prototype, 'clientHeight', 'get').mockImplementation(function () {
+      return this.getAttribute('data-testid') === 'stash-shelf' ? 320 : 0;
+    });
+    render(<VillageStashPanel config={overflowConfig} left={0} top={0} widthPx={320} zIndex={12} onClose={() => {}} />);
+    expect(screen.getByTestId('stash-scroll-track')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('stash-filter-all'));
+    scrollHeight.mockRestore();
+    clientHeight.mockRestore();
   });
 });
 
-// INV:village-stash-panel.INV-4 — the detail card previews the last hovered/focused
-// item in the shared tooltip vocabulary (name, effect, covers, stock), falling back
-// to the first visible row; the Pack affordance exists only when a planner is bound.
-describe('stash item detail card (INV-4)', () => {
-  it('previews the first shelf row by default in the shared vocabulary', () => {
+// INV:village-stash-panel.INV-4 — the fixed detail card is retired (Director 2026-11-26): the item
+// is described by its shared tooltip on hover/focus, and a click assigns only with a bound planner.
+// Read-only: no button, and a click changes nothing in the ledger.
+describe('stash item interaction (INV-4)', () => {
+  it('has no fixed detail card and no Pack button in read-only mode', () => {
     renderPanel();
-    const detail = screen.getByTestId('stash-detail');
-    const first = defaultQuestItems[CFG.items[0].itemId];
-    expect(detail).toHaveTextContent(first.labelKey);
-    /* R-363 detail card: stock reads as the «N in store» line, not a badge. */
-    expect(detail).toHaveTextContent(`${CFG.items[0].qty} in store`);
-    expect(detail).toHaveTextContent('gameFrame.stash.usableInExpeditions');
+    expect(screen.queryByTestId('stash-detail')).toBeNull();
+    expect(screen.queryByTestId('stash-pack-detail')).toBeNull();
+    expect(screen.queryAllByRole('button').filter((b) => b.getAttribute('data-testid')?.startsWith('stash-item-'))).toHaveLength(0);
   });
 
-  it('updates the preview when a cell is hovered', () => {
+  it('a read-only click on a cell does not mutate the ledger', () => {
     renderPanel();
     const rows = within(screen.getByRole('list')).getAllByRole('listitem');
-    fireEvent.mouseEnter(rows[2]);
-    const detail = screen.getByTestId('stash-detail');
-    expect(detail).toHaveTextContent(defaultQuestItems[CFG.items[2].itemId].labelKey);
+    fireEvent.click(rows[0]);
+    expect(useVillageStashStore.getState().lastEvent).toBeNull();
   });
 
-  it('carries no Pack affordance in read-only mode', () => {
-    renderPanel();
-    expect(screen.getByTestId('stash-detail')).toBeInTheDocument();
-    expect(screen.queryByTestId('stash-pack-detail')).toBeNull();
-  });
-
-  it('exposes a Pack button in bound mode that assigns through the ledger', () => {
+  it('bound mode: a click on a cell assigns through the ledger', () => {
     setLedger({ activeStashOwner: 'poi-demo' });
     renderPanel();
     expect(screen.getByTestId('stash-shelf')).toHaveAttribute('data-stash-mode', 'interactive');
-    const pack = screen.getByTestId('stash-pack-detail');
-    expect(pack).toHaveAttribute('data-assign-state', 'eligible');
-    fireEvent.click(pack);
+    const cell = screen.getByTestId(`stash-item-${CFG.items[0].itemId}`);
+    expect(cell).toHaveAttribute('data-assign-state', 'eligible');
+    fireEvent.click(cell);
     expect(useVillageStashStore.getState().lastEvent?.kind).toBe('assign');
     expect(useVillageStashStore.getState().lastEvent?.itemId).toBe(CFG.items[0].itemId);
   });
@@ -130,13 +149,13 @@ describe('stash item detail card (INV-4)', () => {
   // supersedes the PanelFrameOrnaments contract) with the stock counter the
   // mockup paints («24 / 24») restored — supersedes the 2026-11-20 no-counter
   // ruling.
-  it('mounts the mockup painted backdrop and the stock counter', () => {
+  it('mounts the mockup painted backdrop and no stock counter', () => {
     const { container } = renderPanel();
-    const backdrop = container.querySelector('img[src*="stash-frame-clean"]') as HTMLElement;
+    const backdrop = container.querySelector('img[src*="stash-frame-no-grid"]') as HTMLElement;
     expect(backdrop).toBeTruthy();
     expect(backdrop.getAttribute('aria-hidden')).toBe('true');
-    const cap = container.querySelector('[data-testid="stash-capacity"]') as HTMLElement;
-    expect(cap).toBeTruthy();
-    expect(cap.textContent).toContain('/');
+    expect(container.querySelector('[data-frame-manifest="stash-frame"]')).toBeNull();
+    /* The «N / M» counter is retired (Director 2026-11-26). */
+    expect(container.querySelector('[data-testid="stash-capacity"]')).toBeNull();
   });
 });

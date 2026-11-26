@@ -34,6 +34,10 @@ describe('LEGO board DOM contract (PLAN-134 §6)', () => {
       expect(card?.textContent).toContain(piece.provenance.ruling);
     }
     expect(container.querySelector('[data-lego-kind-group="frame"]')).toBeInTheDocument();
+    const timeDisc = container.querySelector('[data-lego-piece-card="time-disc-v1"] [data-piece-preview="time-disc-v1"]');
+    expect(timeDisc).toBeInTheDocument();
+    expect(timeDisc?.querySelector('[data-piece-asset="sun"]')).toBeInTheDocument();
+    expect(timeDisc?.querySelector('[data-piece-asset="moon"]')).toBeInTheDocument();
   }, 15000);
 
   it('unresolved lane has no ruling controls and control patterns are read-only', () => {

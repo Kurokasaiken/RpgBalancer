@@ -12,9 +12,9 @@ Scope: `/hud-lab` contiene una board di ruling per gli **art piece** di `src/con
 
 `inventoryRev` è SHA-256 della serializzazione canonica di: pezzi validi (`id/kind/status`), mapping Lab→piece, classificazioni unresolved, inclusi i difetti di schema del registry. Qualunque cambio a questi input invalida i packet già esportati.
 
-## Difetto registry noto: `time-disc-v1`
+## `time-disc-v1` multi-asset — risolto
 
-`time-disc-v1` è battezzato nel lavoro parallelo sul tempo ma non valida contro lo schema PLAN-130 corrente: usa `assets.sun`/`assets.moon` e `provenance.sha256_sun`/`sha256_moon` invece di `assets.master` + `provenance.sha256`. Decisione PLAN-134 (2026-11-25): la board **non** estende lo schema al multi-asset e **non** riscrive/splitta il pezzo dentro questo plan, perché entrambe sono mutazioni canoniche fuori scope. La voce resta quindi nella lane unresolved come inventory defect non-rulingable; una canonizzazione futura richiede ruling/plan dedicato (split in revisioni immutabili oppure amend esplicito dello schema multi-asset).
+`time-disc-v1` è canonizzato come pezzo raster multi-asset (`assets.sun`/`assets.moon`) dopo il ruling Director 2026-11-26: «multi asset, ma il cerchio verrà riutilizzato anche da altre parti». Lo schema PLAN-130 ora ammette varianti raster nomate di una stessa unità logica; la provenance conserva un unico `sha256`, calcolato sul fingerprint canonico `<assetKey>:<sha256(file)>` con chiavi ordinate. Il pezzo quindi non è più un inventory defect ed è rulingable come gli altri pezzi validi. La decisione PLAN-134 del 2026-11-25 resta storicamente corretta: la board non estese lo schema dentro quel plan; l'amend è avvenuto come ruling dedicato successivo.
 
 ## Uso della board
 

@@ -1,0 +1,7 @@
+{
+  "artifact": "public/assets/ui/hud-real/controls/square-socket-normal.webp",
+  "sha256": "6209cf8a243fa176515664946f29075972c04563e3bd2614e9a8bedbf2234b36",
+  "construction": "deterministic rounded-square brass rim + green lacquer well; seed=136",
+  "reference": ".mw/specs/hud-real/refs/ref-round-filter-sockets-2026-11-26.png",
+  "plan": "PLAN-136"
+}

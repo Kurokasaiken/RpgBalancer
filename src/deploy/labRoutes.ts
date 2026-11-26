@@ -76,6 +76,7 @@ export const LAB_ROUTE_COMPONENTS: LabRouteComponents = {
   "/hud-layout": lazy(() => import('../pages/hud-layout').then(m => ({ default: m.default }))),
   "/hud-roster-crop": lazy(() => import('../pages/hud-roster-crop').then(m => ({ default: m.default }))),
   "/hud-target": lazy(() => import('../pages/hud-target').then(m => ({ default: m.default }))),
+  "/events-tuner": lazy(() => import('../pages/events-tuner').then(m => ({ default: m.default }))),
   "/hud-zanara-roster": lazy(() => import('../pages/hud-zanara-roster').then(m => ({ default: m.default }))),
   "/hud-roster-mockup": lazy(() => import('../pages/hud-roster-mockup').then(m => ({ default: m.default }))),
   "/hud-r1": lazy(() => import('../pages/hud-r1').then(m => ({ default: m.default }))),

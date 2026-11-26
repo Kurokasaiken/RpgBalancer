@@ -74,8 +74,12 @@ Questo progetto ha `CANON.md` come mappa delle autorità; fino a una revisione e
 - **Provider API supportati:** `openrouter`, `groq`, `anthropic`, `openai`, `cerebras`, `mistral`,
   `gemini` (usa `GOOGLE_API_KEY`).
 - **Provider web:** `chatgpt`, `claude` — richiedono sessioni autenticate in `.mw/providers/sessions/`.
+- **Trasporto provider web — protocollo canonico (2026-11-26):** due strade. (a) **AppleScript v69** su Chrome personale del Director: `mind-weaver/tools/mw-chatgpt-watch.py` osserva e inietta nelle tab via AppleScript `execute javascript` — niente CDP, niente riavvio browser, niente furto di focus; è la strada per conversazioni dentro i **progetti web** (Wanderlust triumph / Videogame RPG), perché il contesto progetto vive nell'account e la conversazione-progetto va continuata, non ricreata. ChatGPT-specifico nei selector: per grok/gemini/deepseek servono adapter con la stessa tecnica. Richiede "Allow JavaScript from Apple Events" attivo in Chrome. (b) **CDP/Canary** (`mw-web-turn.py`): Canary è il browser provider sulla porta 9222, il Chrome personale non va mai toccato da automation CDP né da `mw-provider-tabs`; sessioni rinfrescabili con `mind-weaver/scripts/mw-web-cookie-import.py --provider X --source cdp --cdp-port 9222 --yes` dopo login manuale in Canary. Prima di postare verificare con `inspect` di essere sulla conversazione giusta: un CONVERSATION_MISMATCH silenzioso crea chat spurie fuori progetto.
 - **Bridge Telegram:** `RPG/tools/telegram-mw-bridge.py` legge `.env` di RPG, invoca
   `RPG/scripts/mw-ask.py` con fallback a `mind-weaver/scripts/mw-ask.py`.
+- **Resource lifecycle:** `RPG/tools/resource-lifecycle` è un symlink vivo alla fonte
+  canonica Mind Weaver; non copiare i tool in RPG. Contratto operativo:
+  `.windsurf/rules/17-resource-lifecycle.md`.
 - **Skill di apprendimento e bugfix:**
   - `RPG/.agents/skills/learn/SKILL.md` — cattura pattern e mantiene contesto.
   - `RPG/.agents/skills/bugfix/SKILL.md` — workflow generico di bugfix.

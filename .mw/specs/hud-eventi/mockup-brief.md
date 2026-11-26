@@ -136,9 +136,11 @@ pericoli, altri colori saranno x altro»*.
   pinnato se presente, altrimenti scadenza più vicina), il suo countdown e
   apre/chiude il pannello Eventi esistente. Non introduce una seconda lista né
   una modale.
-- Il riferimento magenta non si edita mai. La derivazione produzione è
-  deterministicamente rigenerabile con `scripts/hud-real/build-events-bar.py`
-  → `public/assets/ui/hud-real/events/bar.webp`.
+- Il riferimento magenta non si edita mai. La pipeline `build-events-bar.py`
+  → `build-events-tube.py` → `build-events-interior.py` resta la storia della
+  derivazione dell'artifact `events/bar.webp`, ma dal 2026-11-26 sera quel
+  file non è più il guscio live: il guscio è lo stesso oggetto riusabile del
+  Tempo (`HudRealTimeShellLayers` + `TIME_SLIM_BAR`), consumato mirrored.
 
 ### Implementazione corrente
 
@@ -163,3 +165,18 @@ Il testo vivo sta su una sola riga; il countdown compatto (`5d`) viene messo
 alla fine, immediatamente prima della gemma. Witness aggiornato:
 `test-results/r386-events-bar/swap-empty-bar.png`,
 `swap-threat-bar.png`, probe `swap-probe.json`.
+
+
+### Guscio condiviso integrale — ruling 2026-11-26 sera
+
+Il Director ha trasformato la fase da "ibrido con rail Time" a sostituzione
+integrale riusabile: *«fai quella parte integralmente»* e *«non deve essere un
+altro componente o una copia, devono puntare allo stesso oggetto proprio»*.
+Il contratto corrente quindi non è più una shell Events derivata: `HudRealTime`
+e `HudRealEventsBar` montano entrambi `HudRealTimeShellLayers` sullo stesso
+`TIME_SLIM_BAR`. Events è il consumer mirrored. Dopo la correzione Director il
+centro non è coperto da una maschera: `time/bar-slim-empty.webp` è la variante
+baked dello stesso master Time, con smalto/socket dipinti del Tempo fisicamente
+rimossi e sostituiti dall'interno donato dal vecchio Events; dentro ospita la
+lettura evento, mentre il medaglione destro contiene gem-content semantico +
+glifo tipo.

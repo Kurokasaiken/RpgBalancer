@@ -66,6 +66,8 @@ generato, un solo pezzo d'arte nuovo con gate del Director.
 
 ## 3. La soluzione: apron dipinto, canvas intatto
 
+Raccordo nord (R-392): [PLAN-137](../../../../plans/PLAN-137-hud-night-11.md) richiede una prova del cielo stellato separato dalle nuvole dietro la cresta. Riusa questo fit e questa cornice; non autorizza spostamento di terra o sostituzione del dipinto originale.
+
 - Il canvas 2752×1536 e **tutti** i suoi asset restano byte-identici: POI, maschere, regioni, tasselli,
   grade, notte. Nessuna coordinata cambia.
 - Si aggiunge un **apron**: una cornice dipinta *attorno* al canvas (coordinate negative / oltre 2752),
@@ -396,3 +398,77 @@ Questa sezione registra l'autorizzazione esplicita successiva all'hard stop di �
 3. **Gate invariato.** L'eventuale attempt5 deve essere validato con gli stessi criteri frozen. Se fallisce, la striscia resta non ingested e la decisione torna al Director senza altri retry impliciti.
 4. **Esito attempt5.** Chat `https://gemini.google.com/app/42b67bf1c8366d3f`; il download nativo non è scattato, ma il capture canvas è full-size `1376×768`, opaco, quindi la validazione sui pixel decodificati resta eseguibile. Color transfer applicato su 251368 campioni. Validazione frozen: un solo hard error, `painted reference p95DeltaE 22.6463 > 18`; seam canvas, strict outer-water e independent-land PASS, nessun review flag. Il risultato è leggermente peggiore di attempt4 sul repaint (`p95 22.6463` contro `22.5323`, mean `7.4930` contro `6.8869`): il multi-reference non risolve il repaint sistemico. Striscia non ingested; nessun altro retry è autorizzato.
 5. **Osservazione di coerenza.** Il piano originale prevedeva già che Gemini ridipingesse il ritaglio e che il compositing tenesse solo la parte vuota. Poiché attempt4/attempt5 passano seam, low-frequency, outer-water e independent-land, il repaint high-frequency dentro la reference appare il solo blocco residuo: una futura modifica del gate deve essere esplicita e motivata, non retroattiva.
+
+## 15. Correzione Director — ricomposizione dei corner, non estensione laterale (2026-11-26)
+
+Questa sezione prevale su ogni frase precedente in conflitto, incluse le parti di crop/outpainting che trattano le masse tagliate ai bordi come geografia da continuare.
+
+1. **Modello corretto.** Gli elementi decorativi esistenti ai bordi/corner devono essere **selezionati, separati e traslati** verso gli angoli/bordi della composizione allargata. Lo spazio che lasciano dentro il dipinto originale viene riempito con mare. Il continente centrale non viene ridisegnato né rimpicciolito dentro il canvas: risulta più piccolo perché il campo visivo finale contiene più mare.
+2. **Divieto semantico.** È vietato aggiungere nuova terra, continuare un corner in una costa laterale, trasformare elementi tagliati in masse geografiche estese o usare l'apron per “completare” quei pezzi come se fossero territorio. Attempt4/attempt5 non sono ingeribili anche quando seam/outer-water passano, perché espandono semanticamente un corner in territorio laterale.
+3. **Comportamento runtime.** Dopo la ricomposizione gli elementi corner/bordo fanno parte della mappa e **seguono pan/zoom della mappa**. Non sono overlay HUD o elementi screen-fixed della viewport.
+4. **Selezione Director obbligatoria, ma non ritaglio preciso.** I pezzi da spostare non vengono decisi dall'agente né dedotti automaticamente: il Director li indica con il tool di selezione poligonale e drag target. I poligoni sono però **identificatori semantici grossolani** delle parti di terra/corner — il Director ha chiarito che non gli interessa ritagliarli correttamente/pixel-perfect in questa fase, solo far capire a quali parti si riferisce. La spec JSON risultante è input congelato per capire cosa spostare; il ritaglio/estrazione preciso sarà responsabilità della pipeline successiva, non del gesto manuale nel composer. Finché quella spec non esiste, niente generazione/compositing produzione.
+5. **Stato del lavoro precedente.** Le misure T1/T1.5 di camera/HUD/apron restano utili come vincoli geometrici. Il crop-plan Gemini e la pilot strip-based restano invece fermi: erano costruiti sul modello sbagliato di outpainting/continuazione delle forme tagliate. Nessun ulteriore retry Gemini è autorizzato su quella traiettoria.
+6. **Prossima revisione necessaria.** T2+ deve essere riscritto attorno a una pipeline di ricomposizione: spec corner/bordo approvata dal Director, estrazione pulita dei pezzi, riempimento mare dei vuoti, posizionamento target, verifica visuale human-eye e solo dopo integrazione runtime. Le metriche seam/repaint dovranno essere riprogettate per questo modello; non basta emendare la soglia `p95DeltaE` della pilot precedente.
+7. **Scala visiva nel composer.** Il corner composer può registrare per ogni pezzo una scala uniforme target (`mappa2-corner-composer/v2`, trasformazione “scala attorno al centroide sorgente, poi traslazione”). Questa scala serve al Director per valutare il fitting della composizione ed è marcata nella spec come `planning-footprint-only`: non è un'autorizzazione a ridimensionare automaticamente gli asset reali in produzione, che restano alla scala originale salvo ruling esplicito.
+8. **Pivot decisivo Director — continente rimpicciolito, masse laterali ferme (2026-11-26).** Il Director ha risposto **B** alla domanda sul contenuto delle selezioni e ha chiarito testualmente: *“in produzione sarà il continente a rimpicciolire, nn il resto ad ingrandirsi Mare + continente si rimpiccioliscono, le masse d terra laterali rimangono della stessa misura e posizione. Dove c'è spazio generiamo mare”*. Questo punto prevale sui punti 1/7 dove parlano di traslare/scalare le fasce come blocco e su ogni interpretazione “apron = spostare i pezzi”. Modello congelato per la prossima riscrittura T2+: i poligoni sono solo indicazioni semantiche delle zone; il contenuto concettuale è **solo terra/corner**; in produzione mare+continente centrale vengono rimpiccioliti, le masse laterali restano invariate per dimensione e posizione, e lo spazio esposto viene riempito con mare generato. Il JSON ricostruito `.mw/specs/mappa2-apron/corner-composer/director-2026-11-26.json` è evidenza delle zone indicate, non una trasformazione produzione: `scale=1.15` resta planning-footprint-only e non va applicato. Prima di implementare resta da confermare se il rettangolo/canvas finale resta `2752×1536` oppure se esiste comunque un canvas/output più grande in cui posizionare il continente rimpicciolito.
+
+## 16. Piano esecutivo sostitutivo — same-canvas `0.90 bottom-match` (handoff 2026-11-26)
+
+Questa sezione prevale su §15 e su tutta la traiettoria apron/outpaint precedente. È il resume point operativo per la prossima sessione: non riaprire il dibattito geometrico già chiuso, salvo nuovo ruling Director.
+
+### 16.1 Visual ruling congelato
+
+Il Director ha confermato **«stesso canvas»** e poi **«corretto»** sulla variante `0.90 bottom-match` con HUD. La geometria approvata è:
+
+- canvas/output finale: **invariato `2752×1536`**;
+- centro mare+continente: scala uniforme **`0.90`** attorno al centro del canvas, poi traslazione verticale verso il basso di circa **`+58px` world** (≈`34px` schermo a 1440×900);
+- riferimento verticale: l'isolotto basso stimato attorno a `(1320,1350)` world deve mantenere il gap originale dalla HUD inferiore, circa `24px` viewport nel mockup;
+- masse laterali terra/corner: **stessa dimensione e stessa posizione**, niente scala `1.15` e niente spostamento come blocco;
+- mare dentro i poligoni Director: non è un pezzo trasportato; i poligoni sono solo indicazioni semantiche delle zone laterali;
+- spazio esposto marino: mare pulito senza ghosting; **deroga nord R-392:** il vuoto oltre la cresta serve al cielo, non ad altro mare. Una sottile lama di mare/orizzonte ai lati dietro le nuvole resta alternativa da confrontare, non un riempimento già deciso.
+
+Baseline visual-fork congelata:
+
+- viewport approvata `.mw/specs/mappa2-apron/visual-fork/approved-bottommatch-viewport.png`, sha256 `9210f70c6b0eb85f13acaa0e9698025335fa7aa477b02e3b92db0f2588060da1`;
+- board HUD `.mw/specs/mappa2-apron/visual-fork/approved-bottommatch-hud-board.png`, sha256 `08fdedfbef9cc85dbbd57598b6c283f5400397e6d4f326b6167a2980944576ee`;
+- dettaglio gap `.mw/specs/mappa2-apron/visual-fork/approved-bottom-gap-detail.png`, sha256 `19cd7c0ed65ef4a19ab851cbfff9540a72768b5b2fab24c238e7989fb92a6a73`.
+
+Caveat della baseline: è un mockup procedurale. La geometria è approvata; la qualità di mare/cuciture **non** è approvata. L'ombra tipo montagne innevate in alto è ghosting da inpainting/blur e va eliminata in produzione.
+
+### 16.2 Verità architetturale da non saltare
+
+La mappa in `/game` non è una singola immagine piatta: il runtime usa il pack `public/assets/world/mappa2/base/` con layer, canopy cut-out, maschere mare/surf, tiles, grade, effetti, coordinate POI/villaggi/invasion e config derivate. Non basta sostituire `composite.webp` né scalare una texture nel renderer: bisogna produrre una nuova versione coerente dell'asset pack e rimappare le coordinate gameplay collegate.
+
+### 16.3 Task esecutivi proposti
+
+1. **T16-A — Freeze macchina della geometria.** Creare `.mw/specs/mappa2-apron/final-composition-spec.json` con: dimensioni canvas, scala centro `0.90`, centro di scaling, shift `+58`, poligoni semantici Director, reference point isolotto basso, classificazione provvisoria `central|fixed|transition` e baseline sha256 sopra. Test permanente sul parsing/invarianti della spec. **Stato 2026-11-26:** spec minima creata e validata come JSON round-trip (2 pezzi semantici); mancano ancora classificazione `transition` raffinata e test permanente.
+2. **T16-B — Inventory asset/coordinate.** Produrre una matrice asset-by-asset e coordinate-by-coordinate: `regenerate`, `transform-central`, `fixed-identity`, `manual-review`. Coprire almeno layer base/nocanopy/hi/v2, `Foreground.webp`, canopy, sea/surf masks, `sea_zones`, tiles, grade, sea pattern/foam, region ids/territories, POI demo/reali, villages, invasion land/path, spawn/journey e qualunque config normalizzata. Nessuna integrazione prima che questa matrice esista.
+3. **T16-C — Compositore offline base.** Implementare `scripts/plan135/build-mappa2-recomposed-base.py` (o nome equivalente) che legge la spec, usa gli asset sorgenti produzione, separa le masse laterali tramite maschere authored/raffinate — non i soli poligoni grossolani — ricompone il centro scalato+shifted, preserva i fixed pixel e riempie il vuoto con mare pulito. Output in una directory candidata versionata, non overwrite diretto del pack canonico.
+4. **T16-D — Sea fill quality gate.** Prima strategia: ricostruzione procedurale/patch/inpaint controllato dai pixel mare esistenti, vincolata a non trascinare terra. Se la review human-eye mostra ghosting o mare troppo sintetico, STOP e decisione Director su generazione assistita mirata del solo mare. Nessuna generazione AI implicita.
+5. **T16-E — Rigenerazione derivati.** Rigenerare o trasformare coerentemente tutti i derivati marcati `regenerate`/`transform-central` in T16-B: maschere, canopy, tiles, sea zones, grade, territory/region data e asset hi/standard necessari. Il criterio preferito è derivare dal base ricomposto, non patchare a mano ogni derivato.
+6. **T16-F — Coordinate gameplay remap.** Implementare una funzione di mapping documentata: punti `central` → scala `0.90` + shift `+58`; punti `fixed` → identità; punti `transition` → classificazione manuale registrata. Applicarla a POI, villages, invasion, spawn/path e config world-normalized. Test permanenti devono fallire senza remap.
+7. **T16-G — Integrazione candidata.** Collegare il pack candidato al manifest/runtime in modo config-first e reversibile. Non rompere `/mappa2-lab` e route esistenti; se serve una modalità side-by-side, resta dev-only e headless.
+8. **T16-H — Verifica runtime.** Probe headless/background su `/game` canonical `localhost:5173`, inclusa cattura 1440×900 con HUD, giorno/notte se applicabile, e confronto con la baseline approvata. Verificare esplicitamente: niente contatto terra/HUD per i tre componenti superiori e la nav inferiore centrale; gap isolotto/HUD circa `24px` viewport con tolleranza da registrare; niente ghost montagne; niente duplicazioni delle masse laterali.
+
+### 16.4 Contratto di chiusura proposto
+
+Obbligazioni blocking minime da tradurre in `verification.json` quando il task viene eseguito:
+
+- test permanente `final-composition-spec` + test transform/remap (`npm run test -- <scope>`) verdi;
+- script compositore deterministico: stesso input → stesso sha256 output entro tolleranza nulla o documentata;
+- validazione asset: dimensioni `2752×1536`, manifest/schema validi, nessun asset canonico sovrascritto senza backup/versionamento;
+- regression test permanente per il mapping coordinate central/fixed;
+- witness headless `/game` 1440×900 con HUD che dimostra il bottom-gap e l'assenza di contatto terra/HUD nei componenti target;
+- human-eye Director su side-by-side baseline approvata vs implementazione, stessa viewport;
+- `npm run lint -- <scope>`, `npm run build:check`, `npm run closure:lint`, `npm run governance:check` come da invarianti, oppure debito preesistente esplicitamente registrato.
+
+### 16.5 Open decision da non decidere silenziosamente
+
+- metodo finale del mare: procedurale/patch controllato oppure generazione assistita mirata solo-mare;
+- perimetro esatto dei fixed asset nelle zone di transizione, specie dove terra laterale e continente si toccano;
+- comportamento dei POI/marker durante pan/zoom dopo il remap: dimensione world-attached, screen-sized o ibrida, secondo contratto esistente;
+- destino di nuvole, sea-life, canopy e `Foreground` bottom strip: fixed, central, rigenerati o ricomposti caso per caso nella matrice T16-B.
+
+**Resume point immediato:** iniziare da T16-A/T16-B, non dal compositing. Non usare più il crop-plan strip/Gemini di §§12-15 come traiettoria produzione.
+
+**Raccordo esecutivo R-392 (nord):** in T16-B classificare separatamente cielo, profilo della cresta, acqua e nuvole di contorno; T16-C/D applicano il sea fill solo alla maschera marina. T16-H verifica anche cime libere dal chrome e continuità ai lati del cielo. Geometria e remap di §16 invariati. Ruota diurna, moto delle nuvole, opzioni A/B e verifica visiva vivono in [PLAN-137, revisione nord](../../../../plans/PLAN-137-hud-night-11.md#revisione-nord-la-mappa-come-orologio).

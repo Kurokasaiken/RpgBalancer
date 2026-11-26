@@ -1,63 +1,31 @@
 /**
- * eventsBarConfig — visual/geometry contract of the docked Events bar
- * (Director reference 2026-11-25, `.mw/specs/hud-eventi/refs/ref-eventi-bar-specular-time-2026-11-25.png`).
+ * Events collapsed-bar content contract.
  *
- * The source art is the Director-registered bar keyed from magenta by
- * `scripts/hud-real/build-events-bar.py` (976×186). Geometry is authored in
- * design px at 2× resolution — the same model as the signed Time/Resources
- * bars — so the component's intrinsic box is 488×93.
+ * Director ruling 2026-11-26: the shell is NOT Events-owned art. It is the
+ * same reusable Time shell (`HudRealTimeShellLayers` + `TIME_SLIM_BAR`),
+ * consumed mirrored. This config therefore carries only the Events-specific
+ * live content: typography, colours, spacing inside the shared content well,
+ * and the semantic gem treatment. Shell dimensions/geometry are deliberately
+ * absent so they cannot fork from Time.
  */
 import { z } from 'zod';
 
-const rectSchema = z
+const eventsBarConfigSchema = z
   .object({
-    x: z.number(),
-    y: z.number(),
-    w: z.number().positive(),
-    h: z.number().positive(),
-  })
-  .strict();
-
-const circleSchema = z
-  .object({
-    cx: z.number(),
-    cy: z.number(),
-    r: z.number().positive(),
-  })
-  .strict();
-
-export const eventsBarConfigSchema = z
-  .object({
-    asset: z.string().min(1),
-    art: z
-      .object({
-        w: z.number().positive(),
-        h: z.number().positive(),
-        sourceW: z.number().positive(),
-        sourceH: z.number().positive(),
-      })
-      .strict(),
-    field: rectSchema,
-    medallion: circleSchema,
-    gem: circleSchema,
-    /** Green neutral gem swapped wholesale from the signed Time component
-     *  (Director 2026-11-25: use the Time one, do not recolor/overpaint it). */
-    timeGem: z
-      .object({
-        url: z.string().min(1),
-        size: z.number().positive(),
-        offset: z.object({ x: z.number(), y: z.number() }).strict(),
-      })
-      .strict(),
+    assets: z.object({ neutralGem: z.string().min(1), medallionFrame: z.string().min(1) }).strict(),
+    /** Live-reading spacing inside the shared Time-shell content well. */
     content: z
       .object({
-        iconSizePx: z.number().positive(),
         horizontalGapPx: z.number().positive(),
         countdownGapPx: z.number().positive(),
-        titleWeight: z.number().positive(),
-        titleTrackingPx: z.number(),
+        wellPaddingXPx: z.number().positive(),
+        wellPaddingYPx: z.number().positive(),
+        medallionClearancePx: z.number().positive(),
+        medallionIconSizePx: z.number().positive(),
+        titleWeight: z.number().int().positive(),
+        titleTrackingPx: z.number().positive(),
         countdownMinWidthPx: z.number().positive(),
-        countdownWeight: z.number().positive(),
+        countdownWeight: z.number().int().positive(),
       })
       .strict(),
     fonts: z
@@ -76,15 +44,15 @@ export const eventsBarConfigSchema = z
         glow: z.string().min(1),
       })
       .strict(),
-    /** CSS filter recipes applied to a circular copy of the red gem. Red is
-     *  the danger state itself; the other tones recolour that painted gem
-     *  without replacing the art. */
+    /** Filters applied to the neutral green Time-gem content, clipped inside
+     *  the medallion seat. Neutral/good stay in the green family; warning and
+     *  danger move the same content toward amber/red without forking the shell. */
     gemFilters: z
       .object({
         danger: z.string(),
-        warning: z.string().min(1),
-        neutral: z.string().min(1),
-        good: z.string().min(1),
+        warning: z.string(),
+        neutral: z.string(),
+        good: z.string(),
       })
       .strict(),
   })
@@ -93,22 +61,17 @@ export const eventsBarConfigSchema = z
 export type EventsBarConfig = z.infer<typeof eventsBarConfigSchema>;
 
 const RAW_EVENTS_BAR_CONFIG: EventsBarConfig = {
-  asset: '/assets/ui/hud-real/events/bar.webp',
-  art: { w: 488, h: 93, sourceW: 976, sourceH: 186 },
-  /* Measured on the keyed production art, halved to design px. The safe
-   *  writing field extends under the subtle right-hand filigree; the countdown
-   *  stays clear of the gem bezel. */
-  field: { x: 90, y: 22, w: 303, h: 49 },
-  medallion: { cx: 67.5, cy: 46, r: 23 },
-  gem: { cx: 442.5, cy: 46, r: 27 },
-  timeGem: { url: '/assets/ui/hud-real/time/dial-frame.webp', size: 85, offset: { x: 0, y: 0 } },
+  assets: { neutralGem: '/assets/ui/hud-real/events/gem-neutral.webp', medallionFrame: '/assets/ui/hud-real/events/dial-frame.webp' },
   content: {
-    iconSizePx: 25,
     horizontalGapPx: 7,
     countdownGapPx: 10,
+    wellPaddingXPx: 13,
+    wellPaddingYPx: 3,
+    medallionClearancePx: 8,
+    medallionIconSizePx: 20,
     titleWeight: 700,
     titleTrackingPx: 0.4,
-    countdownMinWidthPx: 38,
+    countdownMinWidthPx: 34,
     countdownWeight: 700,
   },
   fonts: {
@@ -124,10 +87,10 @@ const RAW_EVENTS_BAR_CONFIG: EventsBarConfig = {
     glow: 'rgba(240, 201, 135, 0.55)',
   },
   gemFilters: {
-    danger: '',
-    warning: 'hue-rotate(28deg) saturate(1.08)',
-    neutral: 'hue-rotate(168deg) saturate(0.78) brightness(0.96)',
-    good: 'hue-rotate(105deg) saturate(0.95)',
+    danger: 'hue-rotate(220deg) saturate(1.6) brightness(0.88)',
+    warning: 'hue-rotate(250deg) saturate(1.28) brightness(1.03)',
+    neutral: '',
+    good: 'saturate(1.12) brightness(1.04)',
   },
 };
 

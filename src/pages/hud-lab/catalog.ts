@@ -73,6 +73,18 @@ export const LAB_CATALOG: readonly LabEntry[] = [
     },
   },
   {
+    id: 'stash-overflow-fixture',
+    kind: 'component',
+    title: 'Stash — fixture overflow (scroll condizionale)',
+    status: 'candidato',
+    family: 'triade',
+    host: 'stash-overflow',
+    provenance: {
+      ruling: 'PLAN-136 / R-391 (2026-11-26): la scrollbar laterale appare solo se le righe filtrate superano la capacità visibile (15 alcove)',
+    },
+    notes: 'Fixture sintetica dichiarata: 18 righe duplicate dai consumabili reali — la config produzione capa a 12 item unici, sotto la capacità visibile, quindi l\'overflow non è altrimenti osservabile. Serve da witness permanente per il scroll condizionale.',
+  },
+  {
     id: 'victory-reward',
     kind: 'component',
     title: 'Victory / Reward (pergamena)',

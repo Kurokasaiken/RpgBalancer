@@ -116,6 +116,33 @@ export const StashHost: Host = () => {
   );
 };
 
+export const StashOverflowHost: Host = () => {
+  /* PLAN-136 witness fixture: a synthetic shelf config with 18 rows so the
+   * conditional scroll track (R-391) can be witnessed — production data caps
+   * at 12 unique consumables, below the 15-alcove visible capacity. The panel
+   * takes config as a prop, so no production validation is bypassed. */
+  useEffect(() => { void useVillageStashStore.getState().hydrate(); }, []);
+  const overflowConfig = useMemo(() => ({
+    ...VILLAGE_STASH_CONFIG,
+    items: Array.from({ length: 18 }, (_, i) => ({
+      itemId: VILLAGE_STASH_CONFIG.items[i % VILLAGE_STASH_CONFIG.items.length]!.itemId,
+      qty: 1,
+    })),
+  }), []);
+  return (
+  <div style={{ position: 'relative', height: 430, overflow: 'hidden' }}>
+    <VillageStashPanel
+      config={overflowConfig}
+      left={0}
+      top={0}
+      widthPx={VILLAGE_STASH_CONFIG.panel.widthPx}
+      zIndex={1}
+      onClose={() => undefined}
+    />
+  </div>
+  );
+};
+
 export const TopChromeHost: Host = () => {
   const { t } = useTranslation('idleVillage');
   const { state, config } = useMinimalGameplayWithIdleVillageConfig();

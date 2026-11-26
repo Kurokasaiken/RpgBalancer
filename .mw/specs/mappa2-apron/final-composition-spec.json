@@ -1,0 +1,175 @@
+{
+  "schema": "mappa2-final-composition/v1",
+  "status": "approved-geometry-mockup-only",
+  "canvas": {
+    "width": 2752,
+    "height": 1536,
+    "mode": "same-canvas"
+  },
+  "centerTransform": {
+    "scale": 0.9,
+    "scaleAbout": {
+      "x": 1376,
+      "y": 768
+    },
+    "postTranslate": {
+      "dx": 0,
+      "dy": 58
+    },
+    "units": "world px",
+    "appliesTo": "central sea+continent content only"
+  },
+  "fixedSemanticZones": {
+    "source": "mappa2-corner-composer/director-2026-11-26.json",
+    "polygonsAre": "semantic gross indications, not cut masks",
+    "pieces": [
+      {
+        "id": "piece-1",
+        "label": "corner-tr",
+        "polygon": [
+          {
+            "x": 965.07,
+            "y": 13.65
+          },
+          {
+            "x": 9.66,
+            "y": 8.59
+          },
+          {
+            "x": 4.6,
+            "y": 1509.96
+          },
+          {
+            "x": 985.29,
+            "y": 1520.07
+          },
+          {
+            "x": 889.25,
+            "y": 1393.69
+          },
+          {
+            "x": 707.26,
+            "y": 1307.75
+          },
+          {
+            "x": 606.16,
+            "y": 1130.83
+          },
+          {
+            "x": 585.94,
+            "y": 1019.61
+          },
+          {
+            "x": 560.67,
+            "y": 918.51
+          },
+          {
+            "x": 671.88,
+            "y": 852.79
+          },
+          {
+            "x": 601.11,
+            "y": 559.6
+          },
+          {
+            "x": 419.12,
+            "y": 372.56
+          },
+          {
+            "x": 530.33,
+            "y": 200.68
+          },
+          {
+            "x": 863.97,
+            "y": 205.74
+          },
+          {
+            "x": 975.18,
+            "y": 134.97
+          }
+        ]
+      },
+      {
+        "id": "piece-2",
+        "label": "corner-tr",
+        "polygon": [
+          {
+            "x": 2056.98,
+            "y": 3.54
+          },
+          {
+            "x": 2739.42,
+            "y": 8.59
+          },
+          {
+            "x": 2734.36,
+            "y": 1509.96
+          },
+          {
+            "x": 1960.93,
+            "y": 1515.01
+          },
+          {
+            "x": 2380.51,
+            "y": 1191.49
+          },
+          {
+            "x": 2370.4,
+            "y": 958.95
+          },
+          {
+            "x": 2405.78,
+            "y": 696.09
+          },
+          {
+            "x": 2426,
+            "y": 473.66
+          },
+          {
+            "x": 2304.68,
+            "y": 286.62
+          }
+        ]
+      }
+    ],
+    "productionRule": "only land/corner masses remain same size and position; sea inside polygons is not transported"
+  },
+  "bottomMatch": {
+    "referenceFeature": "lowest central islet",
+    "estimatedSourcePoint": {
+      "x": 1320,
+      "y": 1350
+    },
+    "viewport": "1440x900 fit-height",
+    "targetGapPx": 24,
+    "tolerancePx": 6,
+    "measuredMockupGapPx": 24
+  },
+  "seaFill": {
+    "required": "clean generated/reconstructed sea in exposed space",
+    "forbidden": "mountain/land ghosting from blur or inpainting; new land; continuation of side masses",
+    "method": "open decision: procedural/patch-controlled first; AI-assisted only after Director approval"
+  },
+  "visualForkBaseline": {
+    "viewport": {
+      "path": ".mw/specs/mappa2-apron/visual-fork/approved-bottommatch-viewport.png",
+      "sha256": "9210f70c6b0eb85f13acaa0e9698025335fa7aa477b02e3b92db0f2588060da1"
+    },
+    "hudBoard": {
+      "path": ".mw/specs/mappa2-apron/visual-fork/approved-bottommatch-hud-board.png",
+      "sha256": "08fdedfbef9cc85dbbd57598b6c283f5400397e6d4f326b6167a2980944576ee"
+    },
+    "gapDetail": {
+      "path": ".mw/specs/mappa2-apron/visual-fork/approved-bottom-gap-detail.png",
+      "sha256": "19cd7c0ed65ef4a19ab851cbfff9540a72768b5b2fab24c238e7989fb92a6a73"
+    }
+  },
+  "nonGoals": [
+    "no apron/outpainting continuation of coasts",
+    "no scaling or translating lateral landmasses as production transform",
+    "no use of composer scale 1.15 in production",
+    "no direct overwrite of canonical public asset pack"
+  ],
+  "createdAt": "2026-11-26T19:05:00Z",
+  "sourceRuling": "R-387 / PLAN-135 section 16"
+}

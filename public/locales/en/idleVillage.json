@@ -1191,7 +1191,7 @@
       "openRejected": "{name} is available after the quest"
     },
     "stash": {
-      "title": "Village stash",
+      "title": "Stash",
       "capacity": "{count} of {max} goods in store",
       "goodsCount": "{count} of {max} goods",
       "qty": "{qty} in store",

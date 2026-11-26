@@ -30,6 +30,15 @@ invariants:
       hidden + scrollbar-gutter riservato, mai bande che appaiono/scompaiono.
     test_refs:
       - tests/unit/idleVillage/rosterV2Controls.test.tsx
+  - id: drag-test-container-v2.INV-3
+    source: director-spec
+    source_ref: R-391
+    statement: >-
+      I controlli rotondi header del roster (filter, sort, close) usano il socket canonico Events
+      `round-socket-events-v1` tramite il vocabolario condiviso `data-ctl="round"`; non sono ammessi ring/pill
+      divergenti o asset slicekit legacy. Gli stati selected/hover/focus sono effetti DOM/CSS dello stesso socket.
+    test_refs:
+      - tests/unit/idleVillage/rosterV2Controls.test.tsx
 ---
 # drag-test-container-v2
 
@@ -55,3 +64,7 @@ Root: `src/ui/idleVillage/rosterV2/DragTestContainerV2.tsx`.
 - PLAN-054 T-002: partizione generata meccanicamente da `componentInventory.ts`.
 
 <!-- /plan054:generated -->
+
+## Emendamento R-391/PLAN-136
+
+Il roster eredita il socket Events canonico attraverso `skinScope.css [data-ctl="round"]`; nessuna modifica meccanica ai select nativi o alla hit-area R-238. Il controllo resto-roster è quindi allineato a stash e tempo per filtro/sort/close.

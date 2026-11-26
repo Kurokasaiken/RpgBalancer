@@ -27,10 +27,12 @@ import '@testing-library/jest-dom';
 import { GameTopChrome } from '@/ui/idleVillage/components/gameFrame/GameTopChrome';
 import { HudRealTime } from '@/ui/idleVillage/hudReal/HudRealTime';
 import { TIME_SLIM_BAR } from '@/ui/idleVillage/hudReal/timeSlimGeometry';
+import { TIME_SLIM_SHELL_EMPTY_ASSET } from '@/ui/idleVillage/hudReal/timeShellGeometry';
 import { RESOURCES_SLIM_BAR } from '@/ui/idleVillage/hudReal/resourcesSlimGeometry';
 import { useGameLayoutInsets } from '@/ui/idleVillage/store/useGameLayoutInsets';
 import { CASSETTO_LAYOUT_CONFIG } from '@/balancing/config/idleVillage/cassettoLayoutConfig';
 import { EVENTS_BAR_CONFIG } from '@/balancing/config/idleVillage/eventsBarConfig';
+import { EVENTS_PANEL_CONFIG } from '@/balancing/config/idleVillage/eventsPanelConfig';
 import { HudRealEventsBar } from '@/ui/idleVillage/hudReal/HudRealEventsBar';
 import type { HudEvent } from '@/ui/idleVillage/components/gameFrame/HudEventLedger';
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
@@ -263,8 +265,17 @@ describe('R-386 — the Events bar docks in the top-right reserve, specular to T
     const slot = screen.getByTestId('chrome-events');
     const left = parseFloat(slot.style.left);
     const width = parseFloat(slot.style.width);
-    expect(left + width).toBeCloseTo(1440 - TC.marginPx, 6);
-    expect(width).toBeCloseTo(TC.chronicleReservePx - TC.marginPx, 6);
+    /* Director 2026-11-26: the right edge docks at the symmetric margin —
+     *  same distance from the right edge as the Time sun reads from the left
+     *  (bannerMarginPx minus the sun medallion overhang, scaled by fit). */
+    const fit = fitFor(1440, TC.marginPx);
+    const eventsRightMargin = Math.max(TC.marginPx, TC.bannerMarginPx - TC.sunTipOverhangPx * fit);
+    expect(left + width).toBeCloseTo(1440 - eventsRightMargin, 6);
+    /* Director 2026-11-26: Events is literally the same Time shell mirrored,
+     *  so its width is TIME_SLIM_BAR.w at the shared fit unless the reserve
+     *  itself forces a smaller scale. */
+    const expectedWidth = TIME_SLIM_BAR.w * Math.min(1, (TC.chronicleReservePx - eventsRightMargin) / TIME_SLIM_BAR.w, fit);
+    expect(width).toBeCloseTo(expectedWidth, 6);
     const res = screen.getByTestId('chrome-resources');
     const resRight = parseFloat(res.style.left) + parseFloat(res.style.width);
     expect(resRight).toBeLessThanOrEqual(left + 1e-6);
@@ -303,27 +314,37 @@ describe('R-386 — collapsed event selection and gem semantics', () => {
   });
 
   // INV:game-top-chrome.INV-10
-  it('danger keeps the native red gem; other tones recolour a circular copy of it', () => {
-    const { rerender } = render(<HudRealEventsBar events={[threat]} />);
-    const bar = document.querySelector('[data-hudreal-events-bar]') as HTMLElement;
-    expect(bar.dataset.gemTone).toBe('danger');
-    expect(document.querySelector('[data-events-gem-filter]')).not.toBeInTheDocument();
-
-    rerender(<HudRealEventsBar events={[quest]} />);
-    expect(bar.dataset.gemTone).toBe('warning');
-    const gem = document.querySelector('[data-events-gem-filter]') as HTMLImageElement;
-    expect(gem).toBeInTheDocument();
-    expect(gem.style.clipPath).toContain(`circle(${EVENTS_BAR_CONFIG.gem.r}px`);
-    expect(gem.style.filter).toBe(EVENTS_BAR_CONFIG.gemFilters.warning);
+  it('consumes the same Time shell object mirrored, with the painted controls baked out', () => {
+    render(<HudRealEventsBar events={[threat]} />);
+    const shell = document.querySelector('[data-hudreal-events-bar] [data-time-shell-art]') as HTMLImageElement;
+    const medallion = document.querySelector('[data-hudreal-events-bar] [data-time-shell-medallion]') as HTMLImageElement;
+    expect(shell.getAttribute('src')).toBe(TIME_SLIM_SHELL_EMPTY_ASSET);
+    expect(shell.style.transform).toBe('scaleX(-1)');
+    expect(medallion.style.transform).toBe('scaleX(-1)');
+    expect(medallion.getAttribute('src')).toBe(EVENTS_BAR_CONFIG.assets.medallionFrame);
+    expect(document.querySelector('[data-hudreal-events-bar] [data-time-shell-blackwell]')).not.toBeInTheDocument();
   });
 
   // INV:game-top-chrome.INV-10
-  it('neutral swaps in the signed Time green gem asset instead of repainting the red one', () => {
-    render(<HudRealEventsBar events={[]} />);
-    const gem = document.querySelector('[data-events-gem-time]') as HTMLImageElement;
+  it('tones recolour the circular gem content inside the shared medallion seat', () => {
+    const { rerender } = render(<HudRealEventsBar events={[threat]} />);
+    const bar = document.querySelector('[data-hudreal-events-bar]') as HTMLElement;
+    expect(bar.dataset.gemTone).toBe('danger');
+    let gem = document.querySelector('[data-events-gem-tone]') as HTMLImageElement;
     expect(gem).toBeInTheDocument();
-    expect(gem.getAttribute('src')).toBe('/assets/ui/hud-real/time/dial-frame.webp');
-    expect(document.querySelector('[data-events-gem-filter]')).not.toBeInTheDocument();
+    expect(gem.getAttribute('src')).toBe(EVENTS_BAR_CONFIG.assets.neutralGem);
+    expect(gem.style.clipPath).toContain(`circle(${DEFAULT_GAME_FRAME_CONFIG.timeOfDay.dialSlim.disc}px`);
+    expect(gem.style.filter).toBe(EVENTS_BAR_CONFIG.gemFilters.danger);
+
+    rerender(<HudRealEventsBar events={[quest]} />);
+    expect(bar.dataset.gemTone).toBe('warning');
+    gem = document.querySelector('[data-events-gem-tone]') as HTMLImageElement;
+    expect(gem.style.filter).toBe(EVENTS_BAR_CONFIG.gemFilters.warning);
+
+    rerender(<HudRealEventsBar events={[]} />);
+    expect(bar.dataset.gemTone).toBe('neutral');
+    gem = document.querySelector('[data-events-gem-tone]') as HTMLImageElement;
+    expect(gem.style.filter).toBe('');
   });
 
   // INV:game-top-chrome.INV-9
@@ -394,5 +415,121 @@ describe('R-339 T6 — the sun ornament seats in the slim banner emerald', () =>
     expect(phase!.getAttribute('data-phase')).toBe('night');
     const moon = phase!.querySelector('img[src*="moon.webp"]') as HTMLImageElement;
     expect(moon.style.opacity).toBe('1');
+  });
+});
+
+describe('R-386-open (Director 2026-11-26) — the open panel stretches below the bar', () => {
+  const panelEvents: HudEvent[] = [
+    { id: 'invasion', typeId: 'threat', title: 'Invasione goblin', daysLeft: 5 },
+    { id: 'harvest-1', typeId: 'harvest', title: 'Raccolto pronto', daysLeft: 2 },
+    { id: 'quest-open', typeId: 'quest', title: 'Quest aperta', daysLeft: 1 },
+  ];
+  const flushRaf = async () => {
+    await act(async () => {
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    });
+  };
+
+  // INV:game-top-chrome.INV-11
+  it('closed renders no panel body; open mounts it below the bar with one row per event', async () => {
+    const { rerender } = render(
+      <TooltipProvider>
+        <GameTopChrome frame={{ scale: 1, W: 1440, H: 900 }} items={ITEMS} events={panelEvents} eventsOpen={false} />
+      </TooltipProvider>,
+    );
+    expect(document.querySelector('[data-hudreal-events-panel]')).not.toBeInTheDocument();
+    rerender(
+      <TooltipProvider>
+        <GameTopChrome frame={{ scale: 1, W: 1440, H: 900 }} items={ITEMS} events={panelEvents} eventsOpen />
+      </TooltipProvider>,
+    );
+    await flushRaf();
+    const panel = document.querySelector('[data-hudreal-events-panel]') as HTMLElement;
+    expect(panel).toBeInTheDocument();
+    expect(document.querySelectorAll('[data-events-panel-row]')).toHaveLength(3);
+    /* Shared-shell contract: the legacy 488px panel art is uniformly fitted
+     *  to the 419.5px Time shell rather than forking the collapsed width. */
+    expect(panel.parentElement?.style.transform).toBe(`scale(${TIME_SLIM_BAR.w / EVENTS_PANEL_CONFIG.art.w})`);
+  });
+
+  // INV:game-top-chrome.INV-11
+  it('rows sort pinned threat first, then the nearest deadline; the slice art tiles one band per row', async () => {
+    render(
+      <TooltipProvider>
+        <GameTopChrome frame={{ scale: 1, W: 1440, H: 900 }} items={ITEMS} events={panelEvents} eventsOpen />
+      </TooltipProvider>,
+    );
+    await flushRaf();
+    const ids = [...document.querySelectorAll('[data-events-panel-row]')].map((row) => (row as HTMLElement).dataset.eventsPanelRow);
+    expect(ids).toEqual(['invasion', 'quest-open', 'harvest-1']);
+    const rowImages = document.querySelectorAll('[data-events-panel-row] img[src*="panel-row"]');
+    expect(rowImages.length).toBe(3);
+  });
+
+  // INV:game-top-chrome.INV-12
+  it('the filter slots keep only the rows of the active type and "all" restores them', async () => {
+    render(
+      <TooltipProvider>
+        <GameTopChrome frame={{ scale: 1, W: 1440, H: 900 }} items={ITEMS} events={panelEvents} eventsOpen />
+      </TooltipProvider>,
+    );
+    await flushRaf();
+    const threatSlot = document.querySelector('[data-events-panel-slot="threat"]') as HTMLElement;
+    expect(threatSlot).toBeInTheDocument();
+    fireEvent.click(threatSlot);
+    const ids = [...document.querySelectorAll('[data-events-panel-row]')].map((row) => (row as HTMLElement).dataset.eventsPanelRow);
+    expect(ids).toEqual(['invasion']);
+    expect((document.querySelector('[data-events-panel-slot="threat"]') as HTMLElement).getAttribute('aria-pressed')).toBe('true');
+    fireEvent.click(document.querySelector('[data-events-panel-slot="all"]') as HTMLElement);
+    expect(document.querySelectorAll('[data-events-panel-row]')).toHaveLength(3);
+  });
+
+  // INV:game-top-chrome.INV-12
+  it('clicking a row forwards the event to the host selection contract', async () => {
+    const onSelectEvent = vi.fn();
+    render(
+      <TooltipProvider>
+        <GameTopChrome frame={{ scale: 1, W: 1440, H: 900 }} items={ITEMS} events={panelEvents} eventsOpen onSelectEvent={onSelectEvent} />
+      </TooltipProvider>,
+    );
+    await flushRaf();
+    fireEvent.click(document.querySelector('[data-events-panel-row="invasion"]') as HTMLElement);
+    expect(onSelectEvent).toHaveBeenCalledTimes(1);
+    expect(onSelectEvent.mock.calls[0][0].id).toBe('invasion');
+  });
+
+  // INV:game-top-chrome.INV-11
+  it('the panel grows longer with more rows — height is a function of row count', async () => {
+    const many: HudEvent[] = [
+      ...panelEvents,
+      { id: 'visit-1', typeId: 'visit', title: 'Carovana', daysLeft: 7 },
+    ];
+    const { rerender } = render(
+      <TooltipProvider>
+        <GameTopChrome frame={{ scale: 1, W: 1440, H: 900 }} items={ITEMS} events={panelEvents} eventsOpen />
+      </TooltipProvider>,
+    );
+    await flushRaf();
+    const height3 = parseFloat((document.querySelector('[data-hudreal-events-panel]') as HTMLElement).style.height);
+    rerender(
+      <TooltipProvider>
+        <GameTopChrome frame={{ scale: 1, W: 1440, H: 900 }} items={ITEMS} events={many} eventsOpen />
+      </TooltipProvider>,
+    );
+    const height4 = parseFloat((document.querySelector('[data-hudreal-events-panel]') as HTMLElement).style.height);
+    expect(height4).toBeGreaterThan(height3);
+    expect(height4 - height3).toBeCloseTo(49.5, 3);
+  });
+
+  // INV:game-top-chrome.INV-11
+  it('empty ledger still renders one quiet row with the empty reading', async () => {
+    render(
+      <TooltipProvider>
+        <GameTopChrome frame={{ scale: 1, W: 1440, H: 900 }} items={ITEMS} events={[]} eventsOpen />
+      </TooltipProvider>,
+    );
+    await flushRaf();
+    expect(document.querySelector('[data-hudreal-events-panel]')).toBeInTheDocument();
+    expect(document.querySelectorAll('[data-events-panel-row]')).toHaveLength(0);
   });
 });

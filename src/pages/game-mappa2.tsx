@@ -1459,6 +1459,7 @@ export default function GameMappa2Page() {
             events={gameEvents}
             eventsOpen={panels.visible.events}
             onToggleEvents={() => panels.toggle('events')}
+            onSelectEvent={focusEvent}
           />
         ) : (
           <>
@@ -1612,7 +1613,7 @@ export default function GameMappa2Page() {
         </div>
         </StagePanelFrame>
       )}
-      {panels.visible.events && (
+      {panels.visible.events && hud.mode !== 'blueprint' && (
         <StagePanelFrame panelId="events" positioned={false}>
           {(res) => (
             /* R-334ter + PLAN-125 F4: the signed ledger replaces the stock

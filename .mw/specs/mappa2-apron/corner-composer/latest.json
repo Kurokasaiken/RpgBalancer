@@ -1,0 +1,163 @@
+{
+  "schema": "mappa2-corner-composer/v2",
+  "sourceImage": "./composite.webp",
+  "foregroundImage": "/assets/world/mappa2/base/layers/Foreground.webp",
+  "sourceWidth": 2752,
+  "sourceHeight": 1536,
+  "apron": {
+    "left": 560,
+    "top": 200,
+    "right": 560,
+    "bottom": 0
+  },
+  "pieces": [
+    {
+      "id": "piece-1",
+      "label": "corner-tr",
+      "polygon": [
+        {
+          "x": 965.07,
+          "y": 13.65
+        },
+        {
+          "x": 9.66,
+          "y": 8.59
+        },
+        {
+          "x": 4.6,
+          "y": 1509.96
+        },
+        {
+          "x": 985.29,
+          "y": 1520.07
+        },
+        {
+          "x": 889.25,
+          "y": 1393.69
+        },
+        {
+          "x": 707.26,
+          "y": 1307.75
+        },
+        {
+          "x": 606.16,
+          "y": 1130.83
+        },
+        {
+          "x": 585.94,
+          "y": 1019.61
+        },
+        {
+          "x": 560.67,
+          "y": 918.51
+        },
+        {
+          "x": 671.88,
+          "y": 852.79
+        },
+        {
+          "x": 601.11,
+          "y": 559.6
+        },
+        {
+          "x": 419.12,
+          "y": 372.56
+        },
+        {
+          "x": 530.33,
+          "y": 200.68
+        },
+        {
+          "x": 863.97,
+          "y": 205.74
+        },
+        {
+          "x": 975.18,
+          "y": 134.97
+        }
+      ],
+      "target": {
+        "dx": -463.79,
+        "dy": -103.51,
+        "scale": 1.15
+      },
+      "targetNormalized": {
+        "dx": -0.16853,
+        "dy": -0.06739
+      },
+      "transformModel": "uniform-scale-about-source-centroid-then-translate",
+      "scaleSemantics": "planning-footprint-only; production assets are not implicitly resized",
+      "centroidSource": {
+        "x": 625.03,
+        "y": 743.27
+      },
+      "centroidTarget": {
+        "x": 161.24,
+        "y": 639.76
+      }
+    },
+    {
+      "id": "piece-2",
+      "label": "corner-tr",
+      "polygon": [
+        {
+          "x": 2056.98,
+          "y": 3.54
+        },
+        {
+          "x": 2739.42,
+          "y": 8.59
+        },
+        {
+          "x": 2734.36,
+          "y": 1509.96
+        },
+        {
+          "x": 1960.93,
+          "y": 1515.01
+        },
+        {
+          "x": 2380.51,
+          "y": 1191.49
+        },
+        {
+          "x": 2370.4,
+          "y": 958.95
+        },
+        {
+          "x": 2405.78,
+          "y": 696.09
+        },
+        {
+          "x": 2426,
+          "y": 473.66
+        },
+        {
+          "x": 2304.68,
+          "y": 286.62
+        }
+      ],
+      "target": {
+        "dx": 514.65,
+        "dy": -93.82,
+        "scale": 1.15
+      },
+      "targetNormalized": {
+        "dx": 0.18701,
+        "dy": -0.06108
+      },
+      "transformModel": "uniform-scale-about-source-centroid-then-translate",
+      "scaleSemantics": "planning-footprint-only; production assets are not implicitly resized",
+      "centroidSource": {
+        "x": 2375.45,
+        "y": 738.21
+      },
+      "centroidTarget": {
+        "x": 2890.1,
+        "y": 644.39
+      }
+    }
+  ],
+  "exportedAt": "2026-11-26T17:07:20.452Z",
+  "handoffNote": "Director-pasted composer JSON reconstructed from chat; redundant polygonNormalized arrays omitted because derivable from polygon/source dimensions. Polygons are semantic gross indications, not cut masks. Scale is planning-footprint-only. Later Director clarification supersedes the apparent production interpretation: only land/corner masses are semantic pieces; central sea+continent shrink in production while lateral land masses remain same size/position; newly exposed space is generated sea."
+}

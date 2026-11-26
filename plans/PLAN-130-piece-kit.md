@@ -13,6 +13,12 @@ il dialect enum (OB-10) richiede evidenza visiva al primo ruling.
 ---
 Architettura r002–r005 invariata.
 
+**Amendment Director 2026-11-26:** un pezzo raster può essere multi-asset
+quando le varianti sono stati di una stessa unità logica riusabile (primo
+caso: `time-disc-v1` sole/luna, riusabile fuori dalla barra Tempo). Non è uno
+split in revisioni indipendenti: l'id resta uno solo e la provenance porta un
+`sha256` unico calcolato sul fingerprint canonico degli asset.
+
 ## 1. Problema
 
 Ogni nuova superficie da mockup riparte da zero → divergenza di materiali,
@@ -40,14 +46,18 @@ piece = {
   dialect: "<enum>",                  // enum OB-10, asse separato da materials
   materials: MaterialTag[],           // >=1, vocabolario [P3]
   ornamentScale?: number,             // obbligatorio ornament|frame
-  assets?: { master: path },          // tutti i kind con raster (incluso frame/standalone)
+  assets?: Record<assetKey, path>,        // raster: `master` mono-asset oppure varianti
+                                      // nomate (`sun`/`moon`, …) di UN pezzo logico;
+                                      // frame/standalone resta mono-asset `master`
   specRef?: path,                     // solo frame/slice-kit
   family?: string,                    // obbligatorio se scope="family"
   supersedes?: "<slug>-v<M>",
   provenance: { golden: path, sha256, ruling, generator?, promptPath?, date,
                 deltaE?, partialFields?: string[] }   // sha256 UNICO qui;
                 // frame/slice-kit: sha256 = sha(specRef)+sha(golden), MAI del manifest
-                // (il manifest si rigenera: sha stabile = niente -vN spurii)
+                // (il manifest si rigenera: sha stabile = niente -vN spurii);
+                // raster mono-asset master: sha256(file); raster multi-asset:
+                // sha256 delle righe `<assetKey>:<sha256(file)>`, chiavi ordinate
 }
 ```
 
@@ -125,8 +135,9 @@ ruling; il check gira SEMPRE con un valore presente (fix B2).
 **Tabella ruolo→kind (appendice normativa, estendibile solo via ruling):**
 `ctaWindow→button-plate`; `sectionFrame|outerFrame→frame`;
 `headerBand|titleBand|engravedBand→band`; `railOrnament|cornerOrnament|
-laurel|gem|skull|supplyIcon→ornament`; `componentGround|panelGround→ground`;
-`iconPlate|poiIcon→icon-plate`. Ruolo non in tabella → regione non
+laurel|gem|skull|supplyIcon|phaseDisc→ornament`;
+`componentGround|panelGround→ground`; `iconPlate|poiIcon→icon-plate`.
+Ruolo non in tabella → regione non
 classificabile (rosso finché il ruling non la aggiunge).
 
 `checkedPieces` deve contenere TUTTI i pezzi `compatibleForNew` calcolati

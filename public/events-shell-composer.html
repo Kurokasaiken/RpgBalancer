@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Events shell composer</title>
+<style>
+  html,body{margin:0;min-height:100%;background:#071014;color:#eadfbd;font-family:system-ui,sans-serif}
+  body{display:flex;flex-direction:column;align-items:center;padding:18px;box-sizing:border-box}
+  #viewport{position:relative;width:min(1258px,96vw);overflow:hidden;border:1px solid #5b4420;background:#020608;touch-action:none;user-select:none}
+  #world{position:absolute;left:0;top:0;width:839px;height:160px;transform-origin:0 0}
+  #world img{position:absolute;pointer-events:none;-webkit-user-drag:none}
+  #shell{left:0;top:26px;width:839px;height:108px;transform:scaleX(-1)}
+  #ornaments{left:0;top:26px;width:839px;height:108px;transform:scaleX(-1);z-index:3}
+  #frame{width:170px;height:170px;left:696.8px;top:-5.6px;transform:scaleX(-1);z-index:4}
+  #donor{position:absolute;left:104px;top:36px;width:644px;height:89px;opacity:.92;outline:1px dashed rgba(255,220,100,.35);pointer-events:auto;cursor:grab;overflow:hidden;z-index:2}
+  #donorImg{left:0;top:0;width:976px;height:186px}
+  .sel{position:absolute;border:2px solid #ff4f4f;background:rgba(255,40,40,.16);box-sizing:border-box;pointer-events:none;z-index:5}
+  #ghost{position:absolute;border:2px dashed #ffe08a;background:rgba(255,210,80,.12);box-sizing:border-box;pointer-events:none;z-index:6;display:none}
+  #panel{width:min(1258px,96vw);display:grid;grid-template-columns:1fr auto auto auto;gap:12px;align-items:center;margin-top:12px;font-size:13px}
+  input[type=range]{width:100%}
+  button{background:#182b2b;color:#eadfbd;border:1px solid #806435;border-radius:6px;padding:7px 10px;cursor:pointer}
+  button:hover{background:#243d3d}
+  button.active{background:#4b3218;border-color:#e4b95f}
+  #status{grid-column:1/-1;min-height:18px;color:#bda96f;font-size:12px;white-space:pre-wrap}
+  #hint{position:absolute;right:8px;bottom:6px;color:rgba(255,240,190,.5);font-size:11px;pointer-events:none;z-index:7}
+  #cropPanel{width:min(1258px,96vw);margin-top:22px;border-top:1px solid #4a3821;padding-top:14px}
+  #cropPanel h2{font-size:15px;margin:0 0 6px;color:#f2df9d;font-weight:600}
+  #cropPanel p{font-size:12px;line-height:1.45;color:#c9b98d;margin:0 0 10px;max-width:1100px}
+  #cropControls{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:12px;color:#bda96f}
+  #sourceWrap{position:relative;width:976px;height:186px;max-width:100%;border:1px solid #5b4420;background:#020608;touch-action:none;user-select:none;overflow:hidden}
+  #sourceImg{position:absolute;left:0;top:0;width:976px;height:186px;pointer-events:none;-webkit-user-drag:none}
+  #cropBox{position:absolute;border:2px solid #57d7ff;background:rgba(64,190,255,.12);box-sizing:border-box;pointer-events:none;z-index:3}
+  #cropGhost{position:absolute;border:2px dashed #57d7ff;background:rgba(64,190,255,.16);box-sizing:border-box;pointer-events:none;z-index:4;display:none}
+</style>
+</head>
+<body>
+<div id="viewport">
+  <div id="world">
+    <img id="shell" src="/assets/ui/hud-real/time/bar-slim-empty-base.webp" alt="" />
+    <div id="donor"><img id="donorImg" src="/assets/ui/hud-real/events/bar.webp" alt="" /></div>
+    <img id="ornaments" src="/assets/ui/hud-real/time/bar-slim-inner-ornaments.webp" alt="" />
+    <img id="frame" src="/assets/ui/hud-real/events/dial-frame.webp" alt="" />
+    <div id="selections"></div>
+    <div id="ghost"></div>
+  </div>
+</div>
+<div id="panel">
+  <label>scala interno <input id="scale" type="range" min="0.25" max="2.5" step="0.01" value="1" /></label>
+  <button id="undo">annulla selezione</button>
+  <button id="clear">azzera</button>
+  <button id="copy">copia report</button>
+  <div id="status">trascina il componente interno per spostarlo · Shift+trascina sopra di esso per selezionare cosa eliminare</div>
+</div>
+<section id="cropPanel">
+  <h2>ritaglio dal vecchio Events intero</h2>
+  <p>Il vecchio interno non era ben ritagliato perché partiva da un crop già deciso a priori. Qui sotto c’è il componente Events intero: premi “ritaglia interno”, trascina il rettangolo esattamente sulla materia che vuoi tenere, e il pezzo sopra userà solo quel rettangolo. Così possiamo capire se il problema è il bordo, la posizione, la scala o un residuo del frame.</p>
+  <div id="cropControls"><button id="cropMode">ritaglia interno</button><span id="cropStatus">crop attuale: x=151 y=38 w=680 h=103</span></div>
+  <div id="sourceWrap">
+    <img id="sourceImg" src="/assets/ui/hud-real/events/bar.webp" alt="" />
+    <div id="cropBox"></div>
+    <div id="cropGhost"></div>
+  </div>
+</section>
+<script>
+const W=839,H=160,SRC_W=976,SRC_H=186;
+const viewport=document.getElementById('viewport');
+const world=document.getElementById('world');
+const selectionsEl=document.getElementById('selections');
+const ghost=document.getElementById('ghost');
+const donor=document.getElementById('donor');
+const donorImg=document.getElementById('donorImg');
+const scaleInput=document.getElementById('scale');
+const status=document.getElementById('status');
+const cropModeBtn=document.getElementById('cropMode');
+const cropStatus=document.getElementById('cropStatus');
+const sourceWrap=document.getElementById('sourceWrap');
+const cropBox=document.getElementById('cropBox');
+const cropGhost=document.getElementById('cropGhost');
+const initialCrop={x:205,y:50,w:590,h:84};
+let scale=1, selections=[], start=null, mode=null, dragDonor=null;
+let crop={...initialCrop}, cropping=false, cropStart=null;
+let donorState={x:104,y:36,scale:1};
+function fit(){const width=viewport.clientWidth;scale=width/W;world.style.transform=`scale(${scale})`;viewport.style.height=(H*scale)+'px'}
+function pt(ev){const r=viewport.getBoundingClientRect();return{x:(ev.clientX-r.left)/scale,y:(ev.clientY-r.top)/scale}}
+function srcPt(ev){const r=sourceWrap.getBoundingClientRect();return{x:(ev.clientX-r.left)*SRC_W/r.width,y:(ev.clientY-r.top)*SRC_H/r.height}}
+function norm(a,b){return{x:Math.min(a.x,b.x),y:Math.min(a.y,b.y),w:Math.abs(a.x-b.x),h:Math.abs(a.y-b.y)}}
+function clampCrop(r){const x=Math.max(0,Math.min(SRC_W-1,r.x)),y=Math.max(0,Math.min(SRC_H-1,r.y));return{x,y,w:Math.max(1,Math.min(SRC_W-x,r.w)),h:Math.max(1,Math.min(SRC_H-y,r.h))}}
+function renderDonor(){
+  const s=donorState.scale,fitW=644,fitH=89;
+  const fx=(fitW/crop.w)*s,fy=(fitH/crop.h)*s;
+  donor.style.left=donorState.x+'px';donor.style.top=donorState.y+'px';
+  donor.style.width=(fitW*s)+'px';donor.style.height=(fitH*s)+'px';
+  donorImg.style.width=(SRC_W*fx)+'px';donorImg.style.height=(SRC_H*fy)+'px';
+  donorImg.style.left=(-crop.x*fx)+'px';donorImg.style.top=(-crop.y*fy)+'px';
+}
+function renderCrop(){
+  const r=sourceWrap.getBoundingClientRect(),kx=r.width/SRC_W,ky=r.height/SRC_H;
+  Object.assign(cropBox.style,{left:(crop.x*kx)+'px',top:(crop.y*ky)+'px',width:(crop.w*kx)+'px',height:(crop.h*ky)+'px'});
+  cropStatus.textContent=`crop attuale: x=${crop.x.toFixed(1)} y=${crop.y.toFixed(1)} w=${crop.w.toFixed(1)} h=${crop.h.toFixed(1)}`;
+}
+function renderSelections(){
+  selectionsEl.innerHTML='';
+  selections.forEach((r,i)=>{const d=document.createElement('div');d.className='sel';d.style.left=r.x+'px';d.style.top=r.y+'px';d.style.width=r.w+'px';d.style.height=r.h+'px';selectionsEl.appendChild(d)});
+  status.textContent=`selezioni: ${selections.length} · interno x=${donorState.x.toFixed(1)} y=${donorState.y.toFixed(1)} scala=${donorState.scale.toFixed(2)}`;
+}
+function insideDonor(p){return p.x>=donorState.x&&p.x<=donorState.x+644*donorState.scale&&p.y>=donorState.y&&p.y<=donorState.y+89*donorState.scale}
+viewport.addEventListener('pointerdown',ev=>{
+  viewport.setPointerCapture(ev.pointerId);const p=pt(ev);
+  if(insideDonor(p)&&!ev.shiftKey){mode='donor';dragDonor={start:p,x:donorState.x,y:donorState.y};return}
+  mode='select';start=p;ghost.style.display='block';
+});
+viewport.addEventListener('pointermove',ev=>{
+  const p=pt(ev);
+  if(mode==='donor'&&dragDonor){donorState.x=dragDonor.x+p.x-dragDonor.start.x;donorState.y=dragDonor.y+p.y-dragDonor.start.y;renderDonor();renderSelections();return}
+  if(mode!=='select'||!start)return;
+  const r=norm(start,p);Object.assign(ghost.style,{left:r.x+'px',top:r.y+'px',width:r.w+'px',height:r.h+'px'});
+});
+viewport.addEventListener('pointerup',ev=>{
+  if(mode==='select'&&start){const r=norm(start,pt(ev));ghost.style.display='none';if(r.w>3&&r.h>3)selections.push(r);renderSelections()}
+  mode=null;start=null;dragDonor=null;
+});
+cropModeBtn.addEventListener('click',()=>{cropping=!cropping;cropModeBtn.classList.toggle('active',cropping);cropModeBtn.textContent=cropping?'trascina il ritaglio sul componente':'ritaglia interno'});
+sourceWrap.addEventListener('pointerdown',ev=>{
+  if(!cropping)return;sourceWrap.setPointerCapture(ev.pointerId);cropStart=srcPt(ev);cropGhost.style.display='block';
+});
+sourceWrap.addEventListener('pointermove',ev=>{
+  if(!cropping||!cropStart)return;
+  const p=srcPt(ev),r=norm(cropStart,p),rect=sourceWrap.getBoundingClientRect(),kx=rect.width/SRC_W,ky=rect.height/SRC_H;
+  Object.assign(cropGhost.style,{left:(r.x*kx)+'px',top:(r.y*ky)+'px',width:(r.w*kx)+'px',height:(r.h*ky)+'px'});
+});
+sourceWrap.addEventListener('pointerup',ev=>{
+  if(!cropping||!cropStart)return;
+  const r=clampCrop(norm(cropStart,srcPt(ev)));cropGhost.style.display='none';cropStart=null;
+  if(r.w>8&&r.h>8){crop=r;renderDonor();renderCrop();renderSelections()}
+  cropping=false;cropModeBtn.classList.remove('active');cropModeBtn.textContent='ritaglia interno';
+});
+scaleInput.addEventListener('input',()=>{donorState.scale=Number(scaleInput.value);renderDonor();renderSelections()});
+document.getElementById('undo').onclick=()=>{selections.pop();renderSelections()};
+document.getElementById('clear').onclick=()=>{selections=[];donorState={x:104,y:36,scale:1};crop={...initialCrop};scaleInput.value='1';renderDonor();renderCrop();renderSelections()};
+document.getElementById('copy').onclick=async()=>{
+ const report={coordinateSystem:'source px, shell 839x108 inside world 839x160; shell y offset 26; mirrored events orientation; crop coordinates refer to events/bar.webp 976x186',removeSelections:selections.map(r=>({x:+r.x.toFixed(2),y:+r.y.toFixed(2),w:+r.w.toFixed(2),h:+r.h.toFixed(2)})),eventsInterior:{x:+donorState.x.toFixed(2),y:+donorState.y.toFixed(2),scale:+donorState.scale.toFixed(3),crop:{x:+crop.x.toFixed(2),y:+crop.y.toFixed(2),w:+crop.w.toFixed(2),h:+crop.h.toFixed(2)},finalW:+(644*donorState.scale).toFixed(2),finalH:+(89*donorState.scale).toFixed(2),fitToWell:{w:644,h:89,note:"crop is resized anisotropically into the shell well, as in the baked asset"}}};
+ await navigator.clipboard.writeText(JSON.stringify(report,null,2));status.textContent='report copiato negli appunti';
+};
+window.addEventListener('resize',()=>{fit();renderCrop()});fit();renderDonor();renderCrop();renderSelections();
+</script>
+</body>
+</html>

@@ -12,6 +12,10 @@ import { checkPiecesGate } from '../../../scripts/verification/piecesGate';
 const sha = (s: string | Buffer) => createHash('sha256').update(s).digest('hex');
 const combined = (a: string, b: string) =>
   createHash('sha256').update(`${a}:${b}`).digest('hex');
+const combinedAssets = (entries: [string, string][]) =>
+  createHash('sha256')
+    .update(entries.sort(([a], [b]) => a.localeCompare(b)).map(([key, content]) => `${key}:${sha(content)}`).join('\n'))
+    .digest('hex');
 
 type Fixture = {
   root: string;
@@ -197,5 +201,90 @@ describe('checkPiecesGate (PLAN-130 OB-2 negativi)', () => {
     const f = makeFixture();
     f.writeRegistry([f.piece()]);
     expect(run(f)).toEqual([]);
+  });
+
+  it('ornament multi-asset con fingerprint canonico → verde', () => {
+    const f = makeFixture();
+    f.write('assets/sun.webp', 'sun-bytes');
+    f.write('assets/moon.webp', 'moon-bytes');
+    const fingerprint = combinedAssets([
+      ['sun', 'sun-bytes'],
+      ['moon', 'moon-bytes'],
+    ]);
+    f.writeRegistry([
+      {
+        id: 'time-disc-v1',
+        kind: 'ornament',
+        scope: 'hud',
+        status: 'baptized',
+        role: 'phaseDisc',
+        dialect: 'nav-filetto',
+        materials: ['oro-filetto', 'cielo-notturno'],
+        ornamentScale: 0.3,
+        assets: { sun: 'assets/sun.webp', moon: 'assets/moon.webp' },
+        provenance: { golden: 'goldens/', sha256: fingerprint, ruling: 'r', date: 'd' },
+      },
+    ], { materials: ['oro-filetto', 'cielo-notturno'] });
+    expect(run(f)).toEqual([]);
+  });
+
+  it('ornament multi-asset con fingerprint stale → errore', () => {
+    const f = makeFixture();
+    f.write('assets/sun.webp', 'sun-bytes');
+    f.write('assets/moon.webp', 'moon-bytes');
+    f.writeRegistry([
+      {
+        id: 'time-disc-v1',
+        kind: 'ornament',
+        scope: 'hud',
+        status: 'baptized',
+        role: 'phaseDisc',
+        dialect: 'nav-filetto',
+        materials: ['oro-filetto'],
+        ornamentScale: 0.3,
+        assets: { sun: 'assets/sun.webp', moon: 'assets/moon.webp' },
+        provenance: { golden: 'goldens/', sha256: sha('stale'), ruling: 'r', date: 'd' },
+      },
+    ]);
+    expect(run(f).join(' ')).toMatch(/fingerprint multi-asset/);
+  });
+
+  it('asset raster con chiave non slug → errore schema', () => {
+    const f = makeFixture();
+    f.writeRegistry([
+      {
+        id: 'time-disc-v1',
+        kind: 'ornament',
+        scope: 'hud',
+        status: 'baptized',
+        role: 'phaseDisc',
+        dialect: 'nav-filetto',
+        materials: ['oro-filetto'],
+        ornamentScale: 0.3,
+        assets: { 'sun:bad': 'assets/sun.webp' },
+        provenance: { golden: 'goldens/', sha256: sha('x'), ruling: 'r', date: 'd' },
+      },
+    ]);
+    expect(run(f).join(' ')).toMatch(/schema.*assets|asset keys/);
+  });
+
+  it('frame/standalone multi-asset → errore schema (resta mono-master)', () => {
+    const f = makeFixture();
+    f.writeRegistry([
+      {
+        id: 'frame-standalone-v1',
+        kind: 'frame',
+        source: 'standalone',
+        scope: 'hud',
+        status: 'baptized',
+        role: 'outerFrame',
+        dialect: 'nav-filetto',
+        materials: ['oro-filetto'],
+        ornamentScale: 0.3,
+        assets: { master: 'goldens/g.png', alt: 'goldens/g.png' },
+        provenance: { golden: 'goldens/g.png', sha256: sha('x'), ruling: 'r', date: 'd' },
+      },
+    ]);
+    expect(run(f).join(' ')).toMatch(/exactly one assets\.master|schema/);
   });
 });

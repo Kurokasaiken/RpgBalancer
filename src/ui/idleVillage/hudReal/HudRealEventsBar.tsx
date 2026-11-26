@@ -1,9 +1,12 @@
 /**
- * HudRealEventsBar — collapsed docked Events surface, specular to the slim
- * Time bar. Director reference 2026-11-25: the right gem is red for dangers;
- * other colours denote other event categories. The painted gem carries the
- * tone, while the left medallion keeps a type glyph so the sign is never
- * colour-only.
+ * HudRealEventsBar — collapsed docked Events surface.
+ *
+ * Director ruling 2026-11-26: this is not a forked Events frame. It consumes
+ * the same reusable Time shell layers and slim geometry as HudRealTime,
+ * mirrored geometrically. The central painted time controls are hidden by the
+ * shell's black live-content well; Events then mounts its own reading inside.
+ * The medallion keeps a type glyph while the gem disc carries tone, so the
+ * sign is never colour-only.
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -16,6 +19,9 @@ import { EVENTS_BAR_CONFIG, type EventsBarConfig } from '@/balancing/config/idle
 import { HUD_TYPE, hudPx } from './hudType';
 import { HudGlyph } from '@/ui/idleVillage/components/gameFrame/hudIcons';
 import type { HudEvent } from '@/ui/idleVillage/components/gameFrame/HudEventLedger';
+import { TIME_SLIM_BAR } from './timeSlimGeometry';
+import { resolveTimeShellLayout, TIME_SLIM_SHELL_EMPTY_ASSET } from './timeShellGeometry';
+import { HudRealTimeShellLayers } from './HudRealTimeShell';
 
 const FALLBACK_TYPE: Omit<GameFrameEventTypeConfig, 'id'> = {
   labelKey: 'gameFrame.events.types.other',
@@ -33,10 +39,9 @@ export interface HudRealEventsBarProps {
   onToggle?: () => void;
   /** Ledger type registry — tones, icons and pinned collapsed types. */
   ledgerConfig?: GameFrameEventLedgerConfig;
-  /** Visual/geometry contract of the signed bar art. */
+  /** Events live-content contract; the shell itself stays Time-owned. */
   config?: EventsBarConfig;
 }
-
 
 /**
  * Pick the event the collapsed bar represents. Pinned types (threat first in
@@ -84,12 +89,30 @@ export const HudRealEventsBar: React.FC<HudRealEventsBarProps> = ({
   const ariaLabel = selected
     ? t('gameFrame.events.bar.selectedAriaLabel', { count: events.length, type: typeLabel, title, countdown, action: actionLabel })
     : t('gameFrame.events.bar.ariaLabel', { count: events.length, action: actionLabel });
-  const medallionLeft = BAR.medallion.cx - BAR.medallion.r;
-  const medallionTop = BAR.medallion.cy - BAR.medallion.r;
-  const gemLeft = BAR.gem.cx - BAR.gem.r;
-  const gemTop = BAR.gem.cy - BAR.gem.r;
-  const useTimeGem = tone === 'neutral';
-  const gemFilter = useTimeGem ? '' : BAR.gemFilters[tone];
+
+  /* Shared shell, mirrored mathematically: the medallion moves to the right
+   *  while live text below remains unmirrored. */
+  const shellBar = TIME_SLIM_BAR;
+  const baseShellDial = DEFAULT_GAME_FRAME_CONFIG.timeOfDay.dialSlim;
+  const shellDial = {
+    ...baseShellDial,
+    frame: baseShellDial.frame ? { ...baseShellDial.frame, url: BAR.assets.medallionFrame } : undefined,
+  };
+  const shellLayout = resolveTimeShellLayout(shellBar, shellDial, true);
+  const frameSize = shellDial.frame?.size ?? 0;
+  const frameCenter = shellLayout.frameCenter ?? { x: shellLayout.dialCenter.cx, y: shellLayout.dialCenter.cy };
+  const frameLeft = frameCenter.x - frameSize / 2;
+  const frameTop = frameCenter.y - frameSize / 2;
+  const gemClipRadius = shellDial.disc;
+  const gemClipCenter = {
+    x: frameSize / 2 + shellLayout.dialCenter.cx - frameCenter.x,
+    y: frameSize / 2 + shellLayout.dialCenter.cy - frameCenter.y,
+  };
+  const gemFilter = BAR.gemFilters[tone];
+  const well = shellLayout.contentWell;
+  const fieldX = well.x + BAR.content.wellPaddingXPx;
+  const fieldW = Math.max(0, frameLeft - BAR.content.medallionClearancePx - fieldX);
+  const medallionIcon = BAR.content.medallionIconSizePx;
 
   return (
     <button
@@ -104,8 +127,8 @@ export const HudRealEventsBar: React.FC<HudRealEventsBarProps> = ({
       onClick={onToggle}
       style={{
         position: 'relative',
-        width: BAR.art.w,
-        height: BAR.art.h,
+        width: shellBar.w,
+        height: shellBar.h,
         padding: 0,
         border: 0,
         background: 'transparent',
@@ -119,50 +142,50 @@ export const HudRealEventsBar: React.FC<HudRealEventsBarProps> = ({
 [data-hudreal-events-bar]:focus-visible { outline: 2px solid ${BAR.colors.focus}; outline-offset: 3px; }
 [data-hudreal-events-bar]:not(:disabled):hover { filter: brightness(1.12); }
 `}</style>
-      <img src={BAR.asset} alt="" draggable={false} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', display: 'block', pointerEvents: 'none' }} />
-      {gemFilter && (
-        <img
-          src={BAR.asset}
-          alt=""
-          draggable={false}
-          data-events-gem-filter=""
+      <HudRealTimeShellLayers bar={shellBar} asset={TIME_SLIM_SHELL_EMPTY_ASSET} dial={shellDial} mirrored />
+      <img
+        src={BAR.assets.neutralGem}
+        alt=""
+        draggable={false}
+        data-events-gem-tone={tone}
+        style={{
+          position: 'absolute',
+          left: frameLeft,
+          top: frameTop,
+          width: frameSize,
+          height: frameSize,
+          display: 'block',
+          pointerEvents: 'none',
+          transform: 'scaleX(-1)',
+          clipPath: `circle(${gemClipRadius}px at ${gemClipCenter.x}px ${gemClipCenter.y}px)`,
+          filter: gemFilter || undefined,
+        }}
+      />
+      {open && (
+        <span
+          aria-hidden="true"
+          data-events-open-ring=""
           style={{
             position: 'absolute',
-            inset: 0,
-            width: '100%',
-            height: '100%',
-            display: 'block',
-            pointerEvents: 'none',
-            clipPath: `circle(${BAR.gem.r}px at ${BAR.gem.cx}px ${BAR.gem.cy}px)`,
-            filter: gemFilter,
-          }}
-        />
-      )}
-      {useTimeGem && (
-        <img
-          src={BAR.timeGem.url}
-          alt=""
-          draggable={false}
-          data-events-gem-time=""
-          style={{
-            position: 'absolute',
-            left: BAR.gem.cx + BAR.timeGem.offset.x - BAR.timeGem.size / 2,
-            top: BAR.gem.cy + BAR.timeGem.offset.y - BAR.timeGem.size / 2,
-            width: BAR.timeGem.size,
-            height: BAR.timeGem.size,
-            display: 'block',
+            left: shellLayout.dialCenter.cx - shellDial.wellR,
+            top: shellLayout.dialCenter.cy - shellDial.wellR,
+            width: shellDial.wellR * 2,
+            height: shellDial.wellR * 2,
+            borderRadius: '50%',
+            boxShadow: `0 0 0 2px ${BAR.colors.gold}, 0 0 10px ${BAR.colors.glow}`,
             pointerEvents: 'none',
           }}
         />
       )}
       <span
         aria-hidden="true"
+        data-events-medallion-glyph=""
         style={{
           position: 'absolute',
-          left: medallionLeft,
-          top: medallionTop,
-          width: BAR.medallion.r * 2,
-          height: BAR.medallion.r * 2,
+          left: shellLayout.dialCenter.cx - medallionIcon / 2,
+          top: shellLayout.dialCenter.cy - medallionIcon / 2,
+          width: medallionIcon,
+          height: medallionIcon,
           display: 'grid',
           placeItems: 'center',
           color: BAR.colors.gold,
@@ -170,15 +193,15 @@ export const HudRealEventsBar: React.FC<HudRealEventsBarProps> = ({
           pointerEvents: 'none',
         }}
       >
-        <HudGlyph iconId={typeConfig.icon} label={typeLabel} size={BAR.content.iconSizePx} />
+        <HudGlyph iconId={typeConfig.icon} label={typeLabel} size={medallionIcon} />
       </span>
       <span
         style={{
           position: 'absolute',
-          left: BAR.field.x,
-          top: BAR.field.y,
-          width: BAR.field.w,
-          height: BAR.field.h,
+          left: fieldX,
+          top: well.y + BAR.content.wellPaddingYPx,
+          width: fieldW,
+          height: well.h - BAR.content.wellPaddingYPx * 2,
           display: 'flex',
           alignItems: 'center',
           columnGap: BAR.content.horizontalGapPx,
@@ -226,9 +249,10 @@ export const HudRealEventsBar: React.FC<HudRealEventsBarProps> = ({
               paddingLeft: BAR.content.countdownGapPx,
               textAlign: 'right',
               fontFamily: BAR.fonts.body,
-              fontSize: hudPx(HUD_TYPE.secondary),
+              fontSize: hudPx(HUD_TYPE.body),
               fontWeight: BAR.content.countdownWeight,
-              color: BAR.colors.gold,
+              color: BAR.colors.dim,
+              fontVariantNumeric: 'tabular-nums',
               whiteSpace: 'nowrap',
             }}
           >
@@ -236,21 +260,6 @@ export const HudRealEventsBar: React.FC<HudRealEventsBarProps> = ({
           </span>
         )}
       </span>
-      {open && (
-        <span
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            left: gemLeft,
-            top: gemTop,
-            width: BAR.gem.r * 2,
-            height: BAR.gem.r * 2,
-            borderRadius: '50%',
-            boxShadow: `0 0 0 2px ${BAR.colors.gold}, 0 0 10px ${BAR.colors.glow}`,
-            pointerEvents: 'none',
-          }}
-        />
-      )}
     </button>
   );
 };
