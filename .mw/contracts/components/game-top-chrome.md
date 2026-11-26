@@ -106,18 +106,20 @@ invariants:
     statement: >-
       La barra Eventi chiusa rappresenta l'evento più urgente, con i tipi pinned di
       `eventLedger.pinTypesWhenCollapsed` (threat) prioritari rispetto agli altri; le righe `arriving` restano nascoste
-      finché la carta non completa il passaggio. Il click sulla barra toggla il pannello Eventi esistente — nessuna
-      seconda lista/modale.
+      finché la carta non completa il passaggio. Il contenuto live sta su una sola riga e il countdown compatto (`5d`)
+      chiude la riga all'estremità prima della gemma; il tipo resta in aria/medaglione, non come seconda riga visiva.
+      Il click sulla barra toggla il pannello Eventi esistente — nessuna seconda lista/modale.
     test_refs:
       - tests/unit/idleVillage/r339TopChrome.test.tsx
   - id: game-top-chrome.INV-10
     source: director-spec
     source_ref: R-386
     statement: >-
-      Semantica gemma (Director 2026-11-25: «la gemma rossa è x i pericoli, altri colori saranno x altro»): threat usa
-      la gemma rossa nativa dell'arte; gli altri toni ricolorano solo una copia circolare della gemma via filtri in
-      config. Il medaglione sinistro conserva sempre il glifo/segno del tipo, quindi il significato non è mai
-      colour-only.
+      Semantica gemma (Director 2026-11-25: «la gemma rossa è x i pericoli, altri colori saranno x altro»; correzione
+      stesso giorno: la gemma verde usa quella del componente Tempo, «swappa proprio»): threat usa la gemma rossa
+      nativa dell'arte; neutral/empty swappa l'asset `time/dial-frame.webp` sopra la sede senza scriverci o dipingerci
+      sopra; warning/good restano ricolori circolari provvisori in config finché il Director non battezza altri asset.
+      Il medaglione sinistro conserva sempre il glifo/segno del tipo, quindi il significato non è mai colour-only.
     test_refs:
       - tests/unit/idleVillage/r339TopChrome.test.tsx
 ---

@@ -16,7 +16,6 @@ import { EVENTS_BAR_CONFIG, type EventsBarConfig } from '@/balancing/config/idle
 import { HUD_TYPE, hudPx } from './hudType';
 import { HudGlyph } from '@/ui/idleVillage/components/gameFrame/hudIcons';
 import type { HudEvent } from '@/ui/idleVillage/components/gameFrame/HudEventLedger';
-import { selectEventsBarEvent } from '@/ui/idleVillage/components/gameFrame/eventsBarModel';
 
 const FALLBACK_TYPE: Omit<GameFrameEventTypeConfig, 'id'> = {
   labelKey: 'gameFrame.events.types.other',
@@ -39,6 +38,24 @@ export interface HudRealEventsBarProps {
 }
 
 
+/**
+ * Pick the event the collapsed bar represents. Pinned types (threat first in
+ * the ledger config) outrank everything else; inside the chosen group the
+ * nearest deadline wins. Rows still travelling into the ledger stay hidden
+ * until their hand-off completes. Local by design: behavior is tested through
+ * the rendered bar, preserving the fast-refresh component-only export.
+ */
+function selectEventsBarEvent(
+  events: readonly HudEvent[],
+  pinnedTypeIds: readonly string[],
+): HudEvent | undefined {
+  const visible = events.filter((event) => !event.arriving);
+  if (visible.length === 0) return undefined;
+  const pinned = visible.filter((event) => pinnedTypeIds.includes(event.typeId));
+  const candidates = pinned.length > 0 ? pinned : visible;
+  return candidates.reduce((best, event) => (event.daysLeft < best.daysLeft ? event : best), candidates[0]);
+}
+
 /** Collapsed Events bar mounted in the top-right chrome reserve. */
 export const HudRealEventsBar: React.FC<HudRealEventsBarProps> = ({
   events,
@@ -58,6 +75,9 @@ export const HudRealEventsBar: React.FC<HudRealEventsBarProps> = ({
       ? t('gameFrame.events.today')
       : t('gameFrame.events.daysLeft', { count: selected.daysLeft })
     : t('gameFrame.events.empty');
+  /* Director 2026-11-25: compact visual countdown at the end of the single
+   *  line (`5d`/`5g`); the aria string keeps the localized readable form. */
+  const compactCountdown = countdown.replace(/(\d+)\s+(\p{L})/u, '$1$2');
   const title = selected?.title ?? t('gameFrame.events.title');
   const typeLabel = t(typeConfig.labelKey);
   const actionLabel = open ? t('gameFrame.events.bar.close') : t('gameFrame.events.bar.open');
@@ -68,7 +88,8 @@ export const HudRealEventsBar: React.FC<HudRealEventsBarProps> = ({
   const medallionTop = BAR.medallion.cy - BAR.medallion.r;
   const gemLeft = BAR.gem.cx - BAR.gem.r;
   const gemTop = BAR.gem.cy - BAR.gem.r;
-  const gemFilter = BAR.gemFilters[tone];
+  const useTimeGem = tone === 'neutral';
+  const gemFilter = useTimeGem ? '' : BAR.gemFilters[tone];
 
   return (
     <button
@@ -117,6 +138,23 @@ export const HudRealEventsBar: React.FC<HudRealEventsBarProps> = ({
           }}
         />
       )}
+      {useTimeGem && (
+        <img
+          src={BAR.timeGem.url}
+          alt=""
+          draggable={false}
+          data-events-gem-time=""
+          style={{
+            position: 'absolute',
+            left: BAR.gem.cx + BAR.timeGem.offset.x - BAR.timeGem.size / 2,
+            top: BAR.gem.cy + BAR.timeGem.offset.y - BAR.timeGem.size / 2,
+            width: BAR.timeGem.size,
+            height: BAR.timeGem.size,
+            display: 'block',
+            pointerEvents: 'none',
+          }}
+        />
+      )}
       <span
         aria-hidden="true"
         style={{
@@ -141,9 +179,7 @@ export const HudRealEventsBar: React.FC<HudRealEventsBarProps> = ({
           top: BAR.field.y,
           width: BAR.field.w,
           height: BAR.field.h,
-          display: 'grid',
-          gridTemplateColumns: 'minmax(0, 1fr) auto',
-          gridTemplateRows: 'auto auto',
+          display: 'flex',
           alignItems: 'center',
           columnGap: BAR.content.horizontalGapPx,
           pointerEvents: 'none',
@@ -153,7 +189,8 @@ export const HudRealEventsBar: React.FC<HudRealEventsBarProps> = ({
         <span
           data-events-bar-title=""
           style={{
-            gridColumn: '1 / -1',
+            flex: '1 1 auto',
+            minWidth: 0,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
@@ -164,27 +201,29 @@ export const HudRealEventsBar: React.FC<HudRealEventsBarProps> = ({
             color: BAR.colors.text,
           }}
         >
-          {title}
+          {selected ? title : countdown}
         </span>
         <span
           data-events-bar-type=""
           style={{
-            minWidth: 0,
+            position: 'absolute',
+            width: 1,
+            height: 1,
             overflow: 'hidden',
-            textOverflow: 'ellipsis',
+            clipPath: 'inset(50%)',
             whiteSpace: 'nowrap',
-            fontFamily: BAR.fonts.body,
-            fontSize: hudPx(HUD_TYPE.caption),
-            color: BAR.colors.dim,
           }}
         >
-          {selected ? typeLabel : countdown}
+          {typeLabel}
         </span>
         {selected && (
           <span
             data-events-bar-countdown=""
             style={{
+              flex: '0 0 auto',
               minWidth: BAR.content.countdownMinWidthPx,
+              marginLeft: 'auto',
+              paddingLeft: BAR.content.countdownGapPx,
               textAlign: 'right',
               fontFamily: BAR.fonts.body,
               fontSize: hudPx(HUD_TYPE.secondary),
@@ -193,7 +232,7 @@ export const HudRealEventsBar: React.FC<HudRealEventsBarProps> = ({
               whiteSpace: 'nowrap',
             }}
           >
-            {countdown}
+            {compactCountdown}
           </span>
         )}
       </span>

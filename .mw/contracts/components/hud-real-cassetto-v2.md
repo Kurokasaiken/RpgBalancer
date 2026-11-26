@@ -130,13 +130,16 @@ invariants:
       dal Director nella stessa sessione («mi sembra accettabile»).
     test_refs:
       - tests/unit/idleVillage/r374CassettoV2.test.ts
-  - id: cassetto-v2-well-velluto
+  - id: cassetto-v2-well-marmo
     source: director-ruling
-    source_ref: R-378 rev6 (Director 2026-11-25, fork zoom board-zoom-pozzi.png — scelta «C»)
+    source_ref: R-378 rev7 (Director 2026-11-25, fork3 board3-venature.png — scelta «C3 velo minimo»)
     statement: >-
-      i pozzi interni usano la ricetta «velluto + vignettatura»: glow radiale orizzontale in alto
-      e vignettatura profonda in basso, nessuna arte nuova. Varianti scartate sul fork: flat nero-teal
-      (superata), marmo riusato dal campo esterno («troppo nero» anche a velo 45%, B2/B3).
+      i pozzi interni sono «marmo vellutato»: la pietra del campo esterno (ground.webp) sotto un velo
+      MINIMO (12%→22%) così le venature si leggono chiaramente; glow smeraldo dall'alto che tiene i pozzi
+      nella famiglia teal, vignettatura profonda in basso, rim light oro sul bordo interno superiore che
+      rafforza il frame in ottone. SUPERA rev6 «velluto+vignettatura» a soli gradienti («debolucci») —
+      rinominato da cassetto-v2-well-velluto; il marmo rejected in round 1 a velo 45-62% («troppo nero»)
+      è ciò che il Director ha scelto una volta sceso al velo minimo.
     test_refs:
       - tests/unit/idleVillage/r374CassettoV2.test.ts
   - id: cassetto-v2-captions-floor-12

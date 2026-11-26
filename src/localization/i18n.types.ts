@@ -509,8 +509,18 @@ export default interface Resources {
         "wonder": "Sea wonder"
       },
       "events": {
+        "all": "All",
+        "bar": {
+          "ariaLabel": "Events, {count} upcoming. {action}",
+          "close": "Close events panel",
+          "open": "Open events panel",
+          "selectedAriaLabel": "Events, {count} upcoming. {type}: {title}, {countdown}. {action}"
+        },
+        "close": "Close",
+        "collapse": "Collapse",
         "daysLeft": "{count} d",
         "empty": "Nothing on the horizon.",
+        "expand": "Expand",
         "fixtures": {
           "caravan": "A merchant caravan arrives",
           "expedition": "Expedition returns from the north",
@@ -520,6 +530,7 @@ export default interface Resources {
           "wolves": "Wolves sighted by the old woods"
         },
         "move": "Move panel",
+        "otherEvents": "Other events · {count}",
         "showLess": "Show less",
         "showMore": "Show all ({count})",
         "sort": {
@@ -1272,6 +1283,88 @@ export default interface Resources {
       },
       "subtitle": "Post-mappa2 workbench — active decisions, living map, HUD construction and review surfaces.",
       "title": "Hub"
+    },
+    "hudLab": {
+      "lego": {
+        "approve": "approve",
+        "baseline": {
+          "approved": "baseline approved",
+          "rejected": "baseline rejected",
+          "undecided": "baseline undecided"
+        },
+        "canon": {
+          "baptized": "canon: baptized",
+          "candidate": "canon: candidate",
+          "retired": "canon: retired"
+        },
+        "chooseReason": "choose…",
+        "constraint": "Reusable constraint (optional)",
+        "controlPatternsTitle": "Control patterns observed — read only",
+        "copied": "copied",
+        "copyId": "copy ID",
+        "copyJson": "copy JSON",
+        "coverageHeaders": {
+          "missingDelta": "missing delta",
+          "need": "need",
+          "reusablePieceIds": "reusable pieces",
+          "role": "role",
+          "surface": "surface"
+        },
+        "coverageTitle": "Coverage matrix stash / roster / quest",
+        "errors": {
+          "inventory-stale": "inventory is stale; rebase needed",
+          "missing-other-note": "reason “other” requires a note",
+          "missing-reason": "reject requires a reason",
+          "no-decisions": "no touched decisions",
+          "retired-reapproval": "retired ids cannot be revived; create a new revision",
+          "schema-invalid": "packet schema invalid",
+          "status-conflict": "canonical status conflict",
+          "unknown-piece": "unknown piece"
+        },
+        "exportTitle": "Ruling packet export",
+        "exportToggle": "show export",
+        "filters": {
+          "all": "all reviews",
+          "allCanon": "all canonical statuses",
+          "allKinds": "all kinds",
+          "approved": "approved",
+          "canon": "canonical status filter",
+          "kind": "kind filter",
+          "rejected": "rejected",
+          "review": "review filter",
+          "touched": "touched",
+          "undecided": "undecided",
+          "untouched": "untouched"
+        },
+        "inventoryRevLabel": "inventoryRev",
+        "jsonLabel": "JSON v1",
+        "kinds": {
+          "band": "bands",
+          "button-plate": "button plates",
+          "frame": "frames",
+          "ground": "grounds",
+          "icon-plate": "icon plates",
+          "ornament": "ornaments"
+        },
+        "markdownLabel": "Markdown summary",
+        "note": "Note / conditions",
+        "piecesCount": "valid pieces",
+        "reasons": {
+          "dialect-intent": "dialect/intent mismatch",
+          "other": "other",
+          "quality-insufficient": "quality insufficient",
+          "role-nuance": "role nuance",
+          "scale-mismatch": "scale mismatch"
+        },
+        "reject": "reject",
+        "rejectReason": "Reject reason",
+        "reset": "reset",
+        "subtitle": "Ruling inventory for immutable art pieces. Compare pieces at equal size, touch decisions in memory, export a packet for a later governed apply.",
+        "title": "LEGO board — HUD art inventory",
+        "touchedCount": "{{count}} touched",
+        "unresolvedTitle": "Unresolved lane — not rulingable",
+        "unsavedWarning": "Review is in-memory only. Reloading the page loses touched decisions; export JSON before closing. This board never writes pieces.json, charters or production files."
+      }
     },
     "map": {
       "activeActivities": "Active Activities",

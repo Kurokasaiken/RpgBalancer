@@ -303,15 +303,20 @@ const wellStyle: React.CSSProperties = {
   /* WELL recipe — rebalanced toward TEAL (OB-7 app-1, Director 2026-11-21: «troppo nero in proporzione»; was
    * ~80% black / 20% green): the green glow band widens (0–30% / 70–100%, was 16%/84%) and the core lifts
    * toward nero-teal. Saturated emerald stays for accents only (Outbound segment, CTA, gems). */
-  /* R-378 rev6 (Director 2026-11-25): recipe C «velluto + vignettatura» — chosen on the zoom fork over flat
-   * and marble-veiled variants («marmo solo nero», rejected). Emerald luminosity from the top centre,
-   * depth darkening towards the bottom corners; no new art, pure layered gradients. */
+  /* R-378 rev7 (Director 2026-11-25): «marmo vellutato» C3 — the field marble shows through a MINIMAL veil
+   * (12%→22%) so the veins read clearly («le venature devono essere + visibili»); emerald top glow keeps the
+   * wells in the teal family, deep bottom vignette keeps them nocturnal, gold rim light on the top inner edge
+   * strengthens the brass frame. Supersedes rev6 «velluto+vignettatura» (pure gradients, no art — too weak,
+   * «debolucci»); the marble-veiled direction rejected in round 1 («troppo nero» at 45-62% veil) is what the
+   * Director chose once the veil dropped to minimum. */
   background: [
-    'radial-gradient(ellipse 120% 90% at 50% 0%, rgba(30,130,90,.30) 0%, transparent 55%)',
-    'radial-gradient(ellipse 140% 120% at 50% 115%, rgba(0,0,0,.62) 0%, transparent 60%)',
-    'linear-gradient(180deg, #04222b 0%, #01141c 50%, #03302a 100%)',
+    'radial-gradient(ellipse 120% 85% at 50% 0%, rgba(46,170,116,.30) 0%, transparent 55%)',
+    'radial-gradient(ellipse 150% 130% at 50% 118%, rgba(0,0,0,.66) 0%, transparent 62%)',
+    'linear-gradient(rgba(4,22,24,.12), rgba(2,12,16,.22))',
+    `url(${ASSET}/ground.webp) center / cover no-repeat`,
+    '#04222b',
   ].join(', '),
-  boxShadow: 'inset 0 0 0 1px rgba(30,120,84,.42), inset 0 0 18px rgba(24,110,78,.34), inset 0 0 34px rgba(0,0,0,.50)',
+  boxShadow: 'inset 0 1px 0 rgba(255,222,140,.30), inset 0 0 0 1px rgba(46,150,108,.5), inset 0 0 24px rgba(34,140,96,.42), inset 0 -16px 34px rgba(0,0,0,.58)',
 };
 
 /** The % readout (Director 2026-11-20: a big number beside the emblem). Pending → a muted dash, same height. */
@@ -681,7 +686,11 @@ export const HudRealCassettoV2: React.FC<HudRealCassettoV2Props> = ({
               {/* Gemini-generated pill, ORNATE pass (Director 2026-11-22 «il componente viaggi è ancora quello vecchio»):
                *  `journey-pill.webp` — lit emerald Outbound, two dark recessed segments, slanted cuts with branch flourishes,
                *  8 emerald gems — keyed, empty: icons and names stay live DOM on top (i18n). */}
-              <img data-cassetto-journey-art="" aria-hidden alt="" draggable={false} src={`${ASSET}/journey-pill.webp`} style={{ display: 'block', width: '100%', height: 'auto' }} />
+              {/* R-378 rev8 (Director 2026-11-25 «il componente viaggio ha un'ombra dietro che deve sparire»):
+               *  `-keyed` derivative — the Gemini original baked an opaque dark smoke surround (invisible on the
+               *  flat wells, glaring on the rev7 marble); the surround is keyed out via GrabCut (interior dark
+               *  segments, enamel and gold verified intact). Original journey-pill.webp untouched. */}
+              <img data-cassetto-journey-art="" aria-hidden alt="" draggable={false} src={`${ASSET}/journey-pill-keyed.webp`} style={{ display: 'block', width: '100%', height: 'auto' }} />
               {quest.legs.map((leg, i) => (
                 <div key={i} style={{ position: 'absolute', top: 0, bottom: 0, left: `${JOURNEY_CENTERS[i] ?? 50}%`, transform: `translateX(-50%) translateY(${u(4)})`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: u(4), pointerEvents: 'none' }}>
                   {/* R-378 rev4 (Director 2026-11-24 «le icone devono avere lo stesso colore delle scritte … più grandi»):

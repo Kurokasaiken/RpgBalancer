@@ -151,5 +151,15 @@ pericoli, altri colori saranno x altro»*.
 - Esito 2026-11-25: implementato e verificato su `/game` headless WebGL.
   Witness finali in `test-results/r386-events-bar/`: empty, threat nativo
   con gemma rossa, pannello reale aperto, 1920×1080 e narrowing (visibile a
-  980, nascosto senza overlap a 900 e sotto). Probe: `final-probe.json`,
+  980, nascosto senza overlap a 900 e sotto). Probe: `final-probe.json`/`postrefactor-probe.json`,
   `narrow-probe.json`; confronto visivo: `final-comparison-board.png`.
+
+### Correzione Director 2026-11-25 — gemma verde Time, una sola riga
+
+Dopo il primo witness il Director ha corretto la lettura: la versione con gemma
+verde non deve essere un repaint/scrivente sopra la gemma rossa, ma deve usare
+proprio l'asset verde del componente Tempo (`time/dial-frame.webp`) in swap.
+Il testo vivo sta su una sola riga; il countdown compatto (`5d`) viene messo
+alla fine, immediatamente prima della gemma. Witness aggiornato:
+`test-results/r386-events-bar/swap-empty-bar.png`,
+`swap-threat-bar.png`, probe `swap-probe.json`.

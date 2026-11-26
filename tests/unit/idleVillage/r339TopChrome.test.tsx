@@ -32,7 +32,6 @@ import { useGameLayoutInsets } from '@/ui/idleVillage/store/useGameLayoutInsets'
 import { CASSETTO_LAYOUT_CONFIG } from '@/balancing/config/idleVillage/cassettoLayoutConfig';
 import { EVENTS_BAR_CONFIG } from '@/balancing/config/idleVillage/eventsBarConfig';
 import { HudRealEventsBar } from '@/ui/idleVillage/hudReal/HudRealEventsBar';
-import { selectEventsBarEvent } from '@/ui/idleVillage/components/gameFrame/eventsBarModel';
 import type { HudEvent } from '@/ui/idleVillage/components/gameFrame/HudEventLedger';
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
 import type { ResourceReadoutItem } from '@/ui/idleVillage/components/gameFrame/ResourceReadout';
@@ -293,12 +292,14 @@ describe('R-386 — collapsed event selection and gem semantics', () => {
 
   // INV:game-top-chrome.INV-9
   it('a pinned threat outranks a nearer non-threat in the collapsed bar', () => {
-    expect(selectEventsBarEvent([quest, threat], DEFAULT_GAME_FRAME_CONFIG.eventLedger.pinTypesWhenCollapsed)?.id).toBe('invasion');
+    render(<HudRealEventsBar events={[quest, threat]} />);
+    expect((document.querySelector('[data-hudreal-events-bar]') as HTMLElement).dataset.eventId).toBe('invasion');
   });
 
   // INV:game-top-chrome.INV-9
   it('without a pinned threat the nearest deadline wins and arriving rows are ignored', () => {
-    expect(selectEventsBarEvent([quest, { ...threat, typeId: 'visit', daysLeft: 0, arriving: true }], DEFAULT_GAME_FRAME_CONFIG.eventLedger.pinTypesWhenCollapsed)?.id).toBe('quest-open');
+    render(<HudRealEventsBar events={[quest, { ...threat, typeId: 'visit', daysLeft: 0, arriving: true }]} />);
+    expect((document.querySelector('[data-hudreal-events-bar]') as HTMLElement).dataset.eventId).toBe('quest-open');
   });
 
   // INV:game-top-chrome.INV-10
@@ -314,6 +315,25 @@ describe('R-386 — collapsed event selection and gem semantics', () => {
     expect(gem).toBeInTheDocument();
     expect(gem.style.clipPath).toContain(`circle(${EVENTS_BAR_CONFIG.gem.r}px`);
     expect(gem.style.filter).toBe(EVENTS_BAR_CONFIG.gemFilters.warning);
+  });
+
+  // INV:game-top-chrome.INV-10
+  it('neutral swaps in the signed Time green gem asset instead of repainting the red one', () => {
+    render(<HudRealEventsBar events={[]} />);
+    const gem = document.querySelector('[data-events-gem-time]') as HTMLImageElement;
+    expect(gem).toBeInTheDocument();
+    expect(gem.getAttribute('src')).toBe('/assets/ui/hud-real/time/dial-frame.webp');
+    expect(document.querySelector('[data-events-gem-filter]')).not.toBeInTheDocument();
+  });
+
+  // INV:game-top-chrome.INV-9
+  it('keeps the live reading on one line with the countdown at the end', () => {
+    render(<HudRealEventsBar events={[threat]} />);
+    const field = document.querySelector('[data-events-bar-title]')?.parentElement as HTMLElement;
+    const countdownEl = document.querySelector('[data-events-bar-countdown]') as HTMLElement;
+    expect(field.style.display).toBe('flex');
+    expect(countdownEl.style.marginLeft).toBe('auto');
+    expect(countdownEl.textContent).toBeTruthy();
   });
 
   // INV:game-top-chrome.INV-10

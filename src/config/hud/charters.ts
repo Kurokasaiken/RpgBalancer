@@ -139,8 +139,8 @@ const CHARTER_DATA: ComponentCharter[] = [
       },
       {
         summary:
-          'pozzi: ricetta velluto+vignettatura — glow orizzontale radiale in alto + vignettatura profonda in basso, zero arte nuova; RISOLTE le varianti scartate: flat nero-teal (superata), marmo riusato (B2/B3 «troppo nero» anche a velo 45%)',
-        ref: 'R-378 rev6 Director 2026-11-25 — fork zoom `.mw/runs/20261125-cassetto-fork/board-zoom-pozzi.png`: scelta «C»; supera la ricetta V3 2026-11-22; conferma occhio pendente sulla ricetta C',
+          'pozzi: «marmo vellutato» C3 — pietra del campo esterno sotto velo minimo 12-22% (venature ben visibili) + glow smeraldo alto + vignettatura profonda + rim light oro sul bordo interno superiore',
+        ref: 'R-378 rev7 Director 2026-11-25 — fork3 `.mw/runs/20261125-cassetto-fork3/board3-venature.png`: scelta «C3 velo minimo» dopo «debolucci» sulla ricetta C pura (rev6, superata); marmo round-1 a velo 45-62% rejected «troppo nero», scelto al velo minimo; conferma occhio live pendente',
       },
       {
         summary:

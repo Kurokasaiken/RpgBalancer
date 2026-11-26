@@ -164,11 +164,16 @@ describe('R-378 rev4/rev5/rev6 — fork rulings Director 2026-11-25', () => {
     expect(V2).not.toContain("cursor: canSend ? 'pointer' : 'default'");
   });
 
-  // INV:cassetto-v2-well-velluto — rev6: wells are recipe C «velluto + vignettatura» (chosen on the zoom fork;
-  // marble-veiled rejected «troppo nero», flat superseded). Radial top glow + bottom vignette, no new art.
-  it('wells use the velvet+vignette recipe (radial layers, flat linear-only superseded)', () => {
-    expect(V2).toContain('radial-gradient(ellipse 120% 90% at 50% 0%');
-    expect(V2).toContain('radial-gradient(ellipse 140% 120% at 50% 115%');
+  // INV:cassetto-v2-well-marmo — rev7 «marmo vellutato» C3: field marble under a MINIMAL veil (12-22%,
+  // «le venature devono essere + visibili») + emerald top glow + deep bottom vignette + gold rim light.
+  // Supersedes rev6 pure-gradient «velluto» («debolucci») — the marble direction rejected in round 1 at
+  // 45-62% veil is what the Director chose once the veil dropped to minimum.
+  it('wells use the veiled-marble recipe C3 (ground.webp visible, rim light, vignette)', () => {
+    expect(V2).toContain('ground.webp');
+    expect(V2).toContain('linear-gradient(rgba(4,22,24,.12), rgba(2,12,16,.22))');
+    expect(V2).toContain('radial-gradient(ellipse 150% 130% at 50% 118%');
+    expect(V2).toContain('inset 0 1px 0 rgba(255,222,140,.30)'); /* gold rim light */
+    expect(V2).not.toContain("'linear-gradient(180deg, #04222b 0%, #01141c 50%, #03302a 100%)'"); /* rev6 flat base superseded */
   });
 
   // INV:cassetto-v2-captions-floor-12 — rev5 «anche + grande»: the legibility floor is 12px (was 11 —

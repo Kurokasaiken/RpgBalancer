@@ -40,10 +40,20 @@ export const eventsBarConfigSchema = z
     field: rectSchema,
     medallion: circleSchema,
     gem: circleSchema,
+    /** Green neutral gem swapped wholesale from the signed Time component
+     *  (Director 2026-11-25: use the Time one, do not recolor/overpaint it). */
+    timeGem: z
+      .object({
+        url: z.string().min(1),
+        size: z.number().positive(),
+        offset: z.object({ x: z.number(), y: z.number() }).strict(),
+      })
+      .strict(),
     content: z
       .object({
         iconSizePx: z.number().positive(),
         horizontalGapPx: z.number().positive(),
+        countdownGapPx: z.number().positive(),
         titleWeight: z.number().positive(),
         titleTrackingPx: z.number(),
         countdownMinWidthPx: z.number().positive(),
@@ -88,12 +98,14 @@ const RAW_EVENTS_BAR_CONFIG: EventsBarConfig = {
   /* Measured on the keyed production art, halved to design px. The safe
    *  writing field extends under the subtle right-hand filigree; the countdown
    *  stays clear of the gem bezel. */
-  field: { x: 90, y: 22, w: 292, h: 49 },
+  field: { x: 90, y: 22, w: 303, h: 49 },
   medallion: { cx: 67.5, cy: 46, r: 23 },
   gem: { cx: 442.5, cy: 46, r: 27 },
+  timeGem: { url: '/assets/ui/hud-real/time/dial-frame.webp', size: 85, offset: { x: 0, y: 0 } },
   content: {
     iconSizePx: 25,
     horizontalGapPx: 7,
+    countdownGapPx: 10,
     titleWeight: 700,
     titleTrackingPx: 0.4,
     countdownMinWidthPx: 38,

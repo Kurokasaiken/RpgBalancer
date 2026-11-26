@@ -36,3 +36,18 @@
   nell'anello dipinto, niente rettangolo skin sullo scroller crew.
   Ruling verbatim: **«battezzo»** (2026-11-22). Sostituisce la baseline
   live; `approved-victory-pergamena-frame.png` resta il golden dell'art.
+
+## Roster medaglioni + vite/foglie a S (reference recuperata, 2026-11-25)
+
+- `ref-roster-vine-medallions-band-mockups.png` — mockup originale recuperato
+  dalla history git (`a4cc3a023^:dev-public/mockups/band-mockups.png`) dopo la
+  richiesta verbatim del Director: **«voblio il mockup originale, quello che m
+  hai mostrato nn è quello d cui parlo, molto + vecchio»**. La tavola mostra tre
+  varianti verticali etichettate nel viewer originale come **A — Spina C1**,
+  **B — Vite oro**, **C — Vite verde**: cerchi/medaglioni concatenati e vite
+  fogliata che scende con andamento a S. Sha256:
+  `6b82e9001fb0d51b3d82dd598e60b658f4343dcf535787c012ada5c4d3283e81`.
+- `ref-roster-vine-medallions-bands.html` — viewer/provenienza originale
+  recuperato da `a4cc3a023^:dev-public/mockups/bands.html`; conserva le etichette
+  delle tre varianti. Non è il generatore dell'immagine, solo il contesto di
+  presentazione ritrovato.

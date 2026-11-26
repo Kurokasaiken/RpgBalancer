@@ -186,6 +186,19 @@ def validate(crop_id, image_path, out_path=None):
     if arr[..., 3].min() < 255:
         errors.append('generated output has transparent pixels; pilot requires a fully opaque finished image')
     rgb = arr[..., :3]
+    if errors:
+        payload = {
+            'schema': 'plan135-pilot-strip-validation/v1',
+            'cropId': crop_id,
+            'image': {'path': rel(image_path), 'sha256': sha256_file(image_path)},
+            'status': 'FAIL',
+            'errors': errors,
+            'reviewFlags': [],
+            'earlyExit': 'dimension/scale/opacity hard failure; semantic repaint, seam and land metrics are not meaningful on a wrongly sized output',
+        }
+        if out_path:
+            write_json(out_path, payload)
+        return payload
     base = load_base_rgb()
     repaint = None
     ref = crop['paintedReferenceWorldPx']

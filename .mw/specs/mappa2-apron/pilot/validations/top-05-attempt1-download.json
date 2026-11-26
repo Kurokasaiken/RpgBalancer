@@ -1,0 +1,15 @@
+{
+  "schema": "plan135-pilot-strip-validation/v1",
+  "cropId": "top-05",
+  "image": {
+    "path": ".mw/specs/mappa2-apron/pilot/generated/top-05-attempt1-download.jpg",
+    "sha256": "78c3a28f0850bfeea820ccefdbaf24e4966043050fdb343fd7b71cc8d4ef83e1"
+  },
+  "status": "FAIL",
+  "errors": [
+    "dimensions 1376x768 != expected 1024x572",
+    "scale lock cannot be verified: source rect does not match output dimensions at 1:1"
+  ],
+  "reviewFlags": [],
+  "earlyExit": "dimension/scale/opacity hard failure; semantic repaint, seam and land metrics are not meaningful on a wrongly sized output"
+}
