@@ -1,0 +1,4473 @@
+{
+  "schema": "plan135-feasibility/v1",
+  "createdAt": "2026-11-26T10:18:07.364Z",
+  "generationGate": "NO_GENERATION_BEFORE_THIS_FILE",
+  "status": "FEASIBLE",
+  "decision": {
+    "apron": {
+      "top": 200,
+      "right": 560,
+      "bottom": 0,
+      "left": 560
+    },
+    "apronWorldRect": {
+      "x0": -560,
+      "y0": -200,
+      "x1": 3312,
+      "y1": 1536
+    },
+    "scale": "1 image px = 1 world px"
+  },
+  "measurementSource": {
+    "route": "/game?capture=1",
+    "browserZoom": 1,
+    "unit": "CSS px",
+    "stableFrames": 2,
+    "stabilityRule": "same nonzero rect on two consecutive animation frames",
+    "slots": [
+      "time",
+      "resources",
+      "events",
+      "nav"
+    ]
+  },
+  "measurements": [
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "label": "1280x720"
+      },
+      "dpr": 1,
+      "chromeRects": [
+        {
+          "id": "time",
+          "x": 58,
+          "y": 18.59375,
+          "width": 381.515625,
+          "height": 49.109375,
+          "visible": true
+        },
+        {
+          "id": "resources",
+          "x": 449.515625,
+          "y": 12,
+          "width": 380.953125,
+          "height": 62.3125,
+          "visible": true
+        },
+        {
+          "id": "events",
+          "x": 920,
+          "y": 10.015625,
+          "width": 348,
+          "height": 66.3125,
+          "visible": true
+        },
+        {
+          "id": "nav",
+          "x": 467.5,
+          "y": 625.71875,
+          "width": 345,
+          "height": 88.26751708984375,
+          "visible": true
+        }
+      ],
+      "stable": {
+        "time": true,
+        "resources": true,
+        "events": true,
+        "nav": true
+      },
+      "fit": {
+        "zoom": 0.43706632653064786,
+        "panX": 256.3601821048801,
+        "panY": -144.32953948518863,
+        "zLand": 0.43706632653064786,
+        "zFrame": 0.4147465437788018,
+        "status": "LAND_CLEAR",
+        "freeRect": {
+          "x": 0,
+          "y": 84.328125,
+          "width": 1280,
+          "height": 533.390625
+        },
+        "visibleFrame": {
+          "x0": 256.3601821048801,
+          "y0": -144.32953948518863,
+          "x1": 3184.9774703787325,
+          "y1": 1503.0176851688532
+        },
+        "visibleFrameRounded": {
+          "x0": 256,
+          "y0": -145,
+          "x1": 3185,
+          "y1": 1504
+        },
+        "projectedLand": {
+          "x0": 174.66910714279712,
+          "y0": 82.3125,
+          "x1": 912.0000000000001,
+          "y1": 617.7187500000437
+        },
+        "apronNeeded": {
+          "left": 0,
+          "right": 433,
+          "top": 145,
+          "bottom": 0
+        },
+        "frameSlack": {
+          "left": 560,
+          "right": 127,
+          "top": 55,
+          "bottom": 0
+        },
+        "landClipPx": 0
+      }
+    },
+    {
+      "viewport": {
+        "width": 1366,
+        "height": 768,
+        "label": "1366x768"
+      },
+      "dpr": 1,
+      "chromeRects": [
+        {
+          "id": "time",
+          "x": 58,
+          "y": 19.09375,
+          "width": 410.1875,
+          "height": 52.796875,
+          "visible": true
+        },
+        {
+          "id": "resources",
+          "x": 478.1875,
+          "y": 12,
+          "width": 409.59375,
+          "height": 67,
+          "visible": true
+        },
+        {
+          "id": "events",
+          "x": 1006,
+          "y": 12.328125,
+          "width": 348,
+          "height": 66.3125,
+          "visible": true
+        },
+        {
+          "id": "nav",
+          "x": 510.5,
+          "y": 673.71875,
+          "width": 345,
+          "height": 88.26751708984375,
+          "visible": true
+        }
+      ],
+      "stable": {
+        "time": true,
+        "resources": true,
+        "events": true,
+        "nav": true
+      },
+      "fit": {
+        "zoom": 0.47242346938779367,
+        "panX": 53.76318915720003,
+        "panY": -140.15681192287497,
+        "zLand": 0.47242346938779367,
+        "zFrame": 0.4423963133640553,
+        "status": "LAND_CLEAR",
+        "freeRect": {
+          "x": 0,
+          "y": 87,
+          "width": 1366,
+          "height": 578.71875
+        },
+        "visibleFrame": {
+          "x0": 53.76318915720003,
+          "y0": -140.15681192287497,
+          "x1": 2945.2368108428,
+          "y1": 1485.5033209135386
+        },
+        "visibleFrameRounded": {
+          "x0": 53,
+          "y0": -141,
+          "x1": 2946,
+          "y1": 1486
+        },
+        "projectedLand": {
+          "x0": 284.510803571396,
+          "y0": 87,
+          "x1": 1081.489196428604,
+          "y1": 665.7187500000473
+        },
+        "apronNeeded": {
+          "left": 0,
+          "right": 194,
+          "top": 141,
+          "bottom": 0
+        },
+        "frameSlack": {
+          "left": 560,
+          "right": 366,
+          "top": 59,
+          "bottom": 0
+        },
+        "landClipPx": 0
+      }
+    },
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "label": "1440x900"
+      },
+      "dpr": 1,
+      "chromeRects": [
+        {
+          "id": "time",
+          "x": 58,
+          "y": 19.25,
+          "width": 419.5,
+          "height": 54,
+          "visible": true
+        },
+        {
+          "id": "resources",
+          "x": 510.546875,
+          "y": 12,
+          "width": 418.890625,
+          "height": 68.515625,
+          "visible": true
+        },
+        {
+          "id": "events",
+          "x": 1080,
+          "y": 13.09375,
+          "width": 348,
+          "height": 66.3125,
+          "visible": true
+        },
+        {
+          "id": "nav",
+          "x": 547.5,
+          "y": 805.71875,
+          "width": 345,
+          "height": 88.26751708984375,
+          "visible": true
+        }
+      ],
+      "stable": {
+        "time": true,
+        "resources": true,
+        "events": true,
+        "nav": true
+      },
+      "fit": {
+        "zoom": 0.5789413265306594,
+        "panX": 255.85065764843034,
+        "panY": -108.8922205820669,
+        "zLand": 0.5789413265306594,
+        "zFrame": 0.5184331797235023,
+        "status": "LAND_CLEAR",
+        "freeRect": {
+          "x": 0,
+          "y": 88.515625,
+          "width": 1440,
+          "height": 709.203125
+        },
+        "visibleFrame": {
+          "x0": 255.85065764843034,
+          "y0": -108.8922205820669,
+          "x1": 2743.1493423515694,
+          "y1": 1445.6694573573955
+        },
+        "visibleFrameRounded": {
+          "x0": 255,
+          "y0": -109,
+          "x1": 2744,
+          "y1": 1446
+        },
+        "projectedLand": {
+          "x0": 231.66299107138872,
+          "y0": 88.515625,
+          "x1": 1208.337008928611,
+          "y1": 797.7187500000578
+        },
+        "apronNeeded": {
+          "left": 0,
+          "right": 0,
+          "top": 109,
+          "bottom": 0
+        },
+        "frameSlack": {
+          "left": 560,
+          "right": 560,
+          "top": 91,
+          "bottom": 0
+        },
+        "landClipPx": 0
+      }
+    },
+    {
+      "viewport": {
+        "width": 1536,
+        "height": 864,
+        "label": "1536x864"
+      },
+      "dpr": 1,
+      "chromeRects": [
+        {
+          "id": "time",
+          "x": 58,
+          "y": 19.25,
+          "width": 419.5,
+          "height": 54,
+          "visible": true
+        },
+        {
+          "id": "resources",
+          "x": 558.546875,
+          "y": 12,
+          "width": 418.890625,
+          "height": 68.515625,
+          "visible": true
+        },
+        {
+          "id": "events",
+          "x": 1176,
+          "y": 13.09375,
+          "width": 348,
+          "height": 66.3125,
+          "visible": true
+        },
+        {
+          "id": "nav",
+          "x": 595.5,
+          "y": 769.71875,
+          "width": 345,
+          "height": 88.26751708984375,
+          "visible": true
+        }
+      ],
+      "stable": {
+        "time": true,
+        "resources": true,
+        "events": true,
+        "nav": true
+      },
+      "fit": {
+        "zoom": 0.5495535714286163,
+        "panX": 102.00203086932606,
+        "panY": -117.06823720551083,
+        "zLand": 0.5495535714286163,
+        "zFrame": 0.4976958525345622,
+        "status": "LAND_CLEAR",
+        "freeRect": {
+          "x": 0,
+          "y": 88.515625,
+          "width": 1536,
+          "height": 673.203125
+        },
+        "visibleFrame": {
+          "x0": 102.00203086932606,
+          "y0": -117.06823720551083,
+          "x1": 2896.997969130674,
+          "y1": 1455.1169780664975
+        },
+        "visibleFrameRounded": {
+          "x0": 102,
+          "y0": -118,
+          "x1": 2897,
+          "y1": 1456
+        },
+        "projectedLand": {
+          "x0": 304.45156249996217,
+          "y0": 88.515625,
+          "x1": 1231.5484375000378,
+          "y1": 761.7187500000549
+        },
+        "apronNeeded": {
+          "left": 0,
+          "right": 145,
+          "top": 118,
+          "bottom": 0
+        },
+        "frameSlack": {
+          "left": 560,
+          "right": 415,
+          "top": 82,
+          "bottom": 0
+        },
+        "landClipPx": 0
+      }
+    },
+    {
+      "viewport": {
+        "width": 1920,
+        "height": 1080,
+        "label": "1920x1080"
+      },
+      "dpr": 1,
+      "chromeRects": [
+        {
+          "id": "time",
+          "x": 58,
+          "y": 19.25,
+          "width": 419.5,
+          "height": 54,
+          "visible": true
+        },
+        {
+          "id": "resources",
+          "x": 750.546875,
+          "y": 12,
+          "width": 418.890625,
+          "height": 68.515625,
+          "visible": true
+        },
+        {
+          "id": "events",
+          "x": 1560,
+          "y": 13.09375,
+          "width": 348,
+          "height": 66.3125,
+          "visible": true
+        },
+        {
+          "id": "nav",
+          "x": 787.5,
+          "y": 985.71875,
+          "width": 345,
+          "height": 88.267578125,
+          "visible": true
+        }
+      ],
+      "stable": {
+        "time": true,
+        "resources": true,
+        "events": true,
+        "nav": true
+      },
+      "fit": {
+        "zoom": 0.7258801020408755,
+        "panX": 176.96753589074024,
+        "panY": -77.94248712856374,
+        "zLand": 0.7258801020408755,
+        "zFrame": 0.6221198156682027,
+        "status": "LAND_CLEAR",
+        "freeRect": {
+          "x": 0,
+          "y": 88.515625,
+          "width": 1920,
+          "height": 889.203125
+        },
+        "visibleFrame": {
+          "x0": 176.96753589074024,
+          "y0": -77.94248712856374,
+          "x1": 2822.0324641092598,
+          "y1": 1409.9065349943535
+        },
+        "visibleFrameRounded": {
+          "x0": 176,
+          "y0": -78,
+          "x1": 2823,
+          "y1": 1410
+        },
+        "projectedLand": {
+          "x0": 347.72013392852153,
+          "y0": 88.515625,
+          "x1": 1572.2798660714784,
+          "y1": 977.7187500000724
+        },
+        "apronNeeded": {
+          "left": 0,
+          "right": 71,
+          "top": 78,
+          "bottom": 0
+        },
+        "frameSlack": {
+          "left": 560,
+          "right": 489,
+          "top": 122,
+          "bottom": 0
+        },
+        "landClipPx": 0
+      }
+    },
+    {
+      "viewport": {
+        "width": 1920,
+        "height": 1200,
+        "label": "1920x1200"
+      },
+      "dpr": 1,
+      "chromeRects": [
+        {
+          "id": "time",
+          "x": 58,
+          "y": 19.25,
+          "width": 419.5,
+          "height": 54,
+          "visible": true
+        },
+        {
+          "id": "resources",
+          "x": 750.546875,
+          "y": 12,
+          "width": 418.890625,
+          "height": 68.515625,
+          "visible": true
+        },
+        {
+          "id": "events",
+          "x": 1560,
+          "y": 13.09375,
+          "width": 348,
+          "height": 66.3125,
+          "visible": true
+        },
+        {
+          "id": "nav",
+          "x": 787.5,
+          "y": 1105.71875,
+          "width": 345,
+          "height": 88.267578125,
+          "visible": true
+        }
+      ],
+      "stable": {
+        "time": true,
+        "resources": true,
+        "events": true,
+        "nav": true
+      },
+      "fit": {
+        "zoom": 0.8238392857143529,
+        "panX": 334.22417903986957,
+        "panY": -63.44283082257712,
+        "zLand": 0.8238392857143529,
+        "zFrame": 0.6912442396313364,
+        "status": "LAND_CLEAR",
+        "freeRect": {
+          "x": 0,
+          "y": 88.515625,
+          "width": 1920,
+          "height": 1009.203125
+        },
+        "visibleFrame": {
+          "x0": 334.22417903986957,
+          "y0": -63.44283082257712,
+          "x1": 2664.7758209601307,
+          "y1": 1393.1519453775857
+        },
+        "visibleFrameRounded": {
+          "x0": 334,
+          "y0": -64,
+          "x1": 2665,
+          "y1": 1394
+        },
+        "projectedLand": {
+          "x0": 265.0915624999434,
+          "y0": 88.515625,
+          "x1": 1654.9084375000568,
+          "y1": 1097.7187500000825
+        },
+        "apronNeeded": {
+          "left": 0,
+          "right": 0,
+          "top": 64,
+          "bottom": 0
+        },
+        "frameSlack": {
+          "left": 560,
+          "right": 560,
+          "top": 136,
+          "bottom": 0
+        },
+        "landClipPx": 0
+      }
+    },
+    {
+      "viewport": {
+        "width": 2000,
+        "height": 1024,
+        "label": "2000x1024"
+      },
+      "dpr": 1,
+      "chromeRects": [
+        {
+          "id": "time",
+          "x": 58,
+          "y": 19.25,
+          "width": 419.5,
+          "height": 54,
+          "visible": true
+        },
+        {
+          "id": "resources",
+          "x": 790.546875,
+          "y": 12,
+          "width": 418.890625,
+          "height": 68.515625,
+          "visible": true
+        },
+        {
+          "id": "events",
+          "x": 1640,
+          "y": 13.09375,
+          "width": 348,
+          "height": 66.3125,
+          "visible": true
+        },
+        {
+          "id": "nav",
+          "x": 827.5,
+          "y": 929.71875,
+          "width": 345,
+          "height": 88.26751708984375,
+          "visible": true
+        }
+      ],
+      "stable": {
+        "time": true,
+        "resources": true,
+        "events": true,
+        "nav": true
+      },
+      "fit": {
+        "zoom": 0.6801658163265861,
+        "panX": 29.270276605839626,
+        "panY": -86.13830285981123,
+        "zLand": 0.6801658163265861,
+        "zFrame": 0.5898617511520737,
+        "status": "LAND_CLEAR",
+        "freeRect": {
+          "x": 0,
+          "y": 88.515625,
+          "width": 2000,
+          "height": 833.203125
+        },
+        "visibleFrame": {
+          "x0": 29.270276605839626,
+          "y0": -86.13830285981123,
+          "x1": 2969.7297233941604,
+          "y1": 1419.376933895809
+        },
+        "visibleFrameRounded": {
+          "x0": 29,
+          "y0": -87,
+          "x1": 2970,
+          "y1": 1420
+        },
+        "projectedLand": {
+          "x0": 426.2801339285246,
+          "y0": 88.515625,
+          "x1": 1573.7198660714755,
+          "y1": 921.718750000068
+        },
+        "apronNeeded": {
+          "left": 0,
+          "right": 218,
+          "top": 87,
+          "bottom": 0
+        },
+        "frameSlack": {
+          "left": 560,
+          "right": 342,
+          "top": 113,
+          "bottom": 0
+        },
+        "landClipPx": 0
+      }
+    },
+    {
+      "viewport": {
+        "width": 2560,
+        "height": 1440,
+        "label": "2560x1440"
+      },
+      "dpr": 1,
+      "chromeRects": [
+        {
+          "id": "time",
+          "x": 75.39999389648438,
+          "y": 25.024999618530273,
+          "width": 545.3499755859375,
+          "height": 70.19999694824219,
+          "visible": true
+        },
+        {
+          "id": "resources",
+          "x": 1007.7030639648438,
+          "y": 15.59999942779541,
+          "width": 544.5578002929688,
+          "height": 89.0703125,
+          "visible": true
+        },
+        {
+          "id": "events",
+          "x": 2196.390625,
+          "y": 26.974998474121094,
+          "width": 347.99365234375,
+          "height": 66.29999542236328,
+          "visible": true
+        },
+        {
+          "id": "nav",
+          "x": 1055.7421875,
+          "y": 1317.4483642578125,
+          "width": 448.5,
+          "height": 114.7479248046875,
+          "visible": true
+        }
+      ],
+      "stable": {
+        "time": true,
+        "resources": true,
+        "events": true,
+        "nav": true
+      },
+      "fit": {
+        "zoom": 0.9769616753715222,
+        "panX": 189.3155452073006,
+        "panY": -71.32725875347032,
+        "zLand": 0.9769616753715222,
+        "zFrame": 0.8294930875576036,
+        "status": "LAND_CLEAR",
+        "freeRect": {
+          "x": 0,
+          "y": 112.67031192779541,
+          "width": 2560,
+          "height": 1196.778052330017
+        },
+        "visibleFrame": {
+          "x0": 189.3155452073006,
+          "y0": -71.32725875347032,
+          "x1": 2809.6844547926994,
+          "y1": 1402.6302528883166
+        },
+        "visibleFrameRounded": {
+          "x0": 189,
+          "y0": -72,
+          "x1": 2810,
+          "y1": 1403
+        },
+        "projectedLand": {
+          "x0": 455.93282682412104,
+          "y0": 112.67031192779541,
+          "x1": 2104.067173175879,
+          "y1": 1309.44836425791
+        },
+        "apronNeeded": {
+          "left": 0,
+          "right": 58,
+          "top": 72,
+          "bottom": 0
+        },
+        "frameSlack": {
+          "left": 560,
+          "right": 502,
+          "top": 128,
+          "bottom": 0
+        },
+        "landClipPx": 0
+      }
+    },
+    {
+      "viewport": {
+        "width": 2560,
+        "height": 1080,
+        "label": "2560x1080"
+      },
+      "dpr": 1,
+      "chromeRects": [
+        {
+          "id": "time",
+          "x": 58,
+          "y": 19.25,
+          "width": 419.5,
+          "height": 54,
+          "visible": true
+        },
+        {
+          "id": "resources",
+          "x": 1070.546875,
+          "y": 12,
+          "width": 418.890625,
+          "height": 68.515625,
+          "visible": true
+        },
+        {
+          "id": "events",
+          "x": 2200,
+          "y": 13.09375,
+          "width": 348,
+          "height": 66.3125,
+          "visible": true
+        },
+        {
+          "id": "nav",
+          "x": 1107.5,
+          "y": 985.71875,
+          "width": 345,
+          "height": 88.267578125,
+          "visible": true
+        }
+      ],
+      "stable": {
+        "time": true,
+        "resources": true,
+        "events": true,
+        "nav": true
+      },
+      "fit": {
+        "zoom": 0.7258801020408755,
+        "panX": -263.87661881234635,
+        "panY": -77.94248712856374,
+        "zLand": 0.7258801020408755,
+        "zFrame": 0.6611570247933884,
+        "status": "LAND_CLEAR",
+        "freeRect": {
+          "x": 0,
+          "y": 88.515625,
+          "width": 2560,
+          "height": 889.203125
+        },
+        "visibleFrame": {
+          "x0": -263.87661881234635,
+          "y0": -77.94248712856374,
+          "x1": 3262.8766188123464,
+          "y1": 1409.9065349943535
+        },
+        "visibleFrameRounded": {
+          "x0": -264,
+          "y0": -78,
+          "x1": 3263,
+          "y1": 1410
+        },
+        "projectedLand": {
+          "x0": 667.7201339285215,
+          "y0": 88.515625,
+          "x1": 1892.2798660714784,
+          "y1": 977.7187500000724
+        },
+        "apronNeeded": {
+          "left": 264,
+          "right": 511,
+          "top": 78,
+          "bottom": 0
+        },
+        "frameSlack": {
+          "left": 296,
+          "right": 49,
+          "top": 122,
+          "bottom": 0
+        },
+        "landClipPx": 0
+      }
+    },
+    {
+      "viewport": {
+        "width": 3440,
+        "height": 1440,
+        "label": "3440x1440"
+      },
+      "dpr": 1,
+      "chromeRects": [
+        {
+          "id": "time",
+          "x": 75.39999389648438,
+          "y": 25.024999618530273,
+          "width": 545.3499755859375,
+          "height": 70.19999694824219,
+          "visible": true
+        },
+        {
+          "id": "resources",
+          "x": 1447.71240234375,
+          "y": 15.59999942779541,
+          "width": 544.557861328125,
+          "height": 89.0703125,
+          "visible": true
+        },
+        {
+          "id": "events",
+          "x": 3076.388916015625,
+          "y": 26.974998474121094,
+          "width": 347.99365234375,
+          "height": 66.29999542236328,
+          "visible": true
+        },
+        {
+          "id": "nav",
+          "x": 1495.731201171875,
+          "y": 1317.4483642578125,
+          "width": 448.5,
+          "height": 114.7479248046875,
+          "visible": true
+        }
+      ],
+      "stable": {
+        "time": true,
+        "resources": true,
+        "events": true,
+        "nav": true
+      },
+      "fit": {
+        "zoom": 0.9769616753715222,
+        "panX": -261.0603611276897,
+        "panY": -71.32725875347032,
+        "zLand": 0.9769616753715222,
+        "zFrame": 0.8884297520661157,
+        "status": "LAND_CLEAR",
+        "freeRect": {
+          "x": 0,
+          "y": 112.67031192779541,
+          "width": 3440,
+          "height": 1196.778052330017
+        },
+        "visibleFrame": {
+          "x0": -261.0603611276897,
+          "y0": -71.32725875347032,
+          "x1": 3260.0603611276897,
+          "y1": 1402.6302528883166
+        },
+        "visibleFrameRounded": {
+          "x0": -262,
+          "y0": -72,
+          "x1": 3261,
+          "y1": 1403
+        },
+        "projectedLand": {
+          "x0": 895.932826824121,
+          "y0": 112.67031192779541,
+          "x1": 2544.067173175879,
+          "y1": 1309.44836425791
+        },
+        "apronNeeded": {
+          "left": 262,
+          "right": 509,
+          "top": 72,
+          "bottom": 0
+        },
+        "frameSlack": {
+          "left": 298,
+          "right": 51,
+          "top": 128,
+          "bottom": 0
+        },
+        "landClipPx": 0
+      }
+    }
+  ],
+  "summary": {
+    "eventsMissingViewports": [],
+    "hardStopViewports": [],
+    "minFrameSlackWorldPx": 0,
+    "minPositiveApronFrameSlackWorldPx": 49,
+    "zeroSlackSides": [
+      "1280x720:bottom",
+      "1366x768:bottom",
+      "1440x900:bottom",
+      "1536x864:bottom",
+      "1920x1080:bottom",
+      "1920x1200:bottom",
+      "2000x1024:bottom",
+      "2560x1440:bottom",
+      "2560x1080:bottom",
+      "3440x1440:bottom"
+    ],
+    "headroomRisk": false
+  },
+  "frozenConstants": {
+    "frameClamp": {
+      "formula": "zFrame=max(viewportW/(2752+560+560),viewportH/(1536+200+0)); CSS px, DPR recorded but not used",
+      "rounding": "floor(min),ceil(max)",
+      "apronWorldRect": {
+        "x0": -560,
+        "y0": -200,
+        "x1": 3312,
+        "y1": 1536
+      },
+      "frameClampMinZoomByViewport": {
+        "1280x720": 0.4147465437788018,
+        "1366x768": 0.4423963133640553,
+        "1440x900": 0.5184331797235023,
+        "1536x864": 0.4976958525345622,
+        "1920x1080": 0.6221198156682027,
+        "1920x1200": 0.6912442396313364,
+        "2000x1024": 0.5898617511520737,
+        "2560x1440": 0.8294930875576036,
+        "2560x1080": 0.6611570247933884,
+        "3440x1440": 0.8884297520661157
+      }
+    },
+    "pilotKillCriteria": {
+      "maxRegenerationsPerStrip": 2,
+      "pilotCycles": 1,
+      "repaintReferenceFail": true,
+      "outerWaterFail": true,
+      "independentLandFail": true,
+      "seamThresholdFail": true
+    },
+    "outerWaterBands": {
+      "top": {
+        "x0": -560,
+        "y0": -200,
+        "x1": 3312,
+        "y1": -141
+      },
+      "left": {
+        "x0": -560,
+        "y0": 0,
+        "x1": -393,
+        "y1": 1535
+      },
+      "right": {
+        "x0": 3144,
+        "y0": 0,
+        "x1": 3312,
+        "y1": 1535
+      },
+      "continuationZones": {
+        "top": {
+          "x0": -560,
+          "y0": -140,
+          "x1": 3312,
+          "y1": -1
+        },
+        "left": {
+          "x0": -392,
+          "y0": 0,
+          "x1": -1,
+          "y1": 1535
+        },
+        "right": {
+          "x0": 2752,
+          "y0": 0,
+          "x1": 3143,
+          "y1": 1535
+        }
+      }
+    },
+    "deepSeaVeil": {
+      "canvasInteriorIntensity": 0,
+      "source": "PLAN-135 §10.11; shader uniform to be pinned before T5"
+    }
+  },
+  "artifacts": {
+    "cropPlan": {
+      "path": ".mw/specs/mappa2-apron/crop-plan.json",
+      "sha256": "e1bce5d79721f42ad3b7ae72e338b0fa722052f7c3142fce46845c29648b84bc"
+    },
+    "apronMeasurements": {
+      "path": ".mw/specs/mappa2-apron/apron.json",
+      "sha256": "aba602410fb29539b7b3e5af6f4310eba32ce508991d405d4bb96c79ef9daafc"
+    },
+    "paintingBaseline": {
+      "path": ".mw/specs/mappa2-apron/painting-baseline.json",
+      "sha256": "38e8333bc4667ef87facc1bed6eb2a38fb1feb9080062ecafd464c460b6638b3"
+    },
+    "waterMaskRaw": {
+      "path": ".mw/specs/mappa2-apron/water-mask-raw.png",
+      "sha256": "0ee8db6305997c035453ceac2bf0ccf90863afba58e811ea3936c74af878032d",
+      "encoding": "PNG grayscale: 255=water, 0=non-water, derived as Mare alpha==255"
+    },
+    "waterMaskOpened": {
+      "path": ".mw/specs/mappa2-apron/water-mask-opened-3x3.png",
+      "sha256": "7cf04d032520e7264965ed3b4188f26eb73ed7983f82417a648316c36c6598df",
+      "encoding": "PNG grayscale after cv2.MORPH_OPEN square 3x3 on raw water mask"
+    },
+    "baselineRenders": [
+      {
+        "viewport": "1280x720",
+        "timeOfDay": "day",
+        "path": ".mw/specs/mappa2-apron/baseline-render/1280x720-day.png",
+        "sha256": "e7a48851a68064c7cc38c8b53b915e7e6e32fa24f8e4cc88b9e62742e339dd10",
+        "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
+        "camera": {
+          "panX": 256.3601821048801,
+          "panY": -144.32953948518863,
+          "zoom": 0.43706632653064786
+        },
+        "canvasScreen": {
+          "x0": -112.04640306130787,
+          "y0": 63.08158163265149,
+          "x1": 1090.760127551035,
+          "y1": 734.4154591837266
+        },
+        "clip": {
+          "x": 0,
+          "y": 63,
+          "width": 1091,
+          "height": 657
+        }
+      },
+      {
+        "viewport": "1366x768",
+        "timeOfDay": "day",
+        "path": ".mw/specs/mappa2-apron/baseline-render/1366x768-day.png",
+        "sha256": "47b808ed410f5f5c5a1e33de1386c86b55adeb3a0fbf98d177042538f807be7b",
+        "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
+        "camera": {
+          "panX": 53.76318915720003,
+          "panY": -140.15681192287497,
+          "zoom": 0.47242346938779367
+        },
+        "canvasScreen": {
+          "x0": -25.39899234699665,
+          "y0": 66.21336734693708,
+          "x1": 1274.7103954082115,
+          "y1": 791.8558163265882
+        },
+        "clip": {
+          "x": 0,
+          "y": 66,
+          "width": 1275,
+          "height": 702
+        }
+      },
+      {
+        "viewport": "1440x900",
+        "timeOfDay": "day",
+        "path": ".mw/specs/mappa2-apron/baseline-render/1440x900-day.png",
+        "sha256": "c8f94c7f065b738e6cbb6bc6001cf473d50b4543cdee431053ac12e1cf99eb34",
+        "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
+        "camera": {
+          "panX": 255.85065764843034,
+          "panY": -108.8922205820669,
+          "zoom": 0.5789413265306594
+        },
+        "canvasScreen": {
+          "x0": -148.12251913272388,
+          "y0": 63.04220663265099,
+          "x1": 1445.1240114796508,
+          "y1": 952.2960841837438
+        },
+        "clip": {
+          "x": 0,
+          "y": 63,
+          "width": 1440,
+          "height": 837
+        }
+      },
+      {
+        "viewport": "1536x864",
+        "timeOfDay": "day",
+        "path": ".mw/specs/mappa2-apron/baseline-render/1536x864-day.png",
+        "sha256": "56c837c330b45cc9f329339db311838b407bcdac289a88f897b670a029a3e88c",
+        "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
+        "camera": {
+          "panX": 102.00203086932606,
+          "panY": -117.06823720551083,
+          "zoom": 0.5495535714286163
+        },
+        "canvasScreen": {
+          "x0": -56.055580357210104,
+          "y0": 64.33526785714089,
+          "x1": 1456.315848214342,
+          "y1": 908.4495535714955
+        },
+        "clip": {
+          "x": 0,
+          "y": 64,
+          "width": 1457,
+          "height": 800
+        }
+      },
+      {
+        "viewport": "1920x1080",
+        "timeOfDay": "day",
+        "path": ".mw/specs/mappa2-apron/baseline-render/1920x1080-day.png",
+        "sha256": "c2b445eb45c1cb2cae5fbc5439a3f14a784cc858010ec3cdefc029a04df2d513",
+        "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
+        "camera": {
+          "panX": 176.96753589074024,
+          "panY": -77.94248712856374,
+          "zoom": 0.7258801020408755
+        },
+        "canvasScreen": {
+          "x0": -128.45721301029283,
+          "y0": 56.576900510201476,
+          "x1": 1869.1648278061966,
+          "y1": 1171.5287372449861
+        },
+        "clip": {
+          "x": 0,
+          "y": 56,
+          "width": 1870,
+          "height": 1024
+        }
+      },
+      {
+        "viewport": "1920x1200",
+        "timeOfDay": "day",
+        "path": ".mw/specs/mappa2-apron/baseline-render/1920x1200-day.png",
+        "sha256": "fcdd47c5139f3d4985b976754d6eb8e1b094ee0b9ffab658cb972a86e9f3e4aa",
+        "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
+        "camera": {
+          "panX": 334.22417903986957,
+          "panY": -63.44283082257712,
+          "zoom": 0.8238392857143529
+        },
+        "canvasScreen": {
+          "x0": -275.34700892867215,
+          "y0": 52.26669642856847,
+          "x1": 1991.8587053572273,
+          "y1": 1317.6838392858147
+        },
+        "clip": {
+          "x": 0,
+          "y": 52,
+          "width": 1920,
+          "height": 1148
+        }
+      },
+      {
+        "viewport": "2000x1024",
+        "timeOfDay": "day",
+        "path": ".mw/specs/mappa2-apron/baseline-render/2000x1024-day.png",
+        "sha256": "c300431749df3c2b88dd51d0080fa86c9b9dce240582042c96f4fd755fbbc2d3",
+        "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
+        "camera": {
+          "panX": 29.270276605839626,
+          "panY": -86.13830285981123,
+          "zoom": 0.6801658163265861
+        },
+        "canvasScreen": {
+          "x0": -19.908641581715887,
+          "y0": 58.588329081630214,
+          "x1": 1851.907684949049,
+          "y1": 1103.3230229592664
+        },
+        "clip": {
+          "x": 0,
+          "y": 58,
+          "width": 1852,
+          "height": 966
+        }
+      },
+      {
+        "viewport": "2560x1440",
+        "timeOfDay": "day",
+        "path": ".mw/specs/mappa2-apron/baseline-render/2560x1440-day.png",
+        "sha256": "23cfe9a8832296d3b8344d36ad6373460a298ad9497063f6e17b08f0b2c3461b",
+        "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
+        "camera": {
+          "panX": 189.3155452073006,
+          "panY": -71.32725875347032,
+          "zoom": 0.9769616753715222
+        },
+        "canvasScreen": {
+          "x0": -184.95403221959756,
+          "y0": 69.68399821144844,
+          "x1": 2503.6444984028317,
+          "y1": 1570.2971315821064
+        },
+        "clip": {
+          "x": 0,
+          "y": 69,
+          "width": 2504,
+          "height": 1371
+        }
+      },
+      {
+        "viewport": "2560x1080",
+        "timeOfDay": "day",
+        "path": ".mw/specs/mappa2-apron/baseline-render/2560x1080-day.png",
+        "sha256": "379c07da0f300ae6b5019638131305a493796361e1e84a67cc2c33233760f4b7",
+        "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
+        "camera": {
+          "panX": -263.87661881234635,
+          "panY": -77.94248712856374,
+          "zoom": 0.7258801020408755
+        },
+        "canvasScreen": {
+          "x0": 191.54278698970717,
+          "y0": 56.576900510201476,
+          "x1": 2189.1648278061966,
+          "y1": 1171.5287372449861
+        },
+        "clip": {
+          "x": 191,
+          "y": 56,
+          "width": 1999,
+          "height": 1024
+        }
+      },
+      {
+        "viewport": "3440x1440",
+        "timeOfDay": "day",
+        "path": ".mw/specs/mappa2-apron/baseline-render/3440x1440-day.png",
+        "sha256": "b92edd41fb9199ece3e305224ca8b7f56d142e0e0f5eec4fdfb267cdec726927",
+        "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
+        "camera": {
+          "panX": -261.0603611276897,
+          "panY": -71.32725875347032,
+          "zoom": 0.9769616753715222
+        },
+        "canvasScreen": {
+          "x0": 255.04596778040235,
+          "y0": 69.68399821144844,
+          "x1": 2943.6444984028317,
+          "y1": 1570.2971315821064
+        },
+        "clip": {
+          "x": 255,
+          "y": 69,
+          "width": 2689,
+          "height": 1371
+        }
+      },
+      {
+        "viewport": "1280x720",
+        "timeOfDay": "night",
+        "path": ".mw/specs/mappa2-apron/baseline-render/1280x720-night.png",
+        "sha256": "a00bbd3aca11ac1d33097fde36dd8ae5add285ce22bcb5502c452b992e28c81a",
+        "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
+        "camera": {
+          "panX": 256.3601821048801,
+          "panY": -144.32953948518863,
+          "zoom": 0.43706632653064786
+        },
+        "canvasScreen": {
+          "x0": -112.04640306130787,
+          "y0": 63.08158163265149,
+          "x1": 1090.760127551035,
+          "y1": 734.4154591837266
+        },
+        "clip": {
+          "x": 0,
+          "y": 63,
+          "width": 1091,
+          "height": 657
+        }
+      },
+      {
+        "viewport": "1366x768",
+        "timeOfDay": "night",
+        "path": ".mw/specs/mappa2-apron/baseline-render/1366x768-night.png",
+        "sha256": "a88f53d064b92e75981b0dd711ddc8ec8cebbb12aed65d1381e5de17c4d35520",
+        "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
+        "camera": {
+          "panX": 53.76318915720003,
+          "panY": -140.15681192287497,
+          "zoom": 0.47242346938779367
+        },
+        "canvasScreen": {
+          "x0": -25.39899234699665,
+          "y0": 66.21336734693708,
+          "x1": 1274.7103954082115,
+          "y1": 791.8558163265882
+        },
+        "clip": {
+          "x": 0,
+          "y": 66,
+          "width": 1275,
+          "height": 702
+        }
+      },
+      {
+        "viewport": "1440x900",
+        "timeOfDay": "night",
+        "path": ".mw/specs/mappa2-apron/baseline-render/1440x900-night.png",
+        "sha256": "ab98fc82a95128fccdf326227dc9343a866847e631133b194ac37c313ee7dcf5",
+        "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
+        "camera": {
+          "panX": 255.85065764843034,
+          "panY": -108.8922205820669,
+          "zoom": 0.5789413265306594
+        },
+        "canvasScreen": {
+          "x0": -148.12251913272388,
+          "y0": 63.04220663265099,
+          "x1": 1445.1240114796508,
+          "y1": 952.2960841837438
+        },
+        "clip": {
+          "x": 0,
+          "y": 63,
+          "width": 1440,
+          "height": 837
+        }
+      },
+      {
+        "viewport": "1536x864",
+        "timeOfDay": "night",
+        "path": ".mw/specs/mappa2-apron/baseline-render/1536x864-night.png",
+        "sha256": "7ef9901cb7e5cca23e5575d6b7e038dfc9818e327e1d3e7f8e1e3bca5fd0b312",
+        "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
+        "camera": {
+          "panX": 102.00203086932606,
+          "panY": -117.06823720551083,
+          "zoom": 0.5495535714286163
+        },
+        "canvasScreen": {
+          "x0": -56.055580357210104,
+          "y0": 64.33526785714089,
+          "x1": 1456.315848214342,
+          "y1": 908.4495535714955
+        },
+        "clip": {
+          "x": 0,
+          "y": 64,
+          "width": 1457,
+          "height": 800
+        }
+      },
+      {
+        "viewport": "1920x1080",
+        "timeOfDay": "night",
+        "path": ".mw/specs/mappa2-apron/baseline-render/1920x1080-night.png",
+        "sha256": "867743ce7102152d2def80fc1efe68fc4d580c0eaf5cc65aecad4c376b0bce18",
+        "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
+        "camera": {
+          "panX": 176.96753589074024,
+          "panY": -77.94248712856374,
+          "zoom": 0.7258801020408755
+        },
+        "canvasScreen": {
+          "x0": -128.45721301029283,
+          "y0": 56.576900510201476,
+          "x1": 1869.1648278061966,
+          "y1": 1171.5287372449861
+        },
+        "clip": {
+          "x": 0,
+          "y": 56,
+          "width": 1870,
+          "height": 1024
+        }
+      },
+      {
+        "viewport": "1920x1200",
+        "timeOfDay": "night",
+        "path": ".mw/specs/mappa2-apron/baseline-render/1920x1200-night.png",
+        "sha256": "e40db70ca22e76ed9376c37ba9c18eff3ef0b7a0df75d3d7fd3a1a2dd3fed08e",
+        "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
+        "camera": {
+          "panX": 334.22417903986957,
+          "panY": -63.44283082257712,
+          "zoom": 0.8238392857143529
+        },
+        "canvasScreen": {
+          "x0": -275.34700892867215,
+          "y0": 52.26669642856847,
+          "x1": 1991.8587053572273,
+          "y1": 1317.6838392858147
+        },
+        "clip": {
+          "x": 0,
+          "y": 52,
+          "width": 1920,
+          "height": 1148
+        }
+      },
+      {
+        "viewport": "2000x1024",
+        "timeOfDay": "night",
+        "path": ".mw/specs/mappa2-apron/baseline-render/2000x1024-night.png",
+        "sha256": "abf944578b22dd7e3fee4fa9e7c5a5cc333d758dd3f52580aeaaa1bafd5249f1",
+        "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
+        "camera": {
+          "panX": 29.270276605839626,
+          "panY": -86.13830285981123,
+          "zoom": 0.6801658163265861
+        },
+        "canvasScreen": {
+          "x0": -19.908641581715887,
+          "y0": 58.588329081630214,
+          "x1": 1851.907684949049,
+          "y1": 1103.3230229592664
+        },
+        "clip": {
+          "x": 0,
+          "y": 58,
+          "width": 1852,
+          "height": 966
+        }
+      },
+      {
+        "viewport": "2560x1440",
+        "timeOfDay": "night",
+        "path": ".mw/specs/mappa2-apron/baseline-render/2560x1440-night.png",
+        "sha256": "2bd49a85276649398443b81c6a64aa5db4991d51507640f20d6728589f120245",
+        "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
+        "camera": {
+          "panX": 189.3155452073006,
+          "panY": -71.32725875347032,
+          "zoom": 0.9769616753715222
+        },
+        "canvasScreen": {
+          "x0": -184.95403221959756,
+          "y0": 69.68399821144844,
+          "x1": 2503.6444984028317,
+          "y1": 1570.2971315821064
+        },
+        "clip": {
+          "x": 0,
+          "y": 69,
+          "width": 2504,
+          "height": 1371
+        }
+      },
+      {
+        "viewport": "2560x1080",
+        "timeOfDay": "night",
+        "path": ".mw/specs/mappa2-apron/baseline-render/2560x1080-night.png",
+        "sha256": "a81ea50fea15a9a854310a75d86bb52020d99b1d03f9eafe036034378bdcf16c",
+        "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
+        "camera": {
+          "panX": -263.87661881234635,
+          "panY": -77.94248712856374,
+          "zoom": 0.7258801020408755
+        },
+        "canvasScreen": {
+          "x0": 191.54278698970717,
+          "y0": 56.576900510201476,
+          "x1": 2189.1648278061966,
+          "y1": 1171.5287372449861
+        },
+        "clip": {
+          "x": 191,
+          "y": 56,
+          "width": 1999,
+          "height": 1024
+        }
+      },
+      {
+        "viewport": "3440x1440",
+        "timeOfDay": "night",
+        "path": ".mw/specs/mappa2-apron/baseline-render/3440x1440-night.png",
+        "sha256": "4b1addb131ad934dfb4383ebe1086afe3293d56ec0e9a273b5b2790519a78816",
+        "captureMode": "renderer-canvas-only: every DOM element hidden except [data-testid=\"pixi-world-canvas\"]; clip is cropped offline from a full-page screenshot to the screen intersection of the original painted canvas; camera clamp harness simulates the frozen 560/200 apron margins without changing canvas assets",
+        "camera": {
+          "panX": -261.0603611276897,
+          "panY": -71.32725875347032,
+          "zoom": 0.9769616753715222
+        },
+        "canvasScreen": {
+          "x0": 255.04596778040235,
+          "y0": 69.68399821144844,
+          "x1": 2943.6444984028317,
+          "y1": 1570.2971315821064
+        },
+        "clip": {
+          "x": 255,
+          "y": 69,
+          "width": 2689,
+          "height": 1371
+        }
+      }
+    ]
+  },
+  "scriptSha256": {
+    "feasibility": "29f95193fab26f91ba223ec3d1e7697405cf4553ad281042ea5b5c792e844c30",
+    "cropPlanGenerator": "ca035adc76c8f930a0d6e8b23d87f0db6b11120b48fe9ba209fda0bcb8e61cae",
+    "paintingBaselineGenerator": "23828786ba4121ec36cc1a5d51e4226b07cca9852bc611f17b669a31aa294af7"
+  },
+  "classifier": {
+    "colorSpace": "CIELAB D65",
+    "distance": "deltaEab-euclidean",
+    "scale": "1 image px = 1 world px",
+    "swatchReference": {
+      "path": "public/assets/world/mappa2/base/layers/base_flat.v2.webp",
+      "sha256": "08f766d78443ef0e06e275b645f6b47addcb5c48e9777944b6336d5f1eb4e256"
+    },
+    "waterSwatches": [
+      {
+        "x": 24,
+        "y": 24,
+        "size": 16,
+        "meanLab": [
+          27.4366,
+          -4.1728,
+          -23.9638
+        ],
+        "patchP95DeltaE": 4.2169,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 152,
+        "y": 24,
+        "size": 16,
+        "meanLab": [
+          41.656,
+          -13.1724,
+          -20.3341
+        ],
+        "patchP95DeltaE": 3.9383,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 280,
+        "y": 24,
+        "size": 16,
+        "meanLab": [
+          43.6695,
+          -18.7698,
+          -16.4494
+        ],
+        "patchP95DeltaE": 2.4538,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 408,
+        "y": 24,
+        "size": 16,
+        "meanLab": [
+          50.2982,
+          -23.172,
+          -14.8713
+        ],
+        "patchP95DeltaE": 2.9541,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 664,
+        "y": 24,
+        "size": 16,
+        "meanLab": [
+          27.0667,
+          -10.5292,
+          -17.5203
+        ],
+        "patchP95DeltaE": 4.9252,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 920,
+        "y": 24,
+        "size": 16,
+        "meanLab": [
+          27.0636,
+          -6.9419,
+          -21.8573
+        ],
+        "patchP95DeltaE": 2.8164,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 1048,
+        "y": 24,
+        "size": 16,
+        "meanLab": [
+          31.086,
+          -9.7994,
+          -21.0339
+        ],
+        "patchP95DeltaE": 1.5091,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 1176,
+        "y": 24,
+        "size": 16,
+        "meanLab": [
+          35.9384,
+          -12.7099,
+          -21.7038
+        ],
+        "patchP95DeltaE": 2.6708,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 1304,
+        "y": 24,
+        "size": 16,
+        "meanLab": [
+          38.9789,
+          -16.8252,
+          -18.4056
+        ],
+        "patchP95DeltaE": 1.9345,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 1432,
+        "y": 24,
+        "size": 16,
+        "meanLab": [
+          51.7359,
+          -26.0082,
+          -15.4118
+        ],
+        "patchP95DeltaE": 4.3562,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 1560,
+        "y": 24,
+        "size": 16,
+        "meanLab": [
+          55.9852,
+          -28.7871,
+          -14.6898
+        ],
+        "patchP95DeltaE": 1.9086,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 1944,
+        "y": 24,
+        "size": 16,
+        "meanLab": [
+          56.1477,
+          -25.074,
+          -20.239
+        ],
+        "patchP95DeltaE": 3.0135,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 2072,
+        "y": 24,
+        "size": 16,
+        "meanLab": [
+          50.5759,
+          -18.5628,
+          -24.2301
+        ],
+        "patchP95DeltaE": 7.6246,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 24,
+        "y": 152,
+        "size": 16,
+        "meanLab": [
+          38.9541,
+          -9.7381,
+          -19.7052
+        ],
+        "patchP95DeltaE": 3.8602,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 536,
+        "y": 152,
+        "size": 16,
+        "meanLab": [
+          36.879,
+          -16.2746,
+          -17.1145
+        ],
+        "patchP95DeltaE": 4.9603,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 664,
+        "y": 152,
+        "size": 16,
+        "meanLab": [
+          38.8805,
+          -18.729,
+          -13.949
+        ],
+        "patchP95DeltaE": 5.0877,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 920,
+        "y": 152,
+        "size": 16,
+        "meanLab": [
+          37.661,
+          -11.0211,
+          -21.9815
+        ],
+        "patchP95DeltaE": 3.8973,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 1048,
+        "y": 152,
+        "size": 16,
+        "meanLab": [
+          40.5901,
+          -14.2318,
+          -22.616
+        ],
+        "patchP95DeltaE": 6.3423,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 1688,
+        "y": 152,
+        "size": 16,
+        "meanLab": [
+          60.2514,
+          -27.5024,
+          -18.5677
+        ],
+        "patchP95DeltaE": 7.596,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 1816,
+        "y": 152,
+        "size": 16,
+        "meanLab": [
+          58.1622,
+          -28.8677,
+          -16.1869
+        ],
+        "patchP95DeltaE": 3.417,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 2072,
+        "y": 152,
+        "size": 16,
+        "meanLab": [
+          59.1507,
+          -27.6147,
+          -18.6846
+        ],
+        "patchP95DeltaE": 3.1288,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 2200,
+        "y": 152,
+        "size": 16,
+        "meanLab": [
+          56.5715,
+          -26.9345,
+          -17.8508
+        ],
+        "patchP95DeltaE": 2.4749,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 2328,
+        "y": 152,
+        "size": 16,
+        "meanLab": [
+          38.8789,
+          -13.8004,
+          -22.4189
+        ],
+        "patchP95DeltaE": 2.3224,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 536,
+        "y": 280,
+        "size": 16,
+        "meanLab": [
+          27.5811,
+          -7.8035,
+          -21.6849
+        ],
+        "patchP95DeltaE": 1.826,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 664,
+        "y": 280,
+        "size": 16,
+        "meanLab": [
+          41.0271,
+          -13.3346,
+          -24.2094
+        ],
+        "patchP95DeltaE": 2.1524,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 2200,
+        "y": 280,
+        "size": 16,
+        "meanLab": [
+          43.5694,
+          -17.066,
+          -21.6618
+        ],
+        "patchP95DeltaE": 3.8372,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 2328,
+        "y": 280,
+        "size": 16,
+        "meanLab": [
+          37.5989,
+          -12.9701,
+          -22.6425
+        ],
+        "patchP95DeltaE": 1.71,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 2456,
+        "y": 280,
+        "size": 16,
+        "meanLab": [
+          36.123,
+          -13.2343,
+          -21.0875
+        ],
+        "patchP95DeltaE": 3.1007,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 2584,
+        "y": 280,
+        "size": 16,
+        "meanLab": [
+          24.3613,
+          -10.361,
+          -14.6598
+        ],
+        "patchP95DeltaE": 3.85,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 408,
+        "y": 408,
+        "size": 16,
+        "meanLab": [
+          26.1801,
+          -5.5854,
+          -22.3605
+        ],
+        "patchP95DeltaE": 3.6863,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 536,
+        "y": 408,
+        "size": 16,
+        "meanLab": [
+          28.4343,
+          -7.7678,
+          -21.5482
+        ],
+        "patchP95DeltaE": 3.4869,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 664,
+        "y": 408,
+        "size": 16,
+        "meanLab": [
+          41.4981,
+          -17.2558,
+          -19.2998
+        ],
+        "patchP95DeltaE": 4.2848,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 2328,
+        "y": 408,
+        "size": 16,
+        "meanLab": [
+          39.4595,
+          -10.595,
+          -26.9888
+        ],
+        "patchP95DeltaE": 2.3574,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 2456,
+        "y": 408,
+        "size": 16,
+        "meanLab": [
+          37.8715,
+          -10.5979,
+          -25.6363
+        ],
+        "patchP95DeltaE": 1.6055,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 2584,
+        "y": 408,
+        "size": 16,
+        "meanLab": [
+          33.598,
+          -11.434,
+          -21.5331
+        ],
+        "patchP95DeltaE": 1.9687,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 408,
+        "y": 536,
+        "size": 16,
+        "meanLab": [
+          35.0445,
+          -11.4399,
+          -22.4337
+        ],
+        "patchP95DeltaE": 4.2812,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 536,
+        "y": 536,
+        "size": 16,
+        "meanLab": [
+          34.4243,
+          -12.8247,
+          -20.3425
+        ],
+        "patchP95DeltaE": 2.6858,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 664,
+        "y": 536,
+        "size": 16,
+        "meanLab": [
+          49.3746,
+          -21.3158,
+          -19.3769
+        ],
+        "patchP95DeltaE": 4.4941,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 408,
+        "y": 664,
+        "size": 16,
+        "meanLab": [
+          32.8885,
+          -8.4705,
+          -25.0004
+        ],
+        "patchP95DeltaE": 1.6592,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 536,
+        "y": 664,
+        "size": 16,
+        "meanLab": [
+          39.9518,
+          -13.8558,
+          -23.1993
+        ],
+        "patchP95DeltaE": 4.1471,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 664,
+        "y": 664,
+        "size": 16,
+        "meanLab": [
+          49.3068,
+          -20.7951,
+          -20.968
+        ],
+        "patchP95DeltaE": 4.8654,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 2328,
+        "y": 664,
+        "size": 16,
+        "meanLab": [
+          45.3736,
+          -14.6801,
+          -25.747
+        ],
+        "patchP95DeltaE": 2.9839,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 2456,
+        "y": 664,
+        "size": 16,
+        "meanLab": [
+          32.6309,
+          -14.8677,
+          -15.7228
+        ],
+        "patchP95DeltaE": 1.8332,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 280,
+        "y": 792,
+        "size": 16,
+        "meanLab": [
+          30.4811,
+          -4.7517,
+          -27.2426
+        ],
+        "patchP95DeltaE": 6.662,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 536,
+        "y": 792,
+        "size": 16,
+        "meanLab": [
+          60.7602,
+          -27.4562,
+          -19.1646
+        ],
+        "patchP95DeltaE": 6.9111,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 664,
+        "y": 792,
+        "size": 16,
+        "meanLab": [
+          51.1196,
+          -21.4014,
+          -20.6936
+        ],
+        "patchP95DeltaE": 7.1092,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 2328,
+        "y": 792,
+        "size": 16,
+        "meanLab": [
+          48.9364,
+          -17.4932,
+          -24.9969
+        ],
+        "patchP95DeltaE": 2.1343,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 2456,
+        "y": 792,
+        "size": 16,
+        "meanLab": [
+          51.5529,
+          -26.3099,
+          -14.547
+        ],
+        "patchP95DeltaE": 3.5972,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 536,
+        "y": 920,
+        "size": 16,
+        "meanLab": [
+          39.8769,
+          -9.0637,
+          -28.2972
+        ],
+        "patchP95DeltaE": 5.0122,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 2328,
+        "y": 920,
+        "size": 16,
+        "meanLab": [
+          54.0385,
+          -21.0861,
+          -24.0863
+        ],
+        "patchP95DeltaE": 3.7854,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 2456,
+        "y": 920,
+        "size": 16,
+        "meanLab": [
+          40.0223,
+          -16.7806,
+          -17.1149
+        ],
+        "patchP95DeltaE": 2.4354,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 280,
+        "y": 1048,
+        "size": 16,
+        "meanLab": [
+          35.8407,
+          -13.4456,
+          -19.4802
+        ],
+        "patchP95DeltaE": 7.7626,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 664,
+        "y": 1048,
+        "size": 16,
+        "meanLab": [
+          44.062,
+          -11.9168,
+          -24.8195
+        ],
+        "patchP95DeltaE": 2.7635,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 1432,
+        "y": 1048,
+        "size": 16,
+        "meanLab": [
+          63.03,
+          -35.3095,
+          -10.5461
+        ],
+        "patchP95DeltaE": 4.4206,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 2328,
+        "y": 1048,
+        "size": 16,
+        "meanLab": [
+          46.9747,
+          -11.9223,
+          -30.6826
+        ],
+        "patchP95DeltaE": 2.0197,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 2456,
+        "y": 1048,
+        "size": 16,
+        "meanLab": [
+          40.6063,
+          -11.4325,
+          -26.699
+        ],
+        "patchP95DeltaE": 3.0344,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 2584,
+        "y": 1048,
+        "size": 16,
+        "meanLab": [
+          37.5814,
+          -16.5364,
+          -14.6288
+        ],
+        "patchP95DeltaE": 2.3634,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 280,
+        "y": 1176,
+        "size": 16,
+        "meanLab": [
+          61.6562,
+          -13.4693,
+          -20.7738
+        ],
+        "patchP95DeltaE": 4.8269,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 1176,
+        "y": 1176,
+        "size": 16,
+        "meanLab": [
+          60.301,
+          -31.7556,
+          -13.4251
+        ],
+        "patchP95DeltaE": 6.1404,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 2072,
+        "y": 1176,
+        "size": 16,
+        "meanLab": [
+          59.4515,
+          -30.7746,
+          -14.3019
+        ],
+        "patchP95DeltaE": 3.3431,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 2200,
+        "y": 1176,
+        "size": 16,
+        "meanLab": [
+          86.2642,
+          -30.5913,
+          -14.0813
+        ],
+        "patchP95DeltaE": 5.3049,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 2328,
+        "y": 1176,
+        "size": 16,
+        "meanLab": [
+          68.8836,
+          -9.3572,
+          -30.8689
+        ],
+        "patchP95DeltaE": 6.8398,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 2456,
+        "y": 1176,
+        "size": 16,
+        "meanLab": [
+          38.7717,
+          -6.8241,
+          -19.9865
+        ],
+        "patchP95DeltaE": 5.1477,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 664,
+        "y": 1304,
+        "size": 16,
+        "meanLab": [
+          46.0253,
+          -14.4422,
+          -22.2887
+        ],
+        "patchP95DeltaE": 2.8124,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 792,
+        "y": 1304,
+        "size": 16,
+        "meanLab": [
+          59.5358,
+          -25.7214,
+          -14.7094
+        ],
+        "patchP95DeltaE": 1.545,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 1176,
+        "y": 1304,
+        "size": 16,
+        "meanLab": [
+          43.4135,
+          -13.6372,
+          -25.7024
+        ],
+        "patchP95DeltaE": 3.0097,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 1432,
+        "y": 1304,
+        "size": 16,
+        "meanLab": [
+          49.1348,
+          -21.2497,
+          -20.1922
+        ],
+        "patchP95DeltaE": 4.52,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 1944,
+        "y": 1304,
+        "size": 16,
+        "meanLab": [
+          44.7897,
+          -20.5305,
+          -16.6417
+        ],
+        "patchP95DeltaE": 4.8014,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 920,
+        "y": 1432,
+        "size": 16,
+        "meanLab": [
+          59.1194,
+          -28.8914,
+          -9.6097
+        ],
+        "patchP95DeltaE": 6.0608,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 1048,
+        "y": 1432,
+        "size": 16,
+        "meanLab": [
+          53.3975,
+          -28.0571,
+          -9.5261
+        ],
+        "patchP95DeltaE": 3.705,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 1176,
+        "y": 1432,
+        "size": 16,
+        "meanLab": [
+          34.3471,
+          -12.3621,
+          -20.6335
+        ],
+        "patchP95DeltaE": 2.5894,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 1304,
+        "y": 1432,
+        "size": 16,
+        "meanLab": [
+          41.3449,
+          -17.1385,
+          -19.8377
+        ],
+        "patchP95DeltaE": 2.1597,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 1432,
+        "y": 1432,
+        "size": 16,
+        "meanLab": [
+          23.7385,
+          -7.3314,
+          -19.6627
+        ],
+        "patchP95DeltaE": 2.6168,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 1560,
+        "y": 1432,
+        "size": 16,
+        "meanLab": [
+          25.6629,
+          -9.9519,
+          -16.8999
+        ],
+        "patchP95DeltaE": 2.5151,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 1688,
+        "y": 1432,
+        "size": 16,
+        "meanLab": [
+          42.2757,
+          -16.726,
+          -20.7021
+        ],
+        "patchP95DeltaE": 4.9655,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 1816,
+        "y": 1432,
+        "size": 16,
+        "meanLab": [
+          40.9832,
+          -14.6765,
+          -21.7596
+        ],
+        "patchP95DeltaE": 3.8661,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 1944,
+        "y": 1432,
+        "size": 16,
+        "meanLab": [
+          32.8461,
+          -11.3016,
+          -20.7548
+        ],
+        "patchP95DeltaE": 7.3953,
+        "radiusDeltaE": 18
+      },
+      {
+        "x": 2072,
+        "y": 1432,
+        "size": 16,
+        "meanLab": [
+          36.4352,
+          -13.4364,
+          -20.2515
+        ],
+        "patchP95DeltaE": 4.11,
+        "radiusDeltaE": 18
+      }
+    ],
+    "swatchSelectionRule": "16px patch fully water in raw Mare alpha and homogeneous (patch P95 deltaE <= 8); radius = max(18, patchP95+6)",
+    "waterRadiusDeltaE": 18,
+    "waterMask": {
+      "path": ".mw/specs/mappa2-apron/water-mask-raw.png",
+      "sha256": "0ee8db6305997c035453ceac2bf0ccf90863afba58e811ea3936c74af878032d",
+      "encoding": "PNG grayscale: 255=water, 0=non-water, derived as Mare alpha==255"
+    },
+    "waterMaskAfterOpening": {
+      "path": ".mw/specs/mappa2-apron/water-mask-opened-3x3.png",
+      "sha256": "7cf04d032520e7264965ed3b4188f26eb73ed7983f82417a648316c36c6598df",
+      "encoding": "PNG grayscale after cv2.MORPH_OPEN square 3x3 on raw water mask"
+    },
+    "morphologicalOpening": {
+      "kernel": "square",
+      "sizePx": 3,
+      "operation": "cv2.MORPH_OPEN on binary water mask"
+    },
+    "independentLandHardFail": {
+      "areaPx2": 64,
+      "bboxMaxSidePx": 8
+    }
+  },
+  "seamMetricSet": {
+    "samplingMask": {
+      "path": ".mw/specs/mappa2-apron/water-mask-raw.png",
+      "sha256": "0ee8db6305997c035453ceac2bf0ccf90863afba58e811ea3936c74af878032d",
+      "encoding": "PNG grayscale: 255=water, 0=non-water, derived as Mare alpha==255"
+    },
+    "lattice": {
+      "originPx": {
+        "x": 128,
+        "y": 96
+      },
+      "stridePx": {
+        "x": 128,
+        "y": 128
+      },
+      "orientations": [
+        "vertical",
+        "horizontal"
+      ],
+      "stripPx": 4,
+      "patchLengthPx": 64,
+      "candidateCount": 440
+    },
+    "metrics": [
+      "photometric mean absolute sRGB per-channel, normalized 0..1",
+      "photometric mean absolute luminance, normalized 0..1",
+      "low-frequency mean absolute sRGB after blur sigma 32px, normalized 0..1",
+      "Sobel gradient continuity across join, 0..255 grayscale delta"
+    ],
+    "baselinesByJoinClass": {
+      "coast-crossing": {
+        "sampleCount": 93,
+        "selectionRule": "lattice positions whose 64px x 8px seam neighbourhood has 5%..95% land coverage in the raw Mare alpha mask",
+        "stripPx": 4,
+        "patchLengthPx": 64,
+        "blurSigmaPx": 32,
+        "positions": [
+          {
+            "x": 256,
+            "y": 96,
+            "orientation": "vertical",
+            "landFraction": 0.69726562
+          },
+          {
+            "x": 384,
+            "y": 96,
+            "orientation": "vertical",
+            "landFraction": 0.5703125
+          },
+          {
+            "x": 768,
+            "y": 96,
+            "orientation": "vertical",
+            "landFraction": 0.05273438
+          },
+          {
+            "x": 896,
+            "y": 96,
+            "orientation": "vertical",
+            "landFraction": 0.07617188
+          },
+          {
+            "x": 1152,
+            "y": 96,
+            "orientation": "vertical",
+            "landFraction": 0.17382812
+          },
+          {
+            "x": 1280,
+            "y": 96,
+            "orientation": "vertical",
+            "landFraction": 0.74804688
+          },
+          {
+            "x": 1280,
+            "y": 96,
+            "orientation": "horizontal",
+            "landFraction": 0.58789062
+          },
+          {
+            "x": 1536,
+            "y": 96,
+            "orientation": "vertical",
+            "landFraction": 0.87109375
+          },
+          {
+            "x": 2432,
+            "y": 96,
+            "orientation": "vertical",
+            "landFraction": 0.10742188
+          },
+          {
+            "x": 128,
+            "y": 224,
+            "orientation": "vertical",
+            "landFraction": 0.1640625
+          },
+          {
+            "x": 256,
+            "y": 224,
+            "orientation": "vertical",
+            "landFraction": 0.28320312
+          },
+          {
+            "x": 256,
+            "y": 224,
+            "orientation": "horizontal",
+            "landFraction": 0.08984375
+          },
+          {
+            "x": 896,
+            "y": 224,
+            "orientation": "horizontal",
+            "landFraction": 0.4609375
+          },
+          {
+            "x": 1792,
+            "y": 224,
+            "orientation": "vertical",
+            "landFraction": 0.63867188
+          },
+          {
+            "x": 1792,
+            "y": 224,
+            "orientation": "horizontal",
+            "landFraction": 0.37304688
+          },
+          {
+            "x": 1920,
+            "y": 224,
+            "orientation": "horizontal",
+            "landFraction": 0.80859375
+          },
+          {
+            "x": 2560,
+            "y": 224,
+            "orientation": "horizontal",
+            "landFraction": 0.42773438
+          },
+          {
+            "x": 128,
+            "y": 352,
+            "orientation": "horizontal",
+            "landFraction": 0.65234375
+          },
+          {
+            "x": 768,
+            "y": 352,
+            "orientation": "horizontal",
+            "landFraction": 0.578125
+          },
+          {
+            "x": 896,
+            "y": 352,
+            "orientation": "vertical",
+            "landFraction": 0.78515625
+          },
+          {
+            "x": 896,
+            "y": 352,
+            "orientation": "horizontal",
+            "landFraction": 0.76757812
+          },
+          {
+            "x": 2048,
+            "y": 352,
+            "orientation": "horizontal",
+            "landFraction": 0.86132812
+          },
+          {
+            "x": 2176,
+            "y": 352,
+            "orientation": "vertical",
+            "landFraction": 0.08007812
+          },
+          {
+            "x": 2304,
+            "y": 352,
+            "orientation": "vertical",
+            "landFraction": 0.53125
+          },
+          {
+            "x": 2560,
+            "y": 352,
+            "orientation": "horizontal",
+            "landFraction": 0.39648438
+          },
+          {
+            "x": 128,
+            "y": 480,
+            "orientation": "vertical",
+            "landFraction": 0.82421875
+          },
+          {
+            "x": 256,
+            "y": 480,
+            "orientation": "vertical",
+            "landFraction": 0.50585938
+          },
+          {
+            "x": 256,
+            "y": 480,
+            "orientation": "horizontal",
+            "landFraction": 0.68359375
+          },
+          {
+            "x": 768,
+            "y": 480,
+            "orientation": "vertical",
+            "landFraction": 0.83203125
+          },
+          {
+            "x": 768,
+            "y": 480,
+            "orientation": "horizontal",
+            "landFraction": 0.12304688
+          },
+          {
+            "x": 2176,
+            "y": 480,
+            "orientation": "vertical",
+            "landFraction": 0.68164062
+          },
+          {
+            "x": 2176,
+            "y": 480,
+            "orientation": "horizontal",
+            "landFraction": 0.85351562
+          },
+          {
+            "x": 2304,
+            "y": 480,
+            "orientation": "vertical",
+            "landFraction": 0.16210938
+          },
+          {
+            "x": 2304,
+            "y": 480,
+            "orientation": "horizontal",
+            "landFraction": 0.53125
+          },
+          {
+            "x": 2560,
+            "y": 480,
+            "orientation": "vertical",
+            "landFraction": 0.8125
+          },
+          {
+            "x": 256,
+            "y": 608,
+            "orientation": "vertical",
+            "landFraction": 0.08984375
+          },
+          {
+            "x": 768,
+            "y": 608,
+            "orientation": "vertical",
+            "landFraction": 0.58789062
+          },
+          {
+            "x": 2176,
+            "y": 608,
+            "orientation": "horizontal",
+            "landFraction": 0.83789062
+          },
+          {
+            "x": 128,
+            "y": 736,
+            "orientation": "vertical",
+            "landFraction": 0.41210938
+          },
+          {
+            "x": 384,
+            "y": 736,
+            "orientation": "vertical",
+            "landFraction": 0.27148438
+          },
+          {
+            "x": 512,
+            "y": 736,
+            "orientation": "vertical",
+            "landFraction": 0.59570312
+          },
+          {
+            "x": 512,
+            "y": 736,
+            "orientation": "horizontal",
+            "landFraction": 0.83007812
+          },
+          {
+            "x": 640,
+            "y": 736,
+            "orientation": "vertical",
+            "landFraction": 0.08203125
+          },
+          {
+            "x": 2176,
+            "y": 736,
+            "orientation": "horizontal",
+            "landFraction": 0.90625
+          },
+          {
+            "x": 2560,
+            "y": 736,
+            "orientation": "vertical",
+            "landFraction": 0.36523438
+          },
+          {
+            "x": 2560,
+            "y": 736,
+            "orientation": "horizontal",
+            "landFraction": 0.43359375
+          },
+          {
+            "x": 256,
+            "y": 864,
+            "orientation": "vertical",
+            "landFraction": 0.796875
+          },
+          {
+            "x": 768,
+            "y": 864,
+            "orientation": "vertical",
+            "landFraction": 0.08398438
+          },
+          {
+            "x": 896,
+            "y": 864,
+            "orientation": "vertical",
+            "landFraction": 0.11132812
+          },
+          {
+            "x": 896,
+            "y": 864,
+            "orientation": "horizontal",
+            "landFraction": 0.12304688
+          },
+          {
+            "x": 2048,
+            "y": 864,
+            "orientation": "vertical",
+            "landFraction": 0.41015625
+          },
+          {
+            "x": 2560,
+            "y": 864,
+            "orientation": "vertical",
+            "landFraction": 0.29296875
+          },
+          {
+            "x": 2560,
+            "y": 864,
+            "orientation": "horizontal",
+            "landFraction": 0.8984375
+          },
+          {
+            "x": 128,
+            "y": 992,
+            "orientation": "vertical",
+            "landFraction": 0.58398438
+          },
+          {
+            "x": 256,
+            "y": 992,
+            "orientation": "vertical",
+            "landFraction": 0.09375
+          },
+          {
+            "x": 256,
+            "y": 992,
+            "orientation": "horizontal",
+            "landFraction": 0.31835938
+          },
+          {
+            "x": 512,
+            "y": 992,
+            "orientation": "vertical",
+            "landFraction": 0.05859375
+          },
+          {
+            "x": 768,
+            "y": 992,
+            "orientation": "horizontal",
+            "landFraction": 0.48828125
+          },
+          {
+            "x": 1152,
+            "y": 992,
+            "orientation": "vertical",
+            "landFraction": 0.80859375
+          },
+          {
+            "x": 1408,
+            "y": 992,
+            "orientation": "vertical",
+            "landFraction": 0.09375
+          },
+          {
+            "x": 1408,
+            "y": 992,
+            "orientation": "horizontal",
+            "landFraction": 0.46289062
+          },
+          {
+            "x": 1536,
+            "y": 992,
+            "orientation": "vertical",
+            "landFraction": 0.65039062
+          },
+          {
+            "x": 2176,
+            "y": 992,
+            "orientation": "vertical",
+            "landFraction": 0.796875
+          },
+          {
+            "x": 384,
+            "y": 1120,
+            "orientation": "vertical",
+            "landFraction": 0.69335938
+          },
+          {
+            "x": 512,
+            "y": 1120,
+            "orientation": "vertical",
+            "landFraction": 0.28515625
+          },
+          {
+            "x": 512,
+            "y": 1120,
+            "orientation": "horizontal",
+            "landFraction": 0.43359375
+          },
+          {
+            "x": 1152,
+            "y": 1120,
+            "orientation": "vertical",
+            "landFraction": 0.75
+          },
+          {
+            "x": 1152,
+            "y": 1120,
+            "orientation": "horizontal",
+            "landFraction": 0.62109375
+          },
+          {
+            "x": 1280,
+            "y": 1120,
+            "orientation": "horizontal",
+            "landFraction": 0.07617188
+          },
+          {
+            "x": 1536,
+            "y": 1120,
+            "orientation": "vertical",
+            "landFraction": 0.14648438
+          },
+          {
+            "x": 1920,
+            "y": 1120,
+            "orientation": "vertical",
+            "landFraction": 0.5078125
+          },
+          {
+            "x": 1920,
+            "y": 1120,
+            "orientation": "horizontal",
+            "landFraction": 0.9375
+          },
+          {
+            "x": 2176,
+            "y": 1120,
+            "orientation": "vertical",
+            "landFraction": 0.19921875
+          },
+          {
+            "x": 256,
+            "y": 1248,
+            "orientation": "vertical",
+            "landFraction": 0.08789062
+          },
+          {
+            "x": 1536,
+            "y": 1248,
+            "orientation": "horizontal",
+            "landFraction": 0.359375
+          },
+          {
+            "x": 1664,
+            "y": 1248,
+            "orientation": "vertical",
+            "landFraction": 0.24804688
+          },
+          {
+            "x": 1792,
+            "y": 1248,
+            "orientation": "vertical",
+            "landFraction": 0.26757812
+          },
+          {
+            "x": 1792,
+            "y": 1248,
+            "orientation": "horizontal",
+            "landFraction": 0.81835938
+          },
+          {
+            "x": 1920,
+            "y": 1248,
+            "orientation": "vertical",
+            "landFraction": 0.63476562
+          },
+          {
+            "x": 2048,
+            "y": 1248,
+            "orientation": "vertical",
+            "landFraction": 0.796875
+          },
+          {
+            "x": 2048,
+            "y": 1248,
+            "orientation": "horizontal",
+            "landFraction": 0.78515625
+          },
+          {
+            "x": 2304,
+            "y": 1248,
+            "orientation": "vertical",
+            "landFraction": 0.25976562
+          },
+          {
+            "x": 2304,
+            "y": 1248,
+            "orientation": "horizontal",
+            "landFraction": 0.2421875
+          },
+          {
+            "x": 2432,
+            "y": 1248,
+            "orientation": "vertical",
+            "landFraction": 0.38671875
+          },
+          {
+            "x": 2560,
+            "y": 1248,
+            "orientation": "vertical",
+            "landFraction": 0.515625
+          },
+          {
+            "x": 2560,
+            "y": 1248,
+            "orientation": "horizontal",
+            "landFraction": 0.140625
+          },
+          {
+            "x": 384,
+            "y": 1376,
+            "orientation": "vertical",
+            "landFraction": 0.4375
+          },
+          {
+            "x": 512,
+            "y": 1376,
+            "orientation": "vertical",
+            "landFraction": 0.30078125
+          },
+          {
+            "x": 640,
+            "y": 1376,
+            "orientation": "vertical",
+            "landFraction": 0.67773438
+          },
+          {
+            "x": 768,
+            "y": 1376,
+            "orientation": "vertical",
+            "landFraction": 0.09179688
+          },
+          {
+            "x": 1280,
+            "y": 1376,
+            "orientation": "horizontal",
+            "landFraction": 0.84179688
+          },
+          {
+            "x": 2176,
+            "y": 1376,
+            "orientation": "vertical",
+            "landFraction": 0.34765625
+          },
+          {
+            "x": 2304,
+            "y": 1376,
+            "orientation": "vertical",
+            "landFraction": 0.30664062
+          }
+        ],
+        "p95": {
+          "photoRgbMeanAbs": [
+            0.13237128,
+            0.12586393,
+            0.1192524
+          ],
+          "photoLumMeanAbs": 0.12349732,
+          "lowFreqRgbMeanAbs": [
+            0.01317731,
+            0.01117461,
+            0.01629155
+          ],
+          "gradientContinuityMeanAbs": 126.4125
+        }
+      },
+      "open-water": {
+        "sampleCount": 171,
+        "selectionRule": "lattice positions whose seam neighbourhood has at most 2% land coverage in the raw Mare alpha mask",
+        "stripPx": 4,
+        "patchLengthPx": 64,
+        "blurSigmaPx": 32,
+        "positions": [
+          {
+            "x": 384,
+            "y": 96,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 512,
+            "y": 96,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 512,
+            "y": 96,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 640,
+            "y": 96,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 896,
+            "y": 96,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 1024,
+            "y": 96,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 1024,
+            "y": 96,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 1152,
+            "y": 96,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 1536,
+            "y": 96,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 1664,
+            "y": 96,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 1664,
+            "y": 96,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 1792,
+            "y": 96,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 1792,
+            "y": 96,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 1920,
+            "y": 96,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 1920,
+            "y": 96,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 2048,
+            "y": 96,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 2048,
+            "y": 96,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 2176,
+            "y": 96,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 2176,
+            "y": 96,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 2304,
+            "y": 96,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 2304,
+            "y": 96,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 384,
+            "y": 224,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 384,
+            "y": 224,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 512,
+            "y": 224,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 512,
+            "y": 224,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 640,
+            "y": 224,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 640,
+            "y": 224,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 768,
+            "y": 224,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 768,
+            "y": 224,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 896,
+            "y": 224,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 2048,
+            "y": 224,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 2048,
+            "y": 224,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 2176,
+            "y": 224,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 2176,
+            "y": 224,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 2304,
+            "y": 224,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 2304,
+            "y": 224,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 2432,
+            "y": 224,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 2432,
+            "y": 224,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 2560,
+            "y": 224,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 384,
+            "y": 352,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 384,
+            "y": 352,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 512,
+            "y": 352,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 512,
+            "y": 352,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 640,
+            "y": 352,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 640,
+            "y": 352,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 768,
+            "y": 352,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 2176,
+            "y": 352,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 2304,
+            "y": 352,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 2432,
+            "y": 352,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 2432,
+            "y": 352,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 2560,
+            "y": 352,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 384,
+            "y": 480,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 384,
+            "y": 480,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 512,
+            "y": 480,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 512,
+            "y": 480,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 640,
+            "y": 480,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 640,
+            "y": 480,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 2432,
+            "y": 480,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 2432,
+            "y": 480,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 128,
+            "y": 608,
+            "orientation": "vertical",
+            "landFraction": 0.0078125
+          },
+          {
+            "x": 128,
+            "y": 608,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 256,
+            "y": 608,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 384,
+            "y": 608,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 384,
+            "y": 608,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 512,
+            "y": 608,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 512,
+            "y": 608,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 640,
+            "y": 608,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 640,
+            "y": 608,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 2304,
+            "y": 608,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 2304,
+            "y": 608,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 2432,
+            "y": 608,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 2432,
+            "y": 608,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 2560,
+            "y": 608,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 2560,
+            "y": 608,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 128,
+            "y": 736,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 256,
+            "y": 736,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 256,
+            "y": 736,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 384,
+            "y": 736,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 640,
+            "y": 736,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 768,
+            "y": 736,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 768,
+            "y": 736,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 2304,
+            "y": 736,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 2304,
+            "y": 736,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 2432,
+            "y": 736,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 2432,
+            "y": 736,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 256,
+            "y": 864,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 384,
+            "y": 864,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 384,
+            "y": 864,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 512,
+            "y": 864,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 512,
+            "y": 864,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 640,
+            "y": 864,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 640,
+            "y": 864,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 768,
+            "y": 864,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 2176,
+            "y": 864,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 2176,
+            "y": 864,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 2304,
+            "y": 864,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 2304,
+            "y": 864,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 2432,
+            "y": 864,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 2432,
+            "y": 864,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 512,
+            "y": 992,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 640,
+            "y": 992,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 640,
+            "y": 992,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 768,
+            "y": 992,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 2176,
+            "y": 992,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 2304,
+            "y": 992,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 2304,
+            "y": 992,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 2432,
+            "y": 992,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 2432,
+            "y": 992,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 2560,
+            "y": 992,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 2560,
+            "y": 992,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 256,
+            "y": 1120,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 256,
+            "y": 1120,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 640,
+            "y": 1120,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 1280,
+            "y": 1120,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 1536,
+            "y": 1120,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 2048,
+            "y": 1120,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 2048,
+            "y": 1120,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 2176,
+            "y": 1120,
+            "orientation": "horizontal",
+            "landFraction": 0.01757812
+          },
+          {
+            "x": 2304,
+            "y": 1120,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 2304,
+            "y": 1120,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 2432,
+            "y": 1120,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 2432,
+            "y": 1120,
+            "orientation": "horizontal",
+            "landFraction": 0.015625
+          },
+          {
+            "x": 2560,
+            "y": 1120,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 2560,
+            "y": 1120,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 256,
+            "y": 1248,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 384,
+            "y": 1248,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 384,
+            "y": 1248,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 512,
+            "y": 1248,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 512,
+            "y": 1248,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 640,
+            "y": 1248,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 640,
+            "y": 1248,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 768,
+            "y": 1248,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 896,
+            "y": 1248,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 896,
+            "y": 1248,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 1024,
+            "y": 1248,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 1024,
+            "y": 1248,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 1152,
+            "y": 1248,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 1152,
+            "y": 1248,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 1280,
+            "y": 1248,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 1280,
+            "y": 1248,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 1408,
+            "y": 1248,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 1408,
+            "y": 1248,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 1536,
+            "y": 1248,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 1920,
+            "y": 1248,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 2176,
+            "y": 1248,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 2176,
+            "y": 1248,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 2432,
+            "y": 1248,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 384,
+            "y": 1376,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 512,
+            "y": 1376,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 640,
+            "y": 1376,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 768,
+            "y": 1376,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 896,
+            "y": 1376,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 896,
+            "y": 1376,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 1024,
+            "y": 1376,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 1024,
+            "y": 1376,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 1152,
+            "y": 1376,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 1152,
+            "y": 1376,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 1280,
+            "y": 1376,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 1408,
+            "y": 1376,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 1408,
+            "y": 1376,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 1536,
+            "y": 1376,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 1536,
+            "y": 1376,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 1664,
+            "y": 1376,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 1664,
+            "y": 1376,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 1792,
+            "y": 1376,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 1792,
+            "y": 1376,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 1920,
+            "y": 1376,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 1920,
+            "y": 1376,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 2048,
+            "y": 1376,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 2048,
+            "y": 1376,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 2176,
+            "y": 1376,
+            "orientation": "horizontal",
+            "landFraction": 0
+          }
+        ],
+        "p95": {
+          "photoRgbMeanAbs": [
+            0.08412223,
+            0.07831641,
+            0.07939637
+          ],
+          "photoLumMeanAbs": 0.07779595,
+          "lowFreqRgbMeanAbs": [
+            0.01143273,
+            0.0107326,
+            0.01214017
+          ],
+          "gradientContinuityMeanAbs": 95.4609375
+        }
+      },
+      "corner": {
+        "sampleCount": 40,
+        "selectionRule": "lattice positions within 384px of a painted-canvas corner in both axes; internal corner proxy because apron corners do not exist in the source painting",
+        "stripPx": 4,
+        "patchLengthPx": 64,
+        "blurSigmaPx": 32,
+        "positions": [
+          {
+            "x": 128,
+            "y": 96,
+            "orientation": "vertical",
+            "landFraction": 1
+          },
+          {
+            "x": 128,
+            "y": 96,
+            "orientation": "horizontal",
+            "landFraction": 1
+          },
+          {
+            "x": 256,
+            "y": 96,
+            "orientation": "vertical",
+            "landFraction": 0.69726562
+          },
+          {
+            "x": 256,
+            "y": 96,
+            "orientation": "horizontal",
+            "landFraction": 1
+          },
+          {
+            "x": 2432,
+            "y": 96,
+            "orientation": "vertical",
+            "landFraction": 0.10742188
+          },
+          {
+            "x": 2432,
+            "y": 96,
+            "orientation": "horizontal",
+            "landFraction": 1
+          },
+          {
+            "x": 2560,
+            "y": 96,
+            "orientation": "vertical",
+            "landFraction": 1
+          },
+          {
+            "x": 2560,
+            "y": 96,
+            "orientation": "horizontal",
+            "landFraction": 1
+          },
+          {
+            "x": 128,
+            "y": 224,
+            "orientation": "vertical",
+            "landFraction": 0.1640625
+          },
+          {
+            "x": 128,
+            "y": 224,
+            "orientation": "horizontal",
+            "landFraction": 1
+          },
+          {
+            "x": 256,
+            "y": 224,
+            "orientation": "vertical",
+            "landFraction": 0.28320312
+          },
+          {
+            "x": 256,
+            "y": 224,
+            "orientation": "horizontal",
+            "landFraction": 0.08984375
+          },
+          {
+            "x": 2432,
+            "y": 224,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 2432,
+            "y": 224,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 2560,
+            "y": 224,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 2560,
+            "y": 224,
+            "orientation": "horizontal",
+            "landFraction": 0.42773438
+          },
+          {
+            "x": 128,
+            "y": 352,
+            "orientation": "vertical",
+            "landFraction": 1
+          },
+          {
+            "x": 128,
+            "y": 352,
+            "orientation": "horizontal",
+            "landFraction": 0.65234375
+          },
+          {
+            "x": 256,
+            "y": 352,
+            "orientation": "vertical",
+            "landFraction": 0.95898438
+          },
+          {
+            "x": 256,
+            "y": 352,
+            "orientation": "horizontal",
+            "landFraction": 0.03125
+          },
+          {
+            "x": 2432,
+            "y": 352,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 2432,
+            "y": 352,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 2560,
+            "y": 352,
+            "orientation": "vertical",
+            "landFraction": 0
+          },
+          {
+            "x": 2560,
+            "y": 352,
+            "orientation": "horizontal",
+            "landFraction": 0.39648438
+          },
+          {
+            "x": 128,
+            "y": 1248,
+            "orientation": "vertical",
+            "landFraction": 1
+          },
+          {
+            "x": 128,
+            "y": 1248,
+            "orientation": "horizontal",
+            "landFraction": 1
+          },
+          {
+            "x": 256,
+            "y": 1248,
+            "orientation": "vertical",
+            "landFraction": 0.08789062
+          },
+          {
+            "x": 256,
+            "y": 1248,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 2432,
+            "y": 1248,
+            "orientation": "vertical",
+            "landFraction": 0.38671875
+          },
+          {
+            "x": 2432,
+            "y": 1248,
+            "orientation": "horizontal",
+            "landFraction": 0
+          },
+          {
+            "x": 2560,
+            "y": 1248,
+            "orientation": "vertical",
+            "landFraction": 0.515625
+          },
+          {
+            "x": 2560,
+            "y": 1248,
+            "orientation": "horizontal",
+            "landFraction": 0.140625
+          },
+          {
+            "x": 128,
+            "y": 1376,
+            "orientation": "vertical",
+            "landFraction": 1
+          },
+          {
+            "x": 128,
+            "y": 1376,
+            "orientation": "horizontal",
+            "landFraction": 1
+          },
+          {
+            "x": 256,
+            "y": 1376,
+            "orientation": "vertical",
+            "landFraction": 1
+          },
+          {
+            "x": 256,
+            "y": 1376,
+            "orientation": "horizontal",
+            "landFraction": 1
+          },
+          {
+            "x": 2432,
+            "y": 1376,
+            "orientation": "vertical",
+            "landFraction": 1
+          },
+          {
+            "x": 2432,
+            "y": 1376,
+            "orientation": "horizontal",
+            "landFraction": 1
+          },
+          {
+            "x": 2560,
+            "y": 1376,
+            "orientation": "vertical",
+            "landFraction": 1
+          },
+          {
+            "x": 2560,
+            "y": 1376,
+            "orientation": "horizontal",
+            "landFraction": 1
+          }
+        ],
+        "p95": {
+          "photoRgbMeanAbs": [
+            0.10834018,
+            0.11049624,
+            0.10785613
+          ],
+          "photoLumMeanAbs": 0.10804246,
+          "lowFreqRgbMeanAbs": [
+            0.00729578,
+            0.00657924,
+            0.01134015
+          ],
+          "gradientContinuityMeanAbs": 135.27578125
+        }
+      }
+    }
+  },
+  "cropPlanValidation": {
+    "ok": true,
+    "errors": []
+  },
+  "paintingBaselineValidation": {
+    "ok": true,
+    "errors": []
+  }
+}

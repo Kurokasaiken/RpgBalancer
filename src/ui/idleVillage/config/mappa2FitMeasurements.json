@@ -1,0 +1,15 @@
+{
+  "source": "public/assets/world/mappa2/base/layers/Mare.v2.webp",
+  "method": "alpha==0 land mask, 8-connected components, largest component",
+  "canvas": {
+    "width": 2752,
+    "height": 1536
+  },
+  "landBounds": {
+    "x0": 656,
+    "y0": 44,
+    "x1": 2343,
+    "y1": 1269
+  },
+  "mainComponentAreaPx": 1262160
+}

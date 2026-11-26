@@ -1,0 +1,539 @@
+{
+  "schema": "plan135-apron-measurements/v2",
+  "createdAt": "2026-11-26T10:18:07.339Z",
+  "unit": "CSS px for chrome/viewport; world px for fit, slack and apron",
+  "canvas": {
+    "width": 2752,
+    "height": 1536
+  },
+  "landBounds": {
+    "x0": 656,
+    "y0": 44,
+    "x1": 2343,
+    "y1": 1269
+  },
+  "approvedApron": {
+    "top": 200,
+    "right": 560,
+    "bottom": 0,
+    "left": 560
+  },
+  "slots": [
+    "time",
+    "resources",
+    "events",
+    "nav"
+  ],
+  "rows": [
+    {
+      "viewport": "1280x720",
+      "zoom": 0.43706632653064786,
+      "zLand": 0.43706632653064786,
+      "frameClampMinZoom": 0.4147465437788018,
+      "status": "LAND_CLEAR",
+      "chromeEnvelope": {
+        "time": {
+          "x": 58,
+          "y": 18.59375,
+          "width": 381.515625,
+          "height": 49.109375
+        },
+        "resources": {
+          "x": 449.515625,
+          "y": 12,
+          "width": 380.953125,
+          "height": 62.3125
+        },
+        "events": {
+          "x": 920,
+          "y": 10.015625,
+          "width": 348,
+          "height": 66.3125
+        },
+        "nav": {
+          "x": 467.5,
+          "y": 625.71875,
+          "width": 345,
+          "height": 88.26751708984375
+        }
+      },
+      "stable": {
+        "time": true,
+        "resources": true,
+        "events": true,
+        "nav": true
+      },
+      "requiredWorldPx": {
+        "left": 0,
+        "right": 433,
+        "top": 145,
+        "bottom": 0
+      },
+      "slackWorldPx": {
+        "left": 560,
+        "right": 127,
+        "top": 55,
+        "bottom": 0
+      }
+    },
+    {
+      "viewport": "1366x768",
+      "zoom": 0.47242346938779367,
+      "zLand": 0.47242346938779367,
+      "frameClampMinZoom": 0.4423963133640553,
+      "status": "LAND_CLEAR",
+      "chromeEnvelope": {
+        "time": {
+          "x": 58,
+          "y": 19.09375,
+          "width": 410.1875,
+          "height": 52.796875
+        },
+        "resources": {
+          "x": 478.1875,
+          "y": 12,
+          "width": 409.59375,
+          "height": 67
+        },
+        "events": {
+          "x": 1006,
+          "y": 12.328125,
+          "width": 348,
+          "height": 66.3125
+        },
+        "nav": {
+          "x": 510.5,
+          "y": 673.71875,
+          "width": 345,
+          "height": 88.26751708984375
+        }
+      },
+      "stable": {
+        "time": true,
+        "resources": true,
+        "events": true,
+        "nav": true
+      },
+      "requiredWorldPx": {
+        "left": 0,
+        "right": 194,
+        "top": 141,
+        "bottom": 0
+      },
+      "slackWorldPx": {
+        "left": 560,
+        "right": 366,
+        "top": 59,
+        "bottom": 0
+      }
+    },
+    {
+      "viewport": "1440x900",
+      "zoom": 0.5789413265306594,
+      "zLand": 0.5789413265306594,
+      "frameClampMinZoom": 0.5184331797235023,
+      "status": "LAND_CLEAR",
+      "chromeEnvelope": {
+        "time": {
+          "x": 58,
+          "y": 19.25,
+          "width": 419.5,
+          "height": 54
+        },
+        "resources": {
+          "x": 510.546875,
+          "y": 12,
+          "width": 418.890625,
+          "height": 68.515625
+        },
+        "events": {
+          "x": 1080,
+          "y": 13.09375,
+          "width": 348,
+          "height": 66.3125
+        },
+        "nav": {
+          "x": 547.5,
+          "y": 805.71875,
+          "width": 345,
+          "height": 88.26751708984375
+        }
+      },
+      "stable": {
+        "time": true,
+        "resources": true,
+        "events": true,
+        "nav": true
+      },
+      "requiredWorldPx": {
+        "left": 0,
+        "right": 0,
+        "top": 109,
+        "bottom": 0
+      },
+      "slackWorldPx": {
+        "left": 560,
+        "right": 560,
+        "top": 91,
+        "bottom": 0
+      }
+    },
+    {
+      "viewport": "1536x864",
+      "zoom": 0.5495535714286163,
+      "zLand": 0.5495535714286163,
+      "frameClampMinZoom": 0.4976958525345622,
+      "status": "LAND_CLEAR",
+      "chromeEnvelope": {
+        "time": {
+          "x": 58,
+          "y": 19.25,
+          "width": 419.5,
+          "height": 54
+        },
+        "resources": {
+          "x": 558.546875,
+          "y": 12,
+          "width": 418.890625,
+          "height": 68.515625
+        },
+        "events": {
+          "x": 1176,
+          "y": 13.09375,
+          "width": 348,
+          "height": 66.3125
+        },
+        "nav": {
+          "x": 595.5,
+          "y": 769.71875,
+          "width": 345,
+          "height": 88.26751708984375
+        }
+      },
+      "stable": {
+        "time": true,
+        "resources": true,
+        "events": true,
+        "nav": true
+      },
+      "requiredWorldPx": {
+        "left": 0,
+        "right": 145,
+        "top": 118,
+        "bottom": 0
+      },
+      "slackWorldPx": {
+        "left": 560,
+        "right": 415,
+        "top": 82,
+        "bottom": 0
+      }
+    },
+    {
+      "viewport": "1920x1080",
+      "zoom": 0.7258801020408755,
+      "zLand": 0.7258801020408755,
+      "frameClampMinZoom": 0.6221198156682027,
+      "status": "LAND_CLEAR",
+      "chromeEnvelope": {
+        "time": {
+          "x": 58,
+          "y": 19.25,
+          "width": 419.5,
+          "height": 54
+        },
+        "resources": {
+          "x": 750.546875,
+          "y": 12,
+          "width": 418.890625,
+          "height": 68.515625
+        },
+        "events": {
+          "x": 1560,
+          "y": 13.09375,
+          "width": 348,
+          "height": 66.3125
+        },
+        "nav": {
+          "x": 787.5,
+          "y": 985.71875,
+          "width": 345,
+          "height": 88.267578125
+        }
+      },
+      "stable": {
+        "time": true,
+        "resources": true,
+        "events": true,
+        "nav": true
+      },
+      "requiredWorldPx": {
+        "left": 0,
+        "right": 71,
+        "top": 78,
+        "bottom": 0
+      },
+      "slackWorldPx": {
+        "left": 560,
+        "right": 489,
+        "top": 122,
+        "bottom": 0
+      }
+    },
+    {
+      "viewport": "1920x1200",
+      "zoom": 0.8238392857143529,
+      "zLand": 0.8238392857143529,
+      "frameClampMinZoom": 0.6912442396313364,
+      "status": "LAND_CLEAR",
+      "chromeEnvelope": {
+        "time": {
+          "x": 58,
+          "y": 19.25,
+          "width": 419.5,
+          "height": 54
+        },
+        "resources": {
+          "x": 750.546875,
+          "y": 12,
+          "width": 418.890625,
+          "height": 68.515625
+        },
+        "events": {
+          "x": 1560,
+          "y": 13.09375,
+          "width": 348,
+          "height": 66.3125
+        },
+        "nav": {
+          "x": 787.5,
+          "y": 1105.71875,
+          "width": 345,
+          "height": 88.267578125
+        }
+      },
+      "stable": {
+        "time": true,
+        "resources": true,
+        "events": true,
+        "nav": true
+      },
+      "requiredWorldPx": {
+        "left": 0,
+        "right": 0,
+        "top": 64,
+        "bottom": 0
+      },
+      "slackWorldPx": {
+        "left": 560,
+        "right": 560,
+        "top": 136,
+        "bottom": 0
+      }
+    },
+    {
+      "viewport": "2000x1024",
+      "zoom": 0.6801658163265861,
+      "zLand": 0.6801658163265861,
+      "frameClampMinZoom": 0.5898617511520737,
+      "status": "LAND_CLEAR",
+      "chromeEnvelope": {
+        "time": {
+          "x": 58,
+          "y": 19.25,
+          "width": 419.5,
+          "height": 54
+        },
+        "resources": {
+          "x": 790.546875,
+          "y": 12,
+          "width": 418.890625,
+          "height": 68.515625
+        },
+        "events": {
+          "x": 1640,
+          "y": 13.09375,
+          "width": 348,
+          "height": 66.3125
+        },
+        "nav": {
+          "x": 827.5,
+          "y": 929.71875,
+          "width": 345,
+          "height": 88.26751708984375
+        }
+      },
+      "stable": {
+        "time": true,
+        "resources": true,
+        "events": true,
+        "nav": true
+      },
+      "requiredWorldPx": {
+        "left": 0,
+        "right": 218,
+        "top": 87,
+        "bottom": 0
+      },
+      "slackWorldPx": {
+        "left": 560,
+        "right": 342,
+        "top": 113,
+        "bottom": 0
+      }
+    },
+    {
+      "viewport": "2560x1440",
+      "zoom": 0.9769616753715222,
+      "zLand": 0.9769616753715222,
+      "frameClampMinZoom": 0.8294930875576036,
+      "status": "LAND_CLEAR",
+      "chromeEnvelope": {
+        "time": {
+          "x": 75.39999389648438,
+          "y": 25.024999618530273,
+          "width": 545.3499755859375,
+          "height": 70.19999694824219
+        },
+        "resources": {
+          "x": 1007.7030639648438,
+          "y": 15.59999942779541,
+          "width": 544.5578002929688,
+          "height": 89.0703125
+        },
+        "events": {
+          "x": 2196.390625,
+          "y": 26.974998474121094,
+          "width": 347.99365234375,
+          "height": 66.29999542236328
+        },
+        "nav": {
+          "x": 1055.7421875,
+          "y": 1317.4483642578125,
+          "width": 448.5,
+          "height": 114.7479248046875
+        }
+      },
+      "stable": {
+        "time": true,
+        "resources": true,
+        "events": true,
+        "nav": true
+      },
+      "requiredWorldPx": {
+        "left": 0,
+        "right": 58,
+        "top": 72,
+        "bottom": 0
+      },
+      "slackWorldPx": {
+        "left": 560,
+        "right": 502,
+        "top": 128,
+        "bottom": 0
+      }
+    },
+    {
+      "viewport": "2560x1080",
+      "zoom": 0.7258801020408755,
+      "zLand": 0.7258801020408755,
+      "frameClampMinZoom": 0.6611570247933884,
+      "status": "LAND_CLEAR",
+      "chromeEnvelope": {
+        "time": {
+          "x": 58,
+          "y": 19.25,
+          "width": 419.5,
+          "height": 54
+        },
+        "resources": {
+          "x": 1070.546875,
+          "y": 12,
+          "width": 418.890625,
+          "height": 68.515625
+        },
+        "events": {
+          "x": 2200,
+          "y": 13.09375,
+          "width": 348,
+          "height": 66.3125
+        },
+        "nav": {
+          "x": 1107.5,
+          "y": 985.71875,
+          "width": 345,
+          "height": 88.267578125
+        }
+      },
+      "stable": {
+        "time": true,
+        "resources": true,
+        "events": true,
+        "nav": true
+      },
+      "requiredWorldPx": {
+        "left": 264,
+        "right": 511,
+        "top": 78,
+        "bottom": 0
+      },
+      "slackWorldPx": {
+        "left": 296,
+        "right": 49,
+        "top": 122,
+        "bottom": 0
+      }
+    },
+    {
+      "viewport": "3440x1440",
+      "zoom": 0.9769616753715222,
+      "zLand": 0.9769616753715222,
+      "frameClampMinZoom": 0.8884297520661157,
+      "status": "LAND_CLEAR",
+      "chromeEnvelope": {
+        "time": {
+          "x": 75.39999389648438,
+          "y": 25.024999618530273,
+          "width": 545.3499755859375,
+          "height": 70.19999694824219
+        },
+        "resources": {
+          "x": 1447.71240234375,
+          "y": 15.59999942779541,
+          "width": 544.557861328125,
+          "height": 89.0703125
+        },
+        "events": {
+          "x": 3076.388916015625,
+          "y": 26.974998474121094,
+          "width": 347.99365234375,
+          "height": 66.29999542236328
+        },
+        "nav": {
+          "x": 1495.731201171875,
+          "y": 1317.4483642578125,
+          "width": 448.5,
+          "height": 114.7479248046875
+        }
+      },
+      "stable": {
+        "time": true,
+        "resources": true,
+        "events": true,
+        "nav": true
+      },
+      "requiredWorldPx": {
+        "left": 262,
+        "right": 509,
+        "top": 72,
+        "bottom": 0
+      },
+      "slackWorldPx": {
+        "left": 298,
+        "right": 51,
+        "top": 128,
+        "bottom": 0
+      }
+    }
+  ]
+}
